@@ -5,6 +5,7 @@
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 import { AGONE }                from "./helpers/config.mjs";
+import { ARMES_DATA, ARMURES_DATA, BOUCLIERS_DATA } from "./helpers/compendium-data.mjs";
 import { registerHandlebarsHelpers as registerHandlebars } from "./helpers/handlebars.mjs";
 
 // ── DataModels ────────────────────────────────────────────────────────────────
@@ -183,6 +184,36 @@ Hooks.once("ready", async () => {
     await Item.createDocuments(itemsPeuples, { pack: "agone.peuples" });
     await packPeuples.configure({ locked: true });
     console.log(`Agone | Compendium peuples initialisé (${itemsPeuples.length} entrées)`);
+  }
+
+  // ── Compendium armes ───────────────────────────────────────────────────
+  const packArmes = game.packs.get("agone.armes");
+  if (packArmes && (await packArmes.getIndex()).size === 0) {
+    const itemsArmes = ARMES_DATA.map(d => ({ name: d.name, type: "arme", system: d }));
+    await packArmes.configure({ locked: false });
+    await Item.createDocuments(itemsArmes, { pack: "agone.armes" });
+    await packArmes.configure({ locked: true });
+    console.log(`Agone | Compendium armes initialisé (${itemsArmes.length} entrées)`);
+  }
+
+  // ── Compendium armures / boucliers ─────────────────────────────────────
+  const packArmures = game.packs.get("agone.armures");
+  if (packArmures) {
+    const itemsArmures   = ARMURES_DATA.map(d => ({ name: d.name, type: "armure", system: d }));
+    const itemsBoucliers = BOUCLIERS_DATA.map(d => ({ name: d.name, type: "armure", system: d }));
+    const allArmures = [...itemsArmures, ...itemsBoucliers];
+    const index = await packArmures.getIndex();
+    if (index.size !== allArmures.length) {
+      await packArmures.configure({ locked: false });
+      // Supprimer les entrées existantes pour éviter les doublons
+      if (index.size > 0) {
+        const toDelete = index.map(e => e._id);
+        await Item.deleteDocuments(toDelete, { pack: "agone.armures" });
+      }
+      await Item.createDocuments(allArmures, { pack: "agone.armures" });
+      await packArmures.configure({ locked: true });
+      console.log(`Agone | Compendium armures initialisé (${allArmures.length} entrées)`);
+    }
   }
 });
 

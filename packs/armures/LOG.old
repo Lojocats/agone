@@ -1,3 +1,5 @@
-2026/03/08-14:56:57.542 931c Recovering log #3
-2026/03/08-14:56:57.546 931c Delete type=0 #3
-2026/03/08-14:56:57.546 931c Delete type=3 #2
+2026/03/08-21:28:44.202 2c3c Log #12: 0 ops saved to Table #13 OK
+2026/03/08-21:28:44.203 2c3c Archiving C:\Users\lojoc\AppData\Local\FoundryVTT\Data\systems\agone\packs\armures/000012.log: OK
+2026/03/08-21:28:44.203 2c3c Table #11: 5 entries OK
+2026/03/08-21:28:44.205 2c3c Archiving C:\Users\lojoc\AppData\Local\FoundryVTT\Data\systems\agone\packs\armures/MANIFEST-000010: OK
+2026/03/08-21:28:44.207 2c3c **** Repaired leveldb C:\Users\lojoc\AppData\Local\FoundryVTT\Data\systems\agone\packs\armures; recovered 1 files; 887 bytes. Some data may have been lost. ****

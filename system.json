@@ -56,6 +56,18 @@
       "label": "Peuples Agone",
       "path": "packs/peuples",
       "type": "Item"
+    },
+    {
+      "name": "armes",
+      "label": "Armes Agone",
+      "path": "packs/armes",
+      "type": "Item"
+    },
+    {
+      "name": "armures",
+      "label": "Boucliers & Armures Agone",
+      "path": "packs/armures",
+      "type": "Item"
     }
   ],
   "socket": false,

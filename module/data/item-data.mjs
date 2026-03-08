@@ -36,8 +36,11 @@ export class ArmeData extends foundry.abstract.TypeDataModel {
       attackBonus: new fields.NumberField({ initial: 0, integer: true }),
       defenseBonus:new fields.NumberField({ initial: 0, integer: true }),
       dommages:    new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-      type:        new fields.StringField({ initial: "P", choices: ["P","T","PT","C"] }),
+      type:        new fields.StringField({ initial: "P", choices: ["P","T","PT","C","TC","PC"] }),
       style:       new fields.StringField({ initial: "melee", choices: ["melee","jet","trait"] }),
+      portee:      new fields.StringField({ initial: "" }),
+      reqFor:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      reqAgi:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       competence:  new fields.StringField({ initial: "" }), // nom de la compétence liée
       description: new fields.StringField({ initial: "" }),
       poids:       new fields.NumberField({ initial: 0, min: 0 })
