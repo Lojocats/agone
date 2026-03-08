@@ -402,6 +402,20 @@
   background: var(--agone-brown);
   color: var(--agone-parchment);
 }
+/* Score sous le minimum racial requis */
+.agone .carac-row.carac-min-requis .stat-num:not(.exp) {
+  border-color: #c04040;
+  background: rgba(180, 40, 40, 0.12);
+  color: #c84040;
+}
+/* Bouton level-up désactivé (max racial atteint) */
+.agone .levelup-btn[disabled],
+.agone .levelup-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  pointer-events: none;
+}
 .agone .item-name.roll-btn {
   display: inline-block;
   width: 100%;
@@ -542,6 +556,28 @@
   font-size: 13px;
 }
 .agone .sante-row label { flex-shrink: 0; }
+/* Bouton 1d10 PdV — visible seulement en mode création */
+.agone .btn-bonus-de.btn-crea {
+  background: rgba(200, 110, 0, 0.85);
+  color: #fff;
+  border: 1px solid #e8a030;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(240, 160, 40, 0.6);
+  flex-shrink: 0;
+}
+.agone .btn-bonus-de.btn-crea:hover {
+  background: rgba(230, 140, 20, 1);
+  box-shadow: 0 0 7px rgba(240, 180, 60, 0.9);
+}
+.agone .sante-pdv-detail {
+  font-size: 11px;
+  color: var(--agone-parchment);
+  gap: 6px;
+  width: fit-content;
+}
 .agone .fumble-zone { margin-top: 8px; }
 .agone .fumble-btn {
   width: 100%;

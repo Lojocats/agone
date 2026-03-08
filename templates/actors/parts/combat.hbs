@@ -9,32 +9,40 @@
         <label>{{localize "AGONE.PointsDeVie"}}</label>
         <span class="stat-num derived-val">{{system.pdv.valeur}}</span>
         <span>/</span>
-        <span class="stat-num derived-val">{{system.pdv.max}}</span>
+        <span class="stat-num derived-val" title="BPdV {{bpdv}} + RES×3 + {{system.pdv.bonusDe}}">{{system.pdv.max}}</span>
+        {{#if modeCreation}}{{#if isOwner}}
+        <button type="button" class="roll-btn-small btn-bonus-de btn-crea" data-action="rollBonusDe"
+                title='{{localize "AGONE.LancerBonusDe"}}'>
+          <i class="fas fa-dice-d10"></i>
+        </button>
+        {{/if}}{{/if}}
       </div>
       <div class="sante-row">
-        <label>{{localize "AGONE.BlessureGrave"}}</label>
-        <span class="derived-val">{{system.seuilBlessureGrave}}</span>
-        <label class="ml-2">{{localize "AGONE.BlessureCritique"}}</label>
-        <span class="derived-val">{{system.seuilBlessureCritique}}</span>
+        <label title="PdV ÷ 3">{{localize "AGONE.BlessureGrave"}}</label>
+        <span class="derived-val" title="PdV ÷ 3">{{system.seuilBlessureGrave}}</span>
+        <label class="ml-2" title="PdV ÷ 2">{{localize "AGONE.BlessureCritique"}}</label>
+        <span class="derived-val" title="PdV ÷ 2">{{system.seuilBlessureCritique}}</span>
       </div>
       <div class="sante-row">
         <label>{{localize "AGONE.BlessuresGraves"}}</label>
         <input type="number" name="system.blessuresGraves" value="{{system.blessuresGraves}}" class="stat-num" max="3" min="0" />
         <span class="hint">(max 3)</span>
       </div>
-    </div>
-
-    <!-- Fumble -->
-    <div class="fumble-zone">
-      <button type="button" class="roll-btn fumble-btn" data-action="rollFumble">
-        <i class="fas fa-skull"></i> {{localize "AGONE.TableFumble"}}
-      </button>
+      <div class="sante-row">
+        <label>{{localize "AGONE.BlessuresCritiques"}}</label>
+        <input type="checkbox" name="system.blessuresCritique" {{#if system.blessuresCritique}}checked{{/if}} />
+      </div>
     </div>
   </div>
 
   <!-- ARMURE -->
   <div class="armure-block">
-    <h3 class="section-title">{{localize "AGONE.Armure"}}</h3>
+    <div class="section-header">
+      <h3>{{localize "AGONE.Armure.Label"}}</h3>
+      <button type="button" class="item-create" data-type="armure" title='{{localize "AGONE.AjouterArmure"}}'>
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
     <div class="armures-list">
       {{#if armures.length}}
       {{#each armures as |armure|}}
@@ -55,19 +63,16 @@
     </div>
     <div class="armure-totaux">
       <span>{{localize "AGONE.ProtectionTotale"}} : <strong>{{system.armure.protection}}</strong></span>
-      <span>{{localize "AGONE.MalusAgi"}} : <strong>{{system.armure.malusAgi}}</strong></span>
-      <span>{{localize "AGONE.MalusPer"}} : <strong>{{system.armure.malusPer}}</strong></span>
+      <span>{{localize "AGONE.MalusAgi"}} : <strong>{{#if system.armure.malusAgi}}−{{system.armure.malusAgi}}{{else}}0{{/if}}</strong></span>
+      <span>{{localize "AGONE.MalusPer"}} : <strong>{{#if system.armure.malusPer}}−{{system.armure.malusPer}}{{else}}0{{/if}}</strong></span>
     </div>
-    <button type="button" class="item-create btn-small" data-type="armure">
-      <i class="fas fa-plus"></i> {{localize "AGONE.AjouterArmure"}}
-    </button>
   </div>
 
   <!-- ARMES -->
   <div class="armes-block">
     <div class="section-header">
       <h3>{{localize "AGONE.Armes"}}</h3>
-      <button type="button" class="item-create" data-type="arme">
+      <button type="button" class="item-create" data-type="arme" title='{{localize "AGONE.AjouterArme"}}'>
         <i class="fas fa-plus"></i>
       </button>
     </div>

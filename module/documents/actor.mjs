@@ -20,15 +20,16 @@ export class AgoneActor extends Actor {
       for (const [k, v] of Object.entries(flat)) {
         if (typeof v === "number" && !Number.isFinite(v)) flat[k] = 0;
       }
-      // Appliquer les contraintes raciales min/max sur les scores d'attributs
+      // Appliquer le plafond racial (max seulement — le min est une contrainte de création gérée par l'UI)
+      // Le raceMax est une valeur brute (sans bonus). Le score stocké = rawScore + bonusAppliqué.
+      // Donc plafond stocké = raceMax + bonusAppliqué.
       const attrs = ["agilite", "force", "perception", "resistance", "intelligence", "volonte", "charisma", "creativite"];
       for (const attr of attrs) {
         const scoreKey = `${attr}.score`;
         if (flat[scoreKey] !== undefined) {
-          const raceMin = this.system[attr]?.raceMin;
-          const raceMax = this.system[attr]?.raceMax;
-          if (raceMin != null) flat[scoreKey] = Math.max(flat[scoreKey], raceMin);
-          if (raceMax != null) flat[scoreKey] = Math.min(flat[scoreKey], raceMax);
+          const raceMax     = this.system[attr]?.raceMax;
+          const bonusOffset = this.system.peupleBonusApplique?.[`${attr}Bonus`] ?? 0;
+          if (raceMax != null) flat[scoreKey] = Math.min(flat[scoreKey], raceMax + bonusOffset);
         }
       }
       changed.system = foundry.utils.expandObject(flat);

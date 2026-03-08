@@ -254,6 +254,21 @@ for (const _k of Object.keys(AGONE.peuplesData)) {
   if (_k !== "humain") AGONE.peuplesData[_k].pointsCreationCarac = 70;
 }
 
+// Base de Points de Vie par race (BPdV — formule PdV max = BPdV + RES×3 + 1d10)
+AGONE.peuplesData.humain.bpdv     = 25;
+AGONE.peuplesData.nain.bpdv       = 20;
+AGONE.peuplesData.geant.bpdv      = 100;
+AGONE.peuplesData.farfadet.bpdv   = 20;
+AGONE.peuplesData.lutin.bpdv      = 20;
+AGONE.peuplesData.satyre.bpdv     = 25;
+AGONE.peuplesData.minotaure.bpdv  = 45;
+AGONE.peuplesData.ogre.bpdv       = 25;
+AGONE.peuplesData.feeNoire.bpdv   = 10;
+AGONE.peuplesData.meduse.bpdv     = 25;
+AGONE.peuplesData.drakonien.bpdv  = 45;
+AGONE.peuplesData.morgane.bpdv    = 25;
+AGONE.peuplesData.pixie.bpdv      = 10;
+
 // Multiplicateurs XP pour la montée de niveau (après création)
 AGONE.xpMultipliers = { aspect: 7, carac: 5, competence: 5, avantage: 10, defaut: 5 };
 
@@ -291,7 +306,7 @@ AGONE.forTaiToBd = {
 };
 
 AGONE.lookupBd = function(forScore, tai) {
-  const sum = Math.max(-1, Math.min(23, (forScore ?? 1) + (tai ?? 0)));
+  const sum = Math.max(-1, Math.min(23, (forScore ?? 0) + (tai ?? 0)));
   return AGONE.forTaiToBd[String(sum)] ?? 0;
 };
 

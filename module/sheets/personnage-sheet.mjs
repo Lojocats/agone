@@ -56,8 +56,11 @@ export class PersonnageSheet extends ActorSheet {
     // Coûts XP pour la montée de niveau (multiplicateurs, après création)
     const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
     const tbl = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
-    // Coût incrémental selon la table d'achat création (N→N+1)
-    const creaDelta = (score) => score + 1 < tbl.length ? tbl[score + 1] : null;
+    // Coût incrémental selon la table d'achat création : utilise le score BRUT (hors bonus racial)
+    // rawScore = score stocké − bonus positif appliqué. Indice dans la table = niveau brut actuel.
+    const creaDelta = (rawScore) => rawScore + 1 < tbl.length ? tbl[rawScore + 1] : null;
+    const posBonus  = (k) => system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+    const rawCarac  = (k) => Math.max(0, system[k].score - posBonus(k));
 
     context.xpCout = {
       corps:        (system.corps.score        + 1) * m.aspect,
@@ -76,14 +79,14 @@ export class PersonnageSheet extends ActorSheet {
       corps:        creaDelta(system.corps.score),
       esprit:       creaDelta(system.esprit.score),
       ame:          creaDelta(system.ame.score),
-      agilite:      creaDelta(system.agilite.score),
-      force:        creaDelta(system.force.score),
-      perception:   creaDelta(system.perception.score),
-      resistance:   creaDelta(system.resistance.score),
-      intelligence: creaDelta(system.intelligence.score),
-      volonte:      creaDelta(system.volonte.score),
-      charisma:     creaDelta(system.charisma.score),
-      creativite:   creaDelta(system.creativite.score),
+      agilite:      creaDelta(rawCarac('agilite')),
+      force:        creaDelta(rawCarac('force')),
+      perception:   creaDelta(rawCarac('perception')),
+      resistance:   creaDelta(rawCarac('resistance')),
+      intelligence: creaDelta(rawCarac('intelligence')),
+      volonte:      creaDelta(rawCarac('volonte')),
+      charisma:     creaDelta(rawCarac('charisma')),
+      creativite:   creaDelta(rawCarac('creativite')),
     };
     for (const c of context.competences) {
       c.xpCout  = (c.system.score + 1) * m.competence;
@@ -112,6 +115,28 @@ export class PersonnageSheet extends ActorSheet {
     context.ptsCreationCaracRestant = system.ptsCreationCarac.max - system.ptsCreationCarac.depense;
     context.ptsCreationCompRestant  = system.ptsCreationComp.max  - system.ptsCreationComp.depense;
     context.modeCreation = system.modeCreation;
+
+    // BPdV de la race (pour affichage dans la formule PdV)
+    const peupleKey = CONFIG.AGONE?.peupleNomVersKey?.[system.peuple] ?? "humain";
+    const peupleData = CONFIG.AGONE?.peuplesData?.[peupleKey] ?? CONFIG.AGONE?.peuplesData?.humain;
+    context.bpdv = peupleData?.bpdv ?? 25;
+
+    // Min/Max raciaux par carac — seuils sur score BRUT (hors bonus racial)
+    const caracsKeys = ['agilite', 'force', 'perception', 'resistance', 'intelligence', 'volonte', 'charisma', 'creativite'];
+    const caracAtMax      = {};
+    const caracBelowMin   = {};
+    const caracEffectiveMax = {}; // max final affiché = raceMax + bonusAppliqué
+    for (const k of caracsKeys) {
+      const bonus    = system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+      const rawScore = system[k].score - bonus;
+      const raceMax  = peupleData?.[`${k}Max`] ?? null;
+      caracAtMax[k]         = raceMax !== null && rawScore >= raceMax;
+      caracBelowMin[k]      = system.modeCreation && (peupleData?.[`${k}Min`] ?? null) !== null && rawScore < peupleData[`${k}Min`];
+      caracEffectiveMax[k]  = raceMax !== null ? raceMax + bonus : null;
+    }
+    context.caracAtMax        = caracAtMax;
+    context.caracBelowMin     = caracBelowMin;
+    context.caracEffectiveMax = caracEffectiveMax;
 
     return context;
   }
@@ -156,6 +181,7 @@ export class PersonnageSheet extends ActorSheet {
     html.find("[data-action='rollEsquive']").click(this._onRollEsquive.bind(this));
     html.find("[data-action='rollDefenseNaturelle']").click(this._onRollDefenseNaturelle.bind(this));
     html.find("[data-action='rollFumble']").click(this._onRollFumble.bind(this));
+    html.find("[data-action='rollBonusDe']").click(this._onRollBonusDe.bind(this));
 
     // Jets de dés — Sorts & Magie
     html.find("[data-action='rollSort']").click(this._onRollSort.bind(this));
@@ -185,8 +211,10 @@ export class PersonnageSheet extends ActorSheet {
     // Montée de niveau (dépense XP)
     html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
 
-    // Mode création — toggle et validation
+    // Mode création — toggle, resets locaux et validation
     html.find("[data-action='toggleCreation']").click(this._onToggleCreation.bind(this));
+    html.find("[data-action='resetCaracs']").click(this._onResetCaracs.bind(this));
+    html.find("[data-action='resetComps']").click(this._onResetComps.bind(this));
     html.find("[data-action='validerCreation']").click(this._onValiderCreation.bind(this));
 
     // Drag & drop inline items
@@ -299,6 +327,16 @@ export class PersonnageSheet extends ActorSheet {
   async _onRollFumble(event) {
     event.preventDefault();
     await this.actor.rollFumble();
+  }
+
+  async _onRollBonusDe(event) {
+    event.preventDefault();
+    const roll = await new Roll("1d10").evaluate();
+    await roll.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+      flavor:  game.i18n.localize("AGONE.BonusDePdvFlavor")
+    });
+    await this.actor.update({ "system.pdv.bonusDe": roll.total });
   }
 
   async _onRollSort(event) {
@@ -433,6 +471,17 @@ export class PersonnageSheet extends ActorSheet {
       "system.peupleBonusApplique.volonteBonus":      0,
       "system.peupleBonusApplique.charismaBonus":     0,
       "system.peupleBonusApplique.creativiteBonus":   0,
+      "system.peupleMalusEnAttente.corpsBonus":        0,
+      "system.peupleMalusEnAttente.espritBonus":       0,
+      "system.peupleMalusEnAttente.ameBonus":          0,
+      "system.peupleMalusEnAttente.agiliteBonus":      0,
+      "system.peupleMalusEnAttente.forceBonus":        0,
+      "system.peupleMalusEnAttente.perceptionBonus":   0,
+      "system.peupleMalusEnAttente.resistanceBonus":   0,
+      "system.peupleMalusEnAttente.intelligenceBonus": 0,
+      "system.peupleMalusEnAttente.volonteBonus":      0,
+      "system.peupleMalusEnAttente.charismaBonus":     0,
+      "system.peupleMalusEnAttente.creativiteBonus":   0,
       "system.corps.score":       Math.max(0, (sd.corps?.score  ?? 0) - (old.corpsBonus  ?? 0)),
       "system.esprit.score":      Math.max(0, (sd.esprit?.score ?? 0) - (old.espritBonus ?? 0)),
       "system.ame.score":         Math.max(0, (sd.ame?.score    ?? 0) - (old.ameBonus    ?? 0)),
@@ -508,13 +557,16 @@ export class PersonnageSheet extends ActorSheet {
       newCompIds = created.map(i => i.id);
     }
 
-    // Retire l'ancien bonus, ajoute le nouveau, puis clamp sur [raceMin, raceMax]
-    const calcScore = (current, oldBonus, newBonus, newMin, newMax) => {
-      let v = Math.max(0, (current ?? 0) - (oldBonus ?? 0) + (newBonus ?? 0));
-      if (newMin != null) v = Math.max(v, newMin);
-      if (newMax != null) v = Math.min(v, newMax);
+    // Retire l'ancien bonus appliqué, ajoute le nouveau bonus POSITIF uniquement.
+    // Le max racial s'applique sur le score brut (acheté), soit total <= rawMax + posBonus.
+    // Les malus (valeurs négatives) sont stockés dans peupleMalusEnAttente.
+    const calcScoreCrea = (current, oldApplied, newPosBonus, newMax) => {
+      let v = Math.max(0, (current ?? 0) - (oldApplied ?? 0) + newPosBonus);
+      if (newMax != null) v = Math.min(v, newMax + newPosBonus);
       return v;
     };
+    const posB = k => Math.max(0, nw[`${k}Bonus`] ?? 0);
+    const negB = k => Math.min(0, nw[`${k}Bonus`] ?? 0);
 
     const update = {
       "system.peuple":                 peupleItem.name,
@@ -522,30 +574,43 @@ export class PersonnageSheet extends ActorSheet {
       "system.tai":                    nw.taiBase ?? 0,
       "system.mvOverride":             nw.mvBase  ?? null,
       "system.peupleCompetenceIds":    newCompIds,
-      "system.peupleBonusApplique.corpsBonus":        nw.corpsBonus        ?? 0,
-      "system.peupleBonusApplique.espritBonus":       nw.espritBonus       ?? 0,
-      "system.peupleBonusApplique.ameBonus":          nw.ameBonus          ?? 0,
-      "system.peupleBonusApplique.agiliteBonus":      nw.agiliteBonus      ?? 0,
-      "system.peupleBonusApplique.forceBonus":        nw.forceBonus        ?? 0,
-      "system.peupleBonusApplique.perceptionBonus":   nw.perceptionBonus   ?? 0,
-      "system.peupleBonusApplique.resistanceBonus":   nw.resistanceBonus   ?? 0,
-      "system.peupleBonusApplique.intelligenceBonus": nw.intelligenceBonus ?? 0,
-      "system.peupleBonusApplique.volonteBonus":      nw.volonteBonus      ?? 0,
-      "system.peupleBonusApplique.charismaBonus":     nw.charismaBonus     ?? 0,
-      "system.peupleBonusApplique.creativiteBonus":   nw.creativiteBonus   ?? 0,
-      // Aspects
-      "system.corps.score":  Math.max(0, (sd.corps?.score  ?? 0) - (old.corpsBonus  ?? 0) + (nw.corpsBonus  ?? 0)),
-      "system.esprit.score": Math.max(0, (sd.esprit?.score ?? 0) - (old.espritBonus ?? 0) + (nw.espritBonus ?? 0)),
-      "system.ame.score":    Math.max(0, (sd.ame?.score    ?? 0) - (old.ameBonus    ?? 0) + (nw.ameBonus    ?? 0)),
-      // Attributs avec clamp sur min/max raciaux
-      "system.agilite.score":      calcScore(sd.agilite?.score,      old.agiliteBonus,      nw.agiliteBonus,      nw.agiliteMin,      nw.agiliteMax),
-      "system.force.score":        calcScore(sd.force?.score,        old.forceBonus,        nw.forceBonus,        nw.forceMin,        nw.forceMax),
-      "system.perception.score":   calcScore(sd.perception?.score,   old.perceptionBonus,   nw.perceptionBonus,   nw.perceptionMin,   nw.perceptionMax),
-      "system.resistance.score":   calcScore(sd.resistance?.score,   old.resistanceBonus,   nw.resistanceBonus,   nw.resistanceMin,   nw.resistanceMax),
-      "system.intelligence.score": calcScore(sd.intelligence?.score, old.intelligenceBonus, nw.intelligenceBonus, nw.intelligenceMin, nw.intelligenceMax),
-      "system.volonte.score":      calcScore(sd.volonte?.score,      old.volonteBonus,      nw.volonteBonus,      nw.volonteMin,      nw.volonteMax),
-      "system.charisma.score":     calcScore(sd.charisma?.score,     old.charismaBonus,     nw.charismaBonus,     nw.charismaMin,     nw.charismaMax),
-      "system.creativite.score":   calcScore(sd.creativite?.score,   old.creativiteBonus,   nw.creativiteBonus,   nw.creativiteMin,   nw.creativiteMax),
+      // Bonus positifs uniquement (appliqués maintenant)
+      "system.peupleBonusApplique.corpsBonus":        Math.max(0, nw.corpsBonus   ?? 0),
+      "system.peupleBonusApplique.espritBonus":       Math.max(0, nw.espritBonus  ?? 0),
+      "system.peupleBonusApplique.ameBonus":          Math.max(0, nw.ameBonus     ?? 0),
+      "system.peupleBonusApplique.agiliteBonus":      posB('agilite'),
+      "system.peupleBonusApplique.forceBonus":        posB('force'),
+      "system.peupleBonusApplique.perceptionBonus":   posB('perception'),
+      "system.peupleBonusApplique.resistanceBonus":   posB('resistance'),
+      "system.peupleBonusApplique.intelligenceBonus": posB('intelligence'),
+      "system.peupleBonusApplique.volonteBonus":      posB('volonte'),
+      "system.peupleBonusApplique.charismaBonus":     posB('charisma'),
+      "system.peupleBonusApplique.creativiteBonus":   posB('creativite'),
+      // Malus négatifs en attente (appliqués à la fin de création)
+      "system.peupleMalusEnAttente.corpsBonus":        Math.min(0, nw.corpsBonus  ?? 0),
+      "system.peupleMalusEnAttente.espritBonus":       Math.min(0, nw.espritBonus ?? 0),
+      "system.peupleMalusEnAttente.ameBonus":          Math.min(0, nw.ameBonus    ?? 0),
+      "system.peupleMalusEnAttente.agiliteBonus":      negB('agilite'),
+      "system.peupleMalusEnAttente.forceBonus":        negB('force'),
+      "system.peupleMalusEnAttente.perceptionBonus":   negB('perception'),
+      "system.peupleMalusEnAttente.resistanceBonus":   negB('resistance'),
+      "system.peupleMalusEnAttente.intelligenceBonus": negB('intelligence'),
+      "system.peupleMalusEnAttente.volonteBonus":      negB('volonte'),
+      "system.peupleMalusEnAttente.charismaBonus":     negB('charisma'),
+      "system.peupleMalusEnAttente.creativiteBonus":   negB('creativite'),
+      // Aspects — bonus positifs uniquement
+      "system.corps.score":  Math.max(0, (sd.corps?.score  ?? 0) - (old.corpsBonus  ?? 0) + Math.max(0, nw.corpsBonus  ?? 0)),
+      "system.esprit.score": Math.max(0, (sd.esprit?.score ?? 0) - (old.espritBonus ?? 0) + Math.max(0, nw.espritBonus ?? 0)),
+      "system.ame.score":    Math.max(0, (sd.ame?.score    ?? 0) - (old.ameBonus    ?? 0) + Math.max(0, nw.ameBonus    ?? 0)),
+      // Attributs : bonus positif appliqué, clamp au max racial uniquement
+      "system.agilite.score":      calcScoreCrea(sd.agilite?.score,      old.agiliteBonus,      posB('agilite'),      nw.agiliteMax),
+      "system.force.score":        calcScoreCrea(sd.force?.score,        old.forceBonus,        posB('force'),        nw.forceMax),
+      "system.perception.score":   calcScoreCrea(sd.perception?.score,   old.perceptionBonus,   posB('perception'),   nw.perceptionMax),
+      "system.resistance.score":   calcScoreCrea(sd.resistance?.score,   old.resistanceBonus,   posB('resistance'),   nw.resistanceMax),
+      "system.intelligence.score": calcScoreCrea(sd.intelligence?.score, old.intelligenceBonus, posB('intelligence'), nw.intelligenceMax),
+      "system.volonte.score":      calcScoreCrea(sd.volonte?.score,      old.volonteBonus,      posB('volonte'),      nw.volonteMax),
+      "system.charisma.score":     calcScoreCrea(sd.charisma?.score,     old.charismaBonus,     posB('charisma'),     nw.charismaMax),
+      "system.creativite.score":   calcScoreCrea(sd.creativite?.score,   old.creativiteBonus,   posB('creativite'),   nw.creativiteMax),
       // Contraintes raciales persistantes
       "system.agilite.raceMin":      nw.agiliteMin      ?? null,
       "system.agilite.raceMax":      nw.agiliteMax      ?? null,
@@ -578,6 +643,18 @@ export class PersonnageSheet extends ActorSheet {
     const itemId = btn.dataset.itemId;
     const xpCout = Number(btn.dataset.cout);
     const sd     = this.actor.system;
+
+    // Vérification du max racial (caracs seulement — seuil sur score brut hors bonus)
+    if (type === "carac") {
+      const pKeyRace  = CONFIG.AGONE?.peupleNomVersKey?.[sd.peuple] ?? "humain";
+      const pDatRace  = CONFIG.AGONE?.peuplesData?.[pKeyRace] ?? {};
+      const maxRacial = pDatRace[`${key}Max`] ?? null;
+      const bonusApp  = sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0;
+      const rawScore  = (sd[key]?.score ?? 0) - bonusApp;
+      if (maxRacial !== null && rawScore >= maxRacial) {
+        return ui.notifications.warn(game.i18n.localize("AGONE.MaxRacialAtteint"));
+      }
+    }
 
     const isCarac  = (type === "aspect" || type === "carac");
     const pool     = isCarac ? sd.ptsCreationCarac : sd.ptsCreationComp;
@@ -666,6 +743,53 @@ export class PersonnageSheet extends ActorSheet {
     await this.actor.update({ "system.modeCreation": !this.actor.system.modeCreation });
   }
 
+  // Mode création — reset caractéristiques
+  // ==============================
+  async _onResetCaracs(event) {
+    event.preventDefault();
+    const confirmed = await Dialog.confirm({
+      title:   game.i18n.localize("AGONE.ResetCreation"),
+      content: `<p>${game.i18n.localize("AGONE.ResetCreationCaracConfirm")}</p>`
+    });
+    if (!confirmed) return;
+
+    const sd = this.actor.system;
+    const caracs  = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'];
+    const aspects = ['corps','esprit','ame'];
+    const upd = { "system.ptsCreationCarac.depense": 0 };
+
+    for (const k of caracs) {
+      const bonus = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+      upd[`system.${k}.score`] = Math.max(0, bonus);
+    }
+    for (const asp of aspects) {
+      upd[`system.${asp}.score`] = 0;
+    }
+
+    await this.actor.update(upd);
+    ui.notifications.info(game.i18n.localize("AGONE.ResetCreationDone"));
+  }
+
+  // Mode création — reset compétences
+  // ==============================
+  async _onResetComps(event) {
+    event.preventDefault();
+    const confirmed = await Dialog.confirm({
+      title:   game.i18n.localize("AGONE.ResetCreation"),
+      content: `<p>${game.i18n.localize("AGONE.ResetCreationCompConfirm")}</p>`
+    });
+    if (!confirmed) return;
+
+    await this.actor.update({ "system.ptsCreationComp.depense": 0 });
+
+    const compUpdates = this.actor.items
+      .filter(i => ['competence', 'manoeuvre'].includes(i.type))
+      .map(i => ({ _id: i.id, "system.score": 0, "system.exp": 0 }));
+    if (compUpdates.length) await this.actor.updateEmbeddedDocuments("Item", compUpdates);
+
+    ui.notifications.info(game.i18n.localize("AGONE.ResetCreationDone"));
+  }
+
   // Mode création — valider (fin de création)
   // ==============================
   async _onValiderCreation(event) {
@@ -675,7 +799,32 @@ export class PersonnageSheet extends ActorSheet {
       content: `<p>${game.i18n.localize("AGONE.ValiderCreationConfirm")}</p>`
     });
     if (!confirmed) return;
-    await this.actor.update({ "system.modeCreation": false });
+
+    // Appliquer les malus raciaux en attente sur les scores
+    const sd     = this.actor.system;
+    const malus  = sd.peupleMalusEnAttente ?? {};
+    const caracs = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'];
+    const aspects = ['corps','esprit','ame'];
+    const upd = { "system.modeCreation": false };
+
+    for (const k of caracs) {
+      const m = malus[`${k}Bonus`] ?? 0;
+      if (m !== 0) {
+        upd[`system.${k}.score`]                          = Math.max(0, (sd[k]?.score ?? 0) + m);
+        upd[`system.peupleBonusApplique.${k}Bonus`]       = (sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0) + m;
+        upd[`system.peupleMalusEnAttente.${k}Bonus`]      = 0;
+      }
+    }
+    for (const asp of aspects) {
+      const m = malus[`${asp}Bonus`] ?? 0;
+      if (m !== 0) {
+        upd[`system.${asp}.score`]                         = Math.max(0, (sd[asp]?.score ?? 0) + m);
+        upd[`system.peupleBonusApplique.${asp}Bonus`]      = (sd.peupleBonusApplique?.[`${asp}Bonus`] ?? 0) + m;
+        upd[`system.peupleMalusEnAttente.${asp}Bonus`]     = 0;
+      }
+    }
+
+    await this.actor.update(upd);
     ui.notifications.info(game.i18n.localize("AGONE.CreationTerminee"));
   }
 

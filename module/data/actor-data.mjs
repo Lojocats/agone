@@ -27,8 +27,23 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       peupleCompetenceIds: new fields.ArrayField(new fields.StringField({ initial: "" })),
       description: new fields.HTMLField({ initial: "" }),
 
-      // Bonus raciaux appliqués (pour pouvoir les retirer si changement de peuple)
+      // Bonus raciaux appliqués (positifs à la création, + négatifs après validation)
       peupleBonusApplique: new fields.SchemaField({
+        corpsBonus:       new fields.NumberField({ initial: 0, integer: true }),
+        espritBonus:      new fields.NumberField({ initial: 0, integer: true }),
+        ameBonus:         new fields.NumberField({ initial: 0, integer: true }),
+        agiliteBonus:     new fields.NumberField({ initial: 0, integer: true }),
+        forceBonus:       new fields.NumberField({ initial: 0, integer: true }),
+        perceptionBonus:  new fields.NumberField({ initial: 0, integer: true }),
+        resistanceBonus:  new fields.NumberField({ initial: 0, integer: true }),
+        intelligenceBonus:new fields.NumberField({ initial: 0, integer: true }),
+        volonteBonus:     new fields.NumberField({ initial: 0, integer: true }),
+        charismaBonus:    new fields.NumberField({ initial: 0, integer: true }),
+        creativiteBonus:  new fields.NumberField({ initial: 0, integer: true }),
+      }),
+
+      // Malus raciaux en attente (appliqués seulement à la fin de la création)
+      peupleMalusEnAttente: new fields.SchemaField({
         corpsBonus:       new fields.NumberField({ initial: 0, integer: true }),
         espritBonus:      new fields.NumberField({ initial: 0, integer: true }),
         ameBonus:         new fields.NumberField({ initial: 0, integer: true }),
@@ -53,8 +68,9 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
       // Points de Vie
       pdv: new fields.SchemaField({
-        valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        valeur:  new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        max:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        bonusDe: new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
 
       // Points d'Héroïsme
@@ -65,66 +81,66 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
       // Aspects
       corps: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         noir:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
       esprit: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         noir:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
       ame: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         noir:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
 
       // Caractéristiques primaires
       agilite:      new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       force:        new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       perception:   new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       resistance:   new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       intelligence: new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       volonte:      new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       charisma:     new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       creativite:   new fields.SchemaField({
-        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        score:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
         raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
@@ -158,7 +174,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       }),
 
       // État de combat
-      blessuresGraves: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 3 }),
+      blessuresGraves:   new fields.NumberField({ initial: 0, integer: true, min: 0, max: 3 }),
+      blessuresCritique: new fields.BooleanField({ initial: false }),
 
       // Ténèbres & Perfidie
       tenebres: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
@@ -229,18 +246,22 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
     // Stats dérivées de TAI
     this.mv  = this.mvOverride ?? taiTables.lookupTai(taiTables.taiToMv, this.tai);
-    if (this.pdv.max === 0) this.pdv.max = taiTables.lookupTai(taiTables.taiToBpdv, this.tai);
+    // PdV max = BPdV(race) + RES × 3 + bonusDe (résultat du 1d10 de création)
+    const bpdv = pData?.bpdv ?? taiTables.lookupTai(taiTables.taiToBpdv, this.tai);
+    this.pdv.max = bpdv + (this.resistance.score * 3) + this.pdv.bonusDe;
     this.bd  = taiTables.lookupBd(this.force.score, this.tai);
     this.modPoids = taiTables.lookupTai(taiTables.taiToModPoids, this.tai);
-    if (this.chargeMax === 0) this.chargeMax = this.force.score * this.modPoids;
+    this.chargeMax = (this.force.score + this.resistance.score) * this.modPoids;
 
     // Caractéristiques secondaires
-    this.melee = Math.round((this.force.score + this.agilite.score * 2) / 3);
-    this.tir   = Math.round((this.perception.score + this.agilite.score) / 2);
-    this.art   = Math.round((this.charisma.score + this.creativite.score) / 2);
+    this.melee    = Math.round((this.force.score + this.agilite.score * 2) / 3);
+    this.tir      = Math.round((this.agilite.score + this.perception.score) / 2);
+    this.emprise  = Math.round((this.intelligence.score + this.volonte.score) / 2);
+    this.art      = Math.round((this.charisma.score + this.creativite.score) / 2);
 
     // Initiative de base (sans arme)
     this.initiative     = this.agilite.score + this.perception.score + this.bonusCorps;
+    this.initMagique    = this.initiative + 10;
     this.defenseNaturelle = this.agilite.score + this.bonusCorps;
 
     // Seuils PdV
@@ -271,8 +292,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       this.armure.malusPer = 0;
       this.armure._malusAgiActif = 0;
     }
-    this.armure._malusAgiActif = this.armure.portee ? this.armure.malusAgi : 0;
-    this.armure._malusPerActif  = this.armure.portee ? this.armure.malusPer : 0;
+    this.armure._malusAgiActif = this.armure.portee ? -this.armure.malusAgi : 0;
+    this.armure._malusPerActif  = this.armure.portee ? -this.armure.malusPer : 0;
   }
 }
 

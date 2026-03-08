@@ -2,12 +2,15 @@
 <div class="competences-section">
   <div class="section-header">
     <h3>{{localize "AGONE.Competences"}}</h3>
+    {{#if modeCreation}}
     <div class="pts-creation-comp">
       <label>{{localize "AGONE.PtsCreationComp"}}</label>
       <span class="derived sombre">{{ptsCreationCompRestant}}</span>
       <span>/</span>
       <span class="derived sombre">{{system.ptsCreationComp.max}}</span>
+      <button type="button" class="btn-icon reset-crea-btn" data-action="resetComps" title='{{localize "AGONE.ResetCreationCompTooltip"}}'>&#8635;</button>
     </div>
+    {{/if}}
     <button type="button" class="compendium-browse btn-icon" data-pack="agone.competences" title='{{localize "AGONE.ParcourirCompetences"}}'>
       <i class="fas fa-search"></i>
     </button>
