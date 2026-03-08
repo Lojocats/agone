@@ -24,6 +24,7 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       parrain:     new fields.StringField({ initial: "" }),
       mv:          new fields.NumberField({ initial: 3, integer: true, min: 0 }),
       mvOverride:  new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      peupleCompetenceIds: new fields.ArrayField(new fields.StringField({ initial: "" })),
       description: new fields.HTMLField({ initial: "" }),
 
       // Bonus raciaux appliqués (pour pouvoir les retirer si changement de peuple)
@@ -46,6 +47,9 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
         courante: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         totale:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
+
+      // Mode création du personnage
+      modeCreation: new fields.BooleanField({ initial: true }),
 
       // Points de Vie
       pdv: new fields.SchemaField({
@@ -131,6 +135,18 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       emprise: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       chargeMax: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
 
+      // Points de création de compétences
+      ptsCreationComp: new fields.SchemaField({
+        depense: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        max:     new fields.NumberField({ initial: 120, integer: true, min: 0 })
+      }),
+
+      // Points de création de caractéristiques
+      ptsCreationCarac: new fields.SchemaField({
+        depense: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        max:     new fields.NumberField({ initial: 80, integer: true, min: 0 })
+      }),
+
       // Armure portée
       armure: new fields.SchemaField({
         nom:       new fields.StringField({ initial: "" }),
@@ -190,6 +206,14 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
   prepareDerivedData() {
     const taiTables = CONFIG.AGONE;
+
+    // Max des points de création dérivés du peuple actif
+    const peupleKey = CONFIG.AGONE?.peupleNomVersKey?.[this.peuple] ?? "humain";
+    const pData     = CONFIG.AGONE?.peuplesData?.[peupleKey] ?? CONFIG.AGONE?.peuplesData?.humain;
+    if (pData) {
+      this.ptsCreationComp.max  = pData.pointsCreationComp  ?? 120;
+      this.ptsCreationCarac.max = pData.pointsCreationCarac ?? 80;
+    }
 
     // Bonus d'aspects
     this.bonusCorps  = Math.max(0, this.corps.score - this.corps.noir);

@@ -22,6 +22,15 @@
             <label>{{localize "AGONE.Bonus"}}</label>
             <span class="derived-val">{{system.bonusCorps}}</span>
           </div>
+          {{#unless modeCreation}}
+          <div class="aspect-stat levelup">
+            <button type="button" class="levelup-btn" data-action="levelUp"
+                    data-type="aspect" data-key="corps" data-cout="{{xpCout.corps}}" data-crea-cout="{{creaCout.corps}}"
+                    title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.corps}} XP)'>
+              <i class="fas fa-arrow-up"></i> {{xpCout.corps}}
+            </button>
+          </div>
+          {{/unless}}
         </div>
       </div>
 
@@ -41,6 +50,15 @@
             <label>{{localize "AGONE.Bonus"}}</label>
             <span class="derived-val">{{system.bonusEsprit}}</span>
           </div>
+          {{#unless modeCreation}}
+          <div class="aspect-stat levelup">
+            <button type="button" class="levelup-btn" data-action="levelUp"
+                    data-type="aspect" data-key="esprit" data-cout="{{xpCout.esprit}}" data-crea-cout="{{creaCout.esprit}}"
+                    title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.esprit}} XP)'>
+              <i class="fas fa-arrow-up"></i> {{xpCout.esprit}}
+            </button>
+          </div>
+          {{/unless}}
         </div>
       </div>
 
@@ -60,6 +78,15 @@
             <label>{{localize "AGONE.Bonus"}}</label>
             <span class="derived-val">{{system.bonusAme}}</span>
           </div>
+          {{#unless modeCreation}}
+          <div class="aspect-stat levelup">
+            <button type="button" class="levelup-btn" data-action="levelUp"
+                    data-type="aspect" data-key="ame" data-cout="{{xpCout.ame}}" data-crea-cout="{{creaCout.ame}}"
+                    title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.ame}} XP)'>
+              <i class="fas fa-arrow-up"></i> {{xpCout.ame}}
+            </button>
+          </div>
+          {{/unless}}
         </div>
       </div>
 
@@ -89,6 +116,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
         <input type="number" name="system.agilite.score" value="{{system.agilite.score}}" class="stat-num" />
         <input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="agilite" data-cout="{{xpCout.agilite}}" data-crea-cout="{{creaCout.agilite}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.agilite}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.agilite}}
+        </button>
       </div>
       {{!-- Force (Corps) --}}
       <div class="carac-row">
@@ -96,6 +128,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Force"}}'>{{localize "AGONE.Attribut.Force"}}</button>
         <input type="number" name="system.force.score" value="{{system.force.score}}" class="stat-num" />
         <input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="force" data-cout="{{xpCout.force}}" data-crea-cout="{{creaCout.force}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.force}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.force}}
+        </button>
       </div>
       {{!-- Perception (Corps) --}}
       <div class="carac-row">
@@ -103,6 +140,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
         <input type="number" name="system.perception.score" value="{{system.perception.score}}" class="stat-num" />
         <input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="perception" data-cout="{{xpCout.perception}}" data-crea-cout="{{creaCout.perception}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.perception}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.perception}}
+        </button>
       </div>
       {{!-- Résistance (Corps) --}}
       <div class="carac-row">
@@ -110,6 +152,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Resistance"}}'>{{localize "AGONE.Attribut.Resistance"}}</button>
         <input type="number" name="system.resistance.score" value="{{system.resistance.score}}" class="stat-num" />
         <input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="resistance" data-cout="{{xpCout.resistance}}" data-crea-cout="{{creaCout.resistance}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.resistance}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.resistance}}
+        </button>
       </div>
       {{!-- Intelligence (Esprit) --}}
       <div class="carac-row">
@@ -117,6 +164,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Intelligence"}}'>{{localize "AGONE.Attribut.Intelligence"}}</button>
         <input type="number" name="system.intelligence.score" value="{{system.intelligence.score}}" class="stat-num" />
         <input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="intelligence" data-cout="{{xpCout.intelligence}}" data-crea-cout="{{creaCout.intelligence}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.intelligence}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.intelligence}}
+        </button>
       </div>
       {{!-- Volonté (Esprit) --}}
       <div class="carac-row">
@@ -124,6 +176,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Volonte"}}'>{{localize "AGONE.Attribut.Volonte"}}</button>
         <input type="number" name="system.volonte.score" value="{{system.volonte.score}}" class="stat-num" />
         <input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="volonte" data-cout="{{xpCout.volonte}}" data-crea-cout="{{creaCout.volonte}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.volonte}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.volonte}}
+        </button>
       </div>
       {{!-- Charisme (Âme) --}}
       <div class="carac-row">
@@ -131,6 +188,11 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Charisma"}}'>{{localize "AGONE.Attribut.Charisma"}}</button>
         <input type="number" name="system.charisma.score" value="{{system.charisma.score}}" class="stat-num" />
         <input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="charisma" data-cout="{{xpCout.charisma}}" data-crea-cout="{{creaCout.charisma}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.charisma}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.charisma}}
+        </button>
       </div>
       {{!-- Créativité (Âme) --}}
       <div class="carac-row">
@@ -138,6 +200,21 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Creativite"}}'>{{localize "AGONE.Attribut.Creativite"}}</button>
         <input type="number" name="system.creativite.score" value="{{system.creativite.score}}" class="stat-num" />
         <input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title="Exp." />
+        <button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="creativite" data-cout="{{xpCout.creativite}}" data-crea-cout="{{creaCout.creativite}}"
+                title='{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.creativite}})'>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.creativite}}
+        </button>
+      </div>
+    </div>
+
+    <!-- Points de création -->
+    <div class="pts-creation-row">
+      <div class="pts-creation-block">
+        <label>{{localize "AGONE.PtsCreationCarac"}}</label>
+        <span class="derived sombre">{{ptsCreationCaracRestant}}</span>
+        <span>/</span>
+        <span class="derived sombre">{{system.ptsCreationCarac.max}}</span>
       </div>
     </div>
 

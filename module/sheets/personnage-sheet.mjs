@@ -53,6 +53,66 @@ export class PersonnageSheet extends ActorSheet {
     context.typsArme  = CONFIG.AGONE.typesArme;
     context.competencesListe = CONFIG.AGONE.competences;
 
+    // Coûts XP pour la montée de niveau (multiplicateurs, après création)
+    const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
+    const tbl = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
+    // Coût incrémental selon la table d'achat création (N→N+1)
+    const creaDelta = (score) => score + 1 < tbl.length ? tbl[score + 1] : null;
+
+    context.xpCout = {
+      corps:        (system.corps.score        + 1) * m.aspect,
+      esprit:       (system.esprit.score       + 1) * m.aspect,
+      ame:          (system.ame.score          + 1) * m.aspect,
+      agilite:      (system.agilite.score      + 1) * m.carac,
+      force:        (system.force.score        + 1) * m.carac,
+      perception:   (system.perception.score   + 1) * m.carac,
+      resistance:   (system.resistance.score   + 1) * m.carac,
+      intelligence: (system.intelligence.score + 1) * m.carac,
+      volonte:      (system.volonte.score      + 1) * m.carac,
+      charisma:     (system.charisma.score     + 1) * m.carac,
+      creativite:   (system.creativite.score   + 1) * m.carac,
+    };
+    context.creaCout = {
+      corps:        creaDelta(system.corps.score),
+      esprit:       creaDelta(system.esprit.score),
+      ame:          creaDelta(system.ame.score),
+      agilite:      creaDelta(system.agilite.score),
+      force:        creaDelta(system.force.score),
+      perception:   creaDelta(system.perception.score),
+      resistance:   creaDelta(system.resistance.score),
+      intelligence: creaDelta(system.intelligence.score),
+      volonte:      creaDelta(system.volonte.score),
+      charisma:     creaDelta(system.charisma.score),
+      creativite:   creaDelta(system.creativite.score),
+    };
+    for (const c of context.competences) {
+      c.xpCout  = (c.system.score + 1) * m.competence;
+      c.creaCout = creaDelta(c.system.score);
+    }
+
+    // Valeur affichée sur les boutons : table d'achat en création, multiplicateurs après
+    const src = system.modeCreation ? context.creaCout : context.xpCout;
+    context.coutAffiche = {
+      corps:        src.corps,
+      esprit:       src.esprit,
+      ame:          src.ame,
+      agilite:      src.agilite,
+      force:        src.force,
+      perception:   src.perception,
+      resistance:   src.resistance,
+      intelligence: src.intelligence,
+      volonte:      src.volonte,
+      charisma:     src.charisma,
+      creativite:   src.creativite,
+    };
+    for (const c of context.competences)
+      c.coutAffiche = system.modeCreation ? c.creaCout : c.xpCout;
+
+    // Points de création restants (valeur décroissante)
+    context.ptsCreationCaracRestant = system.ptsCreationCarac.max - system.ptsCreationCarac.depense;
+    context.ptsCreationCompRestant  = system.ptsCreationComp.max  - system.ptsCreationComp.depense;
+    context.modeCreation = system.modeCreation;
+
     return context;
   }
 
@@ -121,6 +181,13 @@ export class PersonnageSheet extends ActorSheet {
     html.find("[name='system.armure.portee']").change(this._onArmurePorteeChange.bind(this));
     html.find("[name='system.armure.malusAgi']").change(this._onArmureMalusChange.bind(this));
     html.find("[name='system.armure.type']").change(this._onArmureMalusChange.bind(this));
+
+    // Montée de niveau (dépense XP)
+    html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
+
+    // Mode création — toggle et validation
+    html.find("[data-action='toggleCreation']").click(this._onToggleCreation.bind(this));
+    html.find("[data-action='validerCreation']").click(this._onValiderCreation.bind(this));
 
     // Drag & drop inline items
     html.find(".item-drag").each((i, li) => {
@@ -344,11 +411,17 @@ export class PersonnageSheet extends ActorSheet {
     event.preventDefault();
     const sd  = this.actor.system;
     const old = sd.peupleBonusApplique ?? {};
+
+    // Supprimer les compétences raciales de l'ancien peuple
+    const oldCompIds = (sd.peupleCompetenceIds ?? []).filter(id => this.actor.items.has(id));
+    if (oldCompIds.length) await this.actor.deleteEmbeddedDocuments("Item", oldCompIds);
+
     const update = {
-      "system.peuple":      "",
-      "system.peupleId":     "",
-      "system.tai":          0,
-      "system.mvOverride":   null,
+      "system.peuple":                 "",
+      "system.peupleId":               "",
+      "system.tai":                    0,
+      "system.mvOverride":             null,
+      "system.peupleCompetenceIds":    [],
       "system.peupleBonusApplique.corpsBonus":        0,
       "system.peupleBonusApplique.espritBonus":       0,
       "system.peupleBonusApplique.ameBonus":          0,
@@ -406,6 +479,35 @@ export class PersonnageSheet extends ActorSheet {
     const old = sd.peupleBonusApplique ?? {};
     const nw  = peupleItem.system;
 
+    // Supprimer les compétences raciales de l'ancien peuple
+    const oldCompIds = (sd.peupleCompetenceIds ?? []).filter(id => this.actor.items.has(id));
+    if (oldCompIds.length) await this.actor.deleteEmbeddedDocuments("Item", oldCompIds);
+
+    // Résoudre les compétences raciales du nouveau peuple
+    // Priorité : champ sur l'item > table de config (par nom français)
+    const peupleKey     = CONFIG.AGONE.peupleNomVersKey[peupleItem.name];
+    const compRaciales  = (nw.competencesRaciales?.length > 0)
+      ? nw.competencesRaciales
+      : (CONFIG.AGONE.peuplesData[peupleKey]?.competencesRaciales ?? []);
+
+    // Créer les nouvelles compétences raciales (score 5)
+    let newCompIds = [];
+    if (compRaciales.length) {
+      const itemsData = compRaciales.map(c => ({
+        name:   c.specialite ? `${c.nom} (${c.specialite})` : c.nom,
+        type:   "competence",
+        system: {
+          nom:         c.nom,
+          domaine:     c.domaine     ?? "",
+          specialite:  c.specialite  ?? "",
+          attributLie: c.attributLie ?? "agilite",
+          score:       c.score       ?? 5,
+        },
+      }));
+      const created = await this.actor.createEmbeddedDocuments("Item", itemsData);
+      newCompIds = created.map(i => i.id);
+    }
+
     // Retire l'ancien bonus, ajoute le nouveau, puis clamp sur [raceMin, raceMax]
     const calcScore = (current, oldBonus, newBonus, newMin, newMax) => {
       let v = Math.max(0, (current ?? 0) - (oldBonus ?? 0) + (newBonus ?? 0));
@@ -415,10 +517,11 @@ export class PersonnageSheet extends ActorSheet {
     };
 
     const update = {
-      "system.peuple":      peupleItem.name,
-      "system.peupleId":     peupleItem.uuid,
-      "system.tai":          nw.taiBase ?? 0,
-      "system.mvOverride":   nw.mvBase  ?? null,
+      "system.peuple":                 peupleItem.name,
+      "system.peupleId":               peupleItem.uuid,
+      "system.tai":                    nw.taiBase ?? 0,
+      "system.mvOverride":             nw.mvBase  ?? null,
+      "system.peupleCompetenceIds":    newCompIds,
       "system.peupleBonusApplique.corpsBonus":        nw.corpsBonus        ?? 0,
       "system.peupleBonusApplique.espritBonus":       nw.espritBonus       ?? 0,
       "system.peupleBonusApplique.ameBonus":          nw.ameBonus          ?? 0,
@@ -463,6 +566,117 @@ export class PersonnageSheet extends ActorSheet {
     };
     await this.actor.update(update);
     ui.notifications?.info(game.i18n.format("AGONE.PeupleApplique", { name: peupleItem.name }));
+  }
+
+  // Montée de niveau (dépense XP)
+  // ==============================
+  async _onLevelUp(event) {
+    event.preventDefault();
+    const btn    = event.currentTarget;
+    const type   = btn.dataset.type;
+    const key    = btn.dataset.key;
+    const itemId = btn.dataset.itemId;
+    const xpCout = Number(btn.dataset.cout);
+    const sd     = this.actor.system;
+
+    const isCarac  = (type === "aspect" || type === "carac");
+    const pool     = isCarac ? sd.ptsCreationCarac : sd.ptsCreationComp;
+    const restePts = (pool?.max ?? 0) - (pool?.depense ?? 0);
+    const creaCout = Number(btn.dataset.creaCout) || null;
+
+    const item     = (type === "competence") ? this.actor.items.get(itemId) : null;
+    const localExp = isCarac ? (sd[key]?.exp ?? 0) : (item?.system.exp ?? 0);
+
+    // ── MODE CRÉATION ────────────────────────────────────────
+    if (sd.modeCreation) {
+      if (type === "aspect") {
+        return ui.notifications.warn(game.i18n.localize("AGONE.AspectsBloquesCrea"));
+      }
+      if (creaCout === null) {
+        return ui.notifications.warn(game.i18n.localize("AGONE.NiveauMaxCrea"));
+      }
+      if (restePts < creaCout) {
+        return ui.notifications.warn(
+          game.i18n.format("AGONE.PasAssezPtsCrea", { cout: creaCout, actuel: restePts })
+        );
+      }
+      const confirmed = await Dialog.confirm({
+        title:   game.i18n.localize("AGONE.MonterNiveau"),
+        content: `<p>${game.i18n.format("AGONE.ConfirmerMonteeNiveau", { cout: `${creaCout} ${game.i18n.localize("AGONE.PointsCreation")}` })}</p>`
+      });
+      if (!confirmed) return;
+
+      if (isCarac) {
+        await this.actor.update({
+          [`system.${key}.score`]:          (sd[key].score ?? 0) + 1,
+          "system.ptsCreationCarac.depense": (pool.depense ?? 0) + creaCout,
+        });
+      } else if (type === "competence") {
+        if (!item) return;
+        await Promise.all([
+          item.update({ "system.score": item.system.score + 1 }),
+          this.actor.update({ "system.ptsCreationComp.depense": (pool.depense ?? 0) + creaCout }),
+        ]);
+      }
+      return;
+    }
+
+    // ── MODE XP NORMAL ───────────────────────────────────────
+    const fromLocal   = Math.min(localExp, xpCout);
+    const fromGeneral = xpCout - fromLocal;
+
+    if (fromGeneral > sd.experience.courante) {
+      return ui.notifications.warn(
+        game.i18n.format("AGONE.PasAssezXP", { cout: xpCout, actuel: localExp + sd.experience.courante })
+      );
+    }
+
+    const confirmed = await Dialog.confirm({
+      title:   game.i18n.localize("AGONE.MonterNiveau"),
+      content: `<p>${game.i18n.format("AGONE.ConfirmerMonteeNiveau", { cout: xpCout })}</p>`
+    });
+    if (!confirmed) return;
+
+    if (isCarac) {
+      await this.actor.update({
+        [`system.${key}.score`]: (sd[key].score ?? 0) + 1,
+        ...(fromLocal   > 0 ? { [`system.${key}.exp`]:       localExp - fromLocal                      } : {}),
+        ...(fromGeneral > 0 ? { "system.experience.courante": sd.experience.courante - fromGeneral,
+                                "system.experience.totale":   (sd.experience.totale ?? 0) + fromGeneral } : {}),
+      });
+    } else if (type === "competence") {
+      if (!item) return;
+      const updates = [];
+      updates.push(item.update({
+        "system.score": item.system.score + 1,
+        ...(fromLocal > 0 ? { "system.exp": localExp - fromLocal } : {}),
+      }));
+      if (fromGeneral > 0) updates.push(this.actor.update({
+        "system.experience.courante": sd.experience.courante - fromGeneral,
+        "system.experience.totale":   (sd.experience.totale ?? 0) + fromGeneral,
+      }));
+      await Promise.all(updates);
+    }
+  }
+
+  // Mode création — activer/désactiver
+  // ==============================
+  async _onToggleCreation(event) {
+    event.preventDefault();
+    await this.actor.update({ "system.modeCreation": !this.actor.system.modeCreation });
+  }
+
+  // Mode création — valider (fin de création)
+  // ==============================
+  async _onValiderCreation(event) {
+    event.preventDefault();
+    const confirmed = await Dialog.confirm({
+      title:   game.i18n.localize("AGONE.ValiderCreation"),
+      content: `<p>${game.i18n.localize("AGONE.ValiderCreationConfirm")}</p>`
+    });
+    if (!confirmed) return;
+    await this.actor.update({ "system.modeCreation": false });
+    ui.notifications.info(game.i18n.localize("AGONE.CreationTerminee"));
   }
 
   // Édition inline

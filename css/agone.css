@@ -47,6 +47,47 @@
   color: var(--agone-parchment);
 }
 
+/* ── Barre mode création ─────────────────────────────────── */
+.agone .creation-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px;
+  background: rgba(0,0,0,0.25);
+  border-top: 1px solid var(--agone-gold);
+  font-size: 12px;
+}
+.agone .creation-mode-bar.en-creation {
+  background: rgba(120, 60, 0, 0.45);
+  border-top-color: #e8a030;
+}
+.agone .creation-badge {
+  font-weight: bold;
+  color: #f0c060;
+  letter-spacing: 0.04em;
+}
+.agone .btn-valider-creation {
+  margin-left: auto;
+  padding: 2px 10px;
+  background: #5a8a30;
+  color: #fff;
+  border: 1px solid #3a6010;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.agone .btn-valider-creation:hover { background: #3a6a10; }
+.agone .btn-toggle-creation {
+  padding: 2px 10px;
+  background: rgba(80,50,20,0.6);
+  color: var(--agone-parchment);
+  border: 1px solid var(--agone-gold);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.agone .btn-toggle-creation:hover { background: rgba(120,80,30,0.8); }
+
 .agone .header-portrait {
   flex: 0 0 90px;
 }
@@ -132,6 +173,9 @@
 .agone .derived-big.flamme-noire {
   color: var(--agone-noir, #2a2a2a);
   text-shadow: 0 0 4px rgba(80,0,0,0.6);
+}
+.agone .derived.sombre {
+  color: var(--agone-noir, #2a2a2a);
 }
 
 /* ── Onglets ─────────────────────────────────────────────── */

@@ -151,8 +151,16 @@ export class PeupleData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       description:      new fields.HTMLField({ initial: "" }),
-      taiBase:          new fields.NumberField({ initial: 0, integer: true }),
-      mvBase:           new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      taiBase:              new fields.NumberField({ initial: 0, integer: true }),
+      mvBase:               new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      pointsCreationComp:   new fields.NumberField({ initial: 120, integer: true }),
+      competencesRaciales:  new fields.ArrayField(new fields.SchemaField({
+        nom:         new fields.StringField({ initial: "" }),
+        domaine:     new fields.StringField({ initial: "" }),
+        specialite:  new fields.StringField({ initial: "" }),
+        attributLie: new fields.StringField({ initial: "agilite" }),
+        score:       new fields.NumberField({ initial: 5, integer: true }),
+      })),
       // Bonus d'aspects
       corpsBonus:       new fields.NumberField({ initial: 0, integer: true }),
       espritBonus:      new fields.NumberField({ initial: 0, integer: true }),

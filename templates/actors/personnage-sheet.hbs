@@ -39,6 +39,16 @@
           <input type="number" name="system.experience.totale" value="{{system.experience.totale}}" class="stat-num" />
         </div>
       </div>
+      {{#if isOwner}}
+      <div class="creation-mode-bar {{#if modeCreation}}en-creation{{/if}}">
+        {{#if modeCreation}}
+          <span class="creation-badge">{{localize "AGONE.EnModeCreation"}}</span>
+          <button type="button" class="btn-valider-creation" data-action="validerCreation">{{localize "AGONE.ValiderCreation"}}</button>
+        {{else}}
+          <button type="button" class="btn-toggle-creation" data-action="toggleCreation">{{localize "AGONE.ReactiverCreation"}}</button>
+        {{/if}}
+      </div>
+      {{/if}}
     </div>
   </header>
 
