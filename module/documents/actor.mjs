@@ -91,6 +91,13 @@ export class AgoneActor extends Actor {
         );
         const scoreArts = compArts ? compArts.system.score : 0;
         systemData.aptitudeArtsMagiques = systemData.art + scoreArts + systemData.bonusAme;
+
+        // Potentiel d'Emprise (EMP + Conn. des Danseurs + Bonus Esprit)
+        const compDanseurs = this.items.find(i =>
+          i.type === "competence" && i.name.toLowerCase().includes("danseur")
+        );
+        const scoreConnDanseurs = compDanseurs ? compDanseurs.system.score : 0;
+        systemData.aptitudeEmprise = (systemData.emprise ?? 0) + scoreConnDanseurs + (systemData.bonusEsprit ?? 0);
       }
     }
   }

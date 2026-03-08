@@ -98,9 +98,32 @@ export class SortData extends foundry.abstract.TypeDataModel {
       seuil:       new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       portee:      new fields.StringField({ initial: "" }),
       duree:       new fields.StringField({ initial: "" }),
-      temps:       new fields.StringField({ initial: "" }),
-      initiative:  new fields.NumberField({ initial: 10, integer: true }), // Init = Init + 10
-      description: new fields.HTMLField({ initial: "" })
+      // Temps de lancer : "Danse" pour jorniste/obscurantiste/eclipsiste,
+      // "Mesure" pour accord, "Modelage" pour cyse, "Dessin" pour decorum, "Verbe" pour geste
+      danse:       new fields.StringField({ initial: "" }),
+      // Sous-type : instrument (harpe/flute/viole/tambour/cistre) ou saison (printemps/ete/automne/hiver)
+      instrument:  new fields.StringField({ initial: "" }),
+      special:     new fields.StringField({ initial: "" }),
+      description: new fields.HTMLField({ initial: "" }),
+      danseurNom:  new fields.StringField({ initial: "" }),
+    };
+  }
+}
+
+// ================================
+// Danseur
+// ================================
+export class DanseurData extends foundry.abstract.TypeDataModel {
+  static defineSchema() {
+    return {
+      description:       new fields.HTMLField({ initial: "" }),
+      experience:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      memoireActuelle:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      memoireMax:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      bonusEmprise:      new fields.NumberField({ initial: 0, integer: true }),
+      empathie:          new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      enduranceActuelle: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      enduranceMax:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
     };
   }
 }

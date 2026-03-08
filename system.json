@@ -41,7 +41,8 @@
       "equipement": {},
       "pouvoir": {},
       "manoeuvre": {},
-      "peuple": {}
+      "peuple": {},
+      "danseur": {}
     }
   },
   "packs": [
@@ -67,6 +68,12 @@
       "name": "armures",
       "label": "Boucliers & Armures Agone",
       "path": "packs/armures",
+      "type": "Item"
+    },
+    {
+      "name": "sorts",
+      "label": "Sorts & Œuvres Agone",
+      "path": "packs/sorts",
       "type": "Item"
     }
   ],

@@ -2,7 +2,7 @@
   <header class="sheet-header">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
     <div class="header-fields">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom du sort" /></h1>
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom du sort / de l'œuvre" /></h1>
     </div>
   </header>
   <section class="sheet-body">
@@ -10,11 +10,42 @@
       <div class="form-group">
         <label>{{localize "AGONE.TypeMagie"}}</label>
         <select name="system.typeMagie">
-          <option value="artsMagiques" {{#if (eq system.typeMagie "artsMagiques")}}selected{{/if}}>{{localize "AGONE.ArtsMagiques"}}</option>
-          <option value="conjuration" {{#if (eq system.typeMagie "conjuration")}}selected{{/if}}>{{localize "AGONE.Conjuration"}}</option>
-          <option value="sorcellerie" {{#if (eq system.typeMagie "sorcellerie")}}selected{{/if}}>{{localize "AGONE.Sorcellerie"}}</option>
+          <option value="" {{#if (eq system.typeMagie "")}}selected{{/if}}>—</option>
+          <option value="jorniste" {{#if (eq system.typeMagie "jorniste")}}selected{{/if}}>{{localize "AGONE.Jorniste"}}</option>
+          <option value="obscurantiste" {{#if (eq system.typeMagie "obscurantiste")}}selected{{/if}}>{{localize "AGONE.Obscurantiste"}}</option>
+          <option value="eclipsiste" {{#if (eq system.typeMagie "eclipsiste")}}selected{{/if}}>{{localize "AGONE.Eclipsiste"}}</option>
+          <option value="accord" {{#if (eq system.typeMagie "accord")}}selected{{/if}}>{{localize "AGONE.Accord"}}</option>
+          <option value="cyse" {{#if (eq system.typeMagie "cyse")}}selected{{/if}}>{{localize "AGONE.Cyse"}}</option>
+          <option value="decorum" {{#if (eq system.typeMagie "decorum")}}selected{{/if}}>{{localize "AGONE.Decorum"}}</option>
+          <option value="geste" {{#if (eq system.typeMagie "geste")}}selected{{/if}}>{{localize "AGONE.Geste"}}</option>
         </select>
       </div>
+
+      {{#if (or (eq system.typeMagie "accord") (eq system.typeMagie "decorum"))}}
+      <div class="form-group">
+        {{#if (eq system.typeMagie "accord")}}
+          <label>{{localize "AGONE.Instrument"}}</label>
+          <select name="system.instrument">
+            <option value="" {{#if (eq system.instrument "")}}selected{{/if}}>—</option>
+            <option value="harpe" {{#if (eq system.instrument "harpe")}}selected{{/if}}>{{localize "AGONE.Harpe"}}</option>
+            <option value="flute" {{#if (eq system.instrument "flute")}}selected{{/if}}>{{localize "AGONE.Flute"}}</option>
+            <option value="viole" {{#if (eq system.instrument "viole")}}selected{{/if}}>{{localize "AGONE.Viole"}}</option>
+            <option value="tambour" {{#if (eq system.instrument "tambour")}}selected{{/if}}>{{localize "AGONE.Tambour"}}</option>
+            <option value="cistre" {{#if (eq system.instrument "cistre")}}selected{{/if}}>{{localize "AGONE.Cistre"}}</option>
+          </select>
+        {{else}}
+          <label>{{localize "AGONE.Saison"}}</label>
+          <select name="system.instrument">
+            <option value="" {{#if (eq system.instrument "")}}selected{{/if}}>—</option>
+            <option value="printemps" {{#if (eq system.instrument "printemps")}}selected{{/if}}>{{localize "AGONE.Printemps"}}</option>
+            <option value="ete" {{#if (eq system.instrument "ete")}}selected{{/if}}>{{localize "AGONE.Ete"}}</option>
+            <option value="automne" {{#if (eq system.instrument "automne")}}selected{{/if}}>{{localize "AGONE.Automne"}}</option>
+            <option value="hiver" {{#if (eq system.instrument "hiver")}}selected{{/if}}>{{localize "AGONE.Hiver"}}</option>
+          </select>
+        {{/if}}
+      </div>
+      {{/if}}
+
       <div class="form-group">
         <label>{{localize "AGONE.Seuil"}}</label>
         <input type="number" name="system.seuil" value="{{system.seuil}}" class="stat-num" />
@@ -28,12 +59,22 @@
         <input type="text" name="system.duree" value="{{system.duree}}" />
       </div>
       <div class="form-group">
-        <label>{{localize "AGONE.Temps"}}</label>
-        <input type="text" name="system.temps" value="{{system.temps}}" />
+        {{#if (eq system.typeMagie "accord")}}
+          <label>{{localize "AGONE.Mesure"}}</label>
+        {{else if (eq system.typeMagie "cyse")}}
+          <label>{{localize "AGONE.Modelage"}}</label>
+        {{else if (eq system.typeMagie "decorum")}}
+          <label>{{localize "AGONE.Dessin"}}</label>
+        {{else if (eq system.typeMagie "geste")}}
+          <label>{{localize "AGONE.Verbe"}}</label>
+        {{else}}
+          <label>{{localize "AGONE.Danse"}}</label>
+        {{/if}}
+        <input type="text" name="system.danse" value="{{system.danse}}" />
       </div>
       <div class="form-group">
-        <label>{{localize "AGONE.Initiative"}}</label>
-        <input type="number" name="system.initiative" value="{{system.initiative}}" class="stat-num" />
+        <label>{{localize "AGONE.Special"}}</label>
+        <input type="text" name="system.special" value="{{system.special}}" />
       </div>
     </div>
     <div class="form-group description-group">

@@ -1,3 +1,5 @@
+import { SortsBrowser } from "../apps/sorts-browser.mjs";
+
 /**
  * Feuille de personnage Agone (Personnage Joueur)
  * Utilise l'API ActorSheet standard (compatible v12/v13)
@@ -39,6 +41,48 @@ export class PersonnageSheet extends ActorSheet {
     context.equipements  = actor.items.filter(i => i.type === "equipement");
     context.pouvoirs     = actor.items.filter(i => i.type === "pouvoir");
     context.manoeuvres   = actor.items.filter(i => i.type === "manoeuvre");
+    const danseurItems = actor.items.filter(i => i.type === "danseur")
+      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    context.danseurs = danseurItems.map(d => {
+      const assignedSorts = actor.items
+        .filter(s => s.type === "sort" && s.system.danseurNom === d.name)
+        .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie }));
+      return {
+        id: d.id, name: d.name, img: d.img,
+        system: d.system,
+        assignedSorts,
+        assignedCount: assignedSorts.length,
+        isFull: d.system.memoireMax > 0 && assignedSorts.length >= d.system.memoireMax,
+      };
+    });
+
+    // Types de magie présents — pour le mini-filtre de l'onglet Magie
+    const TYPE_LABELS_MAGIE = {
+      jorniste: "Jorniste", obscurantiste: "Obscurantiste", eclipsiste: "Éclipsiste",
+      accord: "Accord", cyse: "Cyse", geste: "Geste", decorum: "Décorum",
+    };
+    context.sortTypes = [...new Set(context.sorts.map(s => s.system.typeMagie).filter(Boolean))]
+      .sort()
+      .map(t => ({ value: t, label: TYPE_LABELS_MAGIE[t] ?? t }));
+
+    // Compétences liées à la magie — détection dynamique selon les sorts possédés
+    const MAGIE_COMP_MAP = {
+      jorniste:      ["Arts Magiques", "Harmonie"],
+      obscurantiste: ["Arts Magiques", "Harmonie"],
+      eclipsiste:    ["Arts Magiques", "Harmonie"],
+      accord:        ["Arts Magiques", "Harmonie"],
+      cyse:          ["Arts Magiques", "Harmonie"],
+      geste:         ["Arts Magiques", "Poésie"],
+      decorum:       ["Arts Magiques", "Résonance"],
+    };
+    const typesMagie = new Set(actor.items.filter(i => i.type === "sort").map(i => i.system.typeMagie));
+    const relevantKeys = new Set(["Arts Magiques"]);
+    for (const type of typesMagie) {
+      for (const k of (MAGIE_COMP_MAP[type] ?? [])) relevantKeys.add(k);
+    }
+    context.competencesMagie = actor.items
+      .filter(i => i.type === "competence" && [...relevantKeys].some(k => i.name.startsWith(k)))
+      .sort((a, b) => a.name.localeCompare(b.name));
 
     // Enrichissement de la description HTML
     context.descriptionHTML = await TextEditor.enrichHTML(
@@ -185,8 +229,35 @@ export class PersonnageSheet extends ActorSheet {
 
     // Jets de dés — Sorts & Magie
     html.find("[data-action='rollSort']").click(this._onRollSort.bind(this));
+    html.find("[data-action='rollEmprise']").click(this._onRollEmprise.bind(this));
+    html.find("[data-action='rollImprovisation']").click(this._onRollImprovisation.bind(this));
+
+    // Description déroulante des sorts
+    html.find("[data-action='toggleSortDesc']").click(this._onToggleSortDesc.bind(this));
     html.find("[data-action='rollAptitudeMagie']").click(this._onRollAptitudeMagie.bind(this));
     html.find("[data-action='rollAptitudeConjuration']").click(this._onRollAptitudeConjuration.bind(this));
+
+    // Mini-filtre sorts (onglet Magie)
+    html.find(".smf-search").on("input", this._onFiltreSorts.bind(this));
+    html.find(".smf-check").on("change", this._onFiltreTypeSorts.bind(this));
+
+    // Drag & drop sorts → danseurs (mémorisation) + réordonnancement
+    html.find(".sort-main-row[draggable]").each((_, el) => {
+      el.addEventListener("dragstart", this._onDragSortStart.bind(this));
+      el.addEventListener("dragend",   this._onDragSortEnd.bind(this));
+    });
+    html.find(".danseur-slots").each((_, el) => {
+      el.addEventListener("dragover",  this._onDragOverDanseur.bind(this));
+      el.addEventListener("dragleave", this._onDragLeaveDanseur.bind(this));
+      el.addEventListener("drop",      this._onDropSortOnDanseur.bind(this));
+    });
+    // Déposer sur le tableau de sorts pour réordonner
+    html.find(".sorts-table tbody").each((_, el) => {
+      el.addEventListener("dragover",  this._onDragOverSortReorder.bind(this));
+      el.addEventListener("dragleave", this._onDragLeaveSortReorder.bind(this));
+      el.addEventListener("drop",      this._onDropSortReorder.bind(this));
+    });
+    html.find(".slot-remove").click(this._onRetireSortDanseur.bind(this));
 
     // Ouvrir le compendium de compétences / peuples
     html.find(".compendium-browse").click(this._onBrowseCompendium.bind(this));
@@ -222,6 +293,22 @@ export class PersonnageSheet extends ActorSheet {
       li.setAttribute("draggable", true);
       li.addEventListener("dragstart", this._onDragStart.bind(this));
     });
+  }
+
+  // ==============================
+  // Description déroulante des sorts
+  // ==============================
+  _onToggleSortDesc(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const btn = event.currentTarget;
+    const mainRow = btn.closest("tr.sort-main-row");
+    const descRow = mainRow?.nextElementSibling;
+    if (!descRow?.classList.contains("sort-desc-row")) return;
+    const isOpen = descRow.style.display !== "none";
+    descRow.style.display = isOpen ? "none" : "";
+    btn.querySelector("i")?.classList.toggle("fa-chevron-right", isOpen);
+    btn.querySelector("i")?.classList.toggle("fa-chevron-down", !isOpen);
   }
 
   // ==============================
@@ -346,6 +433,245 @@ export class PersonnageSheet extends ActorSheet {
     await this.actor.rollSort(itemId);
   }
 
+  // ==============================
+  // Emprise & Improvisation Danseur
+  // ==============================
+  async _onRollEmprise(event) {
+    event.preventDefault();
+    const itemId  = event.currentTarget.dataset.itemId;
+    const danseur = this.actor.items.get(itemId);
+    if (!danseur) return;
+
+    const sd    = this.actor.system;
+    const label = game.i18n.format("AGONE.PotentielEmpriseLabel", { nom: danseur.name });
+
+    // Chercher la compétence Conn. des Danseurs
+    const compDanseurs = this.actor.items.find(i =>
+      i.type === "competence" && i.name.toLowerCase().includes("danseur")
+    );
+    const scoreConnDanseurs = compDanseurs ? compDanseurs.system.score : 0;
+    // Aptitude = EMP + Conn. Danseurs + bonusEsprit
+    const aptitude = (sd.emprise ?? 0) + scoreConnDanseurs + (sd.bonusEsprit ?? 0);
+    const bonusDanseur = danseur.system.bonusEmprise ?? 0;
+
+    const modif = await this.actor._dialogModificateur(label);
+    if (modif === null) return;
+
+    const roll = new Roll("1d10x10 + @apt + @bd + @modif", {
+      apt: aptitude, bd: bonusDanseur, modif
+    });
+    await roll.evaluate();
+    await this.actor._sendRollToChat(roll, label, {
+      aptitude: `Emprise (${sd.emprise}+${scoreConnDanseurs}+${sd.bonusEsprit ?? 0}) : ${aptitude}`,
+      bonus:    `Bonus ${danseur.name} : ${bonusDanseur}`,
+      modif:    `Bonus/Malus : ${modif}`,
+    });
+  }
+
+  async _onRollImprovisation(event) {
+    event.preventDefault();
+    const itemId  = event.currentTarget.dataset.itemId;
+    const danseur = this.actor.items.get(itemId);
+    if (!danseur) return;
+
+    const sd    = this.actor.system;
+    const label = game.i18n.format("AGONE.ImprovisationEmpriseLabel", { nom: danseur.name });
+
+    // Impro : CRÉ + Empathie(danseur) + bonusEsprit
+    const cre       = sd.creativite?.score ?? 0;
+    const empathie  = danseur.system.empathie ?? 0;
+    const bonusEsprit = sd.bonusEsprit ?? 0;
+    const aptitude  = cre + empathie + bonusEsprit;
+
+    const modif = await this.actor._dialogModificateur(label);
+    if (modif === null) return;
+
+    const roll = new Roll("1d10x10 + @apt + @modif", { apt: aptitude, modif });
+    await roll.evaluate();
+    await this.actor._sendRollToChat(roll, label, {
+      aptitude: `CRÉ(${cre}) + Empathie(${empathie}) + BonusEsprit(${bonusEsprit}) : ${aptitude}`,
+      modif:    `Bonus/Malus : ${modif}`,
+    });
+  }
+
+  // ==============================
+  // Mini-filtre sorts (onglet Magie)
+  // ==============================
+  _onFiltreSorts(event) {
+    const query = event.currentTarget.value.toLowerCase().trim();
+    const tbody = event.currentTarget.closest(".sorts-block")?.querySelector(".sorts-table tbody");
+    if (!tbody) return;
+    for (const row of tbody.querySelectorAll("tr.sort-main-row")) {
+      const name = row.querySelector(".item-name")?.textContent?.toLowerCase() ?? "";
+      const type = row.cells[1]?.textContent?.toLowerCase() ?? "";
+      const show = !query || name.includes(query) || type.includes(query);
+      row.style.display = show ? "" : "none";
+      // Si on cache la ligne, cacher aussi la desc row
+      const nextRow = row.nextElementSibling;
+      if (nextRow?.classList.contains("sort-desc-row")) {
+        nextRow.style.display = "none";
+      }
+    }
+  }
+
+  _onFiltreTypeSorts(event) {
+    const checks      = event.currentTarget.closest(".smf-checks")?.querySelectorAll(".smf-check");
+    const activeTypes = new Set([...(checks ?? [])].filter(c => c.checked).map(c => c.value));
+    const tbody       = event.currentTarget.closest(".sorts-block")?.querySelector(".sorts-table tbody");
+    if (!tbody) return;
+    for (const row of tbody.querySelectorAll("tr.sort-main-row")) {
+      const rowType = row.querySelector("td:nth-child(2)")?.textContent?.trim().split(" / ")[0] ?? "";
+      const show    = activeTypes.size === 0 || activeTypes.has(rowType);
+      row.style.display = show ? "" : "none";
+      const nextRow = row.nextElementSibling;
+      if (nextRow?.classList.contains("sort-desc-row")) nextRow.style.display = "none";
+    }
+  }
+
+  // ==============================
+  // Drag & drop sorts → danseurs
+  // ==============================
+  _onDragSortStart(event) {
+    // Drag uniquement depuis la poignée
+    if (!event.target.closest(".sort-drag-handle")) {
+      event.preventDefault();
+      return;
+    }
+    const itemId = event.currentTarget.dataset.itemId;
+    if (!itemId) return;
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", JSON.stringify({ type: "sort-assign", itemId }));
+    event.currentTarget.classList.add("dragging");
+  }
+
+  _onDragSortEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+  }
+
+  _onDragOverDanseur(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    event.currentTarget.classList.add("drag-over");
+  }
+
+  _onDragLeaveDanseur(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      event.currentTarget.classList.remove("drag-over");
+    }
+  }
+
+  async _onDropSortOnDanseur(event) {
+    event.preventDefault();
+    const zone = event.currentTarget;
+    zone.classList.remove("drag-over");
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { return; }
+    if (data?.type !== "sort-assign") return;
+
+    const danseurId    = zone.dataset.danseurId;
+    const danseur      = this.actor.items.get(danseurId);
+    const sort         = this.actor.items.get(data.itemId);
+    if (!danseur || !sort) return;
+
+    const memoireMax    = danseur.system.memoireMax ?? 0;
+    const assignedCount = this.actor.items.filter(i =>
+      i.type === "sort" && i.system.danseurNom === danseur.name
+    ).length;
+
+    if (memoireMax > 0 && assignedCount >= memoireMax && sort.system.danseurNom !== danseur.name) {
+      ui.notifications.warn(
+        game.i18n.format("AGONE.DanseurMemoirePleine", { nom: danseur.name, max: memoireMax })
+      );
+      return;
+    }
+    await sort.update({ "system.danseurNom": danseur.name });
+  }
+
+  // ==============================
+  // Réordonnancement des sorts
+  // ==============================
+  _getTargetSortRow(event, tbody) {
+    for (const row of tbody.querySelectorAll("tr.sort-main-row")) {
+      const rect = row.getBoundingClientRect();
+      if (event.clientY >= rect.top && event.clientY <= rect.bottom) return row;
+    }
+    return null;
+  }
+
+  _clearSortDropIndicators(tbody) {
+    tbody.querySelectorAll(".sort-drop-above, .sort-drop-below").forEach(el => {
+      el.classList.remove("sort-drop-above", "sort-drop-below");
+    });
+  }
+
+  _onDragOverSortReorder(event) {
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { /* ok */ }
+    if (data?.type !== "sort-assign" && !event.dataTransfer.types.includes("text/plain")) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    const tbody    = event.currentTarget;
+    const targetRow = this._getTargetSortRow(event, tbody);
+    this._clearSortDropIndicators(tbody);
+    if (!targetRow) return;
+    const rect    = targetRow.getBoundingClientRect();
+    const before  = event.clientY < rect.top + rect.height / 2;
+    targetRow.classList.add(before ? "sort-drop-above" : "sort-drop-below");
+  }
+
+  _onDragLeaveSortReorder(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      this._clearSortDropIndicators(event.currentTarget);
+    }
+  }
+
+  async _onDropSortReorder(event) {
+    const tbody = event.currentTarget;
+    this._clearSortDropIndicators(tbody);
+    // Le drop→danseur est prioritaire ; ne pas intercepter si la target est une zone danseur
+    if (event.target.closest(".danseur-slots")) return;
+    event.preventDefault();
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { return; }
+    if (data?.type !== "sort-assign") return;
+
+    const draggedSort = this.actor.items.get(data.itemId);
+    if (!draggedSort || draggedSort.type !== "sort") return;
+
+    const targetRow = this._getTargetSortRow(event, tbody);
+    if (!targetRow || targetRow.dataset.itemId === data.itemId) return;
+
+    const targetSort = this.actor.items.get(targetRow.dataset.itemId);
+    if (!targetSort) return;
+
+    const rect       = targetRow.getBoundingClientRect();
+    const sortBefore = event.clientY < rect.top + rect.height / 2;
+    const siblings   = this.actor.items.filter(i => i.type === "sort" && i.id !== draggedSort.id);
+
+    const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
+    const updates    = sortHelper.performIntegerSort(draggedSort, { target: targetSort, siblings, sortBefore });
+    if (updates.length) {
+      await this.actor.updateEmbeddedDocuments("Item",
+        updates.map(u => ({ _id: u.target.id, sort: u.update.sort }))
+      );
+    }
+  }
+
+  async _onRetireSortDanseur(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const sortId = event.currentTarget.dataset.sortId;
+    const sort   = this.actor.items.get(sortId);
+    if (sort) await sort.update({ "system.danseurNom": "" });
+  }
+
+  async _onRollSort(event) {
+    event.preventDefault();
+    const li     = event.currentTarget.closest("[data-item-id]");
+    const itemId = li?.dataset.itemId ?? event.currentTarget.dataset.itemId;
+    await this.actor.rollSort(itemId);
+  }
+
   async _onRollAptitudeMagie(event) {
     event.preventDefault();
     // Roll arts magiques : aptitudeArtsMagiques
@@ -440,6 +766,17 @@ export class PersonnageSheet extends ActorSheet {
   async _onBrowseCompendium(event) {
     event.preventDefault();
     const packId = event.currentTarget.dataset.pack ?? "agone.competences";
+
+    // Sorts → navigateur personnalisé
+    if (packId === "agone.sorts") {
+      if (!this._sortsBrowser) {
+        this._sortsBrowser = new SortsBrowser(this.actor);
+      }
+      this._sortsBrowser.render(true);
+      return;
+    }
+
+    // Autres compendiums → comportement standard
     const pack = game.packs.get(packId);
     if (!pack) return ui.notifications?.warn(game.i18n.localize("AGONE.CompendiumIntrouvable"));
     pack.render(true);

@@ -1,0 +1,55 @@
+<form class="agone sheet item danseur-sheet" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" width="36" height="36">
+    <div class="header-fields">
+      <h1 class="charname">
+        <input name="name" type="text" value="{{item.name}}" placeholder="Nom du Danseur">
+      </h1>
+    </div>
+  </header>
+
+  <section class="sheet-body">
+    <!-- Stats principales -->
+    <div class="danseur-stats-grid">
+      <!-- Mémoire -->
+      <div class="danseur-stat-group">
+        <label>{{localize "AGONE.MemoreDanseur"}}</label>
+        <div class="curr-max-pair">
+          <input type="number" name="system.memoireActuelle" value="{{system.memoireActuelle}}" min="0" placeholder="0">
+          <span>/</span>
+          <input type="number" name="system.memoireMax" value="{{system.memoireMax}}" min="0" placeholder="0">
+        </div>
+      </div>
+      <!-- Endurance -->
+      <div class="danseur-stat-group">
+        <label>{{localize "AGONE.EnduranceDanseur"}}</label>
+        <div class="curr-max-pair">
+          <input type="number" name="system.enduranceActuelle" value="{{system.enduranceActuelle}}" min="0" placeholder="0">
+          <span>/</span>
+          <input type="number" name="system.enduranceMax" value="{{system.enduranceMax}}" min="0" placeholder="0">
+        </div>
+      </div>
+      <!-- Bonus Emprise -->
+      <div class="danseur-stat-group">
+        <label>{{localize "AGONE.BonusEmprise"}}</label>
+        <input type="number" name="system.bonusEmprise" value="{{system.bonusEmprise}}" placeholder="0">
+      </div>
+      <!-- Empathie -->
+      <div class="danseur-stat-group">
+        <label>{{localize "AGONE.EmpathieDanseur"}}</label>
+        <input type="number" name="system.empathie" value="{{system.empathie}}" min="0" placeholder="0">
+      </div>
+      <!-- Expérience -->
+      <div class="danseur-stat-group">
+        <label>{{localize "AGONE.ExperienceDanseur"}}</label>
+        <input type="number" name="system.experience" value="{{system.experience}}" min="0" placeholder="0">
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor system.description name="system.description" button=true editable=isEditable}}
+    </div>
+  </section>
+</form>

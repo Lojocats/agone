@@ -1,0 +1,93 @@
+<div class="sorts-browser-app">
+
+  <!-- Barre de filtres -->
+  <div class="sb-filters">
+    <div class="sb-filter-row">
+      <div class="sb-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="sb-search" placeholder="Rechercher un sort ou un mot-clé..." value="{{search}}">
+      </div>
+      <button type="button" class="sb-clear" title="Effacer les filtres">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <!-- Filtres de type (checkboxes compactes) -->
+    <div class="sb-type-checks">
+      <label class="sb-type-lbl">
+        <input type="checkbox" class="sb-all-check" {{#if allTypesSelected}}checked{{/if}}> Tous
+      </label>
+      {{#each allTypes}}
+      <label class="sb-type-lbl">
+        <input type="checkbox" class="sb-type-check" value="{{this.value}}" {{#if this.active}}checked{{/if}}> {{this.label}}
+      </label>
+      {{/each}}
+    </div>
+    <!-- Filtres secondaires -->
+    <div class="sb-filter-row2">
+      <label>Seuil ≤</label>
+      <input type="number" class="sb-seuil-max" value="{{filterSeuilMax}}" placeholder="—" min="1" max="99">
+      <select class="sb-possede-filter">
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous sorts</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+      </select>
+    </div>
+    <div class="sb-count">{{sorts.length}} sort(s)</div>
+  </div>
+
+  <!-- Liste -->
+  <div class="sb-list-wrapper">
+    <table class="sb-table">
+      <thead>
+        <tr>
+          <th class="sb-col-toggle"></th>
+          <th class="sb-col-name">Nom</th>
+          <th class="sb-col-type">Type / Accord</th>
+          <th class="sb-col-seuil">Seuil</th>
+          <th class="sb-col-portee">Portée</th>
+          <th class="sb-col-duree">Durée</th>
+          <th class="sb-col-danse">{{localize "AGONE.Danse"}}</th>
+          <th class="sb-col-action"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each sorts as |sort|}}
+        <tr class="sb-sort-row {{#if sort.hasInActor}}sb-has-sort{{/if}}" data-sort-idx="{{sort.idx}}">
+          <td>
+            {{#if sort.description}}
+            <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDescBrowser" title="Voir la description">
+              <i class="fas {{#if sort.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+            </button>
+            {{/if}}
+          </td>
+          <td class="sb-name">{{sort.name}}</td>
+          <td class="sb-type">{{sort.typeMagie}}{{#if sort.instrument}} / {{sort.instrument}}{{/if}}</td>
+          <td class="sb-seuil">{{sort.seuil}}</td>
+          <td class="sb-portee">{{sort.portee}}</td>
+          <td class="sb-duree">{{sort.duree}}</td>
+          <td class="sb-danse">{{sort.danse}}</td>
+          <td class="sb-action">
+            {{#if sort.hasInActor}}
+            <i class="fas fa-check sb-check" title="Déjà possédé"></i>
+            {{else}}
+            <button type="button" class="sb-add-btn btn-icon" data-action="addSort" title="Ajouter au personnage">
+              <i class="fas fa-plus"></i>
+            </button>
+            {{/if}}
+          </td>
+        </tr>
+        {{#if sort.description}}
+        <tr class="sort-desc-row" data-sort-idx="{{sort.idx}}" {{#unless sort.expanded}}style="display:none"{{/unless}}>
+          <td></td>
+          <td colspan="7" class="sort-description-cell">{{sort.description}}</td>
+        </tr>
+        {{/if}}
+        {{/each}}
+        {{#unless sorts.length}}
+        <tr><td colspan="8" class="sb-empty">Aucun sort trouvé.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

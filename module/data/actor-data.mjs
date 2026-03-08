@@ -264,6 +264,12 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     this.initMagique    = this.initiative + 10;
     this.defenseNaturelle = this.agilite.score + this.bonusCorps;
 
+    // Aptitudes magiques
+    // Arts Magiques (Jorniste / Obscurantiste / Éclipsiste) : CRÉ × 2
+    this.aptitudeArtsMagiques = this.creativite.score * 2;
+    // Harmoniste (Accord / Cyse / Décorum / Geste) : ART × 2 = (CHA + CRÉ)
+    this.aptitudeConjuration  = this.art * 2;
+
     // Seuils PdV
     this.seuilBlessureGrave    = Math.max(1, Math.floor(this.pdv.max / 3));
     this.seuilBlessureCritique = Math.max(1, Math.floor(this.pdv.max / 2));

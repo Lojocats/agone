@@ -146,37 +146,37 @@ AGONE.peuplesData = {
   },
   // ── Peuples hors tableau (valeurs estimées) ──────────────────
   drakonien: {
-    taiBase: 1, corpsBonus: 0, espritBonus: 0, ameBonus: 0,
+    taiBase: 0, pointsCreationComp: 100, corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,   agiliteMin: null, agiliteMax: null,
     forceBonus: 1,     forceMin: null,   forceMax: null,
     perceptionBonus: 1, perceptionMin: null, perceptionMax: null,
-    resistanceBonus: 2, resistanceMin: null, resistanceMax: null,
-    intelligenceBonus: 1, intelligenceMin: null, intelligenceMax: null,
+    resistanceBonus: 0, resistanceMin: null, resistanceMax: null,
+    intelligenceBonus: 0, intelligenceMin: null, intelligenceMax: null,
     volonteBonus: 0,   volonteMin: null, volonteMax: null,
-    charismaBonus: -1, charismaMin: null, charismaMax: null,
+    charismaBonus: 0, charismaMin: null, charismaMax: null,
     creativiteBonus: 0, creativiteMin: null, creativiteMax: null,
   },
   morgane:   {
     taiBase: 0, pointsCreationComp: 100, corpsBonus: 0, espritBonus: 0, ameBonus: 0,
-    agiliteBonus: 0,   agiliteMin: null, agiliteMax: null,
+    agiliteBonus: 1,   agiliteMin: null, agiliteMax: null,
     forceBonus: 0,     forceMin: null,   forceMax: null,
-    perceptionBonus: 1, perceptionMin: null, perceptionMax: null,
+    perceptionBonus: 0, perceptionMin: null, perceptionMax: null,
     resistanceBonus: 0, resistanceMin: null, resistanceMax: null,
-    intelligenceBonus: 2, intelligenceMin: null, intelligenceMax: null,
-    volonteBonus: 1,  volonteMin: null, volonteMax: null,
-    charismaBonus: 0, charismaMin: null, charismaMax: null,
-    creativiteBonus: 1, creativiteMin: null, creativiteMax: null,
-  },
-  pixie:     {
-    taiBase: -2, mvBase: 5, pointsCreationComp: 100, corpsBonus: 0, espritBonus: 0, ameBonus: 0,  // mvBase=5 : MV spécial (vol)
-    agiliteBonus: 3,   agiliteMin: null, agiliteMax: null,
-    forceBonus: -3,    forceMin: null,   forceMax: null,
-    perceptionBonus: 2, perceptionMin: null, perceptionMax: null,
-    resistanceBonus: -2, resistanceMin: null, resistanceMax: null,
     intelligenceBonus: 0, intelligenceMin: null, intelligenceMax: null,
     volonteBonus: 0,  volonteMin: null, volonteMax: null,
-    charismaBonus: 1, charismaMin: null, charismaMax: null,
-    creativiteBonus: 2, creativiteMin: null, creativiteMax: null,
+    charismaBonus: 4, charismaMin: 12, charismaMax: null,
+    creativiteBonus: -1, creativiteMin: null, creativiteMax: null,
+  },
+  pixie:     {
+    taiBase: -2, pointsCreationComp: 100, corpsBonus: 0, espritBonus: 0, ameBonus: 0,
+    agiliteBonus: 4,   agiliteMin: 7, agiliteMax: null,
+    forceBonus: -4,    forceMin: null,   forceMax: null,
+    perceptionBonus: 1, perceptionMin: null, perceptionMax: null,
+    resistanceBonus: 0, resistanceMin: null, resistanceMax: 3,
+    intelligenceBonus: 0, intelligenceMin: null, intelligenceMax: null,
+    volonteBonus: -1,  volonteMin: null, volonteMax: null,
+    charismaBonus: 0, charismaMin: null, charismaMax: null,
+    creativiteBonus: 0, creativiteMin: null, creativiteMax: null,
   },
 };
 
@@ -244,9 +244,21 @@ AGONE.peuplesData.meduse.competencesRaciales    = [
   { nom: "Intendance",         domaine: "Société", specialite: "",                      attributLie: "intelligence", score: 5 },
   { nom: "Armes",              domaine: "Épreuve",  specialite: "serpents",              attributLie: "melee",        score: 5 },
 ];
-AGONE.peuplesData.drakonien.competencesRaciales = [];
-AGONE.peuplesData.morgane.competencesRaciales   = [];
-AGONE.peuplesData.pixie.competencesRaciales     = [];
+AGONE.peuplesData.drakonien.competencesRaciales = [
+    { nom: "Harmonie",           domaine: "Occulte",  specialite: "dragons",                      attributLie: "creativite",   score: 5 },
+    { nom: "Géographie",         domaine: "Savoir",   specialite: "réseau de sous-sols local",          attributLie: "intelligence", score: 5 },
+    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "protéiforme",                      attributLie: "corps",        score: 5 },
+];
+AGONE.peuplesData.morgane.competencesRaciales   = [
+    { nom: "Poisons",             domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
+    { nom: "Baratin",              domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
+    { nom: "Éloquence",          domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
+];
+AGONE.peuplesData.pixie.competencesRaciales     = [
+    { nom: "Discrétion",         domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
+    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "vol",                    attributLie: "corps",        score: 5 },
+    { nom: "Géographie",         domaine: "Savoir",   specialite: "Harmonde",                      attributLie: "intelligence", score: 5 },
+];
 
 // Points de création de caractéristiques : humain = 80, saisonins = 70
 AGONE.peuplesData.humain.pointsCreationCarac = 80;
@@ -265,7 +277,7 @@ AGONE.peuplesData.minotaure.bpdv  = 45;
 AGONE.peuplesData.ogre.bpdv       = 25;
 AGONE.peuplesData.feeNoire.bpdv   = 10;
 AGONE.peuplesData.meduse.bpdv     = 25;
-AGONE.peuplesData.drakonien.bpdv  = 45;
+AGONE.peuplesData.drakonien.bpdv  = 25;
 AGONE.peuplesData.morgane.bpdv    = 25;
 AGONE.peuplesData.pixie.bpdv      = 10;
 
