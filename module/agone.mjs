@@ -13,7 +13,7 @@ import {
 } from "./data/actor-data.mjs";
 import {
   CompetenceData, ArmeData, ArmureData, DonData,
-  SortData, EquipementData, PouvoirData, ManoeuvreData
+  SortData, EquipementData, PouvoirData, ManoeuvreData, PeupleData
 } from "./data/item-data.mjs";
 
 // ── Documents ─────────────────────────────────────────────────────────────────
@@ -57,6 +57,7 @@ Hooks.once("init", () => {
     equipement  : EquipementData,
     pouvoir     : PouvoirData,
     manoeuvre   : ManoeuvreData,
+    peuple      : PeupleData,
   };
 
   // ── Feuilles ────────────────────────────────────────────────────────────
@@ -102,6 +103,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/actors/parts/avantages.hbs",
     "systems/agone/templates/actors/parts/tenebres.hbs",
     "systems/agone/templates/actors/parts/equipement-tab.hbs",
+    "systems/agone/templates/actors/parts/identite.hbs",
     "systems/agone/templates/actors/parts/flamme.hbs",
     // Items
     "systems/agone/templates/items/competence-sheet.hbs",
@@ -112,6 +114,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/items/equipement-sheet.hbs",
     "systems/agone/templates/items/pouvoir-sheet.hbs",
     "systems/agone/templates/items/manoeuvre-sheet.hbs",
+    "systems/agone/templates/items/peuple-sheet.hbs",
     // Chat
     "systems/agone/templates/chat/roll-result.hbs",
   ];
@@ -136,8 +139,51 @@ Hooks.once("init", () => {
 /* ============================================================================
  * READY HOOK
  * ========================================================================= */
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
   console.log("Agone | Système prêt");
+
+  if (!game.user.isGM) return;
+
+  // ── Compendium compétences ─────────────────────────────────────────────
+  const packComp = game.packs.get("agone.competences");
+  if (packComp && (await packComp.getIndex()).size === 0) {
+    const domainAttr = {
+      "Épreuve":     "agilite",
+      "Maraude":     "agilite",
+      "Société":     "charisma",
+      "Savoir":      "intelligence",
+      "Occulte":     "volonte",
+    };
+    const itemsComp = CONFIG.AGONE.competences.map(name => {
+      const match   = name.match(/\(([^)]+)\)$/);
+      const domaine = match ? match[1] : "";
+      return { name, type: "competence", system: { domaine, attributLie: domainAttr[domaine] ?? "agilite", score: 0, exp: 0, specialite: "", description: "" } };
+    });
+    await packComp.configure({ locked: false });
+    await Item.createDocuments(itemsComp, { pack: "agone.competences" });
+    await packComp.configure({ locked: true });
+    console.log(`Agone | Compendium compétences initialisé (${itemsComp.length} entrées)`);
+  }
+
+  // ── Compendium peuples ─────────────────────────────────────────────────
+  const packPeuples = game.packs.get("agone.peuples");
+  if (packPeuples && (await packPeuples.getIndex()).size === 0) {
+    const peupleLabels = {
+      humain: "Humain", nain: "Nain", geant: "Géant", farfadet: "Farfadet",
+      lutin: "Lutin", satyre: "Satyre", minotaure: "Minotaure", ogre: "Ogre",
+      drakonien: "Drakonien", morgane: "Morgane", pixie: "Pixie",
+      feeNoire: "Fée Noire", meduse: "Méduse",
+    };
+    const itemsPeuples = Object.entries(CONFIG.AGONE.peuplesData).map(([key, data]) => ({
+      name: peupleLabels[key] ?? key,
+      type: "peuple",
+      system: { ...data, description: "" },
+    }));
+    await packPeuples.configure({ locked: false });
+    await Item.createDocuments(itemsPeuples, { pack: "agone.peuples" });
+    await packPeuples.configure({ locked: true });
+    console.log(`Agone | Compendium peuples initialisé (${itemsPeuples.length} entrées)`);
+  }
 });
 
 /* ============================================================================

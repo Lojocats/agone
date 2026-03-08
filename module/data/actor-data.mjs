@@ -17,12 +17,29 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       sexe:        new fields.StringField({ initial: "" }),
       age:         new fields.StringField({ initial: "" }),
       taille:      new fields.StringField({ initial: "" }),
-      tai:         new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      tai:         new fields.NumberField({ initial: 0, integer: true }),
       masse:       new fields.StringField({ initial: "" }),
-      peuple:      new fields.StringField({ initial: "humain" }),
+      peuple:      new fields.StringField({ initial: "Humain" }),
+      peupleId:    new fields.StringField({ initial: "" }),
       parrain:     new fields.StringField({ initial: "" }),
       mv:          new fields.NumberField({ initial: 3, integer: true, min: 0 }),
+      mvOverride:  new fields.NumberField({ initial: null, nullable: true, integer: true }),
       description: new fields.HTMLField({ initial: "" }),
+
+      // Bonus raciaux appliqués (pour pouvoir les retirer si changement de peuple)
+      peupleBonusApplique: new fields.SchemaField({
+        corpsBonus:       new fields.NumberField({ initial: 0, integer: true }),
+        espritBonus:      new fields.NumberField({ initial: 0, integer: true }),
+        ameBonus:         new fields.NumberField({ initial: 0, integer: true }),
+        agiliteBonus:     new fields.NumberField({ initial: 0, integer: true }),
+        forceBonus:       new fields.NumberField({ initial: 0, integer: true }),
+        perceptionBonus:  new fields.NumberField({ initial: 0, integer: true }),
+        resistanceBonus:  new fields.NumberField({ initial: 0, integer: true }),
+        intelligenceBonus:new fields.NumberField({ initial: 0, integer: true }),
+        volonteBonus:     new fields.NumberField({ initial: 0, integer: true }),
+        charismaBonus:    new fields.NumberField({ initial: 0, integer: true }),
+        creativiteBonus:  new fields.NumberField({ initial: 0, integer: true }),
+      }),
 
       // Expérience
       experience: new fields.SchemaField({
@@ -61,36 +78,52 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
       // Caractéristiques primaires
       agilite:      new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       force:        new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       perception:   new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       resistance:   new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       intelligence: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       volonte:      new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       charisma:     new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
       creativite:   new fields.SchemaField({
-        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
-        exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        score:   new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+        exp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        raceMin: new fields.NumberField({ initial: null, nullable: true, integer: true }),
+        raceMax: new fields.NumberField({ initial: null, nullable: true, integer: true }),
       }),
 
       // Secondaires manuels
@@ -156,17 +189,26 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
+    const taiTables = CONFIG.AGONE;
+
     // Bonus d'aspects
     this.bonusCorps  = Math.max(0, this.corps.score - this.corps.noir);
     this.bonusEsprit = Math.max(0, this.esprit.score - this.esprit.noir);
     this.bonusAme    = Math.max(0, this.ame.score - this.ame.noir);
 
-    // Flamme
-    this.flamme      = this.corps.score + this.esprit.score + this.ame.score;
-    this.flammeNoire = this.corps.noir + this.esprit.noir + this.ame.noir;
+    // Flamme = minimum des trois aspects (règle Agone)
+    this.flamme      = Math.min(this.corps.score, this.esprit.score, this.ame.score);
+    this.flammeNoire = Math.min(this.corps.noir, this.esprit.noir, this.ame.noir);
 
     // PH max = Flamme × 2 (si non défini manuellement)
     if (this.ph.max === 0) this.ph.max = this.flamme * 2;
+
+    // Stats dérivées de TAI
+    this.mv  = this.mvOverride ?? taiTables.lookupTai(taiTables.taiToMv, this.tai);
+    if (this.pdv.max === 0) this.pdv.max = taiTables.lookupTai(taiTables.taiToBpdv, this.tai);
+    this.bd  = taiTables.lookupBd(this.force.score, this.tai);
+    this.modPoids = taiTables.lookupTai(taiTables.taiToModPoids, this.tai);
+    if (this.chargeMax === 0) this.chargeMax = this.force.score * this.modPoids;
 
     // Caractéristiques secondaires
     this.melee = Math.round((this.force.score + this.agilite.score * 2) / 3);

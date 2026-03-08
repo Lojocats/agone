@@ -10,7 +10,9 @@
   </div>
 
   <div class="roll-result">
-    <span class="roll-total">{{total}}</span>
+    <span class="roll-total {{#if isFumble}}fumble-adjusted{{/if}}">
+      {{#if fumbleTotal}}{{fumbleTotal}}{{else}}{{total}}{{/if}}
+    </span>
   </div>
 
   {{#if details}}
@@ -31,20 +33,14 @@
   {{#if isFumble}}
   <div class="fumble-alert">
     <i class="fas fa-skull"></i> <strong>{{localize "AGONE.Fumble"}}</strong>
+    — {{localize "AGONE.PenaliteFumble"}} : −{{fumblePenalty}}
+    {{#if fumbleTotal}}<span class="fumble-total-adj">({{localize "AGONE.TotalAjuste"}} : {{fumbleTotal}})</span>{{/if}}
   </div>
   {{/if}}
 
   {{#if isCritique}}
   <div class="critique-alert">
     <i class="fas fa-star"></i> <strong>{{localize "AGONE.JetCritique"}}</strong>
-  </div>
-  {{/if}}
-
-  {{#if showFumbleBtn}}
-  <div class="roll-actions">
-    <button type="button" class="agone-fumble-btn" data-actor-id="{{actorId}}">
-      <i class="fas fa-skull"></i> {{localize "AGONE.TirerTableFumble"}}
-    </button>
   </div>
   {{/if}}
 </div>

@@ -1,0 +1,61 @@
+<!-- PARTIAL : IDENTITÉ / BIOGRAPHIE -->
+<div class="identite-section">
+
+  <h3 class="section-title">{{localize "AGONE.Identite"}}</h3>
+  <div class="identite-grid">
+
+    <!-- Peuple : zone de dépôt depuis le compendium -->
+    <div class="identite-row identite-peuple-row">
+      <label>{{localize "AGONE.Peuple"}}</label>
+      <div class="peuple-drop-zone {{#unless system.peuple}}empty{{/unless}}"
+           data-drop-type="peuple"
+           title='{{localize "AGONE.GlisserPeuple"}}'>
+        {{#if system.peuple}}
+          <span class="peuple-name">{{system.peuple}}</span>
+          <button type="button" class="btn-icon peuple-clear" title='{{localize "AGONE.RetirerPeuple"}}'>
+            <i class="fas fa-times"></i>
+          </button>
+        {{else}}
+          <span class="peuple-placeholder">
+            <i class="fas fa-dragon"></i> {{localize "AGONE.GlisserPeuple"}}
+          </span>
+        {{/if}}
+      </div>
+      <button type="button" class="btn-icon compendium-browse" data-pack="agone.peuples"
+              title='{{localize "AGONE.ParcourirPeuples"}}'>
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <div class="identite-row">
+      <label>{{localize "AGONE.Origine"}}</label>
+      <input type="text" name="system.origine" value="{{system.origine}}" />
+    </div>
+    <div class="identite-row">
+      <label>{{localize "AGONE.Occupation"}}</label>
+      <input type="text" name="system.occupation" value="{{system.occupation}}" />
+    </div>
+    <div class="identite-row">
+      <label>{{localize "AGONE.Sexe"}}</label>
+      <input type="text" name="system.sexe" value="{{system.sexe}}" />
+    </div>
+    <div class="identite-row">
+      <label>{{localize "AGONE.Age"}}</label>
+      <input type="text" name="system.age" value="{{system.age}}" />
+    </div>
+    <div class="identite-row">
+      <label>{{localize "AGONE.Taille"}}</label>
+      <input type="text" name="system.taille" value="{{system.taille}}" />
+    </div>
+    <div class="identite-row">
+      <label>{{localize "AGONE.TAI"}}</label>
+      <input type="number" name="system.tai" value="{{system.tai}}" class="stat-num" />
+    </div>
+  </div>
+
+  {{#if system.description}}
+  <h3 class="section-title" style="margin-top:16px;">{{localize "AGONE.Description"}}</h3>
+  <div class="editor-content">{{{descriptionHTML}}}</div>
+  {{/if}}
+
+</div>

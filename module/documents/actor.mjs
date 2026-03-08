@@ -20,6 +20,17 @@ export class AgoneActor extends Actor {
       for (const [k, v] of Object.entries(flat)) {
         if (typeof v === "number" && !Number.isFinite(v)) flat[k] = 0;
       }
+      // Appliquer les contraintes raciales min/max sur les scores d'attributs
+      const attrs = ["agilite", "force", "perception", "resistance", "intelligence", "volonte", "charisma", "creativite"];
+      for (const attr of attrs) {
+        const scoreKey = `${attr}.score`;
+        if (flat[scoreKey] !== undefined) {
+          const raceMin = this.system[attr]?.raceMin;
+          const raceMax = this.system[attr]?.raceMax;
+          if (raceMin != null) flat[scoreKey] = Math.max(flat[scoreKey], raceMin);
+          if (raceMax != null) flat[scoreKey] = Math.min(flat[scoreKey], raceMax);
+        }
+      }
       changed.system = foundry.utils.expandObject(flat);
     }
     return super._preUpdate(changed, options, user);
@@ -336,26 +347,33 @@ export class AgoneActor extends Actor {
   }
 
   /**
-   * Jet de Fumble (1d10 ouvert, puis si résultat = 1 on relance et soustrait)
+   * Jet de Fumble : 1d10 fermé → pénalité à soustraire du jet raté
    */
   async rollFumble() {
     const label = game.i18n.localize("AGONE.Fumble");
     const roll = new Roll("1d10");
     await roll.evaluate();
 
-    let message = `<strong>${label}</strong><br>`;
-    message += `Résultat : <strong>${roll.total}</strong>`;
-
-    if (roll.total === 1) {
-      const roll2 = new Roll("1d10");
-      await roll2.evaluate();
-      message += `<br><em>Fumble ! Relance : ${roll2.total}</em>`;
-    }
+    const content = await renderTemplate(
+      "systems/agone/templates/chat/roll-result.hbs",
+      {
+        actor:        this,
+        label,
+        roll,
+        total:        roll.total,
+        details:      [{ label: game.i18n.localize("AGONE.PenaliteFumble"), value: roll.total }],
+        rollType:     "ferme",
+        isFumble:     true,
+        fumblePenalty: roll.total,
+        fumbleTotal:  null,
+        isCritique:   false,
+      }
+    );
 
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: this }),
-      content: message,
-      type: CONST.CHAT_MESSAGE_TYPES?.ROLL,
+      content,
+      type:  CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 5,
       rolls: [roll]
     });
     return roll;
@@ -452,33 +470,61 @@ export class AgoneActor extends Actor {
    * Envoie un résultat de jet dans le chat
    */
   async _sendRollToChat(roll, label, details = {}, extra = {}) {
-    const detailLines = Object.entries(details)
-      .map(([k, v]) => `<tr><td class="detail-label">${k}</td><td class="detail-value">${v}</td></tr>`)
-      .join("");
+    const rollType = this._lastRollType ?? "ouvert";
 
-    const typeJet = this._lastRollType === "ferme"
-      ? `<span class="jet-type ferme">${game.i18n.localize("AGONE.JetFerme")}</span>`
-      : `<span class="jet-type ouvert">${game.i18n.localize("AGONE.JetOuvert")}</span>`;
-
-    // Si jet fermé: remplacer la formule (sans explosion)
+    // Si jet fermé: recalculer sans explosion
     let finalRoll = roll;
-    if (this._lastRollType === "ferme") {
+    if (rollType === "ferme") {
       const formula = roll.formula.replace("1d10x10", "1d10");
       const r = new Roll(formula, roll.data);
       await r.evaluate();
       finalRoll = r;
     }
 
+    // Valeur brute du dé (premier dé de la formule)
+    const diceResult = finalRoll.dice[0]?.total ?? "?";
+    const diceLabel  = rollType === "ferme" ? "Dé (fermé)" : "Dé (ouvert)";
+
+    // Convertir les détails en tableau {label, value}
+    // Les valeurs sont au format "Label : valeur" ou "texte simple"
+    const detailsArr = [
+      { label: diceLabel, value: diceResult },
+      ...Object.values(details).map(v => {
+        const idx = v.lastIndexOf(" : ");
+        return idx !== -1
+          ? { label: v.slice(0, idx), value: v.slice(idx + 3) }
+          : { label: v, value: "" };
+      })
+    ];
+
+    // Détection fumble (dé = 1) et critique (dé explosé ≥ 10), jets ouverts seulement
+    const firstFace  = finalRoll.dice[0]?.results?.[0]?.result ?? null;
+    const isFumble   = rollType !== "ferme" && firstFace === 1;
+    const isCritique = rollType !== "ferme" && (finalRoll.dice[0]?.total ?? 0) >= 10;
+
+    // Pénalité de fumble : 1d10 fermé soustrait du total
+    let fumblePenalty = 0;
+    if (isFumble) {
+      const fumbleRoll = new Roll("1d10");
+      await fumbleRoll.evaluate();
+      fumblePenalty = fumbleRoll.total;
+    }
+
     const content = await renderTemplate(
       "systems/agone/templates/chat/roll-result.hbs",
       {
-        actor: this,
+        actor:         this,
         label,
-        roll: finalRoll,
-        total: finalRoll.total,
-        details: detailLines,
-        typeJet,
-        arme: extra.arme ?? null,
+        roll:          finalRoll,
+        total:         finalRoll.total,
+        details:       detailsArr,
+        rollType,
+        isFumble,
+        fumblePenalty,
+        fumbleTotal:   finalRoll.total - fumblePenalty,
+        isCritique,
+        actorId:       this.id,
+        arme:          extra.arme ?? null,
         typeJetCombat: extra.typeJet ?? null
       }
     );
@@ -486,7 +532,7 @@ export class AgoneActor extends Actor {
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: this }),
       content,
-      type: CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 5,
+      type:  CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 5,
       rolls: [finalRoll]
     });
     return finalRoll;

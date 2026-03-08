@@ -1,3 +1,5 @@
-2026/03/08-14:59:30.658 b4cc Recovering log #5
-2026/03/08-14:59:30.661 b4cc Delete type=0 #5
-2026/03/08-14:59:30.661 b4cc Delete type=3 #4
+2026/03/08-18:10:29.660 c560 Recovering log #11
+2026/03/08-18:10:29.661 c560 Level-0 table #13: started
+2026/03/08-18:10:29.667 c560 Level-0 table #13: 3354 bytes OK
+2026/03/08-18:10:29.672 c560 Delete type=0 #11
+2026/03/08-18:10:29.672 c560 Delete type=3 #10

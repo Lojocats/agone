@@ -40,9 +40,24 @@
       "sort": {},
       "equipement": {},
       "pouvoir": {},
-      "manoeuvre": {}
+      "manoeuvre": {},
+      "peuple": {}
     }
   },
+  "packs": [
+    {
+      "name": "competences",
+      "label": "Compétences Agone",
+      "path": "packs/competences",
+      "type": "Item"
+    },
+    {
+      "name": "peuples",
+      "label": "Peuples Agone",
+      "path": "packs/peuples",
+      "type": "Item"
+    }
+  ],
   "socket": false,
   "manifest": "",
   "url": ""

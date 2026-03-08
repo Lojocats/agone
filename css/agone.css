@@ -128,6 +128,11 @@
   font-weight: bold;
   color: var(--agone-gold-light);
 }
+.agone .derived.big.flamme-noire,
+.agone .derived-big.flamme-noire {
+  color: var(--agone-noir, #2a2a2a);
+  text-shadow: 0 0 4px rgba(80,0,0,0.6);
+}
 
 /* ── Onglets ─────────────────────────────────────────────── */
 .agone .sheet-tabs {
@@ -177,8 +182,12 @@
 .agone .section-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
   margin-bottom: 6px;
+}
+.agone .section-header h3 {
+  flex: 1;
+  margin: 0;
 }
 
 /* ── Aspects & Attributs ─────────────────────────────────── */
@@ -259,7 +268,14 @@
 .agone .flamme-box label {
   font-size: 12px;
   text-transform: uppercase;
-  color: var(--agone-brown);
+  color: var(--agone-dark-text);
+  font-weight: 600;
+}
+.agone .flamme-box .derived-val,
+.agone .flamme-box .derived-big {
+  color: var(--agone-dark-text);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 /* ── Caractéristiques ────────────────────────────────────── */
@@ -415,21 +431,24 @@
 .agone input.inline-edit:focus { background: white; }
 
 /* ── Actions d'items ─────────────────────────────────────── */
+.agone .btn-icon,
 .agone .item-create {
   background: transparent;
   border: 1px solid var(--agone-gold);
   color: var(--agone-gold);
-  border-radius: 50%;
+  border-radius: var(--radius);
   width: 22px;
   height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 12px;
-  transition: background 0.2s;
+  font-size: 11px;
+  transition: background 0.2s, color 0.2s;
   padding: 0;
+  flex-shrink: 0;
 }
+.agone .btn-icon:hover,
 .agone .item-create:hover { background: var(--agone-gold); color: var(--agone-brown-dark); }
 
 .agone .item-edit, .agone .item-delete {
@@ -453,6 +472,45 @@
   padding: 8px;
   opacity: 0.7;
 }
+
+/* ── Combat tab ─────────────────────────────────────────── */
+.agone .combat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 4px;
+}
+.agone .sante-block,
+.agone .armure-block,
+.agone .armes-block {
+  width: 100%;
+}
+.agone .sante-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.agone .sante-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.agone .sante-row label { flex-shrink: 0; }
+.agone .fumble-zone { margin-top: 8px; }
+.agone .fumble-btn {
+  width: 100%;
+  background: var(--agone-brown-dark);
+  color: var(--agone-parchment);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  padding: 5px 10px;
+  cursor: pointer;
+  font-family: 'Crimson Text', serif;
+  font-size: 13px;
+}
+.agone .fumble-btn:hover { background: var(--agone-red); }
 
 /* ── Armure ──────────────────────────────────────────────── */
 .agone .armures-list {
@@ -764,6 +822,15 @@
   margin-top: 6px;
   font-weight: bold;
 }
+.agone-roll-card .fumble-alert .fumble-total-adj {
+  font-weight: normal;
+  font-size: 0.9em;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+.agone-roll-card .roll-total.fumble-adjusted {
+  color: var(--agone-red);
+}
 .agone-roll-card .critique-alert {
   background: rgba(201,162,39,0.15);
   border: 1px solid var(--agone-gold);
@@ -784,6 +851,129 @@
   margin-top: 6px;
 }
 .agone-fumble-btn:hover { background: #6e0d0d; }
+
+/* ── Onglet Identité ─────────────────────────────────────── */
+.agone .identite-section { padding: 8px 4px; }
+
+.agone .identite-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 12px;
+  align-items: center;
+}
+.agone .identite-row {
+  display: contents;
+}
+.agone .identite-row label {
+  font-size: 12px;
+  color: var(--agone-brown);
+  white-space: nowrap;
+}
+.agone .identite-row input,
+.agone .identite-row select {
+  width: 100%;
+}
+
+.agone .identite-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.agone .identite-peuple-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.agone .peuple-drop-zone {
+  flex: 1;
+  min-height: 28px;
+  border: 2px dashed var(--agone-gold);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 8px;
+  background: rgba(201,162,39,0.05);
+  transition: background 0.2s;
+}
+.agone .peuple-drop-zone:hover,
+.agone .peuple-drop-zone.dragover {
+  background: rgba(201,162,39,0.15);
+}
+.agone .peuple-drop-zone .peuple-name {
+  flex: 1;
+  font-weight: 600;
+  color: var(--agone-brown-dark);
+  font-family: 'Crimson Text', serif;
+  font-size: 14px;
+}
+.agone .peuple-drop-zone .peuple-placeholder {
+  flex: 1;
+  color: var(--agone-brown);
+  opacity: 0.6;
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* ── Feuille de peuple ───────────────────────────────────── */
+.agone.peuple .peuple-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 8px;
+}
+.agone.peuple .peuple-stat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* Groupe attributs élargi (occupe toute la largeur) */
+.agone.peuple .peuple-stat-group--wide {
+  grid-column: 1 / -1;
+}
+.agone.peuple .peuple-stat-group h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--agone-gold-dark);
+  border-bottom: 1px solid var(--agone-gold);
+  padding-bottom: 2px;
+}
+.agone.peuple .peuple-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  border-bottom: 1px dotted rgba(92,58,30,0.2);
+}
+.agone.peuple .peuple-row-label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--agone-brown);
+  min-width: 90px;
+}
+.agone.peuple .peuple-row-header {
+  border-bottom: 1px solid var(--agone-gold);
+  margin-bottom: 2px;
+}
+.agone.peuple .col-header {
+  width: 52px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--agone-gold-dark);
+  letter-spacing: 0.04em;
+}
+.agone.peuple .bonus-input {
+  width: 52px;
+  text-align: center;
+}
 
 /* ── Feuilles de compagnon / démon / PNJ ─────────────────── */
 .agone.compagnon .sheet-header,
@@ -809,7 +999,14 @@
 }
 .agone .flamme-stat-box label {
   font-size: 12px;
-  color: var(--agone-brown);
+  color: var(--agone-brown-dark);
+  font-weight: 600;
+}
+.agone .flamme-stat-box .derived-big,
+.agone .flamme-stat-box .derived-val,
+.agone .flamme-stat-box .stat-num {
+  color: var(--agone-dark-text);
+  font-weight: 700;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────── */

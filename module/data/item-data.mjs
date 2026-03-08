@@ -143,3 +143,45 @@ export class ManoeuvreData extends foundry.abstract.TypeDataModel {
     };
   }
 }
+
+// ================================
+// Peuple / Espèce
+// ================================
+export class PeupleData extends foundry.abstract.TypeDataModel {
+  static defineSchema() {
+    return {
+      description:      new fields.HTMLField({ initial: "" }),
+      taiBase:          new fields.NumberField({ initial: 0, integer: true }),
+      mvBase:           new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      // Bonus d'aspects
+      corpsBonus:       new fields.NumberField({ initial: 0, integer: true }),
+      espritBonus:      new fields.NumberField({ initial: 0, integer: true }),
+      ameBonus:         new fields.NumberField({ initial: 0, integer: true }),
+      // Bonus/min/max d'attributs (m = minimum autorisé, M = maximum autorisé)
+      agiliteBonus:      new fields.NumberField({ initial: 0,    integer: true }),
+      agiliteMin:        new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      agiliteMax:        new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      forceBonus:        new fields.NumberField({ initial: 0,    integer: true }),
+      forceMin:          new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      forceMax:          new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      perceptionBonus:   new fields.NumberField({ initial: 0,    integer: true }),
+      perceptionMin:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      perceptionMax:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      resistanceBonus:   new fields.NumberField({ initial: 0,    integer: true }),
+      resistanceMin:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      resistanceMax:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      intelligenceBonus: new fields.NumberField({ initial: 0,    integer: true }),
+      intelligenceMin:   new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      intelligenceMax:   new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      volonteBonus:      new fields.NumberField({ initial: 0,    integer: true }),
+      volonteMin:        new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      volonteMax:        new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      charismaBonus:     new fields.NumberField({ initial: 0,    integer: true }),
+      charismaMin:       new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      charismaMax:       new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      creativiteBonus:   new fields.NumberField({ initial: 0,    integer: true }),
+      creativiteMin:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      creativiteMax:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+    };
+  }
+}

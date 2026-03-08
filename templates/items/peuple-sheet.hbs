@@ -1,0 +1,117 @@
+<form class="agone sheet item peuple" autocomplete="off">
+  <header class="sheet-header item-header">
+    <img class="item-image" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-details">
+      <h1><input name="name" type="text" value="{{item.name}}" /></h1>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item active" data-tab="stats">{{localize "AGONE.Stats"}}</a>
+    <a class="item" data-tab="description">{{localize "AGONE.Description"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+
+    <!-- ONGLET STATS -->
+    <div class="tab active" data-group="primary" data-tab="stats">
+      <div class="peuple-stats-grid">
+
+        <div class="peuple-stat-group">
+          <h3 class="section-title">{{localize "AGONE.InfosBase"}}</h3>
+          <div class="peuple-row">
+            <label>{{localize "AGONE.TAI"}}</label>
+            <input type="number" name="system.taiBase" value="{{system.taiBase}}" class="stat-num" />
+          </div>
+          <div class="peuple-row">
+            <label>{{localize "AGONE.MV"}}</label>
+            <input type="number" name="system.mvBase" value="{{system.mvBase}}" class="stat-num" />
+          </div>
+        </div>
+
+        <div class="peuple-stat-group">
+          <h3 class="section-title">{{localize "AGONE.BonusAspects"}}</h3>
+          <div class="peuple-row">
+            <label>{{localize "AGONE.Corps"}}</label>
+            <input type="number" name="system.corpsBonus" value="{{system.corpsBonus}}" class="stat-num bonus-input" />
+          </div>
+          <div class="peuple-row">
+            <label>{{localize "AGONE.Esprit"}}</label>
+            <input type="number" name="system.espritBonus" value="{{system.espritBonus}}" class="stat-num bonus-input" />
+          </div>
+          <div class="peuple-row">
+            <label>{{localize "AGONE.Ame"}}</label>
+            <input type="number" name="system.ameBonus" value="{{system.ameBonus}}" class="stat-num bonus-input" />
+          </div>
+        </div>
+
+        <div class="peuple-stat-group peuple-stat-group--wide">
+          <h3 class="section-title">{{localize "AGONE.BonusAttributs"}}</h3>
+          <div class="peuple-row peuple-row-header">
+            <span class="peuple-row-label"></span>
+            <span class="col-header">{{localize "AGONE.BonusDepart"}}</span>
+            <span class="col-header">{{localize "AGONE.Min"}}</span>
+            <span class="col-header">{{localize "AGONE.Max"}}</span>
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Agilite"}}</label>
+            <input type="number" name="system.agiliteBonus" value="{{system.agiliteBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.agiliteMin"   value="{{system.agiliteMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.agiliteMax"   value="{{system.agiliteMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Force"}}</label>
+            <input type="number" name="system.forceBonus" value="{{system.forceBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.forceMin"   value="{{system.forceMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.forceMax"   value="{{system.forceMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Perception"}}</label>
+            <input type="number" name="system.perceptionBonus" value="{{system.perceptionBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.perceptionMin"   value="{{system.perceptionMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.perceptionMax"   value="{{system.perceptionMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Resistance"}}</label>
+            <input type="number" name="system.resistanceBonus" value="{{system.resistanceBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.resistanceMin"   value="{{system.resistanceMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.resistanceMax"   value="{{system.resistanceMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Intelligence"}}</label>
+            <input type="number" name="system.intelligenceBonus" value="{{system.intelligenceBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.intelligenceMin"   value="{{system.intelligenceMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.intelligenceMax"   value="{{system.intelligenceMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Volonte"}}</label>
+            <input type="number" name="system.volonteBonus" value="{{system.volonteBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.volonteMin"   value="{{system.volonteMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.volonteMax"   value="{{system.volonteMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Charisma"}}</label>
+            <input type="number" name="system.charismaBonus" value="{{system.charismaBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.charismaMin"   value="{{system.charismaMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.charismaMax"   value="{{system.charismaMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+          <div class="peuple-row">
+            <label class="peuple-row-label">{{localize "AGONE.Attribut.Creativite"}}</label>
+            <input type="number" name="system.creativiteBonus" value="{{system.creativiteBonus}}" class="bonus-input" placeholder="0" />
+            <input type="number" name="system.creativiteMin"   value="{{system.creativiteMin}}"   class="bonus-input" placeholder="—" />
+            <input type="number" name="system.creativiteMax"   value="{{system.creativiteMax}}"   class="bonus-input" placeholder="—" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ONGLET DESCRIPTION -->
+    <div class="tab" data-group="primary" data-tab="description">
+      <div class="editor-container">
+        {{editor descriptionHTML target="system.description" button=true editable=owner}}
+      </div>
+    </div>
+
+  </section>
+</form>

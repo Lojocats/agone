@@ -102,6 +102,12 @@ export class PersonnageSheet extends ActorSheet {
     html.find("[data-action='rollAptitudeMagie']").click(this._onRollAptitudeMagie.bind(this));
     html.find("[data-action='rollAptitudeConjuration']").click(this._onRollAptitudeConjuration.bind(this));
 
+    // Ouvrir le compendium de compétences / peuples
+    html.find(".compendium-browse").click(this._onBrowseCompendium.bind(this));
+
+    // Retirer le peuple actuel
+    html.find(".peuple-clear").click(this._onClearPeuple.bind(this));
+
     // Envoyer un item en chat
     html.find("[data-action='rollItemChat']").click(this._onItemSendChat.bind(this));
 
@@ -324,6 +330,141 @@ export class PersonnageSheet extends ActorSheet {
   }
 
   // ==============================
+  // Compendium
+  // ==============================
+  async _onBrowseCompendium(event) {
+    event.preventDefault();
+    const packId = event.currentTarget.dataset.pack ?? "agone.competences";
+    const pack = game.packs.get(packId);
+    if (!pack) return ui.notifications?.warn(game.i18n.localize("AGONE.CompendiumIntrouvable"));
+    pack.render(true);
+  }
+
+  async _onClearPeuple(event) {
+    event.preventDefault();
+    const sd  = this.actor.system;
+    const old = sd.peupleBonusApplique ?? {};
+    const update = {
+      "system.peuple":      "",
+      "system.peupleId":     "",
+      "system.tai":          0,
+      "system.mvOverride":   null,
+      "system.peupleBonusApplique.corpsBonus":        0,
+      "system.peupleBonusApplique.espritBonus":       0,
+      "system.peupleBonusApplique.ameBonus":          0,
+      "system.peupleBonusApplique.agiliteBonus":      0,
+      "system.peupleBonusApplique.forceBonus":        0,
+      "system.peupleBonusApplique.perceptionBonus":   0,
+      "system.peupleBonusApplique.resistanceBonus":   0,
+      "system.peupleBonusApplique.intelligenceBonus": 0,
+      "system.peupleBonusApplique.volonteBonus":      0,
+      "system.peupleBonusApplique.charismaBonus":     0,
+      "system.peupleBonusApplique.creativiteBonus":   0,
+      "system.corps.score":       Math.max(0, (sd.corps?.score  ?? 0) - (old.corpsBonus  ?? 0)),
+      "system.esprit.score":      Math.max(0, (sd.esprit?.score ?? 0) - (old.espritBonus ?? 0)),
+      "system.ame.score":         Math.max(0, (sd.ame?.score    ?? 0) - (old.ameBonus    ?? 0)),
+      "system.agilite.score":     Math.max(0, (sd.agilite?.score      ?? 0) - (old.agiliteBonus      ?? 0)),
+      "system.agilite.raceMin":   null,
+      "system.agilite.raceMax":   null,
+      "system.force.score":       Math.max(0, (sd.force?.score        ?? 0) - (old.forceBonus        ?? 0)),
+      "system.force.raceMin":     null,
+      "system.force.raceMax":     null,
+      "system.perception.score":  Math.max(0, (sd.perception?.score   ?? 0) - (old.perceptionBonus   ?? 0)),
+      "system.perception.raceMin":   null,
+      "system.perception.raceMax":   null,
+      "system.resistance.score":  Math.max(0, (sd.resistance?.score   ?? 0) - (old.resistanceBonus   ?? 0)),
+      "system.resistance.raceMin":   null,
+      "system.resistance.raceMax":   null,
+      "system.intelligence.score":Math.max(0, (sd.intelligence?.score ?? 0) - (old.intelligenceBonus ?? 0)),
+      "system.intelligence.raceMin": null,
+      "system.intelligence.raceMax": null,
+      "system.volonte.score":     Math.max(0, (sd.volonte?.score      ?? 0) - (old.volonteBonus      ?? 0)),
+      "system.volonte.raceMin":   null,
+      "system.volonte.raceMax":   null,
+      "system.charisma.score":    Math.max(0, (sd.charisma?.score     ?? 0) - (old.charismaBonus     ?? 0)),
+      "system.charisma.raceMin":  null,
+      "system.charisma.raceMax":  null,
+      "system.creativite.score":  Math.max(0, (sd.creativite?.score   ?? 0) - (old.creativiteBonus   ?? 0)),
+      "system.creativite.raceMin": null,
+      "system.creativite.raceMax": null,
+    };
+    await this.actor.update(update);
+  }
+
+  // ── Drop d'un item de type peuple ──────────────────────────────────────
+  /** @override */
+  async _onDropItem(event, data) {
+    const item = await Item.fromDropData(data);
+    if (!item || item.type !== "peuple") {
+      return super._onDropItem(event, data);
+    }
+    await this._applyPeuple(item);
+  }
+
+  async _applyPeuple(peupleItem) {
+    const sd  = this.actor.system;
+    const old = sd.peupleBonusApplique ?? {};
+    const nw  = peupleItem.system;
+
+    // Retire l'ancien bonus, ajoute le nouveau, puis clamp sur [raceMin, raceMax]
+    const calcScore = (current, oldBonus, newBonus, newMin, newMax) => {
+      let v = Math.max(0, (current ?? 0) - (oldBonus ?? 0) + (newBonus ?? 0));
+      if (newMin != null) v = Math.max(v, newMin);
+      if (newMax != null) v = Math.min(v, newMax);
+      return v;
+    };
+
+    const update = {
+      "system.peuple":      peupleItem.name,
+      "system.peupleId":     peupleItem.uuid,
+      "system.tai":          nw.taiBase ?? 0,
+      "system.mvOverride":   nw.mvBase  ?? null,
+      "system.peupleBonusApplique.corpsBonus":        nw.corpsBonus        ?? 0,
+      "system.peupleBonusApplique.espritBonus":       nw.espritBonus       ?? 0,
+      "system.peupleBonusApplique.ameBonus":          nw.ameBonus          ?? 0,
+      "system.peupleBonusApplique.agiliteBonus":      nw.agiliteBonus      ?? 0,
+      "system.peupleBonusApplique.forceBonus":        nw.forceBonus        ?? 0,
+      "system.peupleBonusApplique.perceptionBonus":   nw.perceptionBonus   ?? 0,
+      "system.peupleBonusApplique.resistanceBonus":   nw.resistanceBonus   ?? 0,
+      "system.peupleBonusApplique.intelligenceBonus": nw.intelligenceBonus ?? 0,
+      "system.peupleBonusApplique.volonteBonus":      nw.volonteBonus      ?? 0,
+      "system.peupleBonusApplique.charismaBonus":     nw.charismaBonus     ?? 0,
+      "system.peupleBonusApplique.creativiteBonus":   nw.creativiteBonus   ?? 0,
+      // Aspects
+      "system.corps.score":  Math.max(0, (sd.corps?.score  ?? 0) - (old.corpsBonus  ?? 0) + (nw.corpsBonus  ?? 0)),
+      "system.esprit.score": Math.max(0, (sd.esprit?.score ?? 0) - (old.espritBonus ?? 0) + (nw.espritBonus ?? 0)),
+      "system.ame.score":    Math.max(0, (sd.ame?.score    ?? 0) - (old.ameBonus    ?? 0) + (nw.ameBonus    ?? 0)),
+      // Attributs avec clamp sur min/max raciaux
+      "system.agilite.score":      calcScore(sd.agilite?.score,      old.agiliteBonus,      nw.agiliteBonus,      nw.agiliteMin,      nw.agiliteMax),
+      "system.force.score":        calcScore(sd.force?.score,        old.forceBonus,        nw.forceBonus,        nw.forceMin,        nw.forceMax),
+      "system.perception.score":   calcScore(sd.perception?.score,   old.perceptionBonus,   nw.perceptionBonus,   nw.perceptionMin,   nw.perceptionMax),
+      "system.resistance.score":   calcScore(sd.resistance?.score,   old.resistanceBonus,   nw.resistanceBonus,   nw.resistanceMin,   nw.resistanceMax),
+      "system.intelligence.score": calcScore(sd.intelligence?.score, old.intelligenceBonus, nw.intelligenceBonus, nw.intelligenceMin, nw.intelligenceMax),
+      "system.volonte.score":      calcScore(sd.volonte?.score,      old.volonteBonus,      nw.volonteBonus,      nw.volonteMin,      nw.volonteMax),
+      "system.charisma.score":     calcScore(sd.charisma?.score,     old.charismaBonus,     nw.charismaBonus,     nw.charismaMin,     nw.charismaMax),
+      "system.creativite.score":   calcScore(sd.creativite?.score,   old.creativiteBonus,   nw.creativiteBonus,   nw.creativiteMin,   nw.creativiteMax),
+      // Contraintes raciales persistantes
+      "system.agilite.raceMin":      nw.agiliteMin      ?? null,
+      "system.agilite.raceMax":      nw.agiliteMax      ?? null,
+      "system.force.raceMin":        nw.forceMin        ?? null,
+      "system.force.raceMax":        nw.forceMax        ?? null,
+      "system.perception.raceMin":   nw.perceptionMin   ?? null,
+      "system.perception.raceMax":   nw.perceptionMax   ?? null,
+      "system.resistance.raceMin":   nw.resistanceMin   ?? null,
+      "system.resistance.raceMax":   nw.resistanceMax   ?? null,
+      "system.intelligence.raceMin": nw.intelligenceMin ?? null,
+      "system.intelligence.raceMax": nw.intelligenceMax ?? null,
+      "system.volonte.raceMin":      nw.volonteMin      ?? null,
+      "system.volonte.raceMax":      nw.volonteMax      ?? null,
+      "system.charisma.raceMin":     nw.charismaMin     ?? null,
+      "system.charisma.raceMax":     nw.charismaMax     ?? null,
+      "system.creativite.raceMin":   nw.creativiteMin   ?? null,
+      "system.creativite.raceMax":   nw.creativiteMax   ?? null,
+    };
+    await this.actor.update(update);
+    ui.notifications?.info(game.i18n.format("AGONE.PeupleApplique", { name: peupleItem.name }));
+  }
+
   // Édition inline
   // ==============================
   async _onInlineEdit(event) {
