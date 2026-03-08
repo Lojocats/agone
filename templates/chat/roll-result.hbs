@@ -1,0 +1,50 @@
+{{! Template de résultat de jet de dés Agone }}
+<div class="agone-roll-card">
+  <div class="roll-header">
+    <span class="roll-label">{{label}}</span>
+    {{#if rollType}}
+    <span class="roll-type badge-{{rollType}}">
+      {{#if (eq rollType "ouvert")}}Jet Ouvert{{else}}Jet Fermé{{/if}}
+    </span>
+    {{/if}}
+  </div>
+
+  <div class="roll-result">
+    <span class="roll-total">{{total}}</span>
+  </div>
+
+  {{#if details}}
+  <div class="roll-details">
+    <table class="roll-breakdown">
+      <tbody>
+        {{#each details as |detail|}}
+        <tr>
+          <td class="detail-label">{{detail.label}}</td>
+          <td class="detail-value">{{detail.value}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{/if}}
+
+  {{#if isFumble}}
+  <div class="fumble-alert">
+    <i class="fas fa-skull"></i> <strong>{{localize "AGONE.Fumble"}}</strong>
+  </div>
+  {{/if}}
+
+  {{#if isCritique}}
+  <div class="critique-alert">
+    <i class="fas fa-star"></i> <strong>{{localize "AGONE.JetCritique"}}</strong>
+  </div>
+  {{/if}}
+
+  {{#if showFumbleBtn}}
+  <div class="roll-actions">
+    <button type="button" class="agone-fumble-btn" data-actor-id="{{actorId}}">
+      <i class="fas fa-skull"></i> {{localize "AGONE.TirerTableFumble"}}
+    </button>
+  </div>
+  {{/if}}
+</div>

@@ -1,0 +1,117 @@
+<form class="agone sheet {{actor.type}}" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-portrait">
+      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+    </div>
+    <div class="header-fields">
+      <h1 class="charname">
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Nom du personnage" />
+      </h1>
+      <div class="header-row">
+        <label>{{localize "AGONE.Origine"}}</label>
+        <input type="text" name="system.origine" value="{{system.origine}}" />
+        <label>{{localize "AGONE.Occupation"}}</label>
+        <input type="text" name="system.occupation" value="{{system.occupation}}" />
+        <label>{{localize "AGONE.Peuple"}}</label>
+        <select name="system.peuple">
+          {{#each peuples as |p|}}
+            <option value="{{p.value}}" {{#if (eq ../system.peuple p.value)}}selected{{/if}}>{{p.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="header-row">
+        <label>{{localize "AGONE.Sexe"}}</label>
+        <input type="text" name="system.sexe" value="{{system.sexe}}" />
+        <label>{{localize "AGONE.Age"}}</label>
+        <input type="text" name="system.age" value="{{system.age}}" />
+        <label>{{localize "AGONE.Taille"}}</label>
+        <input type="text" name="system.taille" value="{{system.taille}}" />
+        <label>{{localize "AGONE.TAI"}}</label>
+        <input type="number" name="system.tai" value="{{system.tai}}" class="stat-num" />
+      </div>
+      <div class="header-row secondary-stats">
+        <div class="stat-box">
+          <label>{{localize "AGONE.PdV"}}</label>
+          <input type="number" name="system.pdv.valeur" value="{{system.pdv.valeur}}" class="stat-num" />
+          <span>/</span>
+          <input type="number" name="system.pdv.max" value="{{system.pdv.max}}" class="stat-num" />
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.PH"}}</label>
+          <input type="number" name="system.ph.valeur" value="{{system.ph.valeur}}" class="stat-num" />
+          <span>/</span>
+          <span class="derived">{{system.ph.max}}</span>
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.Flamme"}}</label>
+          <span class="derived big">{{system.flamme}}</span>
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.MV"}}</label>
+          <input type="number" name="system.mv" value="{{system.mv}}" class="stat-num" />
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.Exp"}}</label>
+          <input type="number" name="system.experience.courante" value="{{system.experience.courante}}" class="stat-num" />
+          <span>/</span>
+          <input type="number" name="system.experience.totale" value="{{system.experience.totale}}" class="stat-num" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="attributs">{{localize "AGONE.Attributs"}}</a>
+    <a class="item" data-tab="competences">{{localize "AGONE.Competences"}}</a>
+    <a class="item" data-tab="combat">{{localize "AGONE.Combat"}}</a>
+    <a class="item" data-tab="magie">{{localize "AGONE.Magie"}}</a>
+    <a class="item" data-tab="avantages">{{localize "AGONE.Avantages"}}</a>
+    <a class="item" data-tab="tenebres">{{localize "AGONE.Tenebres"}}</a>
+    <a class="item" data-tab="equipement">{{localize "AGONE.Equipement"}}</a>
+    <a class="item" data-tab="notes">{{localize "AGONE.Notes"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+    <!-- ONGLET : ATTRIBUTS -->
+    <div class="tab" data-group="primary" data-tab="attributs">
+      {{> systems/agone/templates/actors/parts/attributs.hbs}}
+    </div>
+
+    <!-- ONGLET : COMPÉTENCES -->
+    <div class="tab" data-group="primary" data-tab="competences">
+      {{> systems/agone/templates/actors/parts/competences.hbs}}
+    </div>
+
+    <!-- ONGLET : COMBAT -->
+    <div class="tab" data-group="primary" data-tab="combat">
+      {{> systems/agone/templates/actors/parts/combat.hbs}}
+    </div>
+
+    <!-- ONGLET : MAGIE -->
+    <div class="tab" data-group="primary" data-tab="magie">
+      {{> systems/agone/templates/actors/parts/magie.hbs}}
+    </div>
+
+    <!-- ONGLET : AVANTAGES -->
+    <div class="tab" data-group="primary" data-tab="avantages">
+      {{> systems/agone/templates/actors/parts/avantages.hbs}}
+    </div>
+
+    <!-- ONGLET : TÉNÈBRES & FLAMME -->
+    <div class="tab" data-group="primary" data-tab="tenebres">
+      {{> systems/agone/templates/actors/parts/tenebres.hbs}}
+    </div>
+
+    <!-- ONGLET : ÉQUIPEMENT -->
+    <div class="tab" data-group="primary" data-tab="equipement">
+      {{> systems/agone/templates/actors/parts/equipement-tab.hbs}}
+    </div>
+
+    <!-- ONGLET : NOTES -->
+    <div class="tab" data-group="primary" data-tab="notes">
+      <div class="editor-container">
+        {{editor descriptionHTML target="system.description" button=true editable=owner}}
+      </div>
+    </div>
+  </section>
+</form>

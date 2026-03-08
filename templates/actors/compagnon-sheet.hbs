@@ -1,0 +1,96 @@
+<form class="agone sheet actor compagnon" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-portrait">
+      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+    </div>
+    <div class="header-fields">
+      <h1 class="charname">
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Nom du compagnon" />
+      </h1>
+      <div class="header-row secondary-stats">
+        <div class="stat-box">
+          <label>{{localize "AGONE.PdV"}}</label>
+          <input type="number" name="system.pdv.valeur" value="{{system.pdv.valeur}}" class="stat-num" />
+          <span>/</span>
+          <input type="number" name="system.pdv.max" value="{{system.pdv.max}}" class="stat-num" />
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.BlessuresGraves"}}</label>
+          <input type="number" name="system.blessuresGraves" value="{{system.blessuresGraves}}" class="stat-num" max="3" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="infos">{{localize "AGONE.Caracteristiques"}}</a>
+    <a class="item" data-tab="combat">{{localize "AGONE.Combat"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab" data-group="primary" data-tab="infos">
+      <div class="carac-grid">
+        <div class="carac-row">
+          <label>{{localize "AGONE.Attribut.Agilite"}}</label>
+          <input type="number" name="system.agilite" value="{{system.agilite}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.Attribut.Force"}}</label>
+          <input type="number" name="system.force" value="{{system.force}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.Attribut.Perception"}}</label>
+          <input type="number" name="system.perception" value="{{system.perception}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.Attribut.Resistance"}}</label>
+          <input type="number" name="system.resistance" value="{{system.resistance}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.ChargeMax"}}</label>
+          <input type="number" name="system.chargeMax" value="{{system.chargeMax}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.Initiative"}}</label>
+          <span class="derived-val">{{system.initiative}}</span>
+          <button type="button" class="roll-btn-small" data-action="rollInitiative">
+            <i class="fas fa-dice-d10"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" data-group="primary" data-tab="combat">
+      <div class="section-header">
+        <h3>{{localize "AGONE.Armes"}}</h3>
+        <button type="button" class="item-create" data-type="arme"><i class="fas fa-plus"></i></button>
+      </div>
+      {{#if armes.length}}
+      <table class="armes-table">
+        <thead>
+          <tr>
+            <th>{{localize "AGONE.Nom"}}</th>
+            <th>{{localize "AGONE.Dommages"}}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each armes as |arme|}}
+          <tr class="item-row" data-item-id="{{arme.id}}">
+            <td>{{arme.name}}</td>
+            <td>{{arme.system.dommages}}</td>
+            <td>
+              <button type="button" class="roll-btn-small" data-action="rollAttaque" data-item-id="{{arme.id}}">
+                <i class="fas fa-dice-d10"></i>
+              </button>
+              <a class="item-edit" data-item-id="{{arme.id}}"><i class="fas fa-edit"></i></a>
+              <a class="item-delete" data-item-id="{{arme.id}}"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{/if}}
+    </div>
+  </section>
+</form>

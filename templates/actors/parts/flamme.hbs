@@ -1,0 +1,42 @@
+<!-- PARTIAL : FLAMME & SAISONINS (bienfaits) -->
+<div class="flamme-saisonins">
+
+  <div class="flamme-resume">
+    <div class="flamme-stat-box">
+      <label>{{localize "AGONE.Flamme"}}</label>
+      <span class="derived-big">{{system.flamme}}</span>
+    </div>
+    <div class="flamme-stat-box">
+      <label>{{localize "AGONE.PH"}}</label>
+      <span class="stat-num derived-val">{{system.ph.valeur}}</span>
+      <span>/</span>
+      <span class="derived-val">{{system.ph.max}}</span>
+    </div>
+  </div>
+
+  <!-- Pouvoirs de la Flamme -->
+  <h4>{{localize "AGONE.PouvoirsFlamme"}}</h4>
+  <ul class="pouvoirs-flamme-list">
+    {{#each pouvoirs as |pouvoir|}}
+    {{#if (eq pouvoir.system.categorie "flamme")}}
+    <li class="item-row" data-item-id="{{pouvoir.id}}">
+      <span>{{pouvoir.name}}</span>
+      <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
+    </li>
+    {{/if}}
+    {{/each}}
+  </ul>
+
+  <!-- Saisonins -->
+  <h4>{{localize "AGONE.Saisonins"}}</h4>
+  <ul class="saisonins-list">
+    {{#each pouvoirs as |pouvoir|}}
+    {{#if (eq pouvoir.system.categorie "saisonin")}}
+    <li class="item-row" data-item-id="{{pouvoir.id}}">
+      <span>{{pouvoir.name}}</span>
+      <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
+    </li>
+    {{/if}}
+    {{/each}}
+  </ul>
+</div>

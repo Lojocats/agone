@@ -1,0 +1,24 @@
+<form class="agone sheet item manoeuvre" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de la manœuvre" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.Score"}}</label>
+        <input type="number" name="system.score" value="{{system.score}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Malus"}}</label>
+        <input type="number" name="system.malus" value="{{system.malus}}" class="stat-num" />
+      </div>
+    </div>
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+  </section>
+</form>

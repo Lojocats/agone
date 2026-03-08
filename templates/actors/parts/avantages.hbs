@@ -1,0 +1,48 @@
+<!-- PARTIAL : AVANTAGES & DÉFAUTS -->
+<div class="avantages-section">
+  <div class="section-header">
+    <h3>{{localize "AGONE.AvantagesDefauts"}}</h3>
+    <button type="button" class="item-create" data-type="don">
+      <i class="fas fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- Avantages -->
+  <div class="avantages-groupe">
+    <h4>{{localize "AGONE.Avantages"}}</h4>
+    {{#if avantages.length}}
+    <ul class="dons-list">
+      {{#each avantages as |don|}}
+      <li class="don-row item-row" data-item-id="{{don.id}}">
+        <span class="don-name">{{don.name}}</span>
+        <span class="don-cout">({{don.system.cout}} pts)</span>
+        <a class="item-edit" data-item-id="{{don.id}}"><i class="fas fa-edit"></i></a>
+        <a class="item-delete" data-item-id="{{don.id}}"><i class="fas fa-trash"></i></a>
+      </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p class="empty-list">{{localize "AGONE.AucunAvantage"}}</p>
+    {{/if}}
+  </div>
+
+  <!-- Défauts -->
+  <div class="defauts-groupe">
+    <h4>{{localize "AGONE.Defauts"}}</h4>
+    {{#if defauts.length}}
+    <ul class="dons-list">
+      {{#each defauts as |don|}}
+      <li class="don-row item-row" data-item-id="{{don.id}}">
+        <span class="don-name">{{don.name}}</span>
+        <span class="don-cout">({{don.system.cout}} pts)</span>
+        <a class="item-edit" data-item-id="{{don.id}}"><i class="fas fa-edit"></i></a>
+        <a class="item-delete" data-item-id="{{don.id}}"><i class="fas fa-trash"></i></a>
+      </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p class="empty-list">{{localize "AGONE.AucunDefaut"}}</p>
+    {{/if}}
+  </div>
+
+</div>

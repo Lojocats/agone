@@ -1,0 +1,47 @@
+<form class="agone sheet item sort" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom du sort" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.TypeMagie"}}</label>
+        <select name="system.typeMagie">
+          <option value="artsMagiques" {{#if (eq system.typeMagie "artsMagiques")}}selected{{/if}}>{{localize "AGONE.ArtsMagiques"}}</option>
+          <option value="conjuration" {{#if (eq system.typeMagie "conjuration")}}selected{{/if}}>{{localize "AGONE.Conjuration"}}</option>
+          <option value="sorcellerie" {{#if (eq system.typeMagie "sorcellerie")}}selected{{/if}}>{{localize "AGONE.Sorcellerie"}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Seuil"}}</label>
+        <input type="number" name="system.seuil" value="{{system.seuil}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Portee"}}</label>
+        <input type="text" name="system.portee" value="{{system.portee}}" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Duree"}}</label>
+        <input type="text" name="system.duree" value="{{system.duree}}" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Temps"}}</label>
+        <input type="text" name="system.temps" value="{{system.temps}}" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Initiative"}}</label>
+        <input type="number" name="system.initiative" value="{{system.initiative}}" class="stat-num" />
+      </div>
+    </div>
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+    <div class="send-to-chat">
+      <button type="button" data-action="toChat"><i class="fas fa-comment"></i> {{localize "AGONE.EnvoyerChat"}}</button>
+    </div>
+  </section>
+</form>

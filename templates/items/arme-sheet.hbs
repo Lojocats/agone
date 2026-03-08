@@ -1,0 +1,71 @@
+<form class="agone sheet item arme" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de l'arme" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid arme-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.TAI"}}</label>
+        <input type="number" name="system.tai" value="{{system.tai}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.TypeArme"}}</label>
+        <select name="system.type">
+          <option value="P" {{#if (eq system.type "P")}}selected{{/if}}>{{localize "AGONE.Percutant"}}</option>
+          <option value="T" {{#if (eq system.type "T")}}selected{{/if}}>{{localize "AGONE.Tranchant"}}</option>
+          <option value="PT" {{#if (eq system.type "PT")}}selected{{/if}}>{{localize "AGONE.PercutantEtTranchant"}}</option>
+          <option value="C" {{#if (eq system.type "C")}}selected{{/if}}>{{localize "AGONE.Contondant"}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.StyleArme"}}</label>
+        <select name="system.style">
+          <option value="melee" {{#if (eq system.style "melee")}}selected{{/if}}>{{localize "AGONE.Melee"}}</option>
+          <option value="jet" {{#if (eq system.style "jet")}}selected{{/if}}>{{localize "AGONE.Jet"}}</option>
+          <option value="trait" {{#if (eq system.style "trait")}}selected{{/if}}>{{localize "AGONE.Trait"}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.InitBonus"}}</label>
+        <input type="number" name="system.initBonus" value="{{system.initBonus}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.AttackBonus"}}</label>
+        <input type="number" name="system.attackBonus" value="{{system.attackBonus}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.DefenseBonus"}}</label>
+        <input type="number" name="system.defenseBonus" value="{{system.defenseBonus}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Dommages"}}</label>
+        <input type="number" name="system.dommages" value="{{system.dommages}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.CompetenceLiee"}}</label>
+        <input type="text" name="system.competence" value="{{system.competence}}" placeholder="Nom de la compétence..." />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Poids"}}</label>
+        <input type="number" name="system.poids" value="{{system.poids}}" class="stat-num" />
+      </div>
+    </div>
+
+    <div class="totaux-bloc">
+      <h3>{{localize "AGONE.TotauxCalcules"}}</h3>
+      <div class="totaux-row">
+        <span>{{localize "AGONE.InitTotal"}} : <strong>{{system.initTotal}}</strong></span>
+        <span>{{localize "AGONE.AttaqTotal"}} : <strong>{{system.attackTotal}}</strong></span>
+        <span>{{localize "AGONE.DefTotal"}} : <strong>{{system.defenseTotal}}</strong></span>
+      </div>
+    </div>
+
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+  </section>
+</form>

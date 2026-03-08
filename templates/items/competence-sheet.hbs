@@ -1,0 +1,47 @@
+<form class="agone sheet item competence" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de la compétence" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.Domaine"}}</label>
+        <input type="text" name="system.domaine" value="{{system.domaine}}" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Specialite"}}</label>
+        <input type="text" name="system.specialite" value="{{system.specialite}}" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.AttributLie"}}</label>
+        <select name="system.attributLie">
+          <option value="agilite"     {{#if (eq system.attributLie "agilite")}}selected{{/if}}>{{localize "AGONE.Attribut.Agilite"}}</option>
+          <option value="force"       {{#if (eq system.attributLie "force")}}selected{{/if}}>{{localize "AGONE.Attribut.Force"}}</option>
+          <option value="perception"  {{#if (eq system.attributLie "perception")}}selected{{/if}}>{{localize "AGONE.Attribut.Perception"}}</option>
+          <option value="intelligence"{{#if (eq system.attributLie "intelligence")}}selected{{/if}}>{{localize "AGONE.Attribut.Intelligence"}}</option>
+          <option value="volonte"     {{#if (eq system.attributLie "volonte")}}selected{{/if}}>{{localize "AGONE.Attribut.Volonte"}}</option>
+          <option value="resistance"  {{#if (eq system.attributLie "resistance")}}selected{{/if}}>{{localize "AGONE.Attribut.Resistance"}}</option>
+          <option value="charisma"    {{#if (eq system.attributLie "charisma")}}selected{{/if}}>{{localize "AGONE.Attribut.Charisma"}}</option>
+          <option value="creativite"  {{#if (eq system.attributLie "creativite")}}selected{{/if}}>{{localize "AGONE.Attribut.Creativite"}}</option>
+          <option value="melee"       {{#if (eq system.attributLie "melee")}}selected{{/if}}>{{localize "AGONE.Melee"}}</option>
+          <option value="tir"         {{#if (eq system.attributLie "tir")}}selected{{/if}}>{{localize "AGONE.Tir"}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Score"}}</label>
+        <input type="number" name="system.score" value="{{system.score}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Exp"}}</label>
+        <input type="number" name="system.exp" value="{{system.exp}}" class="stat-num" />
+      </div>
+    </div>
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Notes"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+  </section>
+</form>

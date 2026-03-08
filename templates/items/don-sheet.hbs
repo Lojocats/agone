@@ -1,0 +1,27 @@
+<form class="agone sheet item don" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.Categorie"}}</label>
+        <select name="system.categorie">
+          <option value="avantage" {{#if (eq system.categorie "avantage")}}selected{{/if}}>{{localize "AGONE.Avantage"}}</option>
+          <option value="defaut" {{#if (eq system.categorie "defaut")}}selected{{/if}}>{{localize "AGONE.Defaut"}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Cout"}}</label>
+        <input type="number" name="system.cout" value="{{system.cout}}" class="stat-num" />
+      </div>
+    </div>
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+  </section>
+</form>

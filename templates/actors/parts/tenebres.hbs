@@ -1,0 +1,59 @@
+<!-- PARTIAL : TÉNÈBRES, PEINES & PERFIDIE -->
+<div class="tenebres-section">
+
+  <!-- Ténèbres & Noirceur -->
+  <div class="tenebres-block">
+    <h3 class="section-title">{{localize "AGONE.Tenebres"}}</h3>
+    <div class="tenebres-grid">
+      <div class="tene-row">
+        <label>{{localize "AGONE.Tenebres"}}</label>
+        <input type="number" name="system.tenebres" value="{{system.tenebres}}" class="stat-num" min="0" max="100" />
+        <span class="hint">/100</span>
+      </div>
+      <div class="tene-row">
+        <label>{{localize "AGONE.Noirceur"}}</label>
+        <span class="derived-val">{{system.noirceur}}</span>
+      </div>
+      <div class="tene-row">
+        <label>{{localize "AGONE.Perfidie"}}</label>
+        <input type="number" name="system.perfidie" value="{{system.perfidie}}" class="stat-num" min="0" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Peines -->
+  <div class="peines-block">
+    <h3 class="section-title">{{localize "AGONE.Peines"}}</h3>
+    <div class="peines-grid">
+      <div class="peine-cell"><label>1 {{localize "AGONE.Peine.diablotin"}}</label><input type="checkbox" name="system.peines.diablotin" {{checked system.peines.diablotin}} /></div>
+      <div class="peine-cell"><label>2 {{localize "AGONE.Peine.cauchemars"}}</label><input type="checkbox" name="system.peines.cauchemars" {{checked system.peines.cauchemars}} /></div>
+      <div class="peine-cell"><label>3 {{localize "AGONE.Peine.demonFacetieux"}}</label><input type="checkbox" name="system.peines.demonFacetieux" {{checked system.peines.demonFacetieux}} /></div>
+      <div class="peine-cell"><label>4 {{localize "AGONE.Peine.somnambule"}}</label><input type="checkbox" name="system.peines.somnambule" {{checked system.peines.somnambule}} /></div>
+      <div class="peine-cell"><label>5 {{localize "AGONE.Peine.insomniaque"}}</label><input type="checkbox" name="system.peines.insomniaque" {{checked system.peines.insomniaque}} /></div>
+      <div class="peine-cell"><label>6 {{localize "AGONE.Peine.mepris"}}</label><input type="checkbox" name="system.peines.mepris" {{checked system.peines.mepris}} /></div>
+      <div class="peine-cell"><label>7 {{localize "AGONE.Peine.devianceSexuelle"}}</label><input type="checkbox" name="system.peines.devianceSexuelle" {{checked system.peines.devianceSexuelle}} /></div>
+      <div class="peine-cell"><label>8 {{localize "AGONE.Peine.scarificationsLunaires"}}</label><input type="checkbox" name="system.peines.scarificationsLunaires" {{checked system.peines.scarificationsLunaires}} /></div>
+      <div class="peine-cell"><label>9 {{localize "AGONE.Peine.jumeauDemoniaque"}}</label><input type="checkbox" name="system.peines.jumeauDemoniaque" {{checked system.peines.jumeauDemoniaque}} /></div>
+      <div class="peine-cell"><label>10 {{localize "AGONE.Peine.obsessionOmbre"}}</label><input type="checkbox" name="system.peines.obsessionOmbre" {{checked system.peines.obsessionOmbre}} /></div>
+      <div class="peine-cell"><label>11 {{localize "AGONE.Peine.presenceOppressante"}}</label><input type="checkbox" name="system.peines.presenceOppressante" {{checked system.peines.presenceOppressante}} /></div>
+      <div class="peine-cell"><label>12 {{localize "AGONE.Peine.alterationSens"}}</label><input type="checkbox" name="system.peines.alterationSens" {{checked system.peines.alterationSens}} /></div>
+      <div class="peine-cell"><label>13 {{localize "AGONE.Peine.sangNoir"}}</label><input type="checkbox" name="system.peines.sangNoir" {{checked system.peines.sangNoir}} /></div>
+      <div class="peine-cell"><label>14 {{localize "AGONE.Peine.apparenceDemoniaque"}}</label><input type="checkbox" name="system.peines.apparenceDemoniaque" {{checked system.peines.apparenceDemoniaque}} /></div>
+      <div class="peine-cell"><label>15 {{localize "AGONE.Peine.siamoisTenebres"}}</label><input type="checkbox" name="system.peines.siamoisTenebres" {{checked system.peines.siamoisTenebres}} /></div>
+      <div class="peine-cell"><label>16 {{localize "AGONE.Peine.malediction"}}</label><input type="checkbox" name="system.peines.malediction" {{checked system.peines.malediction}} /></div>
+      <div class="peine-cell"><label>17 {{localize "AGONE.Peine.ombreVivante"}}</label><input type="checkbox" name="system.peines.ombreVivante" {{checked system.peines.ombreVivante}} /></div>
+      <div class="peine-cell"><label>18 {{localize "AGONE.Peine.marqueHautsDiables"}}</label><input type="checkbox" name="system.peines.marqueHautsDiables" {{checked system.peines.marqueHautsDiables}} /></div>
+      <div class="peine-cell"><label>19 {{localize "AGONE.Peine.portailInterieur"}}</label><input type="checkbox" name="system.peines.portailInterieur" {{checked system.peines.portailInterieur}} /></div>
+      <div class="peine-cell"><label>20 {{localize "AGONE.Peine.ombrePerfidie"}}</label><input type="checkbox" name="system.peines.ombrePerfidie" {{checked system.peines.ombrePerfidie}} /></div>
+      <div class="peine-cell"><label>21 {{localize "AGONE.Peine.dechu"}}</label><input type="checkbox" name="system.peines.dechu" {{checked system.peines.dechu}} /></div>
+    </div>
+    <p class="peines-hint">{{localize "AGONE.PeinesHint"}}</p>
+  </div>
+
+  <!-- Flamme & Saisonins -->
+  <div class="flamme-block">
+    <h3 class="section-title">{{localize "AGONE.FlammeEtSaisonins"}}</h3>
+    {{> systems/agone/templates/actors/parts/flamme.hbs}}
+  </div>
+
+</div>

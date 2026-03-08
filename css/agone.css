@@ -1,0 +1,836 @@
+/* ============================================================
+   AGONE – Feuille de personnage FoundryVTT
+   Inspiré de la fiche Roll20 d'Agone
+   ============================================================ */
+
+/* ── Imports & Variables ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --agone-brown:      #5c3a1e;
+  --agone-brown-dark: #3b210e;
+  --agone-gold:       #c9a227;
+  --agone-gold-light: #e8c964;
+  --agone-red:        #8b1a1a;
+  --agone-parchment:  #f4e8c1;
+  --agone-parchment2: #ede0b0;
+  --agone-dark-text:  #2a1a08;
+  --agone-shadow:     rgba(0,0,0,0.45);
+  --agone-input-bg:   rgba(255,255,255,0.55);
+  --agone-border:     #7d5a2a;
+  --agone-noir:       #1a1a2e;
+  --agone-noir-text:  #c0c0d0;
+  --radius:           4px;
+}
+
+/* ── Base forme ──────────────────────────────────────────── */
+.agone.sheet {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 14px;
+  color: var(--agone-dark-text);
+  background: var(--agone-parchment);
+}
+
+.agone.sheet *,
+.agone.sheet *::before,
+.agone.sheet *::after {
+  box-sizing: border-box;
+}
+
+/* ── En-tête ─────────────────────────────────────────────── */
+.agone .sheet-header {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, var(--agone-brown-dark), var(--agone-brown));
+  border-bottom: 3px solid var(--agone-gold);
+  color: var(--agone-parchment);
+}
+
+.agone .header-portrait {
+  flex: 0 0 90px;
+}
+.agone .profile-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border: 2px solid var(--agone-gold);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.agone .header-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agone .charname input {
+  width: 100%;
+  font-family: 'MedievalSharp', 'Crimson Text', serif;
+  font-size: 22px;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--agone-gold-light);
+  color: var(--agone-parchment);
+  outline: none;
+  padding: 2px 4px;
+}
+
+.agone .header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.agone .header-row label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--agone-gold-light);
+  white-space: nowrap;
+}
+.agone .header-row input,
+.agone .header-row select {
+  background: var(--agone-input-bg);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  color: var(--agone-dark-text);
+  font-size: 13px;
+  padding: 2px 5px;
+}
+
+.agone .secondary-stats {
+  gap: 12px;
+}
+.agone .stat-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone .stat-box label {
+  font-size: 11px;
+  color: var(--agone-gold-light);
+  text-transform: uppercase;
+}
+.agone .stat-num {
+  width: 52px;
+  text-align: center;
+}
+.agone .derived {
+  font-weight: bold;
+  color: var(--agone-gold-light);
+}
+.agone .derived.big,
+.agone .derived-big {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--agone-gold-light);
+}
+
+/* ── Onglets ─────────────────────────────────────────────── */
+.agone .sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--agone-brown);
+  border-bottom: 2px solid var(--agone-gold);
+  padding: 0 6px;
+}
+.agone .sheet-tabs .item {
+  padding: 6px 12px;
+  color: var(--agone-parchment2);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.agone .sheet-tabs .item:hover { color: var(--agone-gold-light); }
+.agone .sheet-tabs .item.active {
+  color: var(--agone-gold);
+  border-bottom-color: var(--agone-gold);
+  font-weight: 600;
+}
+
+/* ── Corps de feuille ────────────────────────────────────── */
+.agone .sheet-body {
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+/* ── Titres de sections ──────────────────────────────────── */
+.agone .section-title,
+.agone .section-header h3,
+.agone h3.section-title {
+  font-family: 'MedievalSharp', 'Crimson Text', serif;
+  font-size: 14px;
+  color: var(--agone-brown-dark);
+  border-bottom: 1px solid var(--agone-gold);
+  padding-bottom: 3px;
+  margin: 10px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.agone .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+/* ── Aspects & Attributs ─────────────────────────────────── */
+.agone .attributs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 750px) {
+  .agone .attributs-grid { grid-template-columns: 1fr; }
+}
+
+.agone .aspects-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.agone .aspect-block {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(92,58,30,0.08);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+}
+.agone .aspect-header {
+  font-family: 'MedievalSharp', sans-serif;
+  font-size: 13px;
+  color: var(--agone-brown-dark);
+  margin: 0 0 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--agone-gold);
+  padding-bottom: 3px;
+}
+.agone .aspect-values {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .aspect-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.agone .aspect-stat label {
+  font-size: 11px;
+  color: var(--agone-brown);
+  flex: 1;
+}
+.agone .aspect-num {
+  width: 50px;
+  text-align: center;
+  background: var(--agone-input-bg);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+}
+.agone .aspect-stat.noir .aspect-num { border-color: var(--agone-noir); }
+.agone .aspect-stat.derived .derived-val {
+  font-weight: bold;
+  color: var(--agone-brown-dark);
+}
+
+.agone .flamme-totaux {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  padding: 6px;
+  background: rgba(92,58,30,0.1);
+  border-radius: var(--radius);
+  border: 1px solid var(--agone-gold);
+}
+.agone .flamme-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .flamme-box label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--agone-brown);
+}
+
+/* ── Caractéristiques ────────────────────────────────────── */
+.agone .carac-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 16px;
+}
+.agone .carac-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px dotted rgba(92,58,30,0.3);
+}
+
+/* ── Caractéristiques dérivées ───────────────────────────── */
+.agone .derived-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 16px;
+  margin-top: 8px;
+}
+.agone .derived-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .derived-row label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--agone-brown);
+}
+.agone .derived-val {
+  font-weight: bold;
+  font-size: 15px;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ── Boutons de jet ──────────────────────────────────────── */
+.agone .roll-btn,
+.agone button.roll-btn {
+  background: linear-gradient(to bottom, var(--agone-brown), var(--agone-brown-dark));
+  color: var(--agone-parchment);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-family: 'Crimson Text', serif;
+  text-align: left;
+}
+.agone .roll-btn:hover {
+  background: linear-gradient(to bottom, var(--agone-gold), var(--agone-brown));
+  color: var(--agone-dark-text);
+  transform: scale(1.02);
+}
+.agone .stat-label {
+  flex: 1;
+  font-size: 13px;
+}
+.agone .roll-btn-small {
+  background: transparent;
+  border: 1px solid var(--agone-border);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  color: var(--agone-brown);
+  transition: background 0.2s, color 0.2s;
+  padding: 0;
+}
+.agone .roll-btn-small:hover {
+  background: var(--agone-brown);
+  color: var(--agone-parchment);
+}
+.agone .item-name.roll-btn {
+  display: inline-block;
+  width: 100%;
+}
+
+/* ── Tableaux ────────────────────────────────────────────── */
+.agone table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.agone table th {
+  background: var(--agone-brown);
+  color: var(--agone-parchment);
+  padding: 4px 6px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.agone table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid rgba(93,58,30,0.2);
+  vertical-align: middle;
+}
+.agone table tbody tr:nth-child(even) td {
+  background: rgba(92,58,30,0.05);
+}
+.agone table tbody tr:hover td {
+  background: rgba(201,162,39,0.12);
+}
+.agone .col-num { width: 50px; text-align: center; }
+.agone .col-tai  { width: 40px; text-align: center; }
+.agone .col-type { width: 40px; text-align: center; }
+.agone .col-init,
+.agone .col-atk,
+.agone .col-def,
+.agone .col-dom  { width: 70px; text-align: center; }
+.agone .bonus-dom { font-size: 10px; color: var(--agone-brown); }
+
+/* ── Inputs inline ───────────────────────────────────────── */
+.agone input[type="number"],
+.agone input[type="text"],
+.agone select {
+  background: var(--agone-input-bg);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+  color: var(--agone-dark-text);
+  padding: 2px 5px;
+  font-size: 13px;
+  font-family: 'Crimson Text', serif;
+}
+.agone input[type="number"]:focus,
+.agone input[type="text"]:focus,
+.agone select:focus {
+  outline: none;
+  border-color: var(--agone-gold);
+  box-shadow: 0 0 4px rgba(201,162,39,0.4);
+}
+.agone input.stat-num {
+  width: 52px;
+  text-align: center;
+}
+.agone input.inline-edit {
+  width: 45px;
+  text-align: center;
+  background: transparent;
+  border: 1px dashed var(--agone-border);
+}
+.agone input.inline-edit:focus { background: white; }
+
+/* ── Actions d'items ─────────────────────────────────────── */
+.agone .item-create {
+  background: transparent;
+  border: 1px solid var(--agone-gold);
+  color: var(--agone-gold);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+  padding: 0;
+}
+.agone .item-create:hover { background: var(--agone-gold); color: var(--agone-brown-dark); }
+
+.agone .item-edit, .agone .item-delete {
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 3px;
+  color: var(--agone-brown);
+  opacity: 0.5;
+  transition: opacity 0.2s, color 0.2s;
+}
+.agone .item-row:hover .item-edit,
+.agone .item-row:hover .item-delete { opacity: 1; }
+.agone .item-delete:hover { color: var(--agone-red); }
+
+/* ── Liste vide ──────────────────────────────────────────── */
+.agone .empty-list {
+  color: var(--agone-brown);
+  font-style: italic;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
+  opacity: 0.7;
+}
+
+/* ── Armure ──────────────────────────────────────────────── */
+.agone .armures-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.agone .armure-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  background: rgba(92,58,30,0.05);
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: var(--radius);
+  font-size: 12px;
+}
+.agone .armure-protection { color: var(--agone-brown-dark); font-weight: 600; }
+.agone .armure-malus { color: var(--agone-red); font-size: 11px; }
+.agone .armure-totaux {
+  display: flex;
+  gap: 12px;
+  padding: 4px 8px;
+  background: rgba(92,58,30,0.1);
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* ── Ténèbres ────────────────────────────────────────────── */
+.agone .tenebres-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+}
+.agone .tenebres-grid,
+.agone .tene-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agone .tene-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.agone .tene-row label { flex: 1; font-size: 12px; }
+
+.agone .peines-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 6px;
+  background: rgba(26,26,46,0.08);
+  border: 1px solid var(--agone-noir);
+  border-radius: var(--radius);
+}
+.agone .peine-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.agone .peine-num {
+  font-size: 10px;
+  color: var(--agone-brown);
+}
+.agone .peines-hint {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown);
+  margin-top: 4px;
+}
+
+/* ── Équipement ──────────────────────────────────────────── */
+.agone .charge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 16px;
+  padding: 6px;
+  background: rgba(92,58,30,0.06);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+.agone .charge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.agone .charge-row label { flex: 1; }
+.agone .surcharge { color: var(--agone-red) !important; }
+.agone .surcharge-malus {
+  font-size: 11px;
+  color: var(--agone-red);
+  font-weight: bold;
+}
+
+.agone .monnaie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+.agone .monnaie-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+}
+.agone .monnaie-row label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--agone-brown);
+  font-weight: 600;
+}
+.agone .monnaie-row input { width: 60px; text-align: center; }
+
+/* ── Sorts & Magie ───────────────────────────────────────── */
+.agone .aptitudes-grid {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.agone .aptitude-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(92,58,30,0.08);
+  border-radius: var(--radius);
+  border: 1px solid var(--agone-border);
+}
+.agone .aptitude-row label { font-size: 12px; }
+
+/* ── Avantages / Défauts ─────────────────────────────────── */
+.agone .dons-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.agone .don-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  background: rgba(92,58,30,0.05);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.agone .don-name { flex: 1; }
+.agone .don-cout { font-size: 11px; color: var(--agone-brown); }
+
+/* ── Pouvoirs ────────────────────────────────────────────── */
+.agone .pouvoirs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.agone .pouvoir-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-bottom: 1px dotted rgba(92,58,30,0.25);
+  font-size: 13px;
+}
+.agone .pouvoir-categorie {
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--agone-brown);
+  color: var(--agone-parchment);
+}
+.agone .pouvoir-name { flex: 1; }
+
+/* ── Editor ──────────────────────────────────────────────── */
+.agone .editor-container {
+  height: 300px;
+}
+.agone .editor-container .editor {
+  height: 100%;
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+  background: var(--agone-input-bg);
+}
+
+/* ── Item sheet ──────────────────────────────────────────── */
+.agone.item {
+  background: var(--agone-parchment);
+}
+.agone .item-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.agone .form-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .form-group label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--agone-brown);
+  font-weight: 600;
+  min-width: 80px;
+}
+.agone .description-group {
+  display: block;
+  padding: 8px;
+}
+.agone .description-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--agone-brown);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.agone .totaux-bloc {
+  padding: 6px 8px;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  margin: 0 8px 8px;
+}
+.agone .totaux-row {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+}
+.agone .arme-grid { grid-template-columns: repeat(3, 1fr); }
+
+/* ── Bouton fumble ───────────────────────────────────────── */
+.agone .fumble-btn {
+  background: linear-gradient(to bottom, var(--agone-red), #5a0e0e);
+  border-color: #8b1a1a;
+  margin-top: 10px;
+}
+.agone .fumble-btn:hover {
+  background: linear-gradient(to bottom, #c02020, var(--agone-red));
+}
+
+/* ── Chat : résultats de jet ─────────────────────────────── */
+.agone-roll-card {
+  padding: 8px 12px;
+  background: var(--agone-parchment);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  font-family: 'Crimson Text', Georgia, serif;
+}
+.agone-roll-card .roll-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--agone-gold);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+.agone-roll-card .roll-label {
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--agone-brown-dark);
+}
+.agone-roll-card .roll-type {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.badge-ouvert { background: var(--agone-brown); color: var(--agone-parchment); }
+.badge-ferme  { background: #444; color: #ddd; }
+
+.agone-roll-card .roll-result {
+  text-align: center;
+  padding: 6px 0;
+}
+.agone-roll-card .roll-total {
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--agone-brown-dark);
+}
+.agone-roll-card .roll-breakdown {
+  font-size: 12px;
+  width: 100%;
+}
+.agone-roll-card .roll-breakdown td { padding: 2px 4px; }
+.agone-roll-card .detail-label { color: var(--agone-brown); }
+.agone-roll-card .detail-value { text-align: right; font-weight: 600; }
+
+.agone-roll-card .fumble-alert {
+  background: rgba(139,26,26,0.15);
+  border: 1px solid var(--agone-red);
+  color: var(--agone-red);
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  margin-top: 6px;
+  font-weight: bold;
+}
+.agone-roll-card .critique-alert {
+  background: rgba(201,162,39,0.15);
+  border: 1px solid var(--agone-gold);
+  color: var(--agone-brown-dark);
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  margin-top: 6px;
+  font-weight: bold;
+}
+.agone-fumble-btn {
+  background: var(--agone-red);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.agone-fumble-btn:hover { background: #6e0d0d; }
+
+/* ── Feuilles de compagnon / démon / PNJ ─────────────────── */
+.agone.compagnon .sheet-header,
+.agone.demon .sheet-header,
+.agone.pnj .sheet-header {
+  /* héritent du style de base */
+}
+
+/* ── Flamme & Saisonins ──────────────────────────────────── */
+.agone .flamme-resume {
+  display: flex;
+  gap: 20px;
+  padding: 8px;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+.agone .flamme-stat-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .flamme-stat-box label {
+  font-size: 12px;
+  color: var(--agone-brown);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+.agone ::-webkit-scrollbar { width: 6px; }
+.agone ::-webkit-scrollbar-track { background: rgba(92,58,30,0.1); }
+.agone ::-webkit-scrollbar-thumb { background: var(--agone-brown); border-radius: 3px; }
+.agone ::-webkit-scrollbar-thumb:hover { background: var(--agone-gold); }
+
+/* ── Send to chat button ─────────────────────────────────── */
+.agone .send-to-chat { text-align: center; margin-top: 10px; }
+.agone .send-to-chat button {
+  background: var(--agone-brown);
+  color: var(--agone-parchment);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  padding: 4px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Crimson Text', serif;
+}
+.agone .send-to-chat button:hover {
+  background: var(--agone-gold);
+  color: var(--agone-brown-dark);
+}

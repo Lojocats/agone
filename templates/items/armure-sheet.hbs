@@ -1,0 +1,40 @@
+<form class="agone sheet item armure" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de l'armure" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.TypeArmure"}}</label>
+        <select name="system.type">
+          <option value="0" {{#if (eq system.type "0")}}selected{{/if}}>{{localize "AGONE.ArmureEpaisse"}}</option>
+          <option value="1" {{#if (eq system.type "1")}}selected{{/if}}>{{localize "AGONE.ArmureSouple"}}</option>
+          <option value="2" {{#if (eq system.type "2")}}selected{{/if}}>{{localize "AGONE.ArmureBouclier"}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Protection"}}</label>
+        <input type="number" name="system.protection" value="{{system.protection}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.MalusAgi"}}</label>
+        <input type="number" name="system.malusAgi" value="{{system.malusAgi}}" class="stat-num" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.MalusPer"}} <em>(calculé auto)</em></label>
+        <span class="derived-val">{{system.malusPer}}</span>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.Poids"}}</label>
+        <input type="number" name="system.poids" value="{{system.poids}}" class="stat-num" />
+      </div>
+    </div>
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+  </section>
+</form>

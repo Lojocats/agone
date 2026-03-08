@@ -1,0 +1,118 @@
+<!-- PARTIAL : ÉQUIPEMENT & CHARGE -->
+<div class="equipement-section">
+
+  <!-- Charge -->
+  <div class="charge-block">
+    <h3 class="section-title">{{localize "AGONE.Charge"}}</h3>
+    <div class="charge-grid">
+      <div class="charge-row">
+        <label>{{localize "AGONE.ChargeMax"}}</label>
+        <span class="derived-val">{{system.chargeMax}}</span>
+      </div>
+      <div class="charge-row">
+        <label>{{localize "AGONE.ChargeActuelle"}}</label>
+        <span class="derived-val {{#if system.malusSurcharge}}surcharge{{/if}}">
+          {{system.chargeActuelle}}
+        </span>
+        {{#if system.malusSurcharge}}
+        <span class="surcharge-malus">{{localize "AGONE.Surcharge"}} −{{system.malusSurcharge}}</span>
+        {{/if}}
+      </div>
+      <div class="charge-row">
+        <label>{{localize "AGONE.DemiCharge"}}</label>
+        <span class="derived-val">{{system.demiCharge}}</span>
+      </div>
+      <div class="charge-row">
+        <label>{{localize "AGONE.ChargeJour"}}</label>
+        <span class="derived-val">{{system.chargeJour}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Équipements -->
+  <div class="equip-list-block">
+    <div class="section-header">
+      <h3>{{localize "AGONE.Equipements"}}</h3>
+      <button type="button" class="item-create" data-type="equipement">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+    {{#if equipements.length}}
+    <table class="equip-table">
+      <thead>
+        <tr>
+          <th>{{localize "AGONE.Nom"}}</th>
+          <th class="col-qte">{{localize "AGONE.Qte"}}</th>
+          <th class="col-poids">{{localize "AGONE.PoidsUnit"}}</th>
+          <th class="col-total">{{localize "AGONE.PoidsTotal"}}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each equipements as |eq|}}
+        <tr class="item-row" data-item-id="{{eq.id}}">
+          <td>
+            <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{eq.id}}">{{eq.name}}</span>
+          </td>
+          <td class="col-qte">
+            <input type="number" value="{{eq.system.quantite}}" class="stat-num inline-edit" data-item-id="{{eq.id}}" data-field="system.quantite" />
+          </td>
+          <td class="col-poids">{{eq.system.poidsUnit}}</td>
+          <td class="col-total">{{eq.system.poidsTotal}}</td>
+          <td>
+            <a class="item-edit" data-item-id="{{eq.id}}"><i class="fas fa-edit"></i></a>
+            <a class="item-delete" data-item-id="{{eq.id}}"><i class="fas fa-trash"></i></a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+    <p class="empty-list">{{localize "AGONE.AucunEquipement"}}</p>
+    {{/if}}
+  </div>
+
+  <!-- Monnaie -->
+  <div class="monnaie-block">
+    <h3 class="section-title">{{localize "AGONE.Monnaie"}}</h3>
+    <div class="monnaie-grid">
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Aiglon"}}</label>
+        <input type="number" name="system.monnaie.aiglon" value="{{system.monnaie.aiglon}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Sastre"}}</label>
+        <input type="number" name="system.monnaie.sastre" value="{{system.monnaie.sastre}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Pistole"}}</label>
+        <input type="number" name="system.monnaie.pistole" value="{{system.monnaie.pistole}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Dirhem"}}</label>
+        <input type="number" name="system.monnaie.dirhem" value="{{system.monnaie.dirhem}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Perle"}}</label>
+        <input type="number" name="system.monnaie.perle" value="{{system.monnaie.perle}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Cristal"}}</label>
+        <input type="number" name="system.monnaie.cristal" value="{{system.monnaie.cristal}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.PieceOr"}}</label>
+        <input type="number" name="system.monnaie.pieceOr" value="{{system.monnaie.pieceOr}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Sou"}}</label>
+        <input type="number" name="system.monnaie.sou" value="{{system.monnaie.sou}}" class="stat-num" />
+      </div>
+      <div class="monnaie-row">
+        <label>{{localize "AGONE.Bribe"}}</label>
+        <input type="number" name="system.monnaie.bribe" value="{{system.monnaie.bribe}}" class="stat-num" />
+      </div>
+    </div>
+  </div>
+
+</div>

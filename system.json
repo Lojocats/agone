@@ -1,0 +1,49 @@
+{
+  "id": "agone",
+  "title": "Agone",
+  "description": "Système Agone — Jeu de rôle fantasy médiéval pour Foundry VTT",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Agone System Community"
+    }
+  ],
+  "esmodules": [
+    "module/agone.mjs"
+  ],
+  "styles": [
+    "css/agone.css"
+  ],
+  "languages": [
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "personnage": {},
+      "compagnon": {},
+      "demon": {},
+      "pnj": {}
+    },
+    "Item": {
+      "competence": {},
+      "arme": {},
+      "armure": {},
+      "don": {},
+      "sort": {},
+      "equipement": {},
+      "pouvoir": {},
+      "manoeuvre": {}
+    }
+  },
+  "socket": false,
+  "manifest": "",
+  "url": ""
+}

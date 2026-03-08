@@ -1,0 +1,28 @@
+<form class="agone sheet item equipement" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de l'équipement" /></h1>
+    </div>
+  </header>
+  <section class="sheet-body">
+    <div class="item-form-grid">
+      <div class="form-group">
+        <label>{{localize "AGONE.Quantite"}}</label>
+        <input type="number" name="system.quantite" value="{{system.quantite}}" class="stat-num" min="0" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.PoidsUnit"}}</label>
+        <input type="number" name="system.poidsUnit" value="{{system.poidsUnit}}" class="stat-num" step="0.1" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.PoidsTotal"}} <em>(calculé)</em></label>
+        <span class="derived-val">{{system.poidsTotal}}</span>
+      </div>
+    </div>
+    <div class="form-group description-group">
+      <label>{{localize "AGONE.Description"}}</label>
+      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+    </div>
+  </section>
+</form>

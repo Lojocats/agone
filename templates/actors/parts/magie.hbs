@@ -1,0 +1,98 @@
+<!-- PARTIAL : MAGIE -->
+<div class="magie-section">
+
+  <!-- Aptitudes magiques -->
+  <div class="aptitudes-block">
+    <h3 class="section-title">{{localize "AGONE.AptitudesMagiques"}}</h3>
+    <div class="aptitudes-grid">
+      <div class="aptitude-row">
+        <label>{{localize "AGONE.AptitudeArtsMagiques"}}</label>
+        <span class="derived-val">{{system.aptitudeArtsMagiques}}</span>
+        <button type="button" class="roll-btn-small" data-action="rollAptitudeMagie" title='{{localize "AGONE.JeterAptitudeMagie"}}'>
+          <i class="fas fa-dice-d10"></i>
+        </button>
+      </div>
+      <div class="aptitude-row">
+        <label>{{localize "AGONE.AptitudeConjuration"}}</label>
+        <span class="derived-val">{{system.aptitudeConjuration}}</span>
+        <button type="button" class="roll-btn-small" data-action="rollAptitudeConjuration" title='{{localize "AGONE.JeterAptitudeConj"}}'>
+          <i class="fas fa-dice-d10"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sorts -->
+  <div class="sorts-block">
+    <div class="section-header">
+      <h3>{{localize "AGONE.Sorts"}}</h3>
+      <button type="button" class="item-create" data-type="sort">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+
+    {{#if sorts.length}}
+    <table class="sorts-table">
+      <thead>
+        <tr>
+          <th>{{localize "AGONE.Nom"}}</th>
+          <th>{{localize "AGONE.TypeMagie"}}</th>
+          <th>{{localize "AGONE.Seuil"}}</th>
+          <th>{{localize "AGONE.Portee"}}</th>
+          <th>{{localize "AGONE.Duree"}}</th>
+          <th>{{localize "AGONE.Initiative"}}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each sorts as |sort|}}
+        <tr class="item-row" data-item-id="{{sort.id}}">
+          <td>
+            <button type="button" class="roll-btn item-name" data-action="rollSort" data-item-id="{{sort.id}}">
+              {{sort.name}}
+            </button>
+          </td>
+          <td>{{sort.system.typeMagie}}</td>
+          <td>{{sort.system.seuil}}</td>
+          <td>{{sort.system.portee}}</td>
+          <td>{{sort.system.duree}}</td>
+          <td>{{sort.system.initiative}}</td>
+          <td>
+            <a class="item-edit" data-item-id="{{sort.id}}"><i class="fas fa-edit"></i></a>
+            <a class="item-delete" data-item-id="{{sort.id}}"><i class="fas fa-trash"></i></a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+    <p class="empty-list">{{localize "AGONE.AucunSort"}}</p>
+    {{/if}}
+  </div>
+
+  <!-- Pouvoirs de la Flamme / Saisonins -->
+  <div class="pouvoirs-block">
+    <div class="section-header">
+      <h3>{{localize "AGONE.Pouvoirs"}}</h3>
+      <button type="button" class="item-create" data-type="pouvoir">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+
+    {{#if pouvoirs.length}}
+    <ul class="pouvoirs-list">
+      {{#each pouvoirs as |pouvoir|}}
+      <li class="pouvoir-row item-row" data-item-id="{{pouvoir.id}}">
+        <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
+        <span class="pouvoir-name">{{pouvoir.name}}</span>
+        <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
+        <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
+      </li>
+      {{/each}}
+    </ul>
+    {{else}}
+    <p class="empty-list">{{localize "AGONE.AucunPouvoir"}}</p>
+    {{/if}}
+  </div>
+
+</div>

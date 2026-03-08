@@ -1,0 +1,190 @@
+<!-- PARTIAL : ATTRIBUTS -->
+<div class="attributs-grid">
+
+  <!-- ASPECTS -->
+  <div class="aspects-section">
+    <h3 class="section-title">{{localize "AGONE.Aspects"}}</h3>
+    <div class="aspects-row">
+
+      <!-- CORPS -->
+      <div class="aspect-block">
+        <h4 class="aspect-header">{{localize "AGONE.Corps"}}</h4>
+        <div class="aspect-values">
+          <div class="aspect-stat">
+            <label>{{localize "AGONE.Corps"}}</label>
+            <input type="number" name="system.corps.score" value="{{system.corps.score}}" class="stat-num aspect-num" />
+          </div>
+          <div class="aspect-stat noir">
+            <label>{{localize "AGONE.Noir"}}</label>
+            <input type="number" name="system.corps.noir" value="{{system.corps.noir}}" class="stat-num aspect-num" />
+          </div>
+          <div class="aspect-stat derived">
+            <label>{{localize "AGONE.Bonus"}}</label>
+            <span class="derived-val">{{system.bonusCorps}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESPRIT -->
+      <div class="aspect-block">
+        <h4 class="aspect-header">{{localize "AGONE.Esprit"}}</h4>
+        <div class="aspect-values">
+          <div class="aspect-stat">
+            <label>{{localize "AGONE.Esprit"}}</label>
+            <input type="number" name="system.esprit.score" value="{{system.esprit.score}}" class="stat-num aspect-num" />
+          </div>
+          <div class="aspect-stat noir">
+            <label>{{localize "AGONE.Noir"}}</label>
+            <input type="number" name="system.esprit.noir" value="{{system.esprit.noir}}" class="stat-num aspect-num" />
+          </div>
+          <div class="aspect-stat derived">
+            <label>{{localize "AGONE.Bonus"}}</label>
+            <span class="derived-val">{{system.bonusEsprit}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÂME -->
+      <div class="aspect-block">
+        <h4 class="aspect-header">{{localize "AGONE.Ame"}}</h4>
+        <div class="aspect-values">
+          <div class="aspect-stat">
+            <label>{{localize "AGONE.Ame"}}</label>
+            <input type="number" name="system.ame.score" value="{{system.ame.score}}" class="stat-num aspect-num" />
+          </div>
+          <div class="aspect-stat noir">
+            <label>{{localize "AGONE.Noir"}}</label>
+            <input type="number" name="system.ame.noir" value="{{system.ame.noir}}" class="stat-num aspect-num" />
+          </div>
+          <div class="aspect-stat derived">
+            <label>{{localize "AGONE.Bonus"}}</label>
+            <span class="derived-val">{{system.bonusAme}}</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /aspects-row -->
+
+    <!-- Totaux Flamme -->
+    <div class="flamme-totaux">
+      <div class="flamme-box">
+        <label>{{localize "AGONE.Flamme"}}</label>
+        <span class="derived-big">{{system.flamme}}</span>
+      </div>
+      <div class="flamme-box">
+        <label>{{localize "AGONE.FlammeNoire"}}</label>
+        <span class="derived-big noir">{{system.flammeNoire}}</span>
+      </div>
+    </div>
+  </div><!-- /aspects-section -->
+
+  <!-- CARACTÉRISTIQUES -->
+  <div class="carac-section">
+    <h3 class="section-title">{{localize "AGONE.Caracteristiques"}}</h3>
+
+    <div class="carac-grid">
+      {{!-- Agilité (Corps) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="agilite"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
+        <input type="number" name="system.agilite.score" value="{{system.agilite.score}}" class="stat-num" />
+        <input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Force (Corps) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="force"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Force"}}'>{{localize "AGONE.Attribut.Force"}}</button>
+        <input type="number" name="system.force.score" value="{{system.force.score}}" class="stat-num" />
+        <input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Perception (Corps) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="perception"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
+        <input type="number" name="system.perception.score" value="{{system.perception.score}}" class="stat-num" />
+        <input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Résistance (Corps) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="resistance"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Resistance"}}'>{{localize "AGONE.Attribut.Resistance"}}</button>
+        <input type="number" name="system.resistance.score" value="{{system.resistance.score}}" class="stat-num" />
+        <input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Intelligence (Esprit) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="intelligence"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Intelligence"}}'>{{localize "AGONE.Attribut.Intelligence"}}</button>
+        <input type="number" name="system.intelligence.score" value="{{system.intelligence.score}}" class="stat-num" />
+        <input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Volonté (Esprit) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="volonte"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Volonte"}}'>{{localize "AGONE.Attribut.Volonte"}}</button>
+        <input type="number" name="system.volonte.score" value="{{system.volonte.score}}" class="stat-num" />
+        <input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Charisme (Âme) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="charisma"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Charisma"}}'>{{localize "AGONE.Attribut.Charisma"}}</button>
+        <input type="number" name="system.charisma.score" value="{{system.charisma.score}}" class="stat-num" />
+        <input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+      {{!-- Créativité (Âme) --}}
+      <div class="carac-row">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="creativite"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Creativite"}}'>{{localize "AGONE.Attribut.Creativite"}}</button>
+        <input type="number" name="system.creativite.score" value="{{system.creativite.score}}" class="stat-num" />
+        <input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title="Exp." />
+      </div>
+    </div>
+
+    <!-- Caractéristiques dérivées -->
+    <h3 class="section-title">{{localize "AGONE.CaracDerivees"}}</h3>
+    <div class="derived-grid">
+      <div class="derived-row">
+        <label>{{localize "AGONE.Melee"}}</label>
+        <span class="derived-val">{{system.melee}}</span>
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.Tir"}}</label>
+        <span class="derived-val">{{system.tir}}</span>
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.Art"}}</label>
+        <span class="derived-val">{{system.art}}</span>
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.Initiative"}}</label>
+        <span class="derived-val">{{system.initiative}}</span>
+        <button type="button" class="roll-btn-small" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'>
+          <i class="fas fa-dice-d10"></i>
+        </button>
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.DefenseNaturelle"}}</label>
+        <span class="derived-val">{{system.defenseNaturelle}}</span>
+        <button type="button" class="roll-btn-small" data-action="rollDefenseNaturelle" title='{{localize "AGONE.JeterDefenseNat"}}'>
+          <i class="fas fa-dice-d10"></i>
+        </button>
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.BD"}}</label>
+        <input type="number" name="system.bd" value="{{system.bd}}" class="stat-num" />
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.EsquiveTotal"}}</label>
+        <span class="derived-val">{{system.esquiveTotal}}</span>
+        <button type="button" class="roll-btn-small" data-action="rollEsquive" title='{{localize "AGONE.JeterEsquive"}}'>
+          <i class="fas fa-dice-d10"></i>
+        </button>
+      </div>
+      <div class="derived-row">
+        <label>{{localize "AGONE.Emprise"}}</label>
+        <input type="number" name="system.emprise" value="{{system.emprise}}" class="stat-num" />
+      </div>
+    </div><!-- /derived-grid -->
+  </div><!-- /carac-section -->
+</div><!-- /attributs-grid -->

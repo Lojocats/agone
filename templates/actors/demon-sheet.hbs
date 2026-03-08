@@ -1,0 +1,92 @@
+<form class="agone sheet actor demon" autocomplete="off">
+  <header class="sheet-header">
+    <div class="header-portrait">
+      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+    </div>
+    <div class="header-fields">
+      <h1 class="charname">
+        <input name="name" type="text" value="{{actor.name}}" placeholder="Nom du démon" />
+      </h1>
+      <div class="header-row secondary-stats">
+        <div class="stat-box">
+          <label>{{localize "AGONE.Endurance"}}</label>
+          <input type="number" name="system.endurance.valeur" value="{{system.endurance.valeur}}" class="stat-num" />
+          <span>/</span>
+          <input type="number" name="system.endurance.max" value="{{system.endurance.max}}" class="stat-num" />
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.Densite"}}</label>
+          <input type="number" name="system.densite.valeur" value="{{system.densite.valeur}}" class="stat-num" />
+          <span>/</span>
+          <input type="number" name="system.densite.max" value="{{system.densite.max}}" class="stat-num" />
+        </div>
+        <div class="stat-box">
+          <label>{{localize "AGONE.Opacite"}}</label>
+          <input type="number" name="system.opacite" value="{{system.opacite}}" class="stat-num" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="infos">{{localize "AGONE.Caracteristiques"}}</a>
+    <a class="item" data-tab="pouvoirs">{{localize "AGONE.Pouvoirs"}}</a>
+    <a class="item" data-tab="notes">{{localize "AGONE.Notes"}}</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab" data-group="primary" data-tab="infos">
+      <div class="carac-grid">
+        <div class="carac-row">
+          <label>{{localize "AGONE.DIF"}}</label>
+          <input type="number" name="system.dif" value="{{system.dif}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.AptitudeConjuration"}}</label>
+          <input type="number" name="system.aptitudeConjuration" value="{{system.aptitudeConjuration}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.Empathie"}}</label>
+          <input type="number" name="system.empathie" value="{{system.empathie}}" class="stat-num" />
+        </div>
+        <div class="carac-row">
+          <label>{{localize "AGONE.Memoire"}}</label>
+          <input type="number" name="system.memoire.valeur" value="{{system.memoire.valeur}}" class="stat-num" />
+          <span>/</span>
+          <input type="number" name="system.memoire.max" value="{{system.memoire.max}}" class="stat-num" />
+        </div>
+      </div>
+      <div class="connivances-block">
+        <h3>{{localize "AGONE.Connivances"}}</h3>
+        {{editor connivancesHTML target="system.connivances" button=true editable=owner}}
+      </div>
+    </div>
+
+    <div class="tab" data-group="primary" data-tab="pouvoirs">
+      <div class="section-header">
+        <h3>{{localize "AGONE.Pouvoirs"}}</h3>
+        <button type="button" class="item-create" data-type="pouvoir"><i class="fas fa-plus"></i></button>
+      </div>
+      {{#if pouvoirs.length}}
+      <ul class="pouvoirs-list">
+        {{#each pouvoirs as |pouvoir|}}
+        <li class="pouvoir-row item-row" data-item-id="{{pouvoir.id}}">
+          <span class="pouvoir-categorie">{{pouvoir.system.categorie}}</span>
+          <span class="pouvoir-name">{{pouvoir.name}}</span>
+          <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
+          <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="empty-list">{{localize "AGONE.AucunPouvoir"}}</p>
+      {{/if}}
+    </div>
+
+    <div class="tab" data-group="primary" data-tab="notes">
+      <div class="editor-container">
+        {{editor descriptionHTML target="system.description" button=true editable=owner}}
+      </div>
+    </div>
+  </section>
+</form>
