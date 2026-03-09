@@ -163,10 +163,13 @@ export class AgoneActor extends Actor {
     if (attrConfig.aspect === "esprit") bonusAspect = sd.bonusEsprit ?? 0;
     if (attrConfig.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
 
-    const label = item.name;
-    const modif = await this._dialogModificateur(label);
+    const specialite = compData.specialite ?? "";
+    const label = item.name + (compData.domaine ? ` [${compData.domaine}]` : "");
+    const modif = await this._dialogModificateur(label, { specialite });
     if (modif === null) return;
 
+    const bonusSpe    = this._lastBonusSpe ?? 0;
+    const malusComp0  = compScore === 0 ? -3 : 0;
     const malusArmure = (attrKey === "agilite" || attrKey === "perception")
       ? (sd.armure?._malusAgiActif ?? 0) : 0;
 
@@ -175,16 +178,16 @@ export class AgoneActor extends Actor {
       {
         comp: compScore,
         attr: attrScore,
-        bonus: bonusAspect,
-        modif: modif + malusArmure + (sd.malusSurcharge ?? 0)
+        bonus: bonusAspect + bonusSpe,
+        modif: modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0)
       }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      competence: `${label} : ${compScore}`,
+      competence: `${label} : ${compScore}${compScore === 0 ? ` (${game.i18n.localize("AGONE.MalusCompNonApprise")})` : ""}`,
       attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
-      aspect:    `Bonus d'aspect : ${bonusAspect}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0)}`
+      aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
+      modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0)}`
     });
     return roll;
   }
@@ -396,7 +399,25 @@ export class AgoneActor extends Actor {
     if (!sort || sort.type !== "sort") return;
 
     const seuil = sort.system.seuil ?? 0;
-    const aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
+    let aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
+
+    // Compétence alternative : min(artsMagiques, compAlt + attrAlt + bonusAspect)
+    const compAltNom = sort.system.compAlt?.trim() ?? "";
+    if (compAltNom) {
+      const compAltItem = this.items.find(i => i.type === "competence" && i.name === compAltNom);
+      if (compAltItem) {
+        const attrAltKey  = sort.system.attrAlt || compAltItem.system.attributLie || "charisma";
+        const attrAltScore = sd[attrAltKey]?.score ?? 0;
+        const attrCfg     = CONFIG.AGONE.attributs[attrAltKey] ?? {};
+        let bonusAlt = 0;
+        if (attrCfg.aspect === "corps")  bonusAlt = sd.bonusCorps  ?? 0;
+        if (attrCfg.aspect === "esprit") bonusAlt = sd.bonusEsprit ?? 0;
+        if (attrCfg.aspect === "ame")    bonusAlt = sd.bonusAme    ?? 0;
+        const altAptitude = compAltItem.system.score + attrAltScore + bonusAlt;
+        aptitude = Math.min(aptitude, altAptitude);
+      }
+    }
+
     const label = sort.name;
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
@@ -408,8 +429,11 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
 
     const succes = roll.total >= seuil;
+    const aptitudeLabel = compAltNom
+      ? `Arts Magiques (min avec ${compAltNom}) : ${aptitude}`
+      : `Arts Magiques : ${aptitude}`;
     await this._sendRollToChat(roll, label, {
-      aptitude: `Arts Magiques : ${aptitude}`,
+      aptitude: aptitudeLabel,
       seuil:    `Seuil : ${seuil}`,
       resultat: succes ? "✔ Succès" : "✘ Échec",
       modif:    `Bonus/Malus : ${modif}`
@@ -425,7 +449,12 @@ export class AgoneActor extends Actor {
    * Affiche un dialog pour saisir le modificateur (bonus/malus)
    * @returns {Promise<number|null>} modificateur ou null si annulé
    */
-  async _dialogModificateur(label) {
+  async _dialogModificateur(label, { specialite = "" } = {}) {
+    const speRow = specialite ? `
+              <div class="form-group form-check">
+                <input type="checkbox" id="bonusSpe" name="bonusSpe" />
+                <label for="bonusSpe">${game.i18n.localize("AGONE.BonusSpecialite")} <em>${specialite}</em> (+1)</label>
+              </div>` : "";
     return new Promise((resolve) => {
       new Dialog({
         title: label,
@@ -437,13 +466,10 @@ export class AgoneActor extends Actor {
                 <label>${game.i18n.localize("AGONE.BonusMalus")}</label>
                 <input type="number" id="modif" name="modif" value="0" autofocus/>
               </div>
-              <div class="form-group">
-                <label>${game.i18n.localize("AGONE.TypeJet")}</label>
-                <select id="typeJet" name="typeJet">
-                  <option value="ouvert">${game.i18n.localize("AGONE.JetOuvert")}</option>
-                  <option value="ferme">${game.i18n.localize("AGONE.JetFerme")}</option>
-                </select>
-              </div>
+              <div class="form-group form-check">
+                <input type="checkbox" id="typeJet" name="typeJet" checked />
+                <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
+              </div>${speRow}
             </div>
           </form>
         `,
@@ -452,9 +478,10 @@ export class AgoneActor extends Actor {
             icon: '<i class="fas fa-dice-d10"></i>',
             label: game.i18n.localize("AGONE.Lancer"),
             callback: (html) => {
-              const modif = parseInt(html.find("#modif").val()) || 0;
-              const type  = html.find("#typeJet").val();
-              resolve({ modif, type });
+              const modif    = parseInt(html.find("#modif").val()) || 0;
+              const type     = html.find("#typeJet").prop("checked") ? "ouvert" : "ferme";
+              const bonusSpe = specialite && html.find("#bonusSpe").prop("checked") ? 1 : 0;
+              resolve({ modif, type, bonusSpe });
             }
           },
           annuler: {
@@ -468,8 +495,9 @@ export class AgoneActor extends Actor {
       }).render(true);
     }).then(result => {
       if (!result) return null;
-      // Mémoriser le type de jet pour modifier la formule
+      // Mémoriser le type de jet et le bonus spécialité pour les callers
       this._lastRollType = result.type;
+      this._lastBonusSpe = result.bonusSpe ?? 0;
       return result.modif;
     });
   }
@@ -498,6 +526,8 @@ export class AgoneActor extends Actor {
     const detailsArr = [
       { label: diceLabel, value: diceResult },
       ...Object.values(details).map(v => {
+        // Accepte soit une chaîne "Label : valeur", soit un objet {label, value, tooltip?}
+        if (typeof v === "object" && v !== null) return v;
         const idx = v.lastIndexOf(" : ");
         return idx !== -1
           ? { label: v.slice(0, idx), value: v.slice(idx + 3) }
@@ -512,10 +542,13 @@ export class AgoneActor extends Actor {
 
     // Pénalité de fumble : 1d10 fermé soustrait du total
     let fumblePenalty = 0;
+    let isMegaFumble  = false;
     if (isFumble) {
       const fumbleRoll = new Roll("1d10");
       await fumbleRoll.evaluate();
       fumblePenalty = fumbleRoll.total;
+      isMegaFumble  = fumblePenalty === 10;
+      if (isMegaFumble) Hooks.callAll("agone.megaFumble", { actor: this, roll: finalRoll, fumbleRoll });
     }
 
     const content = await renderTemplate(
@@ -530,6 +563,7 @@ export class AgoneActor extends Actor {
         isFumble,
         fumblePenalty,
         fumbleTotal:   finalRoll.total - fumblePenalty,
+        isMegaFumble,
         isCritique,
         actorId:       this.id,
         arme:          extra.arme ?? null,

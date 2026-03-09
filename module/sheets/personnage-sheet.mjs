@@ -1,4 +1,11 @@
 import { SortsBrowser } from "../apps/sorts-browser.mjs";
+import { CompetencesBrowser } from "../apps/competences-browser.mjs";
+import { ArmesBrowser } from "../apps/armes-browser.mjs";
+import { ArmuresBrowser } from "../apps/armures-browser.mjs";
+import { DonsBrowser } from "../apps/dons-browser.mjs";
+import { ManoeuvresBrowser } from "../apps/manoeuvres-browser.mjs";
+import { PeuplesBrowser } from "../apps/peuples-browser.mjs";
+import { PouvoirsBrowser } from "../apps/pouvoirs-browser.mjs";
 
 /**
  * Feuille de personnage Agone (Personnage Joueur)
@@ -31,22 +38,24 @@ export class PersonnageSheet extends ActorSheet {
     context.isGM      = game.user.isGM;
 
     // Tri des items par type
+    const bySort = (a, b) => (a.sort ?? 0) - (b.sort ?? 0);
     context.competences = actor.items.filter(i => i.type === "competence")
-      .sort((a, b) => a.name.localeCompare(b.name));
-    context.armes        = actor.items.filter(i => i.type === "arme");
+      .sort((a, b) => bySort(a, b) || a.name.localeCompare(b.name, "fr"));
+    context.armes        = actor.items.filter(i => i.type === "arme").sort(bySort);
     context.armures      = actor.items.filter(i => i.type === "armure");
-    context.dons         = actor.items.filter(i => i.type === "don" && i.system.categorie === "avantage");
-    context.defauts      = actor.items.filter(i => i.type === "don" && i.system.categorie === "defaut");
-    context.sorts        = actor.items.filter(i => i.type === "sort");
-    context.equipements  = actor.items.filter(i => i.type === "equipement");
+    context.dons         = actor.items.filter(i => i.type === "don" && i.system.categorie === "avantage").sort(bySort);
+    context.avantages    = context.dons;  // alias pour avantages.hbs
+    context.defauts      = actor.items.filter(i => i.type === "don" && i.system.categorie === "defaut").sort(bySort);
+    context.sorts        = actor.items.filter(i => i.type === "sort").sort(bySort);
+    context.equipements  = actor.items.filter(i => i.type === "equipement").sort(bySort);
     context.pouvoirs     = actor.items.filter(i => i.type === "pouvoir");
-    context.manoeuvres   = actor.items.filter(i => i.type === "manoeuvre");
+    context.manoeuvres   = actor.items.filter(i => i.type === "manoeuvre").sort(bySort);
     const danseurItems = actor.items.filter(i => i.type === "danseur")
       .sort((a, b) => a.name.localeCompare(b.name, "fr"));
     context.danseurs = danseurItems.map(d => {
       const assignedSorts = actor.items
         .filter(s => s.type === "sort" && s.system.danseurNom === d.name)
-        .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie }));
+        .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie, seuil: s.system.seuil, portee: s.system.portee, duree: s.system.duree, danse: s.system.danse }));
       return {
         id: d.id, name: d.name, img: d.img,
         system: d.system,
@@ -64,25 +73,6 @@ export class PersonnageSheet extends ActorSheet {
     context.sortTypes = [...new Set(context.sorts.map(s => s.system.typeMagie).filter(Boolean))]
       .sort()
       .map(t => ({ value: t, label: TYPE_LABELS_MAGIE[t] ?? t }));
-
-    // Compétences liées à la magie — détection dynamique selon les sorts possédés
-    const MAGIE_COMP_MAP = {
-      jorniste:      ["Arts Magiques", "Harmonie"],
-      obscurantiste: ["Arts Magiques", "Harmonie"],
-      eclipsiste:    ["Arts Magiques", "Harmonie"],
-      accord:        ["Arts Magiques", "Harmonie"],
-      cyse:          ["Arts Magiques", "Harmonie"],
-      geste:         ["Arts Magiques", "Poésie"],
-      decorum:       ["Arts Magiques", "Résonance"],
-    };
-    const typesMagie = new Set(actor.items.filter(i => i.type === "sort").map(i => i.system.typeMagie));
-    const relevantKeys = new Set(["Arts Magiques"]);
-    for (const type of typesMagie) {
-      for (const k of (MAGIE_COMP_MAP[type] ?? [])) relevantKeys.add(k);
-    }
-    context.competencesMagie = actor.items
-      .filter(i => i.type === "competence" && [...relevantKeys].some(k => i.name.startsWith(k)))
-      .sort((a, b) => a.name.localeCompare(b.name));
 
     // Enrichissement de la description HTML
     context.descriptionHTML = await TextEditor.enrichHTML(
@@ -102,7 +92,12 @@ export class PersonnageSheet extends ActorSheet {
     const tbl = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
     // Coût incrémental selon la table d'achat création : utilise le score BRUT (hors bonus racial)
     // rawScore = score stocké − bonus positif appliqué. Indice dans la table = niveau brut actuel.
-    const creaDelta = (rawScore) => rawScore + 1 < tbl.length ? tbl[rawScore + 1] : null;
+    // Au-delà de la table, on extrapole en continuant le delta croissant.
+    const lastDelta = tbl.length >= 2 ? tbl[tbl.length - 1] - tbl[tbl.length - 2] : 1;
+    const creaDelta = (rawScore) => {
+      if (rawScore + 1 < tbl.length) return tbl[rawScore + 1] - tbl[rawScore];
+      return lastDelta + (rawScore - (tbl.length - 2));
+    };
     const posBonus  = (k) => system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
     const rawCarac  = (k) => Math.max(0, system[k].score - posBonus(k));
 
@@ -155,10 +150,54 @@ export class PersonnageSheet extends ActorSheet {
     for (const c of context.competences)
       c.coutAffiche = system.modeCreation ? c.creaCout : c.xpCout;
 
+    // Compétences Arts Magiques par domaine (Accord, Décorum, Geste, Cyse)
+    // POT = Art + min(score_artsMag, score_compLiée) + bonusÂme
+    // Accord → Musique | Cyse → Sculpture | Décorum → Peinture | Geste → Poésie
+    const DOMAINES_ARTS = ["Accord", "Décorum", "Geste", "Cyse"];
+    const ARTS_COMP_LIEE = {
+      "Accord":  "Musique (Société)",
+      "Cyse":    "Sculpture (Société)",
+      "Décorum": "Peinture (Société)",
+      "Geste":   "Poésie (Société)",
+    };
+    context.artsMagiquesByDomaine = DOMAINES_ARTS.map(domaine => {
+      const comp = context.competences.find(c =>
+        c.name === "Arts Magiques (Occulte)" && c.system.domaine === domaine
+      );
+      const score        = comp ? (comp.system.score ?? 0) : 0;
+      const specialite   = comp?.system.specialite ?? "";
+
+      // Compétence mondaine liée
+      const nomCompLiee  = ARTS_COMP_LIEE[domaine] ?? "";
+      const compLiee     = context.competences.find(c => c.name === nomCompLiee);
+      const scoreCompLiee = compLiee ? (compLiee.system.score ?? 0) : 0;
+
+      // Potentiel limité par la plus faible des deux compétences
+      const scoreEffectif = comp ? Math.min(score, scoreCompLiee) : 0;
+      const potentiel     = comp ? (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
+      // Arts Improvisés = CRÉ + min(Arts Magiques, art profane) + bonusAme
+      const impro         = comp ? (system.creativite?.score ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
+      return {
+        domaine, comp, potentiel, impro, specialite, nomCompLiee, compLiee, scoreCompLiee,
+        // Composantes de formule exposées pour les tooltips de chat
+        scoreArtsMag: score, scoreEffectif,
+        artVal:     system.art ?? 0,
+        creVal:     system.creativite?.score ?? 0,
+        bonusAmeVal: system.bonusAme ?? 0,
+      };
+    });
+
     // Points de création restants (valeur décroissante)
     context.ptsCreationCaracRestant = system.ptsCreationCarac.max - system.ptsCreationCarac.depense;
     context.ptsCreationCompRestant  = system.ptsCreationComp.max  - system.ptsCreationComp.depense;
-    context.modeCreation = system.modeCreation;
+    context.modeCreation   = system.modeCreation;
+    context.modeLevelUp    = !!system.modeLevelUp;
+    // Visibilité des boutons de montée de niveau :
+    //   - mode carac/comp : toujours visible en création, sinon si modeLevelUp toggleé
+    //   - mode aspect      : seulement en XP normal avec modeLevelUp
+    context.showLevelUp       = system.modeCreation || !!system.modeLevelUp;
+    context.showLevelUpAspect = !system.modeCreation && !!system.modeLevelUp;
+    context.showLevelUpComp   = system.modeCreation || !!system.modeLevelUp;
 
     // BPdV de la race (pour affichage dans la formule PdV)
     const peupleKey = CONFIG.AGONE?.peupleNomVersKey?.[system.peuple] ?? "humain";
@@ -236,12 +275,17 @@ export class PersonnageSheet extends ActorSheet {
     html.find("[data-action='toggleSortDesc']").click(this._onToggleSortDesc.bind(this));
     html.find("[data-action='rollAptitudeMagie']").click(this._onRollAptitudeMagie.bind(this));
     html.find("[data-action='rollAptitudeConjuration']").click(this._onRollAptitudeConjuration.bind(this));
+    html.find("[data-action='rollArtDomaine']").click(this._onRollArtDomaine.bind(this));
+    html.find("[data-action='rollImpArtDomaine']").click(this._onRollImpArtDomaine.bind(this));
 
     // Mini-filtre sorts (onglet Magie)
     html.find(".smf-search").on("input", this._onFiltreSorts.bind(this));
     html.find(".smf-check").on("change", this._onFiltreTypeSorts.bind(this));
 
     // Drag & drop sorts → danseurs (mémorisation) + réordonnancement
+    // Tracking mousedown pour détecter si le drag vient bien de la poignée
+    html.find(".sort-drag-handle").on("mousedown", () => { this._sortDragFromHandle = true; });
+    html.find(".sort-main-row").on("mouseup", () => { this._sortDragFromHandle = false; });
     html.find(".sort-main-row[draggable]").each((_, el) => {
       el.addEventListener("dragstart", this._onDragSortStart.bind(this));
       el.addEventListener("dragend",   this._onDragSortEnd.bind(this));
@@ -258,6 +302,16 @@ export class PersonnageSheet extends ActorSheet {
       el.addEventListener("drop",      this._onDropSortReorder.bind(this));
     });
     html.find(".slot-remove").click(this._onRetireSortDanseur.bind(this));
+
+    // Drag & drop pour réordonner les sorts dans les slots danseurs
+    this._setupDanseurSlotsDrag(html);
+
+    // Réordonnancement items par glisser-déposer
+    this._setupDragReorder(html, ".competences-table tbody .item-row", ".competences-table tbody");
+    this._setupDragReorder(html, ".manoeuvres-table tbody .item-row", ".manoeuvres-table tbody");
+    this._setupDragReorder(html, ".armes-table tbody .item-row", ".armes-table tbody");
+    this._setupDragReorder(html, ".equip-table tbody .item-row", ".equip-table tbody");
+    this._setupDragReorder(html, ".dons-list .item-row", ".dons-list");
 
     // Ouvrir le compendium de compétences / peuples
     html.find(".compendium-browse").click(this._onBrowseCompendium.bind(this));
@@ -282,6 +336,9 @@ export class PersonnageSheet extends ActorSheet {
     // Montée de niveau (dépense XP)
     html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
 
+    // Mode niveau — toggle visibilité boutons
+    html.find("[data-action='toggleLevelUp']").click(this._onToggleLevelUp.bind(this));
+
     // Mode création — toggle, resets locaux et validation
     html.find("[data-action='toggleCreation']").click(this._onToggleCreation.bind(this));
     html.find("[data-action='resetCaracs']").click(this._onResetCaracs.bind(this));
@@ -292,6 +349,26 @@ export class PersonnageSheet extends ActorSheet {
     html.find(".item-drag").each((i, li) => {
       li.setAttribute("draggable", true);
       li.addEventListener("dragstart", this._onDragStart.bind(this));
+    });
+
+    // Toggle description manœuvres
+    html.on("click", ".man-desc-toggle", ev => {
+      const id = ev.currentTarget.dataset.itemId;
+      const row = html.find(`.man-desc-expand[data-item-id="${id}"]`);
+      const icon = ev.currentTarget.querySelector(".man-toggle-icon");
+      row.slideToggle(120);
+      icon?.classList.toggle("fa-chevron-right");
+      icon?.classList.toggle("fa-chevron-down");
+    });
+
+    // Toggle description avantages/défauts
+    html.on("click", ".don-desc-toggle", ev => {
+      const id = ev.currentTarget.dataset.itemId;
+      const row = html.find(`.don-desc-expand[data-item-id="${id}"]`);
+      const icon = ev.currentTarget.querySelector(".don-toggle-icon");
+      row.slideToggle(120);
+      icon?.classList.toggle("fa-chevron-right");
+      icon?.classList.toggle("fa-chevron-down");
     });
   }
 
@@ -334,7 +411,16 @@ export class PersonnageSheet extends ActorSheet {
     event.preventDefault();
     const btn  = event.currentTarget;
     const type = btn.dataset.type;
-    const name = game.i18n.localize(`AGONE.Nouvel${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    let name = game.i18n.localize(`AGONE.Nouvel${type.charAt(0).toUpperCase() + type.slice(1)}`);
+    if (type === "danseur") {
+      const baseName = name;
+      const taken = new Set(this.actor.items.filter(i => i.type === "danseur").map(i => i.name));
+      if (taken.has(name)) {
+        let n = 2;
+        while (taken.has(`${baseName} ${n}`)) n++;
+        name = `${baseName} ${n}`;
+      }
+    }
     const itemData = { name, type, system: {} };
     return await Item.create(itemData, { parent: this.actor });
   }
@@ -532,11 +618,12 @@ export class PersonnageSheet extends ActorSheet {
   // Drag & drop sorts → danseurs
   // ==============================
   _onDragSortStart(event) {
-    // Drag uniquement depuis la poignée
-    if (!event.target.closest(".sort-drag-handle")) {
+    // Drag uniquement si initié depuis la poignée (tracké via mousedown)
+    if (!this._sortDragFromHandle) {
       event.preventDefault();
       return;
     }
+    this._sortDragFromHandle = false;
     const itemId = event.currentTarget.dataset.itemId;
     if (!itemId) return;
     event.dataTransfer.effectAllowed = "move";
@@ -665,6 +752,163 @@ export class PersonnageSheet extends ActorSheet {
     if (sort) await sort.update({ "system.danseurNom": "" });
   }
 
+  // ==============================
+  // Drag & drop réordonnancement dans les slots danseurs
+  // ==============================
+  _setupDanseurSlotsDrag(html) {
+    html.find(".danseur-slot-sort").each((_, el) => {
+      const sortId = el.dataset.sortId;
+      if (!sortId) return;
+      el.setAttribute("draggable", true);
+      el.addEventListener("dragstart", evt => {
+        evt.stopPropagation();
+        evt.dataTransfer.effectAllowed = "move";
+        evt.dataTransfer.setData("text/plain", JSON.stringify({ type: "slot-reorder", sortId }));
+        el.classList.add("dragging");
+      });
+      el.addEventListener("dragend", () => el.classList.remove("dragging"));
+    });
+    html.find(".danseur-slots").each((_, container) => {
+      container.addEventListener("dragover", evt => {
+        let data;
+        try { data = JSON.parse(evt.dataTransfer.getData("text/plain")); } catch { }
+        if (data?.type !== "slot-reorder") return;
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = "move";
+        const slots = [...container.querySelectorAll(".danseur-slot-sort")];
+        container.querySelectorAll(".slot-drop-above, .slot-drop-below")
+          .forEach(s => s.classList.remove("slot-drop-above", "slot-drop-below"));
+        const target = slots.find(s => {
+          const r = s.getBoundingClientRect();
+          return evt.clientY >= r.top && evt.clientY <= r.bottom;
+        });
+        if (!target) return;
+        const r = target.getBoundingClientRect();
+        target.classList.add(evt.clientY < r.top + r.height / 2 ? "slot-drop-above" : "slot-drop-below");
+      });
+      container.addEventListener("dragleave", evt => {
+        if (!container.contains(evt.relatedTarget)) {
+          container.querySelectorAll(".slot-drop-above, .slot-drop-below")
+            .forEach(s => s.classList.remove("slot-drop-above", "slot-drop-below"));
+        }
+      });
+      container.addEventListener("drop", async evt => {
+        container.querySelectorAll(".slot-drop-above, .slot-drop-below")
+          .forEach(s => s.classList.remove("slot-drop-above", "slot-drop-below"));
+        let data;
+        try { data = JSON.parse(evt.dataTransfer.getData("text/plain")); } catch { return; }
+        if (data?.type !== "slot-reorder") return;
+        evt.preventDefault();
+        evt.stopPropagation();
+        const danseurId    = container.dataset.danseurId;
+        const danseur      = this.actor.items.get(danseurId);
+        const draggedSort  = this.actor.items.get(data.sortId);
+        if (!danseur || !draggedSort) return;
+        const slots = [...container.querySelectorAll(".danseur-slot-sort")];
+        const targetSlot = slots.find(s => {
+          const r = s.getBoundingClientRect();
+          return evt.clientY >= r.top && evt.clientY <= r.bottom;
+        });
+        if (!targetSlot || targetSlot.dataset.sortId === data.sortId) return;
+        const targetSort = this.actor.items.get(targetSlot.dataset.sortId);
+        if (!targetSort) return;
+        const r = targetSlot.getBoundingClientRect();
+        const sortBefore = evt.clientY < r.top + r.height / 2;
+        const siblings   = this.actor.items.filter(i =>
+          i.type === "sort" && i.id !== draggedSort.id && i.system.danseurNom === danseur.name
+        );
+        const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
+        const updates    = sortHelper.performIntegerSort(draggedSort, { target: targetSort, siblings, sortBefore });
+        if (updates.length) {
+          await this.actor.updateEmbeddedDocuments("Item",
+            updates.map(u => ({ _id: u.target.id, sort: u.update.sort }))
+          );
+        }
+      });
+    });
+  }
+
+  _setupDragReorder(html, rowSel, containerSel) {
+    html.find(rowSel).each((_, el) => {
+      const handle = el.querySelector(".item-drag-handle");
+      if (!handle) return;
+      handle.addEventListener("mousedown", () => { el._fromDragHandle = true; });
+      el.addEventListener("mouseup", () => { el._fromDragHandle = false; });
+      el.setAttribute("draggable", true);
+      el.addEventListener("dragstart", evt => {
+        if (!el._fromDragHandle) { evt.preventDefault(); return; }
+        el._fromDragHandle = false;
+        const itemId = el.dataset.itemId;
+        if (!itemId) return;
+        evt.dataTransfer.effectAllowed = "move";
+        evt.dataTransfer.setData("text/plain", JSON.stringify({ type: "item-reorder", itemId }));
+        el.classList.add("dragging");
+      });
+      el.addEventListener("dragend", () => el.classList.remove("dragging"));
+    });
+    html.find(containerSel).each((_, container) => {
+      container.addEventListener("dragover",  this._onDragOverItemReorder.bind(this));
+      container.addEventListener("dragleave", this._onDragLeaveItemReorder.bind(this));
+      container.addEventListener("drop",      this._onDropItemReorder.bind(this));
+    });
+  }
+
+  _onDragOverItemReorder(event) {
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { }
+    if (data?.type !== "item-reorder" && !event.dataTransfer.types.includes("text/plain")) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    const container = event.currentTarget;
+    const rows = [...container.querySelectorAll(".item-row[data-item-id]")];
+    const targetRow = rows.find(row => {
+      const rect = row.getBoundingClientRect();
+      return event.clientY >= rect.top && event.clientY <= rect.bottom;
+    });
+    container.querySelectorAll(".item-drop-above, .item-drop-below")
+      .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
+    if (!targetRow) return;
+    const rect = targetRow.getBoundingClientRect();
+    targetRow.classList.add(event.clientY < rect.top + rect.height / 2 ? "item-drop-above" : "item-drop-below");
+  }
+
+  _onDragLeaveItemReorder(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      event.currentTarget.querySelectorAll(".item-drop-above, .item-drop-below")
+        .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
+    }
+  }
+
+  async _onDropItemReorder(event) {
+    const container = event.currentTarget;
+    container.querySelectorAll(".item-drop-above, .item-drop-below")
+      .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
+    event.preventDefault();
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { return; }
+    if (data?.type !== "item-reorder") return;
+    const draggedItem = this.actor.items.get(data.itemId);
+    if (!draggedItem) return;
+    const rows = [...container.querySelectorAll(".item-row[data-item-id]")];
+    const targetRow = rows.find(row => {
+      const rect = row.getBoundingClientRect();
+      return event.clientY >= rect.top && event.clientY <= rect.bottom;
+    });
+    if (!targetRow || targetRow.dataset.itemId === data.itemId) return;
+    const targetItem = this.actor.items.get(targetRow.dataset.itemId);
+    if (!targetItem || targetItem.type !== draggedItem.type) return;
+    const rect = targetRow.getBoundingClientRect();
+    const sortBefore = event.clientY < rect.top + rect.height / 2;
+    const siblings   = this.actor.items.filter(i => i.type === draggedItem.type && i.id !== draggedItem.id);
+    const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
+    const updates    = sortHelper.performIntegerSort(draggedItem, { target: targetItem, siblings, sortBefore });
+    if (updates.length) {
+      await this.actor.updateEmbeddedDocuments("Item",
+        updates.map(u => ({ _id: u.target.id, sort: u.update.sort }))
+      );
+    }
+  }
+
   async _onRollSort(event) {
     event.preventDefault();
     const li     = event.currentTarget.closest("[data-item-id]");
@@ -697,6 +941,62 @@ export class PersonnageSheet extends ActorSheet {
     await roll.evaluate();
     await this.actor._sendRollToChat(roll, label, {
       aptitude: `${label} : ${sd.aptitudeConjuration ?? 0}`,
+      modif: `Bonus/Malus : ${modif}`
+    });
+  }
+
+  async _onRollArtDomaine(event) {
+    event.preventDefault();
+    const btn       = event.currentTarget;
+    const domaine   = btn.dataset.domaine ?? "";
+    const apt       = parseInt(btn.dataset.apt)       || 0;
+    const specialite = btn.dataset.specialite ?? "";
+    // Composantes pour le tooltip
+    const artVal    = parseInt(btn.dataset.art)       || 0;
+    const scoreArts = parseInt(btn.dataset.scoreArts) || 0;
+    const scoreComp = parseInt(btn.dataset.scoreComp) || 0;
+    const nomComp   = btn.dataset.nomComp ?? "";
+    const scoreEff  = parseInt(btn.dataset.scoreEff)  || 0;
+    const bonusAme  = parseInt(btn.dataset.bonusAme)  || 0;
+    const label     = game.i18n.format("AGONE.PotentielArtLabel", { domaine });
+    const modif     = await this.actor._dialogModificateur(label, { specialite });
+    if (modif === null) return;
+    const bonusSpe  = this.actor._lastBonusSpe ?? 0;
+    const total     = apt + bonusSpe;
+    const roll = new Roll("1d10x10 + @total + @modif", { total, modif });
+    await roll.evaluate();
+    // Formule détaillée visible dans le chat
+    const formule = `ART(${artVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
+    await this.actor._sendRollToChat(roll, label, {
+      aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
+      modif: `Bonus/Malus : ${modif}`
+    });
+  }
+
+  async _onRollImpArtDomaine(event) {
+    event.preventDefault();
+    const btn       = event.currentTarget;
+    const domaine   = btn.dataset.domaine ?? "";
+    const apt       = parseInt(btn.dataset.apt)       || 0;
+    const specialite = btn.dataset.specialite ?? "";
+    // Composantes pour le tooltip
+    const creVal    = parseInt(btn.dataset.cre)       || 0;
+    const scoreArts = parseInt(btn.dataset.scoreArts) || 0;
+    const scoreComp = parseInt(btn.dataset.scoreComp) || 0;
+    const nomComp   = btn.dataset.nomComp ?? "";
+    const scoreEff  = parseInt(btn.dataset.scoreEff)  || 0;
+    const bonusAme  = parseInt(btn.dataset.bonusAme)  || 0;
+    const label     = game.i18n.format("AGONE.ImproArtLabel", { domaine });
+    const modif     = await this.actor._dialogModificateur(label, { specialite });
+    if (modif === null) return;
+    const bonusSpe  = this.actor._lastBonusSpe ?? 0;
+    const total     = apt + bonusSpe;
+    const roll = new Roll("1d10x10 + @total + @modif", { total, modif });
+    await roll.evaluate();
+    // Formule détaillée visible dans le chat
+    const formule = `CRÉ(${creVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
+    await this.actor._sendRollToChat(roll, label, {
+      aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
       modif: `Bonus/Malus : ${modif}`
     });
   }
@@ -773,6 +1073,69 @@ export class PersonnageSheet extends ActorSheet {
         this._sortsBrowser = new SortsBrowser(this.actor);
       }
       this._sortsBrowser.render(true);
+      return;
+    }
+
+    // Compétences → navigateur personnalisé
+    if (packId === "agone.competences") {
+      if (!this._competencesBrowser) {
+        this._competencesBrowser = new CompetencesBrowser(this.actor);
+      }
+      this._competencesBrowser.render(true);
+      return;
+    }
+
+    // Armes → navigateur personnalisé
+    if (packId === "agone.armes") {
+      if (!this._armesBrowser) {
+        this._armesBrowser = new ArmesBrowser(this.actor);
+      }
+      this._armesBrowser.render(true);
+      return;
+    }
+
+    // Armures & Boucliers → navigateur personnalisé
+    if (packId === "agone.armures") {
+      if (!this._armuresBrowser) {
+        this._armuresBrowser = new ArmuresBrowser(this.actor);
+      }
+      this._armuresBrowser.render(true);
+      return;
+    }
+
+    // Avantages & Défauts → navigateur personnalisé
+    if (packId === "agone.dons") {
+      if (!this._donsBrowser) {
+        this._donsBrowser = new DonsBrowser(this.actor);
+      }
+      this._donsBrowser.render(true);
+      return;
+    }
+
+    // Manœuvres & Bottes → navigateur personnalisé
+    if (packId === "agone.manoeuvres") {
+      if (!this._manoeuvresBrowser) {
+        this._manoeuvresBrowser = new ManoeuvresBrowser(this.actor);
+      }
+      this._manoeuvresBrowser.render(true);
+      return;
+    }
+
+    // Peuples → navigateur personnalisé
+    if (packId === "agone.peuples") {
+      if (!this._peuplesBrowser) {
+        this._peuplesBrowser = new PeuplesBrowser(this.actor);
+      }
+      this._peuplesBrowser.render(true);
+      return;
+    }
+
+    // Pouvoirs de Flamme → navigateur personnalisé
+    if (packId === "agone.pouvoirs") {
+      if (!this._pouvoirsBrowser) {
+        this._pouvoirsBrowser = new PouvoirsBrowser(this.actor);
+      }
+      this._pouvoirsBrowser.render(true);
       return;
     }
 
@@ -1039,8 +1402,10 @@ export class PersonnageSheet extends ActorSheet {
     const fromLocal   = Math.min(localExp, xpCout);
     const fromGeneral = xpCout - fromLocal;
 
+    // Si les XP locaux + généraux suffisent, propose directement la confirmation
+    // Sinon, propose de verser l'XP général disponible en réserve locale
     if (fromGeneral > sd.experience.courante) {
-      return ui.notifications.warn(
+      return ui.notifications.error(
         game.i18n.format("AGONE.PasAssezXP", { cout: xpCout, actuel: localExp + sd.experience.courante })
       );
     }
@@ -1055,8 +1420,8 @@ export class PersonnageSheet extends ActorSheet {
       await this.actor.update({
         [`system.${key}.score`]: (sd[key].score ?? 0) + 1,
         ...(fromLocal   > 0 ? { [`system.${key}.exp`]:       localExp - fromLocal                      } : {}),
-        ...(fromGeneral > 0 ? { "system.experience.courante": sd.experience.courante - fromGeneral,
-                                "system.experience.totale":   (sd.experience.totale ?? 0) + fromGeneral } : {}),
+        ...(fromGeneral > 0 ? { "system.experience.courante": sd.experience.courante - fromGeneral      } : {}),
+        "system.experience.totale": (sd.experience.totale ?? 0) + xpCout,
       });
     } else if (type === "competence") {
       if (!item) return;
@@ -1065,9 +1430,9 @@ export class PersonnageSheet extends ActorSheet {
         "system.score": item.system.score + 1,
         ...(fromLocal > 0 ? { "system.exp": localExp - fromLocal } : {}),
       }));
-      if (fromGeneral > 0) updates.push(this.actor.update({
-        "system.experience.courante": sd.experience.courante - fromGeneral,
-        "system.experience.totale":   (sd.experience.totale ?? 0) + fromGeneral,
+      updates.push(this.actor.update({
+        ...(fromGeneral > 0 ? { "system.experience.courante": sd.experience.courante - fromGeneral } : {}),
+        "system.experience.totale": (sd.experience.totale ?? 0) + xpCout,
       }));
       await Promise.all(updates);
     }
@@ -1078,6 +1443,13 @@ export class PersonnageSheet extends ActorSheet {
   async _onToggleCreation(event) {
     event.preventDefault();
     await this.actor.update({ "system.modeCreation": !this.actor.system.modeCreation });
+  }
+
+  // Toggle visibilité boutons level-up
+  // ==============================
+  async _onToggleLevelUp(event) {
+    event.preventDefault();
+    await this.actor.update({ "system.modeLevelUp": !this.actor.system.modeLevelUp });
   }
 
   // Mode création — reset caractéristiques

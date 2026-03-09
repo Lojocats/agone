@@ -46,6 +46,7 @@
           <th class="col-poids">{{localize "AGONE.PoidsUnit"}}</th>
           <th class="col-total">{{localize "AGONE.PoidsTotal"}}</th>
           <th></th>
+          <th class="col-drag"></th>
         </tr>
       </thead>
       <tbody>
@@ -63,6 +64,7 @@
             <a class="item-edit" data-item-id="{{eq.id}}"><i class="fas fa-edit"></i></a>
             <a class="item-delete" data-item-id="{{eq.id}}"><i class="fas fa-trash"></i></a>
           </td>
+          <td class="col-drag"><span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span></td>
         </tr>
         {{/each}}
       </tbody>

@@ -46,6 +46,9 @@
           <button type="button" class="btn-valider-creation" data-action="validerCreation">{{localize "AGONE.ValiderCreation"}}</button>
         {{else}}
           <button type="button" class="btn-toggle-creation" data-action="toggleCreation">{{localize "AGONE.ReactiverCreation"}}</button>
+          <button type="button" class="btn-toggle-levelup {{#if modeLevelUp}}active{{/if}}" data-action="toggleLevelUp" title='{{localize "AGONE.ModeLevelUp"}}'>
+            <i class="fas fa-arrow-up"></i> {{localize "AGONE.ModeLevelUp"}}
+          </button>
         {{/if}}
       </div>
       {{/if}}

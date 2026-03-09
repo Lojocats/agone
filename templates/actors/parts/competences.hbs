@@ -30,6 +30,7 @@
         <th class="col-score">{{localize "AGONE.Score"}}</th>
         <th class="col-exp">{{localize "AGONE.Exp"}}</th>
         <th class="col-actions"></th>
+        <th class="col-drag"></th>
       </tr>
     </thead>
     <tbody>
@@ -46,11 +47,11 @@
         <td class="col-attr">{{comp.system.attributLie}}</td>
         <td class="col-score">
           <input type="number" name="items.{{comp.id}}.system.score" value="{{comp.system.score}}" class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.score" />
-          <button type="button" class="levelup-btn" data-action="levelUp"
+          {{#if ../showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                   data-type="competence" data-item-id="{{comp.id}}" data-cout="{{comp.xpCout}}" data-crea-cout="{{comp.creaCout}}"
                   title='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
             <i class="fas fa-arrow-up"></i> {{comp.coutAffiche}}
-          </button>
+          </button>{{/if}}
         </td>
         <td class="col-exp">
           <input type="number" name="items.{{comp.id}}.system.exp" value="{{comp.system.exp}}" class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />
@@ -59,6 +60,7 @@
           <a class="item-edit" data-item-id="{{comp.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
           <a class="item-delete" data-item-id="{{comp.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </td>
+        <td class="col-drag"><span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span></td>
       </tr>
       {{/each}}
     </tbody>
@@ -70,6 +72,9 @@
   <!-- Manœuvres & Bottes -->
   <div class="section-header">
     <h3>{{localize "AGONE.Manoeuvres"}}</h3>
+    <button type="button" class="compendium-browse btn-icon" data-pack="agone.manoeuvres" title='{{localize "AGONE.ParcourirManoeuvres"}}'>
+      <i class="fas fa-search"></i>
+    </button>
     <button type="button" class="item-create" data-type="manoeuvre" title='{{localize "AGONE.AjouterManoeuvre"}}'>
       <i class="fas fa-plus"></i>
     </button>
@@ -79,15 +84,30 @@
   <table class="manoeuvres-table">
     <thead>
       <tr>
+        <th class="man-col-toggle"></th>
+        <th class="man-col-badge"></th>
         <th>{{localize "AGONE.Nom"}}</th>
         <th class="col-score">{{localize "AGONE.Score"}}</th>
         <th class="col-mod">{{localize "AGONE.Malus"}}</th>
         <th></th>
+        <th class="col-drag"></th>
       </tr>
     </thead>
     <tbody>
       {{#each manoeuvres as |man|}}
       <tr class="item-row" data-item-id="{{man.id}}">
+        <td class="man-col-toggle">
+          {{#if man.system.description}}
+          <button type="button" class="man-desc-toggle btn-icon" data-item-id="{{man.id}}" title="Description">
+            <i class="fas fa-chevron-right man-toggle-icon"></i>
+          </button>
+          {{/if}}
+        </td>
+        <td class="man-col-badge">
+          <span class="man-badge man-badge-{{man.system.categorie}}">
+            {{#if (eq man.system.categorie "botte")}}Botte{{else}}Manœuvre{{/if}}
+          </span>
+        </td>
         <td>
           <button type="button" class="roll-btn item-name" data-action="rollManoeuvre" data-item-id="{{man.id}}">
             {{man.name}}
@@ -99,6 +119,11 @@
           <a class="item-edit" data-item-id="{{man.id}}"><i class="fas fa-edit"></i></a>
           <a class="item-delete" data-item-id="{{man.id}}"><i class="fas fa-trash"></i></a>
         </td>
+        <td class="col-drag"><span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span></td>
+      </tr>
+      <tr class="man-desc-expand" data-item-id="{{man.id}}" style="display:none">
+        <td></td>
+        <td colspan="6" class="man-desc-cell">{{man.system.description}}</td>
       </tr>
       {{/each}}
     </tbody>

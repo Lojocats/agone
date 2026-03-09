@@ -2,6 +2,9 @@
 <div class="avantages-section">
   <div class="section-header">
     <h3>{{localize "AGONE.AvantagesDefauts"}}</h3>
+    <button type="button" class="compendium-browse btn-icon" data-pack="agone.dons" title='{{localize "AGONE.ParcourirDons"}}'>
+      <i class="fas fa-search"></i>
+    </button>
     <button type="button" class="item-create" data-type="don">
       <i class="fas fa-plus"></i>
     </button>
@@ -14,11 +17,22 @@
     <ul class="dons-list">
       {{#each avantages as |don|}}
       <li class="don-row item-row" data-item-id="{{don.id}}">
+        <span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span>
+        {{#if don.system.description}}
+        <button type="button" class="don-desc-toggle btn-icon" data-item-id="{{don.id}}" title="Description">
+          <i class="fas fa-chevron-right don-toggle-icon"></i>
+        </button>
+        {{/if}}
         <span class="don-name">{{don.name}}</span>
         <span class="don-cout">({{don.system.cout}} pts)</span>
         <a class="item-edit" data-item-id="{{don.id}}"><i class="fas fa-edit"></i></a>
         <a class="item-delete" data-item-id="{{don.id}}"><i class="fas fa-trash"></i></a>
       </li>
+      {{#if don.system.description}}
+      <li class="don-desc-expand" data-item-id="{{don.id}}" style="display:none">
+        <span class="don-desc-text">{{don.system.description}}</span>
+      </li>
+      {{/if}}
       {{/each}}
     </ul>
     {{else}}
@@ -33,11 +47,22 @@
     <ul class="dons-list">
       {{#each defauts as |don|}}
       <li class="don-row item-row" data-item-id="{{don.id}}">
+        <span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span>
+        {{#if don.system.description}}
+        <button type="button" class="don-desc-toggle btn-icon" data-item-id="{{don.id}}" title="Description">
+          <i class="fas fa-chevron-right don-toggle-icon"></i>
+        </button>
+        {{/if}}
         <span class="don-name">{{don.name}}</span>
         <span class="don-cout">({{don.system.cout}} pts)</span>
         <a class="item-edit" data-item-id="{{don.id}}"><i class="fas fa-edit"></i></a>
         <a class="item-delete" data-item-id="{{don.id}}"><i class="fas fa-trash"></i></a>
       </li>
+      {{#if don.system.description}}
+      <li class="don-desc-expand" data-item-id="{{don.id}}" style="display:none">
+        <span class="don-desc-text">{{don.system.description}}</span>
+      </li>
+      {{/if}}
       {{/each}}
     </ul>
     {{else}}

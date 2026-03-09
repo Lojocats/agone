@@ -383,3 +383,261 @@ export const SORTS_DATA = [
   { name:"Le Gouffre du temps",      typeMagie:"geste", seuil:25, portee:"A vue / une cible",                duree:"1 jour",                           danse:"1 jour",     instrument:"", special:"", description:"Décrit les ravages du temps sur la cible. Au fur et à mesure, ces ravages s'inscrivent jusqu'à ce qu'il ne reste rien." },
   { name:"Retour en arrière",        typeMagie:"geste", seuil:25, portee:"Personnel",                        duree:"Instantanée",                      danse:"2 tours",    instrument:"", special:"", description:"Revient une minute dans le passé. Disparaît aux contemporains puis revient à l'emplacement d'une minute avant." },
 ];
+// ── AVANTAGES & DÉFAUTS ───────────────────────────────────────────────────────
+// categorie : "avantage" | "defaut"   cout : valeur en points de création (négatif pour les défauts)
+export const DONS_DATA = [
+  // ── AVANTAGES : ÂME ──────────────────────────────────────────────────────
+  { name:"Charismatique",        categorie:"avantage", cout: 3, description:"D'un seul coup d'œil vous êtes en mesure de vous faire écouter, de persuader ou de convaincre. Bonus de +1 en CHA, maximum de CHA majoré de 1." },
+  { name:"Instinct de la perfection", categorie:"avantage", cout: 5, description:"Vos rapports avec les êtres et les choses sont instinctifs. Vous débuter avec +1 en Âme." },
+  { name:"Inventif",             categorie:"avantage", cout: 1, description:"Bonus de +1 sur tout jet d'une compétence créative au choix (Sculpture, Peinture, Musique, Poésie ou Savoir-faire). Cumulable trois fois dans des domaines différents." },
+  { name:"Séduisant",            categorie:"avantage", cout: 1, description:"Bonus de +1 à tout jet de relation sociale. Toutes les personnes des deux sexes vous trouvent irrésistible." },
+  { name:"Sensible",             categorie:"avantage", cout: 3, description:"Bonus de +1 en CRÉ. Le maximum de CRÉ est majoré de 1 point." },
+  { name:"Don des Bêtes",        categorie:"avantage", cout: 5, description:"Jamais aucun animal ne vous attaquera. Bonus de +5 à tous les jets de Dressage. Commence avec rang 3 en Zoologie. Prix des avantages animaliers divisé par 2." },
+  // ── AVANTAGES : CORPS ─────────────────────────────────────────────────────
+  { name:"Adresse",              categorie:"avantage", cout: 3, description:"Bonus de +1 en AGI. Le maximum d'AGI est majoré de 1 point." },
+  { name:"Ambidextre",           categorie:"avantage", cout: 5, description:"Peut utiliser indifféremment l'une ou l'autre main. Deux objets simultanément avec un malus de -5 à chaque jet seulement." },
+  { name:"Colosse",              categorie:"avantage", cout: 5, description:"TAI majorée de 1 et FOR bénéficie d'un bonus de +1. Interdit aux géants." },
+  { name:"Force de la nature",   categorie:"avantage", cout: 3, description:"Bonus de +1 en RÉS. Le maximum de RÉS est augmenté de 1 point." },
+  { name:"Immunité majeure",     categorie:"avantage", cout: 2, description:"Résistance particulière à une toxine au choix. Bonus de +4 à tous les jets de RÉS contre cette toxine." },
+  { name:"Immunité mineure",     categorie:"avantage", cout: 1, description:"Résistance particulière à une toxine au choix. Bonus de +2 à tous les jets de RÉS contre cette toxine." },
+  { name:"Réflexes éclairs",     categorie:"avantage", cout: 2, description:"Bonus de +3 à l'initiative." },
+  { name:"Second souffle",       categorie:"avantage", cout: 2, description:"La périodicité des jets de RÉS à l'effort ou à l'asphyxie est doublée." },
+  { name:"Sens aiguisés (1 sens)",categorie:"avantage", cout: 1, description:"+1 à tous jets de PER faisant appel au sens surdéveloppé choisi." },
+  { name:"Sens aiguisés (2 sens)",categorie:"avantage", cout: 2, description:"+1 à tous jets de PER pour deux sens surdéveloppés choisis." },
+  { name:"Sens aiguisés (3 sens)",categorie:"avantage", cout: 4, description:"+1 à tous jets de PER pour trois sens surdéveloppés choisis." },
+  { name:"Sens du combat",       categorie:"avantage", cout: 6, description:"Arme non maîtrisée compte comme score 1 (au lieu de -3). Durant les combats, relance deux dés au résultat 0 et conserve le meilleur." },
+  { name:"Sommeil facile",       categorie:"avantage", cout: 1, description:"Peut s'endormir n'importe où et n'importe quand dès que les yeux sont clos." },
+  { name:"Sommeil superflu",     categorie:"avantage", cout: 5, description:"N'a besoin que de 4 heures de repos par jour. Temps d'apprentissage réduit de moitié." },
+  { name:"Spartiate",            categorie:"avantage", cout: 2, description:"Mange et boit moins que la moyenne. La périodicité des jets de RÉS à la soif et à la faim est doublée." },
+  // ── AVANTAGES : ESPRIT ────────────────────────────────────────────────────
+  { name:"Bon sens",             categorie:"avantage", cout: 3, description:"Bonus de +1 en INT. Le maximum d'INT est également majoré de 1 point." },
+  { name:"Clarté de pensée",     categorie:"avantage", cout: 2, description:"Bonus de +1 à tout jet d'action nécessitant de la concentration dans des conditions défavorables." },
+  { name:"Confiance en soi",     categorie:"avantage", cout: 3, description:"Bonus de +1 en VOL. Le maximum de VOL est également majoré de 1 point." },
+  { name:"Don pour les langues", categorie:"avantage", cout: 2, description:"Commence avec deux langues supplémentaires. Coûts d'XP et temps d'apprentissage des langues réduits d'un tiers." },
+  { name:"Erreurs profitables",  categorie:"avantage", cout: 5, description:"Bonus de +1 en Esprit. Apprend plus vite des erreurs." },
+  { name:"Mémoire eidétique",    categorie:"avantage", cout: 3, description:"Mémoire absolue. L'EG doit rappeler tous les détails des scènes vécues." },
+  { name:"Volonté de fer",       categorie:"avantage", cout: 2, description:"Bonus de +1 à tout jet de VOL pour résister à la manipulation et aux pressions physiques ou psychiques." },
+  // ── AVANTAGES GÉNÉRAUX ────────────────────────────────────────────────────
+  { name:"Contacts",             categorie:"avantage", cout: 1, description:"Réseau de relations utiles dans un milieu particulier. Permet d'obtenir informations, faveurs ou accès inaccessibles à un étranger." },
+  { name:"Fortune",              categorie:"avantage", cout: 1, description:"Ressources financières importantes. Peut vivre confortablement et acquérir l'équipement usuel sans difficulté." },
+  { name:"Patrimoine",           categorie:"avantage", cout: 1, description:"Possède un bien de valeur (propriété, titre, héritage) conférant statut social et revenus réguliers." },
+  { name:"Veinard",              categorie:"avantage", cout: 1, description:"Une fois par session, peut relancer n'importe quel jet de dé et choisir l'un ou l'autre des résultats." },
+
+  // ── DÉFAUTS : ÂME ─────────────────────────────────────────────────────────
+  { name:"Blasé",                categorie:"defaut", cout:-2, description:"Malus de -1 en CRÉ. Plus rien ne vous étonne ; difficultés à innover." },
+  { name:"Défiguré",             categorie:"defaut", cout:-2, description:"Suite à une bataille ou un accident vous avez été défiguré. Votre entourage ressent des difficultés à vous regarder." },
+  { name:"Désagréable",          categorie:"defaut", cout:-2, description:"Malus de -1 en CHA. Vous ne pouvez vous empêcher de faire remarquer les défauts d'autrui." },
+  { name:"Difforme",             categorie:"defaut", cout:-5, description:"Malus de -1 en CHA et malus de -1 dans une caractéristique de Corps (au choix de l'EG)." },
+  { name:"Ennemi naturel",       categorie:"defaut", cout:-6, description:"Tout le règne animal vous considère comme un prédateur dangereux. -5 à tout jet sur les animaux." },
+  { name:"Oublié des Muses",     categorie:"defaut", cout:-4, description:"Bonus de +1 en Âme noire. Vous passez votre temps à réfléchir sans parvenir à vous décider à temps." },
+  // ── DÉFAUTS : CORPS ───────────────────────────────────────────────────────
+  { name:"Arthrite",             categorie:"defaut", cout:-2, description:"Malus de -1 en AGI. Articulations douloureuses, difficultés aux travaux manuels de précision." },
+  { name:"Boiteux",              categorie:"defaut", cout:-2, description:"Malus de -2 aux jets d'initiative. Mouvement (MV) divisé par 2." },
+  { name:"Fragile",              categorie:"defaut", cout:-2, description:"Malus de -1 en RÉS. Attrapez les pires afflictions sans cesse." },
+  { name:"Malingre",             categorie:"defaut", cout:-2, description:"Malus de -1 en FOR. Faible ossature et peu de muscles." },
+  { name:"Obèse",                categorie:"defaut", cout:-5, description:"Malus de -1 dans deux caractéristiques physiques au choix. Incapable de participer à un effort physique." },
+  { name:"Sens déficients (1 sens)",categorie:"defaut", cout:-1, description:"-1 sur tous les jets de PER faisant appel au sens déficient choisi." },
+  { name:"Sens déficients (2 sens)",categorie:"defaut", cout:-2, description:"-1 sur tous les jets de PER pour deux sens déficients choisis." },
+  { name:"Vieillard",            categorie:"defaut", cout:-4, description:"Perd 1 point de FOR et 1 point de RÉS, mais les Charges coûtent 2 points de moins (minimum 1)." },
+  // ── DÉFAUTS : ESPRIT ──────────────────────────────────────────────────────
+  { name:"Avoir un faible",      categorie:"defaut", cout:-1, description:"Incapable de se passer de l'objet de son faible (plat, lieu, personne). Sa survie passe avant la vôtre dans les situations dangereuses." },
+  { name:"Cœur tendre",          categorie:"defaut", cout:-2, description:"La souffrance des autres est insupportable. Incapable de porter un coup de grâce à un humain ou saisonin." },
+  { name:"Distrait",             categorie:"defaut", cout:-2, description:"N'écoute pas tout ce qu'on lui dit. Souvent dans les nuages." },
+  // ── DÉFAUTS GÉNÉRAUX ─────────────────────────────────────────────────────
+  { name:"Addiction",            categorie:"defaut", cout:-1, description:"Dépendant à une substance ou une pratique. Sans sa dose régulière, subit des malus croissants jusqu'à l'incapacité." },
+  { name:"Ennemi",               categorie:"defaut", cout:-1, description:"Un ennemi déclaré (individu ou organisation puissant) cherche activement à lui nuire." },
+  { name:"Fauché",               categorie:"defaut", cout:-1, description:"Vit dans la misère. Ne peut s'offrir que le strict nécessaire." },
+  { name:"Malchanceux",          categorie:"defaut", cout:-1, description:"Une fois par session, l'EG peut forcer le joueur à relancer un jet réussi et à conserver le second résultat." },
+  { name:"Naïf",                 categorie:"defaut", cout:-1, description:"Croit facilement tout ce qu'on lui dit. Malus de -3 à tous les jets de Psychologie et de détection du mensonge." },
+  { name:"Trouble émotionnel",   categorie:"defaut", cout:-2, description:"Souffre d'une phobie, d'un traumatisme ou d'une TOC. L'EG peut déclencher ce trouble dans les situations appropriées, entraînant des malus sévères." },
+];
+
+// ── MANŒUVRES & BOTTES ────────────────────────────────────────────────────────
+// categorie : "manoeuvre" | "botte"
+// score = modificateur d'attaque  |  malus = modificateur de défense (+ = bonus, - = malus)
+export const MANOEUVRES_DATA = [
+  // ── MANŒUVRES (données issues du livre de règles) ──────────────────────────
+  // Format : ini / att / déf / dom — 0 = sans modificateur
+  { name:"Aller-Retour",         categorie:"manoeuvre", description:"Ini -3, Att -3, Déf +5, Dom +7. Les deux mains alternent attaques et parades. À chaque round de combat où le personnage utilise cette manœuvre, il peut attaquer deux fois et parer deux fois. Seul un personnage avec deux armes peut en bénéficier." },
+  { name:"Assommer",             categorie:"manoeuvre", description:"Ini -1, Att -2, Déf 0, Dom 0 (KO). Le personnage tente de sonner son adversaire plutôt que de le tuer. Si le modificateur de réussite est suffisant, la cible est renversée ou assommée jusqu'à la fin du prochain round (ou plus)." },
+  { name:"Attaque Acrobatique",  categorie:"manoeuvre", description:"Ini 0, Att +MR, Déf -MR, Dom 0. Farfadet uniquement. Le personnage bondit sur son adversaire. Le modificateur de réussite du jet d'Acrobaties vient s'ajouter à l'Attaque et en soustraire autant à la Défense." },
+  { name:"Attaque en Force",     categorie:"manoeuvre", description:"Ini 0, Att 0, Déf -8, Dom +FOR. Le personnage se jette sur son adversaire pour lui infliger un maximum de dégâts. Bonus de dommages égal au bonus de dommage de Force." },
+  { name:"Aveugler",             categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Ogre uniquement. En réussissant un jet de CHA + Intimidation, le personnage aveugle momentanément la cible : elle subit -10 à toutes ses actions jusqu'à la fin du round suivant." },
+  { name:"Balayer",              categorie:"manoeuvre", description:"Ini -1, Att +2, Déf -4, Dom ÷2. Le personnage effectue un large mouvement pour atteindre tous ses adversaires. Toutes les cibles à portée d'arme peuvent être touchées lors d'un même round." },
+  { name:"Briser",               categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Le personnage tente de détruire un objet tenu ou porté par un adversaire (armure, bouclier, etc.). Jet d'Attaque normal ; les dommages s'appliquent à l'objet ciblé." },
+  { name:"Briser une Arme",      categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Le personnage cherche à briser l'arme de son adversaire lors d'une parade. La manœuvre se déclenche en réaction ; jet opposé de FOR + Armes contre la DEF adverse." },
+  { name:"Charge",               categorie:"manoeuvre", description:"Ini 0, Att 0, Déf -4, Dom +3+TAI+MV. Le personnage se rue sur son adversaire. L'assaillant gagne en dommages +3 + son bonus de TAI + son MV." },
+  { name:"Charge Montée",        categorie:"manoeuvre", description:"Ini 0, Att 0, Déf -1, Dom +3+TAI+TAI(M)+MV(M). Sur une monture, le personnage s'élance au galop. Dommages : +3 + TAI du cavalier + TAI de la monture + MV de la monture." },
+  { name:"Corps à Corps",        categorie:"manoeuvre", description:"Ini 0, Att -3, Déf -3, Dom ÷2. Combat rapproché à mains nues ou à l'arme de corps à corps. Utile pour les personnages qui ont été gênés dans leur arme principale." },
+  { name:"Coup Bas",             categorie:"manoeuvre", description:"Ini 0, Att 0, Déf -5, Dom +5. Farfadet uniquement. Attaque basse surprenante. Bonus de +5 aux dommages mais fort malus défensif." },
+  { name:"Coup de Boule",        categorie:"manoeuvre", description:"Ini -3, Att +5, Déf -3, Dom +7. Minotaure uniquement. Charge de tête foudroyante. En cas de succès, la cible peut être renversée (jet de FOR ou taille opposée)." },
+  { name:"Coup de pointe",       categorie:"manoeuvre", description:"Ini +X, Att -X, Déf -X, Dom 0. Attaque rapide en allonge, sacrifiant précision et défense pour gagner l'initiative. X est librement choisi de 1 à 5." },
+  { name:"Coup de pommeau",      categorie:"manoeuvre", description:"Ini 0, Att -3, Déf -3, Dom 0. Frappe avec le pommeau ou la garde de l'arme, au lieu de la lame. Peut assommer sans tuer." },
+  { name:"Coup en passant",      categorie:"manoeuvre", description:"Ini 0, Att -4, Déf 0, Dom 0. Frappe une cible en la croisant sans s'arrêter. Nécessite de se déplacer ; un seul adversaire peut être frappé." },
+  { name:"Défense Acrobatique",  categorie:"manoeuvre", description:"Ini 0, Att 0, Déf +MR, Dom 0. Farfadet, réaction. La parade se transforme en pirouette acrobatique ; le MR du jet d'Acrobaties s'ajoute à la Défense pour ce round." },
+  { name:"Désarçonner",          categorie:"manoeuvre", description:"Ini -2, Att -2, Déf -5, Dom -2. Renverser ou faire chuter le cavalier de sa monture. Jet opposé contre la monture ou le cavalier." },
+  { name:"Désarmer",             categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Tentative de faire lâcher son arme à l'adversaire. En cas de succès, l'adversaire doit réussir un jet de FOR difficile ou lâcher son arme." },
+  { name:"Double Attaque",       categorie:"manoeuvre", description:"Ini 0, Att -5, Déf -5, Dom 0. Deux attaques dans le même round contre une ou deux cibles différentes, les deux avec -5." },
+  { name:"Double Parade",        categorie:"manoeuvre", description:"Ini 0, Att -5, Déf -5, Dom 0. Deux parades dans le même round, les deux avec -5." },
+  { name:"Eblouir",              categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Ogre, réaction. Par un brusque éclair de lumière, aveugle temporairement ses adversaires. Tous les ennemis dans un cône de 5 m subissent -5 en Défense pendant un round." },
+  { name:"Embrocher",            categorie:"manoeuvre", description:"Ini -1, Att +2, Déf -3, Dom +5. Minotaure uniquement. Impale l'adversaire sur ses cornes. En cas de succès, la cible reste clouée et ne peut agir librement tant qu'elle n'est pas libérée (jet de FOR opposé)." },
+  { name:"Esquive Totale",       categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0 (réduit à zéro les dommages). Le personnage consacre toute son attention à éviter les coups. Ne peut pas attaquer ; tous les dommages reçus sont réduits à 0 si la parade réussit." },
+  { name:"Feinte",               categorie:"manoeuvre", description:"Ini -5, Att -5, Déf 0, Dom 0. Simulacre d'attaque pour tromper l'adversaire. Si la feinte réussit, l'adversaire perd sa défense lors de la véritable attaque suivante." },
+  { name:"Jeu Défensif",         categorie:"manoeuvre", description:"Ini -X, Att -X, Déf +X, Dom 0. Le personnage adopte une posture défensive, sacrifiant X points en Initiative et Attaque pour les gagner en Défense. X au choix de 1 à 5." },
+  { name:"Levier d'Acier",       categorie:"manoeuvre", description:"Ini +1, Att +2, Déf +2, Dom 0. Minotaure uniquement. Utilise la masse et la robustesse des bras pour déstabiliser l'adversaire ou briser sa garde." },
+  { name:"Lier",                 categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Réaction. Le personnage bloque l'arme adverse contre son propre corps ou son arme, immobilisant les deux combattants. Jet de FOR opposé pour maintenir ou briser le lien." },
+  { name:"Marquer",              categorie:"manoeuvre", description:"Ini 0, Att 0, Déf -5, Dom 1 pt. Blessure légère mais précise infligeant exactement 1 point de dommage. Sert à humilier ou marquer l'adversaire sans le tuer." },
+  { name:"Mur de Fer",           categorie:"manoeuvre", description:"Ini 0, Att 0, Déf +BD+BDArme, Dom 0. Position de bloc totale : le personnage additionne son Bonus de Défense et le Bonus de Défense de son arme pour une parade. Ne peut pas attaquer ce round." },
+  { name:"Perce-Bouclier",       categorie:"manoeuvre", description:"Ini -2, Att +5, Déf 0, Dom BD(FOR) seul. Minotaure uniquement. Attaque concentrée traversant le bouclier adverse. Ignore la protection du bouclier ; dommages = seul bonus de dommage de Force." },
+  { name:"Pleine Attaque",       categorie:"manoeuvre", description:"Ini +1, Att +3, Déf 0, Dom +3. Le personnage se jette en avant dans un assaut maximal. Bonus offensifs importants, pas de pénalité défensive." },
+  { name:"Plongée",              categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Lutin uniquement. Depuis les airs, le personnage plonge sur sa cible. L'attaque bénéficie d'un avantage de surprise ; la cible peut être renversée si elle échoue à son jet de défense." },
+  { name:"Point Faible",         categorie:"manoeuvre", description:"Ini -2, Att -4, Déf 0, Dom protection÷2. Le personnage vise un interstice ou une partie non protégée de l'armure adverse. La protection de l'armure est réduite de moitié." },
+  { name:"Pousser son Avantage", categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0 (cumul MR). Le personnage capitalise sur une série de succès. Il accumule les MR de ses attaques successives et peut les dépenser pour augmenter ses prochains jets d'attaque." },
+  { name:"Presser le Contact",   categorie:"manoeuvre", description:"Ini 0, Att 0, Déf -5, Dom 0. Le personnage s'avance pour forcer le corps à corps. Empêche les adversaires armés de longues armes d'attaquer normalement." },
+  { name:"Recevoir",             categorie:"manoeuvre", description:"Ini +5, Att +5, Déf 0, Dom +BD(FOR)(adv)+MV×2+TAI. Réaction à une charge adverse. Le personnage présente son arme à la charge ennemie ; les dommages incluent le bonus de FOR adverse, son double MV et sa TAI." },
+  { name:"Repousser",            categorie:"manoeuvre", description:"Ini -3, Att +2, Déf 0, Dom 0. Frappe destinée à faire reculer l'adversaire plutôt qu'à blesser. En cas de succès, la cible recule de 1 à MR mètres (jet de FOR pour résister)." },
+  { name:"Ridiculiser",          categorie:"manoeuvre", description:"Ini 0, Att -3, Déf -3, Dom 0. Série de bottes d'escrime humiliante. En cas de succès, l'adversaire subit -2 à ses jets de CHA et perd sa prochaine action si MR ≥ 5." },
+  { name:"Riposte",              categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom 0. Réaction. Contre-attaque immédiate après une parade réussie. Utilise la même compétence d'arme ; se joue en réaction, sans initiative." },
+  { name:"Saut Armé",            categorie:"manoeuvre", description:"Ini +3, Att -4, Déf +2, Dom +4. Minotaure uniquement. Bond en avant combinant élévation et attaque. Bonus de +4 aux dommages ; l'adversaire doit réussir un jet pour ne pas être renversé." },
+  { name:"Tenir en Respect",     categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom -10. Le personnage tient son adversaire en joue ou de la pointe de son arme. La cible doit choisir : reculer, se soumettre ou tenter une action risquée." },
+  { name:"Tourbillon",           categorie:"manoeuvre", description:"Ini 0, Att +5, Déf -5, Dom +3+MV. Lutin uniquement. Rotation vrombissante à grande vitesse, les lames tournantes frappant tous les adversaires à portée avec puissance." },
+];
+
+// ── POUVOIRS DE FLAMME ────────────────────────────────────────────────────────
+// categorie : "flamme" | "saisonin"
+export const POUVOIRS_DATA = [
+  // ── POUVOIRS DE FLAMME ────────────────────────────────────────────────────
+  { name:"Appel de Flamme",         categorie:"flamme", description:"Le personnage fait jaillir une flamme de sa paume ou d'un objet proche. Jet de CHA + Mages de Flamme contre DIF 10. La flamme dure jusqu'au prochain lever de soleil ou jusqu'à ce que le personnage la congédie." },
+  { name:"Baptême de Feu",          categorie:"flamme", description:"Initiation d'un novice à la Flamme. Permet à un personnage possédant au moins rang 3 en Mages de Flamme de transmettre la Flamme intérieure à un autre être consentant. Jet de CHA + Mages de Flamme contre DIF 15." },
+  { name:"Barrière de Cendres",     categorie:"flamme", description:"Crée un rideau de braises tourbillonnantes sur une longueur égale au MR de mètres. Tout franchissement exige un jet de résistance au feu (RÉS, DIF 12) ou inflige +3 dommages de brûlure." },
+  { name:"Braise Persistante",      categorie:"flamme", description:"Maintient une braise ou tison allumé indéfiniment, ou ravive une flamme vacillante. Jet de CHA + Mages de Flamme contre DIF 8. Aucune dépense de Souffle si la cible est un objet inerte." },
+  { name:"Brûlure de l'Âme",        categorie:"flamme", description:"Le personnage inflige une brûlure psychique à sa cible. Jet de CHA + Mages de Flamme contre VOL de la cible. En cas de succès, la cible subit -2 à toutes ses actions pendant un nombre de rounds égal au MR." },
+  { name:"Cœur en Feu",             categorie:"flamme", description:"Le personnage exalte le courage de ses alliés dans un rayon de 10 m. Chacun bénéficie de +2 en Attaque et de +2 en résistance à la peur pour la durée d'une scène. Jet de CHA + Mages de Flamme contre DIF 12." },
+  { name:"Embrasement",             categorie:"flamme", description:"Lance une boule de feu sur une cible à portée de vue (jusqu'à 30 m). Jet d'attaque CHA + Mages de Flamme contre la Défense adverse. En cas de succès, inflige 2D6 + MR dommages de feu." },
+  { name:"Flamme Filante",          categorie:"flamme", description:"Projette une langue de feu en ligne droite jusqu'à 20 m. Tous les obstacles sur la trajectoire doivent réussir un jet RÉS (DIF 10) ou prendre feu. Inflige 1D6 + MR dommages." },
+  { name:"Lance-Flammes",           categorie:"flamme", description:"Crache un torrent de feu dans un cône de 5 m de large et 10 m de long. Toutes les cibles dans la zone subissent +2D6 dommages de feu. Jet de CHA + Mages de Flamme contre DIF 14." },
+  { name:"Lumière de la Flamme",    categorie:"flamme", description:"Illumine une zone de 10 m de rayon d'une lumière chaude et dorée pendant une heure par point de MR. Pas de jet de dés requis (automatique pour les détenteurs de la Flamme)." },
+  { name:"Mur de Feu",              categorie:"flamme", description:"Érige un mur de flammes de MR mètres de long et 2 m de haut. Le mur bloque le passage ; toute tentative de franchir inflige 3D6 dommages de feu et déclenche un jet RÉS (DIF 15). Dure MR rounds." },
+  { name:"Regard de Braise",        categorie:"flamme", description:"Les yeux du personnage s'embrasent d'une lueur dorée, intimidant ses adversaires. Bonus de +3 à tout jet de CHA visant à impressionner ou effrayer. Effet automatique, dure une scène." },
+  { name:"Repousser les Ombres",    categorie:"flamme", description:"La Flamme intérieure rayonne, affaiblissant les créatures issues de l'Ombre ou du Froid dans un rayon de 10 m. Ces créatures subissent -3 à toutes leurs actions pendant que le pouvoir est maintenu (coût : 1 Souffle par round)." },
+  { name:"Souffle Vivifiant",       categorie:"flamme", description:"Le personnage transmet sa propre chaleur vitale à un allié blessé ou inconscient. Jet de CHA + Mages de Flamme contre DIF égale à 5 + les points de vie manquants ÷ 3. En cas de succès, la cible récupère MR points de vie." },
+  { name:"Torche Vivante",          categorie:"flamme", description:"Le corps du personnage s'embrase d'une aura protectrice qui repousse les attaques physiques ordinaires et éclaire. Tout attaquant au corps à corps subit 1D6 dommages de feu par round de contact. Dure MR minutes." },
+  // ── POUVOIRS SAISONNIERS ──────────────────────────────────────────────────
+  { name:"Bénédiction d'Été",       categorie:"saisonin", description:"Le personnage canalise la chaleur estivale pour réchauffer ses amis. Les alliés dans un rayon de 5 m regagnent 1D3 PdV par round pendant MR rounds. Jet de CHA + Pratiques Saisonnières contre DIF 12." },
+  { name:"Brume de Printemps",      categorie:"saisonin", description:"Crée un voile de brume dorée réduisant la visibilité à 5 m. Tous les jets de Perception visuelle dans la zone subissent -4. Dure MR × 5 minutes. Jet de CHA + Pratiques Saisonnières contre DIF 10." },
+  { name:"Chant du Vent d'Ouest",   categorie:"saisonin", description:"Invoque une rafale de vent catégorique stoppant une progression ou un projectile. Annule une attaque à distance si le jet de CHA + Pratiques Saisonnières dépasse le jet d'attaque adverse." },
+  { name:"Couronne de Givre",       categorie:"saisonin", description:"Fige l'air autour d'une cible dans un rayon de 3 m. La cible subit -3 en Initiative et doit réussir un jet de RÉS (DIF 12) ou être ralentie (MV ÷ 2) pendant un nombre de rounds égal au MR." },
+  { name:"Éveil des Racines",       categorie:"saisonin", description:"Fait surgir des racines ou des lianes qui entravèrent une cible au sol. Jet de CHA + Pratiques Saisonnières contre DIF 12. En cas de succès, la cible est immobilisée pendant MR rounds (jet de FOR DIF = MR × 3 pour s'échapper chaque round)." },
+  { name:"Manteau d'Automne",       categorie:"saisonin", description:"Enveloppe un allié d'une cape de feuilles mortes protectrices. Confère +2 en protection et +3 à tous les jets de Furtivité dans des environnements naturels. Dure MR × 10 minutes." },
+  { name:"Rosée de l'Aube",         categorie:"saisonin", description:"L'eau pure distillée de la rosée guérit les blessures légères. Jet de CHA + Pratiques Saisonnières contre DIF 10. En cas de succès, redonne MR points de vie à une cible touchée." },
+  { name:"Tonnerre d'Hiver",        categorie:"saisonin", description:"Lance une détonation glaciale assourdissante. Toutes les cibles dans un rayon de 8 m subissent 2D6 dommages de froid et doivent réussir un jet RÉS (DIF 12) ou être sourdes pendant 1D3 rounds. Jet de CHA + Pratiques Saisonnières contre DIF 15." },
+];
+
+// ── PEUPLES ────────────────────────────────────────────────────────────────────
+// Données principales de chaque race du monde d'Agone
+export const PEUPLES_DATA = [
+  {
+    name: "Humain",
+    taiBase: 0, mvBase: 4,
+    pointsCreationComp: 20,
+    competencesRaciales: [],
+    corpsBonus: 0, espritBonus: 0, ameBonus: 0,
+    description: "Peuple le plus répandu, les Humains s'adaptent à tous les environnements. Ils ne bénéficient d'aucun bonus racial particulier mais commencent avec 20 points de compétences supplémentaires."
+  },
+  {
+    name: "Nain",
+    taiBase: -1, mvBase: 3,
+    pointsCreationComp: 15,
+    competencesRaciales: ["Artisanat", "Apprécier les métaux"],
+    corpsBonus: 2, espritBonus: 0, ameBonus: 0,
+    description: "Robustes et tenaces, les Nains vivent sous les montagnes et s'illustrent comme forgerons hors pair. Bonus de +2 en Corps, TAI -1, MV 3. Rang 1 offert en Artisanat et Apprécier les métaux."
+  },
+  {
+    name: "Géant",
+    taiBase: 3, mvBase: 6,
+    pointsCreationComp: 12,
+    competencesRaciales: ["Résistance à la douleur"],
+    corpsBonus: 4, espritBonus: 0, ameBonus: 0,
+    description: "Imposants et puissants, les Géants dominent physiquement tous les autres peuples. Bonus de +4 en Corps, TAI +3, MV 6. Rang 1 offert en Résistance à la douleur."
+  },
+  {
+    name: "Farfadet",
+    taiBase: -2, mvBase: 5,
+    pointsCreationComp: 15,
+    competencesRaciales: ["Acrobaties", "Esquive"],
+    corpsBonus: 0, espritBonus: 0, ameBonus: 2,
+    description: "Agiles et malicieux, les Farfadets sont de petits êtres allégeant leur propre poids. Bonus de +2 en Âme, TAI -2, MV 5. Rang 1 offert en Acrobaties et Esquive. Accès aux manœuvres raciales Farfadet."
+  },
+  {
+    name: "Lutin",
+    taiBase: -3, mvBase: 6,
+    pointsCreationComp: 15,
+    competencesRaciales: ["Acrobaties", "Vol"],
+    corpsBonus: 0, espritBonus: 1, ameBonus: 1,
+    description: "Les Lutins sont les plus petits des peuples ailés d'Agone. Ils peuvent voler (MV vol = 8). Bonus de +1 en Esprit et +1 en Âme, TAI -3, MV 6. Rang 1 offert en Acrobaties et Vol."
+  },
+  {
+    name: "Satyre",
+    taiBase: 0, mvBase: 5,
+    pointsCreationComp: 15,
+    competencesRaciales: ["Chant", "Instruments de musique"],
+    corpsBonus: 0, espritBonus: 0, ameBonus: 3,
+    description: "Artistes nés, les Satyres sont des amoureux des arts et de la fête. Bonus de +3 en Âme, TAI 0, MV 5. Rang 1 offert en Chant et Instruments de musique."
+  },
+  {
+    name: "Minotaure",
+    taiBase: 2, mvBase: 4,
+    pointsCreationComp: 12,
+    competencesRaciales: ["Corps-à-corps", "Intimidation"],
+    corpsBonus: 3, espritBonus: 0, ameBonus: 0,
+    description: "Guerriers dans l'âme, les Minotaures tirent leur force de leur imposante stature et de leurs cornes redoutables. Bonus de +3 en Corps, TAI +2, MV 4. Rang 1 offert en Corps-à-corps et Intimidation. Accès aux manœuvres raciales Minotaure."
+  },
+  {
+    name: "Ogre",
+    taiBase: 2, mvBase: 4,
+    pointsCreationComp: 10,
+    competencesRaciales: ["Intimidation", "Résistance à la douleur"],
+    corpsBonus: 4, espritBonus: -1, ameBonus: 0,
+    description: "Massifs et brutaux mais souvent sous-estimés, les Ogres compensent leur lenteur intellectuelle par une force phénoménale. Bonus de +4 en Corps, -1 en Esprit, TAI +2, MV 4. Accès aux manœuvres raciales Ogre."
+  },
+  {
+    name: "Drakonien",
+    taiBase: 1, mvBase: 4,
+    pointsCreationComp: 12,
+    competencesRaciales: ["Magie drakonienne", "Résistance au feu"],
+    corpsBonus: 1, espritBonus: 1, ameBonus: 1,
+    description: "Descendants de dragons, les Drakoniens allient puissance et intelligence. Bonus de +1 en Corps, Esprit et Âme. TAI +1, MV 4. Rang 1 offert en Magie drakonienne et Résistance au feu."
+  },
+  {
+    name: "Morgane",
+    taiBase: 0, mvBase: 4,
+    pointsCreationComp: 16,
+    competencesRaciales: ["Magie lunaire", "Navigation"],
+    corpsBonus: 0, espritBonus: 1, ameBonus: 2,
+    description: "Liées aux marées et à la lune, les Morganes sont des magiciennes naturelles. Bonus de +1 en Esprit, +2 en Âme. Rang 1 offert en Magie lunaire et Navigation."
+  },
+  {
+    name: "Pixie",
+    taiBase: -4, mvBase: 7,
+    pointsCreationComp: 18,
+    competencesRaciales: ["Magie des fées", "Furtivité"],
+    corpsBonus: 0, espritBonus: 2, ameBonus: 2,
+    description: "Minuscules créatures ailées à la magie indomptable, les Pixies sont insaisissables. Bonus de +2 en Esprit et +2 en Âme. TAI -4, MV 7 (vol 10). Rang 1 offert en Magie des fées et Furtivité."
+  },
+  {
+    name: "Fée Noire",
+    taiBase: -1, mvBase: 5,
+    pointsCreationComp: 14,
+    competencesRaciales: ["Manipulation", "Magie sombre"],
+    corpsBonus: 0, espritBonus: 1, ameBonus: 2,
+    description: "Séduisantes et imprévisibles, les Fées Noires pratiquent une magie d'illusion et de séduction. Bonus de +1 en Esprit, +2 en Âme. TAI -1, MV 5. Rang 1 offert en Manipulation et Magie sombre."
+  },
+  {
+    name: "Méduse",
+    taiBase: 0, mvBase: 4,
+    pointsCreationComp: 12,
+    competencesRaciales: ["Pétrification", "Regard fascinant"],
+    corpsBonus: 1, espritBonus: 0, ameBonus: 2,
+    description: "Créatures mi-humaines mi-serpentines, les Méduses possèdent un regard dévastateur. Bonus de +1 en Corps, +2 en Âme. Rang 1 offert en Pétrification (pouvoir naturel) et Regard fascinant."
+  },
+];

@@ -76,6 +76,25 @@
         <label>{{localize "AGONE.Special"}}</label>
         <input type="text" name="system.special" value="{{system.special}}" />
       </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.CompAlt"}}</label>
+        <input type="text" name="system.compAlt" value="{{system.compAlt}}" placeholder="ex: Danse" />
+      </div>
+      {{#if system.compAlt}}
+      <div class="form-group">
+        <label>{{localize "AGONE.AttrAlt"}}</label>
+        <select name="system.attrAlt">
+          <option value="agilite" {{#if (eq system.attrAlt "agilite")}}selected{{/if}}>{{localize "AGONE.Attribut.Agilite"}}</option>
+          <option value="force" {{#if (eq system.attrAlt "force")}}selected{{/if}}>{{localize "AGONE.Attribut.Force"}}</option>
+          <option value="perception" {{#if (eq system.attrAlt "perception")}}selected{{/if}}>{{localize "AGONE.Attribut.Perception"}}</option>
+          <option value="resistance" {{#if (eq system.attrAlt "resistance")}}selected{{/if}}>{{localize "AGONE.Attribut.Resistance"}}</option>
+          <option value="intelligence" {{#if (eq system.attrAlt "intelligence")}}selected{{/if}}>{{localize "AGONE.Attribut.Intelligence"}}</option>
+          <option value="volonte" {{#if (eq system.attrAlt "volonte")}}selected{{/if}}>{{localize "AGONE.Attribut.Volonte"}}</option>
+          <option value="charisma" {{#if (eq system.attrAlt "charisma")}}selected{{/if}}>{{localize "AGONE.Attribut.Charisma"}}</option>
+          <option value="creativite" {{#if (eq system.attrAlt "creativite")}}selected{{/if}}>{{localize "AGONE.Attribut.Creativite"}}</option>
+        </select>
+      </div>
+      {{/if}}
     </div>
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>

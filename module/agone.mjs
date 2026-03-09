@@ -126,6 +126,12 @@ Hooks.once("init", () => {
     "systems/agone/templates/chat/roll-result.hbs",
     // Apps
     "systems/agone/templates/apps/sorts-browser.hbs",
+    "systems/agone/templates/apps/armes-browser.hbs",
+    "systems/agone/templates/apps/armures-browser.hbs",
+    "systems/agone/templates/apps/dons-browser.hbs",
+    "systems/agone/templates/apps/manoeuvres-browser.hbs",
+    "systems/agone/templates/apps/peuples-browser.hbs",
+    "systems/agone/templates/apps/pouvoirs-browser.hbs",
   ];
   loadTemplates(templates);
 

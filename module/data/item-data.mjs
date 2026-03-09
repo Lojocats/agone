@@ -106,6 +106,10 @@ export class SortData extends foundry.abstract.TypeDataModel {
       special:     new fields.StringField({ initial: "" }),
       description: new fields.HTMLField({ initial: "" }),
       danseurNom:  new fields.StringField({ initial: "" }),
+      // Compétence alternative pour min(artsMagiques, compAlt + attrAlt)
+      compAlt:     new fields.StringField({ initial: "" }),
+      attrAlt:     new fields.StringField({ initial: "charisma",
+        choices: ["agilite","force","perception","resistance","intelligence","volonte","charisma","creativite"] }),
     };
   }
 }
@@ -163,6 +167,7 @@ export class PouvoirData extends foundry.abstract.TypeDataModel {
 export class ManoeuvreData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
+      categorie:   new fields.StringField({ initial: "manoeuvre", choices: ["manoeuvre","botte"] }),
       score:       new fields.NumberField({ initial: 0, integer: true }),
       malus:       new fields.NumberField({ initial: 0, integer: true }),
       description: new fields.HTMLField({ initial: "" })

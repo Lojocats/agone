@@ -1,0 +1,67 @@
+<div class="cb-app">
+
+  <!-- Filtres -->
+  <div class="cb-filters">
+    <input type="text" class="cb-search" placeholder="Rechercher une compétence…" value="{{search}}" />
+
+    <div class="cb-filter-row">
+      <!-- Domaines -->
+      <div class="cb-dom-filters">
+        <label>
+          <input type="checkbox" class="cb-all-check" {{#if allDomainesSelected}}checked{{/if}} />
+          Tous
+        </label>
+        {{#each allDomaines as |d|}}
+        <label>
+          <input type="checkbox" class="cb-dom-check" value="{{d.value}}" {{#if d.active}}checked{{/if}} />
+          <span class="cb-dom-badge dom-{{d.value}}">{{d.label}}</span>
+        </label>
+        {{/each}}
+      </div>
+
+      <!-- Possédées -->
+      <select class="cb-possede-select">
+        <option value="all"  {{#if (eq filterPossede "all")}}selected{{/if}}>Toutes</option>
+        <option value="oui"  {{#if (eq filterPossede "oui")}}selected{{/if}}>Possédées</option>
+        <option value="non"  {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédées</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="cb-table-wrap">
+    <table class="cb-table">
+      <thead>
+        <tr>
+          <th>Compétence</th>
+          <th>Domaine</th>
+          <th>Attribut lié</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each competences as |c|}}
+        <tr class="cb-row {{#if c.count}}cb-row-owned{{/if}}">
+          <td class="cb-name">
+            {{c.name}}
+            {{#if c.count}}<span class="cb-count-badge" title="Possédée {{c.count}} fois">×{{c.count}}</span>{{/if}}
+          </td>
+          <td><span class="cb-dom-badge dom-{{c.domaine}}">{{c.domaine}}</span></td>
+          <td class="cb-attr">{{c.attributLie}}</td>
+          <td>
+            <button type="button" class="cb-add-btn" data-action="addCompetence"
+                    data-name="{{c.name}}" data-attribut-lie="{{c.attributLie}}"
+                    title="Ajouter «{{c.name}}»">
+              <i class="fas fa-plus"></i>
+            </button>
+          </td>
+        </tr>
+        {{/each}}
+        {{#unless competences.length}}
+        <tr><td colspan="4" class="cb-empty">Aucune compétence trouvée.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

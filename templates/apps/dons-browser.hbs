@@ -1,0 +1,91 @@
+<div class="dons-browser-app">
+
+  <!-- Barre de filtres -->
+  <div class="db-filters">
+    <div class="db-filter-row">
+      <div class="db-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="db-search" placeholder="Rechercher un avantage ou un défaut..." value="{{search}}">
+      </div>
+      <button type="button" class="db-clear" title="Effacer les filtres">
+        <i class="fas fa-eraser"></i>
+      </button>
+    </div>
+
+    <div class="db-filter-row2">
+      <select class="db-cat-filter">
+        <option value="all"      {{#if (eq filterCat "all")}}selected{{/if}}>Avantages & Défauts</option>
+        <option value="avantage" {{#if (eq filterCat "avantage")}}selected{{/if}}>Avantages uniquement</option>
+        <option value="defaut"   {{#if (eq filterCat "defaut")}}selected{{/if}}>Défauts uniquement</option>
+      </select>
+      <select class="db-possede-filter">
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+      </select>
+      <span class="db-count">{{dons.length}} résultat(s)</span>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div class="db-list-wrapper">
+    <table class="db-table">
+      <thead>
+        <tr>
+          <th class="db-col-toggle"></th>
+          <th class="db-col-name">Nom</th>
+          <th class="db-col-cat">Catégorie</th>
+          <th class="db-col-cout">Coût</th>
+          <th class="db-col-action"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each dons as |don|}}
+        <tr class="db-row db-row-{{don.categorie}} {{#if don.hasInActor}}db-has-item{{/if}}" data-don-idx="{{don.idx}}">
+          <td>
+            {{#if don.description}}
+            <button type="button" class="db-desc-toggle btn-icon" data-action="toggleDonDesc" title="Voir la description">
+              <i class="fas {{#if don.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+            </button>
+            {{/if}}
+          </td>
+          <td class="db-name">{{don.name}}</td>
+          <td class="db-cat">
+            {{#if (eq don.categorie "avantage")}}
+            <span class="db-badge db-badge-avantage">Avantage</span>
+            {{else}}
+            <span class="db-badge db-badge-defaut">Défaut</span>
+            {{/if}}
+          </td>
+          <td class="db-cout">
+            {{#if (eq don.categorie "avantage")}}
+            <span class="db-cout-pos">+{{don.coutAbs}} pt{{#if (gt don.coutAbs 1)}}s{{/if}}</span>
+            {{else}}
+            <span class="db-cout-neg">−{{don.coutAbs}} pt{{#if (gt don.coutAbs 1)}}s{{/if}}</span>
+            {{/if}}
+          </td>
+          <td class="db-action">
+            {{#if don.hasInActor}}
+            <i class="fas fa-check db-check" title="Déjà possédé"></i>
+            {{else}}
+            <button type="button" class="db-add-btn btn-icon" data-action="addDon" title="Ajouter au personnage">
+              <i class="fas fa-plus"></i>
+            </button>
+            {{/if}}
+          </td>
+        </tr>
+        {{#if don.description}}
+        <tr class="db-desc-row" data-don-idx="{{don.idx}}" {{#unless don.expanded}}style="display:none"{{/unless}}>
+          <td></td>
+          <td colspan="4" class="db-description-cell">{{don.description}}</td>
+        </tr>
+        {{/if}}
+        {{/each}}
+        {{#unless dons.length}}
+        <tr><td colspan="5" class="db-empty">Aucun résultat trouvé.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

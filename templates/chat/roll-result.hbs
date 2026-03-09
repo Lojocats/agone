@@ -22,7 +22,7 @@
         {{#each details as |detail|}}
         <tr>
           <td class="detail-label">{{detail.label}}</td>
-          <td class="detail-value">{{detail.value}}</td>
+          <td class="detail-value"{{#if detail.tooltip}} title="{{detail.tooltip}}"{{/if}}>{{detail.value}}</td>
         </tr>
         {{/each}}
       </tbody>
@@ -31,8 +31,8 @@
   {{/if}}
 
   {{#if isFumble}}
-  <div class="fumble-alert">
-    <i class="fas fa-skull"></i> <strong>{{localize "AGONE.Fumble"}}</strong>
+  <div class="fumble-alert{{#if isMegaFumble}} mega-fumble-alert{{/if}}">
+    <i class="fas fa-skull"></i> <strong>{{#if isMegaFumble}}{{localize "AGONE.MegaFumble"}}{{else}}{{localize "AGONE.Fumble"}}{{/if}}</strong>
     — {{localize "AGONE.PenaliteFumble"}} : −{{fumblePenalty}}
     {{#if fumbleTotal}}<span class="fumble-total-adj">({{localize "AGONE.TotalAjuste"}} : {{fumbleTotal}})</span>{{/if}}
   </div>

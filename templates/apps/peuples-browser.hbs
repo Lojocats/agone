@@ -1,0 +1,75 @@
+<div class="peuples-browser-app">
+
+  <!-- Barre de filtres -->
+  <div class="pb-filters">
+    <div class="pb-filter-row">
+      <div class="pb-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="pb-search" placeholder="Rechercher un peuple..." value="{{search}}">
+      </div>
+      <button type="button" class="pb-clear" title="Effacer les filtres">
+        <i class="fas fa-eraser"></i>
+      </button>
+    </div>
+
+    <div class="pb-filter-row2">
+      <select class="pb-possede-filter">
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous les peuples</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Peuple actif</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Autres peuples</option>
+      </select>
+      <span class="pb-count">{{items.length}} résultat(s)</span>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="pb-list-wrapper">
+    <table class="pb-table">
+      <thead>
+        <tr>
+          <th class="pb-col-toggle"></th>
+          <th class="pb-col-name">Peuple</th>
+          <th class="pb-col-tai" title="TAI de base">TAI</th>
+          <th class="pb-col-action"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items as |item|}}
+        <tr class="pb-row {{#if item.isActif}}pb-row-actif{{/if}}" data-peuple-idx="{{item.idx}}">
+          <td>
+            {{#if item.description}}
+            <button type="button" class="pb-desc-toggle btn-icon" data-action="togglePeupleDesc" title="Voir la description">
+              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+            </button>
+            {{/if}}
+          </td>
+          <td class="pb-name">
+            {{item.name}}
+            {{#if item.isActif}}<span class="pb-badge-actif">Actif</span>{{/if}}
+          </td>
+          <td class="pb-tai">{{item.taiBase}}</td>
+          <td class="pb-action">
+            {{#if item.isActif}}
+            <i class="fas fa-check pb-check" title="Peuple actif"></i>
+            {{else}}
+            <button type="button" class="pb-apply-btn btn-icon" data-action="applyPeuple" title="Appliquer ce peuple">
+              <i class="fas fa-user-check"></i>
+            </button>
+            {{/if}}
+          </td>
+        </tr>
+        {{#if item.description}}
+        <tr class="pb-desc-row" data-peuple-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+          <td></td>
+          <td colspan="3" class="pb-description-cell">{{item.description}}</td>
+        </tr>
+        {{/if}}
+        {{/each}}
+        {{#unless items.length}}
+        <tr><td colspan="4" class="pb-empty">Aucun peuple trouvé.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

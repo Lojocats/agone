@@ -65,6 +65,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
       // Mode création du personnage
       modeCreation: new fields.BooleanField({ initial: true }),
+      // Mode montée de niveau visible (toggle UI)
+      modeLevelUp:  new fields.BooleanField({ initial: false }),
 
       // Points de Vie
       pdv: new fields.SchemaField({
@@ -147,9 +149,12 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       }),
 
       // Secondaires manuels
-      bd:      new fields.NumberField({ initial: 0, integer: true }),
-      emprise: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      bd:       new fields.NumberField({ initial: 0, integer: true }),
+      emprise:  new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       chargeMax: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      // Obédience magique : détermine la formule d'Emprise
+      // jorniste → EMP = INT | eclipsiste → EMP = (INT+VOL)/2 | obscurantiste → EMP = VOL
+      typeMage: new fields.StringField({ initial: "eclipsiste", choices: ["jorniste", "eclipsiste", "obscurantiste"] }),
 
       // Points de création de compétences
       ptsCreationComp: new fields.SchemaField({
@@ -256,7 +261,15 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     // Caractéristiques secondaires
     this.melee    = Math.round((this.force.score + this.agilite.score * 2) / 3);
     this.tir      = Math.round((this.agilite.score + this.perception.score) / 2);
-    this.emprise  = Math.round((this.intelligence.score + this.volonte.score) / 2);
+    // Emprise selon obédience magique
+    if (this.typeMage === "jorniste") {
+      this.emprise = this.intelligence.score;
+    } else if (this.typeMage === "obscurantiste") {
+      this.emprise = this.volonte.score;
+    } else {
+      // eclipsiste (défaut)
+      this.emprise = Math.round((this.intelligence.score + this.volonte.score) / 2);
+    }
     this.art      = Math.round((this.charisma.score + this.creativite.score) / 2);
 
     // Initiative de base (sans arme)

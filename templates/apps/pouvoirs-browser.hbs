@@ -1,0 +1,83 @@
+<div class="pouvoirs-browser-app">
+
+  <!-- Barre de filtres -->
+  <div class="pvb-filters">
+    <div class="pvb-filter-row">
+      <div class="pvb-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="pvb-search" placeholder="Rechercher un pouvoir..." value="{{search}}">
+      </div>
+      <button type="button" class="pvb-clear" title="Effacer les filtres">
+        <i class="fas fa-eraser"></i>
+      </button>
+    </div>
+
+    <div class="pvb-filter-row2">
+      <select class="pvb-cat-filter">
+        <option value="all"     {{#if (eq filterCat "all")}}selected{{/if}}>Tous les pouvoirs</option>
+        <option value="flamme"  {{#if (eq filterCat "flamme")}}selected{{/if}}>Pouvoirs de Flamme</option>
+        <option value="saisonin" {{#if (eq filterCat "saisonin")}}selected{{/if}}>Pouvoirs Saisonins</option>
+      </select>
+      <select class="pvb-possede-filter">
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+      </select>
+      <span class="pvb-count">{{items.length}} résultat(s)</span>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="pvb-list-wrapper">
+    <table class="pvb-table">
+      <thead>
+        <tr>
+          <th class="pvb-col-toggle"></th>
+          <th class="pvb-col-name">Nom</th>
+          <th class="pvb-col-cat">Catégorie</th>
+          <th class="pvb-col-action"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items as |item|}}
+        <tr class="pvb-row pvb-row-{{item.categorie}} {{#if item.hasInActor}}pvb-has-item{{/if}}" data-pouvoir-idx="{{item.idx}}">
+          <td>
+            {{#if item.description}}
+            <button type="button" class="pvb-desc-toggle btn-icon" data-action="togglePouvoirDesc" title="Voir la description">
+              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+            </button>
+            {{/if}}
+          </td>
+          <td class="pvb-name">{{item.name}}</td>
+          <td class="pvb-cat">
+            {{#if (eq item.categorie "flamme")}}
+            <span class="pvb-badge pvb-badge-flamme">Flamme</span>
+            {{else}}
+            <span class="pvb-badge pvb-badge-saisonin">Saisonin</span>
+            {{/if}}
+          </td>
+          <td class="pvb-action">
+            {{#if item.hasInActor}}
+            <i class="fas fa-check pvb-check" title="Déjà possédé"></i>
+            {{else}}
+            <button type="button" class="pvb-add-btn btn-icon" data-action="addPouvoir" title="Ajouter au personnage">
+              <i class="fas fa-plus"></i>
+            </button>
+            {{/if}}
+          </td>
+        </tr>
+        {{#if item.description}}
+        <tr class="pvb-desc-row" data-pouvoir-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+          <td></td>
+          <td colspan="3" class="pvb-description-cell">{{item.description}}</td>
+        </tr>
+        {{/if}}
+        {{/each}}
+        {{#unless items.length}}
+        <tr><td colspan="4" class="pvb-empty">Aucun résultat trouvé.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

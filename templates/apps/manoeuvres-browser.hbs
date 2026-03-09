@@ -1,0 +1,91 @@
+<div class="manoeuvres-browser-app">
+
+  <!-- Barre de filtres -->
+  <div class="mb-filters">
+    <div class="mb-filter-row">
+      <div class="mb-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="mb-search" placeholder="Rechercher une manœuvre ou une botte..." value="{{search}}">
+      </div>
+      <button type="button" class="mb-clear" title="Effacer les filtres">
+        <i class="fas fa-eraser"></i>
+      </button>
+    </div>
+
+    <div class="mb-filter-row2">
+      <select class="mb-cat-filter">
+        <option value="all"       {{#if (eq filterCat "all")}}selected{{/if}}>Manœuvres & Bottes</option>
+        <option value="manoeuvre" {{#if (eq filterCat "manoeuvre")}}selected{{/if}}>Manœuvres uniquement</option>
+        <option value="botte"     {{#if (eq filterCat "botte")}}selected{{/if}}>Bottes uniquement</option>
+      </select>
+      <select class="mb-possede-filter">
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Toutes</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà apprises</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non apprises</option>
+      </select>
+      <span class="mb-count">{{items.length}} résultat(s)</span>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="mb-list-wrapper">
+    <table class="mb-table">
+      <thead>
+        <tr>
+          <th class="mb-col-toggle"></th>
+          <th class="mb-col-name">Nom</th>
+          <th class="mb-col-cat">Catégorie</th>
+          <th class="mb-col-score" title="Modificateur d'Attaque">ATK</th>
+          <th class="mb-col-malus" title="Modificateur de Défense">DEF</th>
+          <th class="mb-col-action"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items as |item|}}
+        <tr class="mb-row mb-row-{{item.categorie}} {{#if item.hasInActor}}mb-has-item{{/if}}" data-man-idx="{{item.idx}}">
+          <td>
+            {{#if item.description}}
+            <button type="button" class="mb-desc-toggle btn-icon" data-action="toggleManDesc" title="Voir la description">
+              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+            </button>
+            {{/if}}
+          </td>
+          <td class="mb-name">{{item.name}}</td>
+          <td class="mb-cat">
+            {{#if (eq item.categorie "botte")}}
+            <span class="mb-badge mb-badge-botte">Botte</span>
+            {{else}}
+            <span class="mb-badge mb-badge-manoeuvre">Manœuvre</span>
+            {{/if}}
+          </td>
+          <td class="mb-score">
+            {{#if (gt item.score 0)}}+{{item.score}}{{else if (lt item.score 0)}}{{item.score}}{{else}}0{{/if}}
+          </td>
+          <td class="mb-malus">
+            {{#if (gt item.malus 0)}}+{{item.malus}}{{else if (lt item.malus 0)}}{{item.malus}}{{else}}0{{/if}}
+          </td>
+          <td class="mb-action">
+            {{#if item.hasInActor}}
+            <i class="fas fa-check mb-check" title="Déjà apprise"></i>
+            {{else}}
+            <button type="button" class="mb-add-btn btn-icon" data-action="addManoeuvre" title="Ajouter au personnage">
+              <i class="fas fa-plus"></i>
+            </button>
+            {{/if}}
+          </td>
+        </tr>
+        {{#if item.description}}
+        <tr class="mb-desc-row" data-man-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+          <td></td>
+          <td colspan="5" class="mb-description-cell">{{item.description}}</td>
+        </tr>
+        {{/if}}
+        {{/each}}
+        {{#unless items.length}}
+        <tr><td colspan="6" class="mb-empty">Aucun résultat trouvé.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

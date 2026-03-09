@@ -13,6 +13,8 @@
           <div class="aspect-stat">
             <label>{{localize "AGONE.Corps"}}</label>
             <input type="number" name="system.corps.score" value="{{system.corps.score}}" class="stat-num aspect-num" />
+            <label class="exp-label">exp.</label>
+            <input type="number" name="system.corps.exp" value="{{system.corps.exp}}" class="stat-num aspect-num exp" title="Exp. réservée Corps" />
           </div>
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
@@ -22,7 +24,7 @@
             <label>{{localize "AGONE.Bonus"}}</label>
             <span class="derived-val">{{system.bonusCorps}}</span>
           </div>
-          {{#unless modeCreation}}
+          {{#if showLevelUpAspect}}
           <div class="aspect-stat levelup">
             <button type="button" class="levelup-btn" data-action="levelUp"
                     data-type="aspect" data-key="corps" data-cout="{{xpCout.corps}}" data-crea-cout="{{creaCout.corps}}"
@@ -30,7 +32,7 @@
               <i class="fas fa-arrow-up"></i> {{xpCout.corps}}
             </button>
           </div>
-          {{/unless}}
+          {{/if}}
         </div>
       </div>
 
@@ -41,6 +43,8 @@
           <div class="aspect-stat">
             <label>{{localize "AGONE.Esprit"}}</label>
             <input type="number" name="system.esprit.score" value="{{system.esprit.score}}" class="stat-num aspect-num" />
+            <label class="exp-label">exp.</label>
+            <input type="number" name="system.esprit.exp" value="{{system.esprit.exp}}" class="stat-num aspect-num exp" title="Exp. réservée Esprit" />
           </div>
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
@@ -50,7 +54,7 @@
             <label>{{localize "AGONE.Bonus"}}</label>
             <span class="derived-val">{{system.bonusEsprit}}</span>
           </div>
-          {{#unless modeCreation}}
+          {{#if showLevelUpAspect}}
           <div class="aspect-stat levelup">
             <button type="button" class="levelup-btn" data-action="levelUp"
                     data-type="aspect" data-key="esprit" data-cout="{{xpCout.esprit}}" data-crea-cout="{{creaCout.esprit}}"
@@ -58,7 +62,7 @@
               <i class="fas fa-arrow-up"></i> {{xpCout.esprit}}
             </button>
           </div>
-          {{/unless}}
+          {{/if}}
         </div>
       </div>
 
@@ -69,6 +73,8 @@
           <div class="aspect-stat">
             <label>{{localize "AGONE.Ame"}}</label>
             <input type="number" name="system.ame.score" value="{{system.ame.score}}" class="stat-num aspect-num" />
+            <label class="exp-label">exp.</label>
+            <input type="number" name="system.ame.exp" value="{{system.ame.exp}}" class="stat-num aspect-num exp" title="Exp. réservée Âme" />
           </div>
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
@@ -78,7 +84,7 @@
             <label>{{localize "AGONE.Bonus"}}</label>
             <span class="derived-val">{{system.bonusAme}}</span>
           </div>
-          {{#unless modeCreation}}
+          {{#if showLevelUpAspect}}
           <div class="aspect-stat levelup">
             <button type="button" class="levelup-btn" data-action="levelUp"
                     data-type="aspect" data-key="ame" data-cout="{{xpCout.ame}}" data-crea-cout="{{creaCout.ame}}"
@@ -86,7 +92,7 @@
               <i class="fas fa-arrow-up"></i> {{xpCout.ame}}
             </button>
           </div>
-          {{/unless}}
+          {{/if}}
         </div>
       </div>
 
@@ -103,139 +109,6 @@
         <span class="derived-big noir">{{system.flammeNoire}}</span>
       </div>
     </div>
-  </div><!-- /aspects-section -->
-
-  <!-- CARACTÉRISTIQUES -->
-  <div class="carac-section">
-    <h3 class="section-title">{{localize "AGONE.Caracteristiques"}}</h3>
-
-    <div class="carac-grid">
-      {{!-- Agilité (Corps) --}}
-      <div class="carac-row{{#if caracBelowMin.agilite}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="agilite"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
-        <input type="number" name="system.agilite.score" value="{{system.agilite.score}}" class="stat-num"
-               {{#if caracBelowMin.agilite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="agilite" data-cout="{{xpCout.agilite}}" data-crea-cout="{{creaCout.agilite}}"
-                title='{{#if caracAtMax.agilite}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.agilite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.agilite}}){{/if}}'
-                {{#if caracAtMax.agilite}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.agilite}}
-        </button>
-      </div>
-      {{!-- Force (Corps) --}}
-      <div class="carac-row{{#if caracBelowMin.force}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="force"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Force"}}'>{{localize "AGONE.Attribut.Force"}}</button>
-        <input type="number" name="system.force.score" value="{{system.force.score}}" class="stat-num"
-               {{#if caracBelowMin.force}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="force" data-cout="{{xpCout.force}}" data-crea-cout="{{creaCout.force}}"
-                title='{{#if caracAtMax.force}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.force}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.force}}){{/if}}'
-                {{#if caracAtMax.force}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.force}}
-        </button>
-      </div>
-      {{!-- Perception (Corps) --}}
-      <div class="carac-row{{#if caracBelowMin.perception}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="perception"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
-        <input type="number" name="system.perception.score" value="{{system.perception.score}}" class="stat-num"
-               {{#if caracBelowMin.perception}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="perception" data-cout="{{xpCout.perception}}" data-crea-cout="{{creaCout.perception}}"
-                title='{{#if caracAtMax.perception}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.perception}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.perception}}){{/if}}'
-                {{#if caracAtMax.perception}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.perception}}
-        </button>
-      </div>
-      {{!-- Résistance (Corps) --}}
-      <div class="carac-row{{#if caracBelowMin.resistance}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="resistance"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Resistance"}}'>{{localize "AGONE.Attribut.Resistance"}}</button>
-        <input type="number" name="system.resistance.score" value="{{system.resistance.score}}" class="stat-num"
-               {{#if caracBelowMin.resistance}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="resistance" data-cout="{{xpCout.resistance}}" data-crea-cout="{{creaCout.resistance}}"
-                title='{{#if caracAtMax.resistance}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.resistance}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.resistance}}){{/if}}'
-                {{#if caracAtMax.resistance}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.resistance}}
-        </button>
-      </div>
-      {{!-- Intelligence (Esprit) --}}
-      <div class="carac-row{{#if caracBelowMin.intelligence}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="intelligence"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Intelligence"}}'>{{localize "AGONE.Attribut.Intelligence"}}</button>
-        <input type="number" name="system.intelligence.score" value="{{system.intelligence.score}}" class="stat-num"
-               {{#if caracBelowMin.intelligence}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="intelligence" data-cout="{{xpCout.intelligence}}" data-crea-cout="{{creaCout.intelligence}}"
-                title='{{#if caracAtMax.intelligence}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.intelligence}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.intelligence}}){{/if}}'
-                {{#if caracAtMax.intelligence}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.intelligence}}
-        </button>
-      </div>
-      {{!-- Volonté (Esprit) --}}
-      <div class="carac-row{{#if caracBelowMin.volonte}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="volonte"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Volonte"}}'>{{localize "AGONE.Attribut.Volonte"}}</button>
-        <input type="number" name="system.volonte.score" value="{{system.volonte.score}}" class="stat-num"
-               {{#if caracBelowMin.volonte}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="volonte" data-cout="{{xpCout.volonte}}" data-crea-cout="{{creaCout.volonte}}"
-                title='{{#if caracAtMax.volonte}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.volonte}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.volonte}}){{/if}}'
-                {{#if caracAtMax.volonte}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.volonte}}
-        </button>
-      </div>
-      {{!-- Charisme (Âme) --}}
-      <div class="carac-row{{#if caracBelowMin.charisma}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="charisma"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Charisma"}}'>{{localize "AGONE.Attribut.Charisma"}}</button>
-        <input type="number" name="system.charisma.score" value="{{system.charisma.score}}" class="stat-num"
-               {{#if caracBelowMin.charisma}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="charisma" data-cout="{{xpCout.charisma}}" data-crea-cout="{{creaCout.charisma}}"
-                title='{{#if caracAtMax.charisma}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.charisma}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.charisma}}){{/if}}'
-                {{#if caracAtMax.charisma}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.charisma}}
-        </button>
-      </div>
-      {{!-- Créativité (Âme) --}}
-      <div class="carac-row{{#if caracBelowMin.creativite}} carac-min-requis{{/if}}">
-        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="creativite"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Creativite"}}'>{{localize "AGONE.Attribut.Creativite"}}</button>
-        <input type="number" name="system.creativite.score" value="{{system.creativite.score}}" class="stat-num"
-               {{#if caracBelowMin.creativite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title="Exp." />
-        <button type="button" class="levelup-btn" data-action="levelUp"
-                data-type="carac" data-key="creativite" data-cout="{{xpCout.creativite}}" data-crea-cout="{{creaCout.creativite}}"
-                title='{{#if caracAtMax.creativite}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.creativite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.creativite}}){{/if}}'
-                {{#if caracAtMax.creativite}}disabled{{/if}}>
-          <i class="fas fa-arrow-up"></i> {{coutAffiche.creativite}}
-        </button>
-      </div>
-    </div>
-
-    <!-- Points de création (visible seulement en mode création) -->
-    {{#if modeCreation}}
-    <div class="pts-creation-row">
-      <div class="pts-creation-block">
-        <label>{{localize "AGONE.PtsCreationCarac"}}</label>
-        <span class="derived sombre">{{ptsCreationCaracRestant}}</span>
-        <span>/</span>
-        <span class="derived sombre">{{system.ptsCreationCarac.max}}</span>
-        <button type="button" class="btn-icon reset-crea-btn" data-action="resetCaracs" title='{{localize "AGONE.ResetCreationCaracTooltip"}}'>&#8635;</button>
-      </div>
-    </div>
-    {{/if}}
 
     <!-- Caractéristiques dérivées -->
     <h3 class="section-title">{{localize "AGONE.CaracDerivees"}}</h3>
@@ -281,10 +154,162 @@
           <i class="fas fa-dice-d10"></i>
         </button>
       </div>
-      <div class="derived-row" title="(INT + VOL) ÷ 2">
+      <div class="derived-row">
         <label>{{localize "AGONE.Emprise"}}</label>
         <span class="derived-val">{{system.emprise}}</span>
+        <select name="system.typeMage" class="emprise-type-select" title="Obédience magique">
+          <option value="jorniste"      {{#if (eq system.typeMage "jorniste")}}selected{{/if}}>Jorniste (INT)</option>
+          <option value="eclipsiste"    {{#if (eq system.typeMage "eclipsiste")}}selected{{/if}}>Éclipsiste (INT+VOL/2)</option>
+          <option value="obscurantiste" {{#if (eq system.typeMage "obscurantiste")}}selected{{/if}}>Obscurantiste (VOL)</option>
+        </select>
       </div>
     </div><!-- /derived-grid -->
+  </div><!-- /aspects-section -->
+
+  <!-- CARACTÉRISTIQUES -->
+  <div class="carac-section">
+    <h3 class="section-title">{{localize "AGONE.Caracteristiques"}}</h3>
+
+    <div class="carac-grid">
+
+      <div class="carac-aspect-group">
+        <h4 class="carac-aspect-label">{{localize "AGONE.Corps"}}</h4>
+      {{!-- Agilité (Corps) --}}
+      <div class="carac-row{{#if caracBelowMin.agilite}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="agilite"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
+        <input type="number" name="system.agilite.score" value="{{system.agilite.score}}" class="stat-num"
+               {{#if caracBelowMin.agilite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="agilite" data-cout="{{xpCout.agilite}}" data-crea-cout="{{creaCout.agilite}}"
+                title='{{#if caracAtMax.agilite}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.agilite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.agilite}}){{/if}}'
+                {{#if caracAtMax.agilite}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.agilite}}
+        </button>{{/if}}
+      </div>
+      {{!-- Force (Corps) --}}
+      <div class="carac-row{{#if caracBelowMin.force}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="force"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Force"}}'>{{localize "AGONE.Attribut.Force"}}</button>
+        <input type="number" name="system.force.score" value="{{system.force.score}}" class="stat-num"
+               {{#if caracBelowMin.force}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="force" data-cout="{{xpCout.force}}" data-crea-cout="{{creaCout.force}}"
+                title='{{#if caracAtMax.force}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.force}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.force}}){{/if}}'
+                {{#if caracAtMax.force}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.force}}
+        </button>{{/if}}
+      </div>
+      {{!-- Perception (Corps) --}}
+      <div class="carac-row{{#if caracBelowMin.perception}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="perception"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
+        <input type="number" name="system.perception.score" value="{{system.perception.score}}" class="stat-num"
+               {{#if caracBelowMin.perception}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="perception" data-cout="{{xpCout.perception}}" data-crea-cout="{{creaCout.perception}}"
+                title='{{#if caracAtMax.perception}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.perception}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.perception}}){{/if}}'
+                {{#if caracAtMax.perception}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.perception}}
+        </button>{{/if}}
+      </div>
+      {{!-- Résistance (Corps) --}}
+      <div class="carac-row{{#if caracBelowMin.resistance}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="resistance"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Resistance"}}'>{{localize "AGONE.Attribut.Resistance"}}</button>
+        <input type="number" name="system.resistance.score" value="{{system.resistance.score}}" class="stat-num"
+               {{#if caracBelowMin.resistance}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="resistance" data-cout="{{xpCout.resistance}}" data-crea-cout="{{creaCout.resistance}}"
+                title='{{#if caracAtMax.resistance}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.resistance}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.resistance}}){{/if}}'
+                {{#if caracAtMax.resistance}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.resistance}}
+        </button>{{/if}}
+      </div>
+      </div>{{!-- /carac-aspect-group Corps --}}
+
+      <div class="carac-aspect-group">
+        <h4 class="carac-aspect-label">{{localize "AGONE.Esprit"}}</h4>
+      {{!-- Intelligence (Esprit) --}}
+      <div class="carac-row{{#if caracBelowMin.intelligence}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="intelligence"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Intelligence"}}'>{{localize "AGONE.Attribut.Intelligence"}}</button>
+        <input type="number" name="system.intelligence.score" value="{{system.intelligence.score}}" class="stat-num"
+               {{#if caracBelowMin.intelligence}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="intelligence" data-cout="{{xpCout.intelligence}}" data-crea-cout="{{creaCout.intelligence}}"
+                title='{{#if caracAtMax.intelligence}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.intelligence}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.intelligence}}){{/if}}'
+                {{#if caracAtMax.intelligence}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.intelligence}}
+        </button>{{/if}}
+      </div>
+      {{!-- Volonté (Esprit) --}}
+      <div class="carac-row{{#if caracBelowMin.volonte}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="volonte"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Volonte"}}'>{{localize "AGONE.Attribut.Volonte"}}</button>
+        <input type="number" name="system.volonte.score" value="{{system.volonte.score}}" class="stat-num"
+               {{#if caracBelowMin.volonte}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="volonte" data-cout="{{xpCout.volonte}}" data-crea-cout="{{creaCout.volonte}}"
+                title='{{#if caracAtMax.volonte}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.volonte}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.volonte}}){{/if}}'
+                {{#if caracAtMax.volonte}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.volonte}}
+        </button>{{/if}}
+      </div>
+      </div>{{!-- /carac-aspect-group Esprit --}}
+
+      <div class="carac-aspect-group">
+        <h4 class="carac-aspect-label">{{localize "AGONE.Ame"}}</h4>
+      {{!-- Charisme (Âme) --}}
+      <div class="carac-row{{#if caracBelowMin.charisma}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="charisma"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Charisma"}}'>{{localize "AGONE.Attribut.Charisma"}}</button>
+        <input type="number" name="system.charisma.score" value="{{system.charisma.score}}" class="stat-num"
+               {{#if caracBelowMin.charisma}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="charisma" data-cout="{{xpCout.charisma}}" data-crea-cout="{{creaCout.charisma}}"
+                title='{{#if caracAtMax.charisma}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.charisma}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.charisma}}){{/if}}'
+                {{#if caracAtMax.charisma}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.charisma}}
+        </button>{{/if}}
+      </div>
+      {{!-- Créativité (Âme) --}}
+      <div class="carac-row{{#if caracBelowMin.creativite}} carac-min-requis{{/if}}">
+        <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="creativite"
+                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Creativite"}}'>{{localize "AGONE.Attribut.Creativite"}}</button>
+        <input type="number" name="system.creativite.score" value="{{system.creativite.score}}" class="stat-num"
+               {{#if caracBelowMin.creativite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+        <input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
+                data-type="carac" data-key="creativite" data-cout="{{xpCout.creativite}}" data-crea-cout="{{creaCout.creativite}}"
+                title='{{#if caracAtMax.creativite}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.creativite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.creativite}}){{/if}}'
+                {{#if caracAtMax.creativite}}disabled{{/if}}>
+          <i class="fas fa-arrow-up"></i> {{coutAffiche.creativite}}
+        </button>{{/if}}
+      </div>
+      </div>{{!-- /carac-aspect-group Âme --}}
+
+    </div>
+
+    <!-- Points de création (visible seulement en mode création) -->
+    {{#if modeCreation}}
+    <div class="pts-creation-row">
+      <div class="pts-creation-block">
+        <label>{{localize "AGONE.PtsCreationCarac"}}</label>
+        <span class="derived sombre">{{ptsCreationCaracRestant}}</span>
+        <span>/</span>
+        <span class="derived sombre">{{system.ptsCreationCarac.max}}</span>
+        <button type="button" class="btn-icon reset-crea-btn" data-action="resetCaracs" title='{{localize "AGONE.ResetCreationCaracTooltip"}}'>&#8635;</button>
+      </div>
+    </div>
+    {{/if}}
+
   </div><!-- /carac-section -->
 </div><!-- /attributs-grid -->
