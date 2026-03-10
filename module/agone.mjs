@@ -26,7 +26,8 @@ import { AgoneItem }        from "./documents/item.mjs";
 import { PersonnageSheet }   from "./sheets/personnage-sheet.mjs";
 
 // ── Apps ─────────────────────────────────────────────────────────────────────
-import { SortsBrowser } from "./apps/sorts-browser.mjs";
+import { SortsBrowser }     from "./apps/sorts-browser.mjs";
+import { AvantagesBrowser } from "./apps/avantages-browser.mjs";
 import {
   CompagnonSheet, DemonSheet, PnjSheet
 } from "./sheets/actor-sheets.mjs";
@@ -129,6 +130,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/armes-browser.hbs",
     "systems/agone/templates/apps/armures-browser.hbs",
     "systems/agone/templates/apps/dons-browser.hbs",
+    "systems/agone/templates/apps/avantages-browser.hbs",
     "systems/agone/templates/apps/manoeuvres-browser.hbs",
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",

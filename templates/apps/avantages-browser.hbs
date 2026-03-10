@@ -1,0 +1,109 @@
+<div class="avantages-browser-app">
+
+  <!-- Barre de filtres -->
+  <div class="avb-filters">
+    <div class="avb-filter-row">
+      <div class="avb-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="avb-search" placeholder="Rechercher…" value="{{search}}">
+      </div>
+      <button type="button" class="avb-clear" title="Effacer les filtres">
+        <i class="fas fa-eraser"></i>
+      </button>
+    </div>
+
+    <div class="avb-filter-row2">
+      <select class="avb-section-filter">
+        <option value="all" {{#if (eq filterSection "all")}}selected{{/if}}>Toutes catégories</option>
+        {{#each sections as |s|}}
+        <option value="{{s.key}}" {{#if (eq ../filterSection s.key)}}selected{{/if}}>{{s.label}}</option>
+        {{/each}}
+      </select>
+
+      <select class="avb-type-filter">
+        <option value="all"      {{#if (eq filterType "all")}}selected{{/if}}>Avantages &amp; Défauts</option>
+        <option value="avantage" {{#if (eq filterType "avantage")}}selected{{/if}}>Avantages uniquement</option>
+        <option value="defaut"   {{#if (eq filterType "defaut")}}selected{{/if}}>Défauts uniquement</option>
+      </select>
+
+      <select class="avb-possede-filter">
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+      </select>
+
+      <span class="avb-count">{{items.length}} résultat(s)</span>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div class="avb-list-wrapper">
+    <table class="avb-table">
+      <thead>
+        <tr>
+          <th class="avb-col-toggle"></th>
+          <th class="avb-col-name">Nom</th>
+          <th class="avb-col-section">Catégorie</th>
+          <th class="avb-col-type">Type</th>
+          <th class="avb-col-charge">Charge</th>
+          <th class="avb-col-action"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items as |item|}}
+        <tr class="avb-row avb-row-{{item.type}} {{#if item.hasInActor}}avb-has-item{{/if}}" data-av-idx="{{item.idx}}">
+          <td>
+            {{#if item.description}}
+            <button type="button" class="avb-desc-toggle btn-icon" data-action="toggleAvDesc" title="Voir la description">
+              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+            </button>
+            {{/if}}
+          </td>
+          <td class="avb-name">{{item.name}}</td>
+          <td class="avb-section">
+            <span class="avb-section-badge avb-sect-{{item.section}}">{{item.sectionLabel}}</span>
+          </td>
+          <td class="avb-type">
+            {{#if (eq item.type "avantage")}}
+            <span class="avb-badge avb-badge-avantage">Avantage</span>
+            {{else}}
+            <span class="avb-badge avb-badge-defaut">Défaut</span>
+            {{/if}}
+          </td>
+          <td class="avb-charge">
+            {{#if (eq item.type "avantage")}}
+            <span class="avb-charge-pos">+{{item.chargeAbs}}</span>
+            {{else}}
+            <span class="avb-charge-neg">−{{item.chargeAbs}}</span>
+            {{/if}}
+          </td>
+          <td class="avb-action">
+            {{#if item.hasInActor}}
+            <i class="fas fa-check avb-check" title="Déjà possédé"></i>
+            {{else}}
+            <button type="button" class="avb-add-btn btn-icon" data-action="addAvantage" title="Ajouter au personnage">
+              <i class="fas fa-plus"></i>
+            </button>
+            {{/if}}
+          </td>
+        </tr>
+        {{#if item.description}}
+        <tr class="avb-desc-row" data-av-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+          <td></td>
+          <td colspan="5" class="avb-description-cell">
+            {{#if item.prerequis}}
+            <em class="avb-prerequis">Prérequis : {{item.prerequis}}</em>
+            {{/if}}
+            {{item.description}}
+          </td>
+        </tr>
+        {{/if}}
+        {{/each}}
+        {{#unless items.length}}
+        <tr><td colspan="6" class="avb-empty">Aucun résultat trouvé.</td></tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

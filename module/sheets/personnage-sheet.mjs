@@ -2,7 +2,8 @@ import { SortsBrowser } from "../apps/sorts-browser.mjs";
 import { CompetencesBrowser } from "../apps/competences-browser.mjs";
 import { ArmesBrowser } from "../apps/armes-browser.mjs";
 import { ArmuresBrowser } from "../apps/armures-browser.mjs";
-import { DonsBrowser } from "../apps/dons-browser.mjs";
+import { DonsBrowser }      from "../apps/dons-browser.mjs";
+import { AvantagesBrowser } from "../apps/avantages-browser.mjs";
 import { ManoeuvresBrowser } from "../apps/manoeuvres-browser.mjs";
 import { PeuplesBrowser } from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser } from "../apps/pouvoirs-browser.mjs";
@@ -1113,12 +1114,12 @@ export class PersonnageSheet extends ActorSheet {
       return;
     }
 
-    // Avantages & Défauts → navigateur personnalisé
+    // Avantages & Défauts → navigateur personnalisé (données PDF)
     if (packId === "agone.dons") {
-      if (!this._donsBrowser) {
-        this._donsBrowser = new DonsBrowser(this.actor);
+      if (!this._avantagesBrowser) {
+        this._avantagesBrowser = new AvantagesBrowser(this.actor);
       }
-      this._donsBrowser.render(true);
+      this._avantagesBrowser.render(true);
       return;
     }
 

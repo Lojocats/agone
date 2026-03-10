@@ -1540,6 +1540,205 @@
   border-top: none;
 }
 
+/* ── Avantages Browser (données PDF) ─────────────────────── */
+.avantages-browser .window-content {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.avantages-browser .avantages-browser-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.avantages-browser .avb-filters {
+  padding: 8px 12px;
+  background: var(--agone-brown);
+  border-bottom: 2px solid var(--agone-gold);
+  flex-shrink: 0;
+}
+.avantages-browser .avb-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.avantages-browser .avb-search-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius, 4px);
+  padding: 2px 8px;
+  gap: 6px;
+  color: var(--agone-parchment);
+}
+.avantages-browser .avb-search-wrap i { opacity: 0.65; font-size: 12px; }
+.avantages-browser .avb-search {
+  border: none !important;
+  background: transparent !important;
+  color: var(--agone-parchment) !important;
+  box-shadow: none !important;
+  font-size: 13px;
+  padding: 4px 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  outline: none;
+}
+.avantages-browser .avb-search::placeholder { color: rgba(240,220,170,0.45); }
+.avantages-browser .avb-clear {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: var(--agone-parchment);
+  border-radius: var(--radius, 4px);
+  padding: 4px 9px;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0.7;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  flex: 0 0 auto;
+  width: auto !important;
+  height: 30px;
+  line-height: 1;
+}
+.avantages-browser .avb-clear:hover { opacity: 1; }
+.avantages-browser .avb-count {
+  font-size: 11px;
+  color: rgba(240,220,170,0.55);
+  text-align: right;
+  margin-top: 4px;
+}
+.avantages-browser .avb-filter-row2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--agone-parchment);
+}
+.avantages-browser .avb-section-filter,
+.avantages-browser .avb-type-filter,
+.avantages-browser .avb-possede-filter {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--agone-parchment);
+  border-radius: var(--radius, 4px);
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.avantages-browser .avb-section-filter option,
+.avantages-browser .avb-type-filter option,
+.avantages-browser .avb-possede-filter option { background: #3a2010; }
+.avantages-browser .avb-list-wrapper { flex: 1; overflow-y: auto; }
+.avantages-browser .avb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.avantages-browser .avb-table thead th {
+  background: var(--agone-brown-dark, #2a1a08);
+  color: var(--agone-gold);
+  padding: 5px 8px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 11px;
+  text-transform: uppercase;
+  text-align: left;
+  font-weight: 600;
+}
+.avantages-browser .avb-table tbody td {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(93,58,30,0.18);
+  vertical-align: middle;
+}
+.avantages-browser .avb-row-avantage:nth-child(odd) td,
+.avantages-browser .avb-row-defaut:nth-child(odd) td { background: rgba(92,58,30,0.05); }
+.avantages-browser .avb-row-avantage:hover td,
+.avantages-browser .avb-row-defaut:hover td { background: rgba(201,162,39,0.1); cursor: default; }
+.avantages-browser .avb-row-avantage.avb-has-item td,
+.avantages-browser .avb-row-defaut.avb-has-item td { opacity: 0.55; }
+.avantages-browser .avb-name { font-weight: 600; min-width: 140px; }
+.avantages-browser .avb-col-action { width: 32px; text-align: center; }
+.avantages-browser .avb-add-btn {
+  background: var(--agone-brown);
+  border: 1px solid var(--agone-gold);
+  color: var(--agone-parchment);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.avantages-browser .avb-add-btn:hover {
+  background: var(--agone-gold);
+  color: var(--agone-dark-text, #2a1a08);
+}
+.avantages-browser .avb-check { color: #4aaa66; font-size: 13px; }
+.avantages-browser .avb-empty {
+  text-align: center;
+  padding: 24px;
+  opacity: 0.55;
+  font-style: italic;
+}
+/* Type badges */
+.avantages-browser .avb-badge-avantage,
+.avantages-browser .avb-badge-defaut {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.avantages-browser .avb-badge-avantage {
+  background: rgba(60,160,80,0.18);
+  color: #3aa050;
+  border: 1px solid rgba(60,160,80,0.35);
+}
+.avantages-browser .avb-badge-defaut {
+  background: rgba(190,50,40,0.15);
+  color: #be3228;
+  border: 1px solid rgba(190,50,40,0.3);
+}
+/* Section badges */
+.avantages-browser .avb-section-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  border: 1px solid rgba(201,162,39,0.3);
+  background: rgba(201,162,39,0.08);
+  color: var(--agone-gold);
+}
+/* Charge values */
+.avantages-browser .avb-charge-pos { color: #3aa050; font-weight: 600; }
+.avantages-browser .avb-charge-neg { color: #be3228; font-weight: 600; }
+/* Description expand */
+.avantages-browser .avb-desc-row td.avb-description-cell {
+  padding: 4px 12px 8px 32px;
+  font-size: 12px;
+  color: rgba(60,35,15,0.82);
+  background: rgba(92,58,30,0.04);
+  line-height: 1.55;
+  border-top: none;
+}
+.avantages-browser .avb-prerequis {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  color: rgba(140,80,30,0.75);
+}
+
 /* ── Manœuvres Browser ────────────────────────────────────── */
 .manoeuvres-browser .window-content {
   padding: 0;
