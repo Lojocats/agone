@@ -501,6 +501,40 @@ export const MANOEUVRES_DATA = [
   { name:"Saut Armé",            categorie:"manoeuvre", description:"Ini +3, Att -4, Déf +2, Dom +4. Minotaure uniquement. Bond en avant combinant élévation et attaque. Bonus de +4 aux dommages ; l'adversaire doit réussir un jet pour ne pas être renversé." },
   { name:"Tenir en Respect",     categorie:"manoeuvre", description:"Ini 0, Att 0, Déf 0, Dom -10. Le personnage tient son adversaire en joue ou de la pointe de son arme. La cible doit choisir : reculer, se soumettre ou tenter une action risquée." },
   { name:"Tourbillon",           categorie:"manoeuvre", description:"Ini 0, Att +5, Déf -5, Dom +3+MV. Lutin uniquement. Rotation vrombissante à grande vitesse, les lames tournantes frappant tous les adversaires à portée avec puissance." },
+
+  // ── BOTTES SECRÈTES ──────────────────────────────────────────────────────
+  // Rareté 12 (3 Charges)
+  { name:"Grande Boucliade",               categorie:"botte", description:"Rareté 12 (3 Charges). Arme : Hache Ogre. Botte secrète." },
+  { name:"Contre Charge",                  categorie:"botte", description:"Rareté 12 (3 Charges). Arme : Grande Lance. Botte secrète." },
+  { name:"Petite Boucliade",               categorie:"botte", description:"Rareté 12 (3 Charges). Arme : Pilum. Botte secrète." },
+  { name:"Poinçonnade",                    categorie:"botte", description:"Rareté 12 (3 Charges). Arme : Marteau de Guerre. Botte secrète." },
+  // Rareté 16 (4 Charges)
+  { name:"Soupe aux Doigts",               categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Masse. Botte secrète." },
+  { name:"Main Volante",                   categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Sabre. Botte secrète." },
+  { name:"Bénédiction Refusée",            categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Cimeterre. Botte secrète." },
+  { name:"Croc",                           categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Hallebarde. Botte secrète." },
+  { name:"Petit Gong",                     categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Massette. Botte secrète." },
+  { name:"Botte du Musicien",              categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Marteau de Guerre. Botte secrète." },
+  { name:"Grand Gong",                     categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Maillet Ogre. Botte secrète." },
+  { name:"Serpentine",                     categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Fléau d'Arme. Botte secrète." },
+  { name:"Grande Comète",                  categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Étoile de Fer. Botte secrète." },
+  { name:"Coup de la Demoiselle",          categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Dague. Botte secrète." },
+  { name:"Angle-Mort",                     categorie:"botte", description:"Rareté 16 (4 Charges). Arme : Drakonien. Botte secrète." },
+  // Rareté 20 (5 Charges)
+  { name:"Coup de Jarnac",                 categorie:"botte", description:"Rareté 20 (5 Charges). Arme : Épée. Botte secrète." },
+  { name:"Coup du Minotaure",              categorie:"botte", description:"Rareté 20 (5 Charges). Arme : Épée Courte. Botte secrète." },
+  { name:"Corps-Qui-Coule",               categorie:"botte", description:"Rareté 20 (5 Charges). Esquive. Botte secrète." },
+  // Rareté 24 (6 Charges)
+  { name:"Botte de Nevers",               categorie:"botte", description:"Rareté 24 (6 Charges). Arme : Rapière. Botte secrète." },
+  { name:"Double Phénix",                 categorie:"botte", description:"Rareté 24 (6 Charges). Arme : Hache Double. Botte secrète." },
+  { name:"Chasse au Moustique",           categorie:"botte", description:"Rareté 24 (6 Charges). Arme : Hache Géante. Botte secrète." },
+  // Rareté 28 (7 Charges)
+  { name:"Baiser du Cyclope",             categorie:"botte", description:"Rareté 28 (7 Charges). Arme : Lance. Botte secrète." },
+  { name:"Une-Deux",                      categorie:"botte", description:"Rareté 28 (7 Charges). Arme : Hache Géante. Botte secrète." },
+  // Bottes Éthyliques (l'Œnerrance)
+  { name:"Botte Éthylique – L'Eclaboussefilade",        categorie:"botte", description:"Rareté variable (3 Charges). Botte secrète éthylique enseignée par Solitène." },
+  { name:"Botte Éthylique – La Culbute de l'Avernegue", categorie:"botte", description:"Rareté variable (4 Charges). Botte secrète éthylique enseignée par Solitène." },
+  { name:"Botte Éthylique – Providente Pochetronade",   categorie:"botte", description:"Rareté variable (6 Charges). Botte secrète éthylique enseignée par Solitène." },
 ];
 
 // ── POUVOIRS DE FLAMME ────────────────────────────────────────────────────────
@@ -618,15 +652,15 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Pixie",
-    taiBase: -4, mvBase: 7,
+    taiBase: -4, mvBase: 1, volBase: 18,
     pointsCreationComp: 18,
     competencesRaciales: ["Magie des fées", "Furtivité"],
     corpsBonus: 0, espritBonus: 2, ameBonus: 2,
-    description: "Minuscules créatures ailées à la magie indomptable, les Pixies sont insaisissables. Bonus de +2 en Esprit et +2 en Âme. TAI -4, MV 7 (vol 10). Rang 1 offert en Magie des fées et Furtivité."
+    description: "Minuscules créatures ailées à la magie indomptable, les Pixies sont insaisissables. Bonus de +2 en Esprit et +2 en Âme. TAI -4, MV 7 (vol 18). Rang 1 offert en Magie des fées et Furtivité."
   },
   {
     name: "Fée Noire",
-    taiBase: -1, mvBase: 5,
+    taiBase: -1, mvBase: 5, volBase: 9,
     pointsCreationComp: 14,
     competencesRaciales: ["Manipulation", "Magie sombre"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 2,

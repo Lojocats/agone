@@ -69,11 +69,10 @@
           <td class="sb-action">
             {{#if sort.hasInActor}}
             <i class="fas fa-check sb-check" title="Déjà possédé"></i>
-            {{else}}
+            {{/if}}
             <button type="button" class="sb-add-btn btn-icon" data-action="addSort" title="Ajouter au personnage">
               <i class="fas fa-plus"></i>
             </button>
-            {{/if}}
           </td>
         </tr>
         {{#if sort.description}}

@@ -24,6 +24,7 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       parrain:     new fields.StringField({ initial: "" }),
       mv:          new fields.NumberField({ initial: 3, integer: true, min: 0 }),
       mvOverride:  new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      mvVol:       new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       peupleCompetenceIds: new fields.ArrayField(new fields.StringField({ initial: "" })),
       description: new fields.HTMLField({ initial: "" }),
 

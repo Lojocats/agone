@@ -10,12 +10,16 @@
         <span class="stat-num derived-val">{{system.pdv.valeur}}</span>
         <span>/</span>
         <span class="stat-num derived-val" title="BPdV {{bpdv}} + RES×3 + {{system.pdv.bonusDe}}">{{system.pdv.max}}</span>
-        {{#if modeCreation}}{{#if isOwner}}
-        <button type="button" class="roll-btn-small btn-bonus-de btn-crea" data-action="rollBonusDe"
+      </div>
+      <div class="sante-row">
+        <label title="{{localize "AGONE.LancerBonusDe"}}">1d10</label>
+        <input type="number" name="system.pdv.bonusDe" value="{{system.pdv.bonusDe}}" class="stat-num" min="0" max="10" style="width:44px" />
+        {{#if isOwner}}
+        <button type="button" class="roll-btn-small btn-bonus-de" data-action="rollBonusDe"
                 title='{{localize "AGONE.LancerBonusDe"}}'>
           <i class="fas fa-dice-d10"></i>
         </button>
-        {{/if}}{{/if}}
+        {{/if}}
       </div>
       <div class="sante-row">
         <label title="PdV ÷ 3">{{localize "AGONE.BlessureGrave"}}</label>

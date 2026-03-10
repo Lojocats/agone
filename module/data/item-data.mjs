@@ -184,6 +184,7 @@ export class PeupleData extends foundry.abstract.TypeDataModel {
       description:      new fields.HTMLField({ initial: "" }),
       taiBase:              new fields.NumberField({ initial: 0, integer: true }),
       mvBase:               new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      mvVolBase:            new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       pointsCreationComp:   new fields.NumberField({ initial: 120, integer: true }),
       competencesRaciales:  new fields.ArrayField(new fields.SchemaField({
         nom:         new fields.StringField({ initial: "" }),

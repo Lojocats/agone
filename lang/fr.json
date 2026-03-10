@@ -19,7 +19,8 @@
     "ParcourirArmures":        "Parcourir le compendium d'armures",
     "ParcourirManoeuvres":     "Parcourir les manœuvres & bottes",
     "ParcourirDons":           "Parcourir les avantages & défauts",
-    "ParcourirPouvoirs":       "Parcourir les pouvoirs de flamme",
+    "ParcourirPouvoirs":       "Parcourir les pouvoirs de Flamme",
+    "VitesseVol":              "Vitesse de vol",
     "ParcourirPeuples":       "Parcourir le compendium de peuples",
     "GlisserPeuple":          "Glisser un peuple ici",
     "RetirerPeuple":          "Retirer le peuple",
@@ -54,7 +55,7 @@
 
     "Origine":    "Origine",
     "Occupation": "Occupation",
-    "Peuple":     "Peuple",
+    "PeupleLabel": "Peuple",
     "Sexe":       "Sexe",
     "Age":        "Âge",
     "Taille":     "Taille",
@@ -67,7 +68,7 @@
     "Flamme": "Flamme",
     "FlammeNoire": "Flamme Noire",
     "FlammeEtSaisonins": "Flamme & Saisonins",
-    "PouvoirsFlamme": "Pouvoirs de la Flamme",
+    "PouvoirsFlamme": "Pouvoirs de Flamme",
     "Saisonins": "Saisonins",
 
     "Aspects":    "Aspects",
@@ -264,7 +265,7 @@
     "Pouvoirs":           "Pouvoirs",
     "AucunPouvoir":       "Aucun pouvoir",
     "CategoriePouvoirs":  "Catégorie",
-    "PouvoirFlamme":      "Pouvoir de la Flamme",
+    "PouvoirFlamme":      "Pouvoir de Flamme",
     "Saisonin":           "Saisonin",
 
     "Avantages":       "Avantages",

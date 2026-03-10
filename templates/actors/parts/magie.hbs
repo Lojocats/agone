@@ -254,11 +254,21 @@
     <ul class="pouvoirs-list">
       {{#each pouvoirs as |pouvoir|}}
       <li class="pouvoir-row item-row" data-item-id="{{pouvoir.id}}">
+        {{#if pouvoir.system.description}}
+        <button type="button" class="pouvoir-desc-toggle btn-icon" data-item-id="{{pouvoir.id}}" title="Description">
+          <i class="fas fa-chevron-right pouvoir-toggle-icon"></i>
+        </button>
+        {{else}}
+        <span style="width:14px;display:inline-block"></span>
+        {{/if}}
         <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
         <span class="pouvoir-name">{{pouvoir.name}}</span>
         <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
         <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
       </li>
+      {{#if pouvoir.system.description}}
+      <li class="pouvoir-desc-expand" data-item-id="{{pouvoir.id}}">{{pouvoir.system.description}}</li>
+      {{/if}}
       {{/each}}
     </ul>
     {{else}}

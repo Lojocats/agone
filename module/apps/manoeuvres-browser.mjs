@@ -132,6 +132,7 @@ export class ManoeuvresBrowser extends Application {
         name  : d.name,
         type  : "manoeuvre",
         system: {
+          categorie  : d.categorie  ?? "manoeuvre",
           score      : d.score       ?? 0,
           malus      : d.malus       ?? 0,
           description: d.description ?? "",

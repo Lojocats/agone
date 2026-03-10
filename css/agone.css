@@ -1954,6 +1954,28 @@
   border-bottom: 1px dotted rgba(92,58,30,0.25);
   font-size: 13px;
 }
+.agone .pouvoir-desc-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: rgba(80,50,20,0.4);
+  font-size: 0.75em;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.agone .pouvoir-desc-toggle:hover { color: var(--agone-brown); }
+.agone .pouvoir-desc-expand {
+  display: none;
+  padding: 2px 6px 6px 28px;
+  font-size: 11px;
+  color: rgba(60,35,15,0.78);
+  font-style: italic;
+  border-bottom: 1px dotted rgba(92,58,30,0.20);
+  background: rgba(0,0,0,0.04);
+  list-style: none;
+}
 .agone .pouvoir-categorie {
   font-size: 10px;
   text-transform: uppercase;
@@ -2588,7 +2610,7 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  color: rgba(255,240,200,0.55);
+  color: rgba(60,35,15,0.55);
   font-size: 0.75em;
   line-height: 1;
   transition: color 0.15s;
@@ -2606,22 +2628,22 @@
   white-space: nowrap;
 }
 .agone .man-badge-manoeuvre {
-  background: rgba(80,110,200,0.22);
-  color: #aabbff;
+  background: rgba(80,110,200,0.14);
+  color: #2a50a0;
   border: 1px solid rgba(80,110,200,0.4);
 }
 .agone .man-badge-botte {
-  background: rgba(200,120,40,0.22);
-  color: #ffbb66;
+  background: rgba(200,120,40,0.16);
+  color: #7a3a00;
   border: 1px solid rgba(200,120,40,0.4);
 }
 
 .agone tr.man-desc-expand td.man-desc-cell {
   font-size: 11px;
   padding: 4px 12px 6px 36px;
-  color: rgba(255,240,200,0.75);
+  color: rgba(60,35,15,0.82);
   font-style: italic;
-  background: rgba(0,0,0,0.18);
+  background: rgba(0,0,0,0.06);
   border-top: 0;
 }
 
@@ -2694,7 +2716,7 @@
   padding: 0 6px;
 }
 .peuples-browser .pb-search-wrap i { color: rgba(255,240,200,0.5); font-size: 0.85em; margin-right: 5px; }
-.peuples-browser .pb-search-input {
+.peuples-browser .pb-search {
   background: none;
   border: none;
   outline: none;
@@ -2704,8 +2726,8 @@
   width: 100%;
   padding: 4px 0;
 }
-.peuples-browser .pb-search-input::placeholder { color: rgba(255,240,200,0.35); }
-.peuples-browser .pb-filter-select {
+.peuples-browser .pb-search::placeholder { color: rgba(255,240,200,0.35); }
+.peuples-browser .pb-possede-filter {
   background: rgba(0,0,0,0.3);
   border: 1px solid rgba(180,150,100,0.4);
   border-radius: 4px;
@@ -2713,7 +2735,7 @@
   font-size: 0.82em;
   padding: 3px 6px;
 }
-.peuples-browser .pb-clear-btn {
+.peuples-browser .pb-clear {
   background: rgba(0,0,0,0.25);
   border: 1px solid rgba(180,150,100,0.35);
   border-radius: 4px;
@@ -2721,13 +2743,17 @@
   cursor: pointer;
   padding: 3px 7px;
   font-size: 0.8em;
+  flex-shrink: 0;
+  align-self: center;
+  width: auto;
   transition: color 0.15s, border-color 0.15s;
 }
-.peuples-browser .pb-clear-btn:hover { color: var(--agone-gold); border-color: var(--agone-gold); }
+.peuples-browser .pb-clear:hover { color: var(--agone-gold); border-color: var(--agone-gold); }
 
-.peuples-browser .pb-body {
+.peuples-browser .pb-list-wrapper {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   padding: 10px 12px;
 }
 .peuples-browser .pb-count {
@@ -2754,16 +2780,16 @@
 .peuples-browser .pb-col-tai    { width: 50px; text-align: center; }
 .peuples-browser .pb-col-action { width: 60px; text-align: center; }
 
-.peuples-browser .pb-item-row {
+.peuples-browser .pb-row {
   transition: background 0.12s;
 }
-.peuples-browser .pb-item-row:hover { background: rgba(180,150,100,0.08); }
-.peuples-browser .pb-item-row td {
+.peuples-browser .pb-row:hover { background: rgba(180,150,100,0.08); }
+.peuples-browser .pb-row td {
   padding: 5px 8px;
   vertical-align: middle;
   border-bottom: 1px solid rgba(180,150,100,0.12);
   font-size: 0.88em;
-  color: rgba(255,240,200,0.85);
+  color: rgba(60,35,15,0.85);
 }
 .peuples-browser .pb-row-actif td { background: rgba(180,150,100,0.12); }
 .peuples-browser .pb-badge-actif {
@@ -2779,24 +2805,24 @@
   margin-left: 5px;
   vertical-align: middle;
 }
-.peuples-browser .pb-toggle-btn {
+.peuples-browser .pb-desc-toggle {
   background: none;
   border: none;
   cursor: pointer;
-  color: rgba(255,240,200,0.45);
+  color: rgba(60,35,15,0.4);
   font-size: 0.75em;
   padding: 0;
   transition: color 0.15s;
 }
-.peuples-browser .pb-toggle-btn:hover { color: var(--agone-gold); }
+.peuples-browser .pb-desc-toggle:hover { color: var(--agone-brown); }
 .peuples-browser .pb-desc-row td {
   font-size: 10.5px;
   padding: 4px 12px 6px 32px;
-  color: rgba(255,240,200,0.7);
+  color: rgba(60,35,15,0.72);
   font-style: italic;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.05);
 }
-.peuples-browser .pb-add-btn {
+.peuples-browser .pb-apply-btn {
   background: rgba(100,160,80,0.2);
   border: 1px solid rgba(100,160,80,0.45);
   border-radius: 3px;
@@ -2806,7 +2832,7 @@
   padding: 2px 7px;
   transition: background 0.15s;
 }
-.peuples-browser .pb-add-btn:hover { background: rgba(100,160,80,0.35); }
+.peuples-browser .pb-apply-btn:hover { background: rgba(100,160,80,0.35); }
 
 /* ══════════════════════════════════════════════════════════
    POUVOIRS DE FLAMME BROWSER
@@ -2844,7 +2870,7 @@
   padding: 0 6px;
 }
 .pouvoirs-browser .pvb-search-wrap i { color: rgba(255,240,200,0.5); font-size: 0.85em; margin-right: 5px; }
-.pouvoirs-browser .pvb-search-input {
+.pouvoirs-browser .pvb-search {
   background: none;
   border: none;
   outline: none;
@@ -2854,8 +2880,9 @@
   width: 100%;
   padding: 4px 0;
 }
-.pouvoirs-browser .pvb-search-input::placeholder { color: rgba(255,240,200,0.35); }
-.pouvoirs-browser .pvb-filter-select {
+.pouvoirs-browser .pvb-search::placeholder { color: rgba(255,240,200,0.35); }
+.pouvoirs-browser .pvb-cat-filter,
+.pouvoirs-browser .pvb-possede-filter {
   background: rgba(0,0,0,0.3);
   border: 1px solid rgba(180,150,100,0.4);
   border-radius: 4px;
@@ -2863,7 +2890,7 @@
   font-size: 0.82em;
   padding: 3px 6px;
 }
-.pouvoirs-browser .pvb-clear-btn {
+.pouvoirs-browser .pvb-clear {
   background: rgba(0,0,0,0.25);
   border: 1px solid rgba(180,150,100,0.35);
   border-radius: 4px;
@@ -2871,13 +2898,17 @@
   cursor: pointer;
   padding: 3px 7px;
   font-size: 0.8em;
+  flex-shrink: 0;
+  align-self: center;
+  width: auto;
   transition: color 0.15s, border-color 0.15s;
 }
-.pouvoirs-browser .pvb-clear-btn:hover { color: var(--agone-gold); border-color: var(--agone-gold); }
+.pouvoirs-browser .pvb-clear:hover { color: var(--agone-gold); border-color: var(--agone-gold); }
 
-.pouvoirs-browser .pvb-body {
+.pouvoirs-browser .pvb-list-wrapper {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   padding: 10px 12px;
 }
 .pouvoirs-browser .pvb-count {
@@ -2904,14 +2935,14 @@
 .pouvoirs-browser .pvb-col-cat    { width: 80px; text-align: center; }
 .pouvoirs-browser .pvb-col-action { width: 60px; text-align: center; }
 
-.pouvoirs-browser .pvb-item-row { transition: background 0.12s; }
-.pouvoirs-browser .pvb-item-row:hover { background: rgba(180,150,100,0.08); }
-.pouvoirs-browser .pvb-item-row td {
+.pouvoirs-browser .pvb-row { transition: background 0.12s; }
+.pouvoirs-browser .pvb-row:hover { background: rgba(180,150,100,0.08); }
+.pouvoirs-browser .pvb-row td {
   padding: 5px 8px;
   vertical-align: middle;
   border-bottom: 1px solid rgba(180,150,100,0.12);
   font-size: 0.88em;
-  color: rgba(255,240,200,0.85);
+  color: rgba(60,35,15,0.85);
 }
 .pouvoirs-browser .pvb-badge {
   display: inline-block;
@@ -2924,30 +2955,30 @@
 }
 .pouvoirs-browser .pvb-badge-flamme {
   background: rgba(220,80,30,0.22);
-  color: #ff9955;
+  color: #8b2000;
   border: 1px solid rgba(220,80,30,0.4);
 }
 .pouvoirs-browser .pvb-badge-saisonin {
   background: rgba(50,150,80,0.22);
-  color: #88ddaa;
+  color: #1a6635;
   border: 1px solid rgba(50,150,80,0.4);
 }
-.pouvoirs-browser .pvb-toggle-btn {
+.pouvoirs-browser .pvb-desc-toggle {
   background: none;
   border: none;
   cursor: pointer;
-  color: rgba(255,240,200,0.45);
+  color: rgba(60,35,15,0.45);
   font-size: 0.75em;
   padding: 0;
   transition: color 0.15s;
 }
-.pouvoirs-browser .pvb-toggle-btn:hover { color: var(--agone-gold); }
+.pouvoirs-browser .pvb-desc-toggle:hover { color: var(--agone-gold); }
 .pouvoirs-browser .pvb-desc-row td {
   font-size: 10.5px;
   padding: 4px 12px 6px 32px;
-  color: rgba(255,240,200,0.7);
+  color: rgba(60,35,15,0.72);
   font-style: italic;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.05);
 }
 .pouvoirs-browser .pvb-add-btn {
   background: rgba(220,80,30,0.18);

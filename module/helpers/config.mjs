@@ -247,7 +247,7 @@ AGONE.peuplesData.meduse.competencesRaciales    = [
 AGONE.peuplesData.drakonien.competencesRaciales = [
     { nom: "Harmonie",           domaine: "Occulte",  specialite: "dragons",                      attributLie: "creativite",   score: 5 },
     { nom: "Géographie",         domaine: "Savoir",   specialite: "réseau de sous-sols local",          attributLie: "intelligence", score: 5 },
-    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "protéiforme",                      attributLie: "corps",        score: 5 },
+    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "protéiforme",                      attributLie: "agilite",     score: 5 },
 ];
 AGONE.peuplesData.morgane.competencesRaciales   = [
     { nom: "Poisons",             domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
@@ -256,7 +256,7 @@ AGONE.peuplesData.morgane.competencesRaciales   = [
 ];
 AGONE.peuplesData.pixie.competencesRaciales     = [
     { nom: "Discrétion",         domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
-    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "vol",                    attributLie: "corps",        score: 5 },
+    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "vol",                    attributLie: "agilite",     score: 5 },
     { nom: "Géographie",         domaine: "Savoir",   specialite: "Harmonde",                      attributLie: "intelligence", score: 5 },
 ];
 
@@ -280,6 +280,10 @@ AGONE.peuplesData.meduse.bpdv     = 25;
 AGONE.peuplesData.drakonien.bpdv  = 25;
 AGONE.peuplesData.morgane.bpdv    = 25;
 AGONE.peuplesData.pixie.bpdv      = 10;
+
+// Vitesse de vol de base (0 = pas de vol)
+AGONE.peuplesData.feeNoire.mvVolBase = 9;
+AGONE.peuplesData.pixie.mvVolBase    = 4;
 
 // Multiplicateurs XP pour la montée de niveau (après création)
 AGONE.xpMultipliers = { aspect: 7, carac: 5, competence: 5, avantage: 10, defaut: 5 };

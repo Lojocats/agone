@@ -361,6 +361,16 @@ export class PersonnageSheet extends ActorSheet {
       icon?.classList.toggle("fa-chevron-down");
     });
 
+    // Toggle description pouvoirs de flamme
+    html.on("click", ".pouvoir-desc-toggle", ev => {
+      const id = ev.currentTarget.dataset.itemId;
+      const row = html.find(`.pouvoir-desc-expand[data-item-id="${id}"]`);
+      const icon = ev.currentTarget.querySelector(".pouvoir-toggle-icon");
+      row.slideToggle(120);
+      icon?.classList.toggle("fa-chevron-right");
+      icon?.classList.toggle("fa-chevron-down");
+    });
+
     // Toggle description avantages/défauts
     html.on("click", ".don-desc-toggle", ev => {
       const id = ev.currentTarget.dataset.itemId;
@@ -1159,6 +1169,7 @@ export class PersonnageSheet extends ActorSheet {
       "system.peupleId":               "",
       "system.tai":                    0,
       "system.mvOverride":             null,
+      "system.mvVol":                  0,
       "system.peupleCompetenceIds":    [],
       "system.peupleBonusApplique.corpsBonus":        0,
       "system.peupleBonusApplique.espritBonus":       0,
@@ -1242,6 +1253,7 @@ export class PersonnageSheet extends ActorSheet {
     // Créer les nouvelles compétences raciales (score 5)
     let newCompIds = [];
     if (compRaciales.length) {
+      const VALID_ATTRS = ["agilite","force","perception","resistance","intelligence","volonte","charisma","creativite","melee","tir"];
       const itemsData = compRaciales.map(c => ({
         name:   c.specialite ? `${c.nom} (${c.specialite})` : c.nom,
         type:   "competence",
@@ -1249,7 +1261,7 @@ export class PersonnageSheet extends ActorSheet {
           nom:         c.nom,
           domaine:     c.domaine     ?? "",
           specialite:  c.specialite  ?? "",
-          attributLie: c.attributLie ?? "agilite",
+          attributLie: VALID_ATTRS.includes(c.attributLie) ? c.attributLie : "agilite",
           score:       c.score       ?? 5,
         },
       }));
@@ -1272,9 +1284,9 @@ export class PersonnageSheet extends ActorSheet {
       "system.peuple":                 peupleItem.name,
       "system.peupleId":               peupleItem.uuid,
       "system.tai":                    nw.taiBase ?? 0,
-      "system.mvOverride":             nw.mvBase  ?? null,
+      "system.mvOverride":             nw.mvBase  ?? (CONFIG.AGONE.peuplesData[peupleKey]?.mvBase ?? null),
+      "system.mvVol":                  nw.mvVolBase || (CONFIG.AGONE.peuplesData[peupleKey]?.mvVolBase ?? 0),
       "system.peupleCompetenceIds":    newCompIds,
-      // Bonus positifs uniquement (appliqués maintenant)
       "system.peupleBonusApplique.corpsBonus":        Math.max(0, nw.corpsBonus   ?? 0),
       "system.peupleBonusApplique.espritBonus":       Math.max(0, nw.espritBonus  ?? 0),
       "system.peupleBonusApplique.ameBonus":          Math.max(0, nw.ameBonus     ?? 0),
