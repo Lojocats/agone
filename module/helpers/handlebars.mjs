@@ -65,4 +65,8 @@ export function registerHandlebarsHelpers() {
   Handlebars.registerHelper("json", function(obj) {
     return JSON.stringify(obj);
   });
+
+  Handlebars.registerHelper("multiply", function(a, b) {
+    return Number(a) * Number(b);
+  });
 }

@@ -15,7 +15,7 @@ import {
 import {
   CompetenceData, ArmeData, ArmureData, DonData,
   SortData, EquipementData, PouvoirData, ManoeuvreData, PeupleData,
-  DanseurData
+  DanseurData, DemonItemData
 } from "./data/item-data.mjs";
 
 // ── Documents ─────────────────────────────────────────────────────────────────
@@ -65,29 +65,35 @@ Hooks.once("init", () => {
     manoeuvre   : ManoeuvreData,
     peuple      : PeupleData,
     danseur     : DanseurData,
+    demon       : DemonItemData,
   };
 
   // ── Feuilles ────────────────────────────────────────────────────────────
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("agone", PersonnageSheet, {
+  const _Actors   = foundry.documents.collections.Actors;
+  const _Items    = foundry.documents.collections.Items;
+  const _ActorSheet = foundry.appv1.sheets.ActorSheet;
+  const _ItemSheet  = foundry.appv1.sheets.ItemSheet;
+
+  _Actors.unregisterSheet("core", _ActorSheet);
+  _Actors.registerSheet("agone", PersonnageSheet, {
     types: ["personnage"], makeDefault: true,
     label: "AGONE.FeuillePersonnage"
   });
-  Actors.registerSheet("agone", CompagnonSheet, {
+  _Actors.registerSheet("agone", CompagnonSheet, {
     types: ["compagnon"], makeDefault: true,
     label: "AGONE.FeuilleCompagnon"
   });
-  Actors.registerSheet("agone", DemonSheet, {
+  _Actors.registerSheet("agone", DemonSheet, {
     types: ["demon"], makeDefault: true,
     label: "AGONE.FeuilleDemon"
   });
-  Actors.registerSheet("agone", PnjSheet, {
+  _Actors.registerSheet("agone", PnjSheet, {
     types: ["pnj"], makeDefault: true,
     label: "AGONE.FeuillePnj"
   });
 
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("agone", AgoneItemSheet, {
+  _Items.unregisterSheet("core", _ItemSheet);
+  _Items.registerSheet("agone", AgoneItemSheet, {
     makeDefault: true,
     label: "AGONE.FeuilleItem"
   });
@@ -135,7 +141,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",
   ];
-  loadTemplates(templates);
+  foundry.applications.handlebars.loadTemplates(templates);
 
   // ── Modificateur de status d'effets ────────────────────────────────────
   CONFIG.statusEffects = [
@@ -344,9 +350,9 @@ Hooks.once("ready", async () => {
  * ========================================================================= */
 
 // Couleur de fond des messages de jet en chat
-Hooks.on("renderChatMessage", (message, html) => {
+Hooks.on("renderChatMessageHTML", (message, html) => {
   if (message.flags?.agone?.rollType) {
-    html[0].classList.add("agone-roll");
+    html.classList.add("agone-roll");
   }
 });
 

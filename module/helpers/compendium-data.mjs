@@ -676,6 +676,71 @@ export const PEUPLES_DATA = [
   },
 ];
 
+// ── EFFETS MÉCANIQUES DES AVANTAGES & DÉFAUTS ──────────────────────────────────
+// Chaque entrée : tableau d'objets { stat, delta } ou { stat:"mv_divisor", value }
+// stat peut être :
+//   "agilite"|"force"|"resistance"|"intelligence"|"volonte"|"charisma"|"creativite"|"perception"
+//     → ajoute delta au score effectif (transient, recalcule les dérivées)
+//   "corps"|"esprit"|"ame"         → ajoute delta à l'aspect score
+//   "corps_noir"|"esprit_noir"|"ame_noir" → ajoute delta à l'aspect noir
+//   "tai"                          → modifie TAI (recompute MV, BD, PdV max, chargeMax)
+//   "initiative_bonus"             → bonus direct sur l'initiative
+//   "art_bonus"                    → bonus direct sur ART secondaire
+//   "emprise_bonus"                → bonus direct sur EMP
+//   "mv_divisor"                   → divise le MV final par value (prend le plus défavorable)
+export const AVANTAGES_EFFETS = {
+  // ── ÂME ───────────────────────────────────────────────────────────────────
+  "Charismatique":             [{ stat:"charisma",        delta:  1 }],
+  "Sensible":                  [{ stat:"creativite",      delta:  1 }],
+  "Instinct de la perfection": [{ stat:"ame",             delta:  1 }],
+  "Blasé":                     [{ stat:"creativite",      delta: -1 }],
+  "Désagréable":               [{ stat:"charisma",        delta: -1 }],
+  "Difforme":                  [{ stat:"charisma",        delta: -1 }],
+  "Oublié des Muses":          [{ stat:"ame_noir",        delta:  1 }],
+  // ── CORPS ─────────────────────────────────────────────────────────────────
+  "Adresse":                   [{ stat:"agilite",         delta:  1 }],
+  "Colosse":                   [{ stat:"tai",             delta:  1 }, { stat:"force", delta: 1 }],
+  "Force de la nature":        [{ stat:"resistance",      delta:  1 }],
+  "Jeune":                     [{ stat:"force",           delta:  1 }, { stat:"resistance", delta: 1 }, { stat:"charges_double" }],
+  "Marque de l'Été":           [{ stat:"corps",           delta:  1 }],
+  "Réflexes éclairs":          [{ stat:"initiative_bonus",delta:  3 }],
+  "Tout petit":                [{ stat:"tai",             delta: -1 }],
+  "Sens aiguisés (1 sens)":    [{ stat:"perception",      delta:  1 }],
+  "Sens aiguisés (2 sens)":    [{ stat:"perception",      delta:  1 }],
+  "Sens aiguisés (3 sens)":    [{ stat:"perception",      delta:  1 }],
+  "Sens aiguisés (4 sens)":    [{ stat:"perception",      delta:  1 }],
+  "Sens aiguisés (5 sens)":    [{ stat:"perception",      delta:  1 }],
+  "Arthrite":                  [{ stat:"agilite",         delta: -1 }],
+  "Boiteux":                   [{ stat:"initiative_bonus",delta: -2 }, { stat:"mv_divisor", value: 2 }],
+  "Fragile":                   [{ stat:"resistance",      delta: -1 }],
+  "Malingre":                  [{ stat:"force",           delta: -1 }],
+  "Marque de l'Ombre":         [{ stat:"corps_noir",      delta:  1 }],
+  "Obèse":                     [{ stat:"agilite",         delta: -1 }],  // choix EG → on pénalise AGI
+  "Vieillard":                 [{ stat:"force",           delta: -1 }, { stat:"resistance", delta: -1 }, { stat:"charges_reduction", delta: 2 }],
+  "Sens déficients (1 sens)":  [{ stat:"perception",      delta: -1 }],
+  "Sens déficients (2 sens)":  [{ stat:"perception",      delta: -1 }],
+  "Sens déficients (3 sens)":  [{ stat:"perception",      delta: -1 }],
+  "Sens déficients (4 sens)":  [{ stat:"perception",      delta: -1 }],
+  "Sens déficients (5 sens)":  [{ stat:"perception",      delta: -1 }],
+  "Un membre en moins":        [{ stat:"mv_divisor",      value:  3 }],
+  // ── ESPRIT ────────────────────────────────────────────────────────────────
+  "Bon sens":                  [{ stat:"intelligence",    delta:  1 }],
+  "Confiance en soi":          [{ stat:"volonte",         delta:  1 }],
+  "Erreurs profitables":       [{ stat:"esprit",          delta:  1 }],
+  "Pas futé":                  [{ stat:"intelligence",    delta: -1 }],
+  "Simple d'esprit":           [{ stat:"esprit_noir",     delta:  1 }],
+  // ── ARTS ──────────────────────────────────────────────────────────────────
+  "Enthousiaste":              [{ stat:"art_bonus",       delta:  1 }],
+  "Ravagé":                    [{ stat:"art_bonus",       delta: -1 }],
+  // ── EMPRISE ───────────────────────────────────────────────────────────────
+  "Doué":                      [{ stat:"emprise_bonus",   delta:  1 }],
+  "Allergie (Emprise)":        [{ stat:"emprise_bonus",   delta: -1 }],  // ── POINTS DE CRÉATION ──────────────────────────────────────────
+  "Orphelin":                  [{ stat:"ptsCreationComp_bonus", delta:  -10 }],
+  "Vies antérieures (1 vie)":  [{ stat:"ptsCreationComp_bonus", delta:   40 }],
+  "Vies antérieures (3 vies)": [{ stat:"ptsCreationComp_bonus", delta:  120 }],
+  "Vies antérieures (5 vies)": [{ stat:"ptsCreationComp_bonus", delta:  200 }],
+};
+
 // ── AVANTAGES & DÉFAUTS ────────────────────────────────────────────────────────
 // categorie : "charge" | "ame" | "corps" | "esprit" | "societe" | "emprise" | "arts" | "saisons" | "flamme"
 // type      : "avantage" | "defaut"

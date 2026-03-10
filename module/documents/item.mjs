@@ -55,9 +55,16 @@ export class AgoneItem extends Item {
     } else if (this.type === "sort") {
       details = `Seuil : ${sd.seuil ?? 0} | Portée : ${sd.portee ?? "-"} | Durée : ${sd.duree ?? "-"}`;
     } else if (this.type === "pouvoir") {
-      details = `Catégorie : ${sd.categorie ?? "-"}`;
+      const catLabel = sd.categorie === "saisonin" ? "Saisonin" : "Pouvoir de Flamme";
+      details = `<em>${catLabel}</em>`;
+    } else if (this.type === "manoeuvre") {
+      const catLabel = sd.categorie === "botte" ? "Botte secrète" : "Manœuvre";
+      const parts = [`<em>${catLabel}</em>`];
+      if (sd.score) parts.push(`Score : ${sd.score}`);
+      if (sd.malus) parts.push(`Malus : ${sd.malus}`);
+      details = parts.join(" · ");
     }
-    const descHTML = sd.description ? await TextEditor.enrichHTML(sd.description, { async: true }) : "";
+    const descHTML = sd.description ? await foundry.applications.ux.TextEditor.implementation.enrichHTML(sd.description, { async: true }) : "";
 
     const content = `
       <div class="agone chat-item-card">

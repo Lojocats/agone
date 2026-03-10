@@ -12,7 +12,7 @@ import { PouvoirsBrowser } from "../apps/pouvoirs-browser.mjs";
  * Feuille de personnage Agone (Personnage Joueur)
  * Utilise l'API ActorSheet standard (compatible v12/v13)
  */
-export class PersonnageSheet extends ActorSheet {
+export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
   /** @override */
   static get defaultOptions() {
@@ -51,18 +51,45 @@ export class PersonnageSheet extends ActorSheet {
     context.equipements  = actor.items.filter(i => i.type === "equipement").sort(bySort);
     context.pouvoirs     = actor.items.filter(i => i.type === "pouvoir");
     context.manoeuvres   = actor.items.filter(i => i.type === "manoeuvre").sort(bySort);
+    context.demons       = actor.items.filter(i => i.type === "demon").sort((a, b) => a.name.localeCompare(b.name, "fr"));
     const danseurItems = actor.items.filter(i => i.type === "danseur")
       .sort((a, b) => a.name.localeCompare(b.name, "fr"));
     context.danseurs = danseurItems.map(d => {
       const assignedSorts = actor.items
         .filter(s => s.type === "sort" && s.system.danseurNom === d.name)
         .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie, seuil: s.system.seuil, portee: s.system.portee, duree: s.system.duree, danse: s.system.danse }));
+      const sd = d.system;
+
+      // Table officielle Agône (colonnes : niv 1–7)
+      const TBL = {
+        memoire:   [12, 14, 16, 18, 24, 30, 40],
+        emprise:   [ 0,  1,  2,  3,  4,  5,  6],
+        empathie:  [ 2,  3,  4,  5,  6,  7,  8],
+        endurance: [ 1,  2,  3,  4,  5,  6,  7],
+      };
+      const niv = (n, mn) => Math.max(0, Math.min(6, (n ?? 1) - 1));
+
+      // Données en mode création : +/− par stat
+      const creaNiveaux = [
+        { stat: "memoire",   nivField: "memoireNiveau",   label: "Mémoire",        niv: sd.memoireNiveau   ?? 1, val: sd.memoireMax,   prefix: "" },
+        { stat: "emprise",   nivField: "empriseNiveau",   label: "Emprise",        niv: sd.empriseNiveau   ?? 1, val: sd.bonusEmprise, prefix: "+" },
+        { stat: "empathie",  nivField: "empathieNiveau",  label: "Empathie",       niv: sd.empathieNiveau  ?? 1, val: sd.empathie,     prefix: "" },
+        { stat: "endurance", nivField: "enduranceNiveau", label: "Endurance",      niv: sd.enduranceNiveau ?? 1, val: sd.enduranceMax, prefix: "" },
+      ].map(x => ({
+        ...x,
+        canDown: x.niv > 1,
+        canUp:   x.niv < 7 && (sd.ptsCreationRestants ?? 0) > 0,
+        nextVal: x.niv < 7 ? TBL[x.stat][x.niv] : null,
+        nextNiv: x.niv < 7 ? x.niv + 1 : null,
+      }));
+
       return {
         id: d.id, name: d.name, img: d.img,
         system: d.system,
         assignedSorts,
         assignedCount: assignedSorts.length,
         isFull: d.system.memoireMax > 0 && assignedSorts.length >= d.system.memoireMax,
+        creaNiveaux,
       };
     });
 
@@ -76,7 +103,7 @@ export class PersonnageSheet extends ActorSheet {
       .map(t => ({ value: t, label: TYPE_LABELS_MAGIE[t] ?? t }));
 
     // Enrichissement de la description HTML
-    context.descriptionHTML = await TextEditor.enrichHTML(
+    context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       system.description ?? "", { async: true, secrets: actor.isOwner }
     );
 
@@ -269,6 +296,7 @@ export class PersonnageSheet extends ActorSheet {
 
     // Jets de dés — Sorts & Magie
     html.find("[data-action='rollSort']").click(this._onRollSort.bind(this));
+    html.find("[data-action='rollSortImpro']").click(this._onRollSortImpro.bind(this));
     html.find("[data-action='rollEmprise']").click(this._onRollEmprise.bind(this));
     html.find("[data-action='rollImprovisation']").click(this._onRollImprovisation.bind(this));
 
@@ -303,6 +331,7 @@ export class PersonnageSheet extends ActorSheet {
       el.addEventListener("drop",      this._onDropSortReorder.bind(this));
     });
     html.find(".slot-remove").click(this._onRetireSortDanseur.bind(this));
+    html.find("[data-action='rollSortDanseur']").click(this._onRollSortDanseur.bind(this));
 
     // Drag & drop pour réordonner les sorts dans les slots danseurs
     this._setupDanseurSlotsDrag(html);
@@ -336,6 +365,33 @@ export class PersonnageSheet extends ActorSheet {
 
     // Montée de niveau (dépense XP)
     html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
+
+    // Montée de niveau danseur
+    html.find("[data-action='levelUpDanseur']").click(this._onLevelUpDanseur.bind(this));
+
+    // Création danseur — +/− niveau inline
+    html.find("[data-action='danseurNiveauUp']").click(ev => this._onDanseurNiveau(ev, +1));
+    html.find("[data-action='danseurNiveauDown']").click(ev => this._onDanseurNiveau(ev, -1));
+
+    // Valider / réactiver mode création danseur
+    html.find("[data-action='validerCreationDanseur']").click(this._onValiderCreationDanseur.bind(this));
+    html.find("[data-action='reactiverCreationDanseur']").click(this._onReactiverCreationDanseur.bind(this));
+
+    // Édition inline des stats courantes du danseur
+    html.find(".danseur-inline-num").change(this._onDanseurStatEdit.bind(this));
+
+    // Valider / réactiver mode création démon
+    html.find("[data-action='validerCreationDemon']").click(this._onValiderCreationDemon.bind(this));
+    html.find("[data-action='reactiverCreationDemon']").click(this._onReactiverCreationDemon.bind(this));
+
+    // Édition inline des stats démon
+    html.find(".demon-inline-num").change(this._onDemonStatEdit.bind(this));
+
+    // Envoyer manœuvre/botte dans le chat
+    html.find("[data-action='rollManoeuvre']").click(this._onChatManoeuvre.bind(this));
+
+    // Envoyer pouvoir de flamme dans le chat
+    html.find("[data-action='chatPouvoir']").click(this._onChatPouvoir.bind(this));
 
     // Mode niveau — toggle visibilité boutons
     html.find("[data-action='toggleLevelUp']").click(this._onToggleLevelUp.bind(this));
@@ -530,6 +586,13 @@ export class PersonnageSheet extends ActorSheet {
     await this.actor.rollSort(itemId);
   }
 
+  async _onRollSortImpro(event) {
+    event.preventDefault();
+    const li     = event.currentTarget.closest("[data-item-id]");
+    const itemId = li?.dataset.itemId ?? event.currentTarget.dataset.itemId;
+    await this.actor.rollSort(itemId, { impro: true });
+  }
+
   // ==============================
   // Emprise & Improvisation Danseur
   // ==============================
@@ -542,14 +605,20 @@ export class PersonnageSheet extends ActorSheet {
     const sd    = this.actor.system;
     const label = game.i18n.format("AGONE.PotentielEmpriseLabel", { nom: danseur.name });
 
-    // Chercher la compétence Conn. des Danseurs
-    const compDanseurs = this.actor.items.find(i =>
+    // Source EMP selon type de mage
+    const empSourceLabel = sd.typeMage === "jorniste"       ? `INT (${sd.intelligence?.score ?? 0}) — Jorniste`
+                         : sd.typeMage === "obscurantiste"  ? `VOL (${sd.volonte?.score ?? 0}) — Obscurantiste`
+                         : `(INT ${sd.intelligence?.score ?? 0} + VOL ${sd.volonte?.score ?? 0}) / 2 — Éclipsiste`;
+
+    const compDanseurs      = this.actor.items.find(i =>
       i.type === "competence" && i.name.toLowerCase().includes("danseur")
     );
-    const scoreConnDanseurs = compDanseurs ? compDanseurs.system.score : 0;
-    // Aptitude = EMP + Conn. Danseurs + bonusEsprit
-    const aptitude = (sd.emprise ?? 0) + scoreConnDanseurs + (sd.bonusEsprit ?? 0);
-    const bonusDanseur = danseur.system.bonusEmprise ?? 0;
+    const scoreConnDanseurs = compDanseurs?.system.score ?? 0;
+    const bonusEsprit       = sd.bonusEsprit ?? 0;
+    const aptitude          = (sd.emprise ?? 0) + scoreConnDanseurs + bonusEsprit;
+    const bonusDanseur      = danseur.system.bonusEmprise ?? 0;
+    const endAct            = danseur.system.enduranceActuelle ?? 0;
+    const endMax            = danseur.system.enduranceMax     ?? 0;
 
     const modif = await this.actor._dialogModificateur(label);
     if (modif === null) return;
@@ -559,9 +628,15 @@ export class PersonnageSheet extends ActorSheet {
     });
     await roll.evaluate();
     await this.actor._sendRollToChat(roll, label, {
-      aptitude: `Emprise (${sd.emprise}+${scoreConnDanseurs}+${sd.bonusEsprit ?? 0}) : ${aptitude}`,
-      bonus:    `Bonus ${danseur.name} : ${bonusDanseur}`,
-      modif:    `Bonus/Malus : ${modif}`,
+      danseur:   { label: "Danseur",               value: danseur.name },
+      endurance: { label: "Endurance danseur",      value: `${endAct} / ${endMax}` },
+      empBase:   { label: "Emprise (base)",          value: sd.emprise ?? 0, tooltip: empSourceLabel },
+      connDans:  { label: compDanseurs?.name ?? "Conn. Danseurs", value: `+${scoreConnDanseurs}` },
+      esprit:    { label: "Bonus Esprit",            value: `+${bonusEsprit}`,
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} − Esprit Noir ${sd.esprit?.noir ?? 0}` },
+      aptTotal:  { label: "Total Emprise",           value: aptitude },
+      bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
+      modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
     });
   }
 
@@ -575,10 +650,12 @@ export class PersonnageSheet extends ActorSheet {
     const label = game.i18n.format("AGONE.ImprovisationEmpriseLabel", { nom: danseur.name });
 
     // Impro : CRÉ + Empathie(danseur) + bonusEsprit
-    const cre       = sd.creativite?.score ?? 0;
-    const empathie  = danseur.system.empathie ?? 0;
+    const cre         = sd.creativite?.score ?? 0;
+    const empathie    = danseur.system.empathie ?? 0;
     const bonusEsprit = sd.bonusEsprit ?? 0;
-    const aptitude  = cre + empathie + bonusEsprit;
+    const aptitude    = cre + empathie + bonusEsprit;
+    const endAct      = danseur.system.enduranceActuelle ?? 0;
+    const endMax      = danseur.system.enduranceMax     ?? 0;
 
     const modif = await this.actor._dialogModificateur(label);
     if (modif === null) return;
@@ -586,8 +663,14 @@ export class PersonnageSheet extends ActorSheet {
     const roll = new Roll("1d10x10 + @apt + @modif", { apt: aptitude, modif });
     await roll.evaluate();
     await this.actor._sendRollToChat(roll, label, {
-      aptitude: `CRÉ(${cre}) + Empathie(${empathie}) + BonusEsprit(${bonusEsprit}) : ${aptitude}`,
-      modif:    `Bonus/Malus : ${modif}`,
+      danseur:   { label: "Danseur",          value: danseur.name },
+      endurance: { label: "Endurance danseur", value: `${endAct} / ${endMax}` },
+      cre:       { label: "Créativité (CRÉ)",  value: cre },
+      empathie:  { label: `Empathie (${danseur.name})`, value: `+${empathie}` },
+      esprit:    { label: "Bonus Esprit",       value: `+${bonusEsprit}`,
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} − Esprit Noir ${sd.esprit?.noir ?? 0}` },
+      aptTotal:  { label: "Total Improvisation", value: aptitude },
+      modif:     { label: "Bonus / Malus",       value: modif >= 0 ? `+${modif}` : modif },
     });
   }
 
@@ -761,6 +844,65 @@ export class PersonnageSheet extends ActorSheet {
     const sortId = event.currentTarget.dataset.sortId;
     const sort   = this.actor.items.get(sortId);
     if (sort) await sort.update({ "system.danseurNom": "" });
+  }
+
+  async _onRollSortDanseur(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const { sortId, danseurId } = event.currentTarget.dataset;
+    const danseur = this.actor.items.get(danseurId);
+    const sort    = this.actor.items.get(sortId);
+    if (!danseur || !sort) return;
+
+    // Guard endurance
+    if ((danseur.system.enduranceActuelle ?? 0) <= 0) {
+      ui.notifications.warn(`${danseur.name} n'a plus d'endurance et ne peut pas lancer de sort.`);
+      return;
+    }
+
+    const sd    = this.actor.system;
+    const label = `${sort.name} (via ${danseur.name})`;
+
+    // Aptitude d'emprise : EMP + Conn. Danseurs + bonusEsprit + bonusDanseur
+    const compDanseurs      = this.actor.items.find(i =>
+      i.type === "competence" && i.name.toLowerCase().includes("danseur")
+    );
+    const scoreConnDanseurs = compDanseurs?.system.score ?? 0;
+    const aptitude          = (sd.emprise ?? 0) + scoreConnDanseurs + (sd.bonusEsprit ?? 0);
+    const bonusDanseur      = danseur.system.bonusEmprise ?? 0;
+    const seuil             = sort.system.seuil ?? 0;
+
+    // Source EMP selon type de mage
+    const empSourceLabel = sd.typeMage === "jorniste"      ? `INT (${sd.intelligence?.score ?? 0}) — Jorniste`
+                         : sd.typeMage === "obscurantiste" ? `VOL (${sd.volonte?.score ?? 0}) — Obscurantiste`
+                         : `(INT ${sd.intelligence?.score ?? 0} + VOL ${sd.volonte?.score ?? 0}) / 2 — Éclipsiste`;
+    const bonusEsprit = sd.bonusEsprit ?? 0;
+    const endBefore   = danseur.system.enduranceActuelle ?? 0;
+    const newEnd      = Math.max(0, endBefore - 1);
+
+    const modif = await this.actor._dialogModificateur(label);
+    if (modif === null) return;
+
+    const roll = new Roll("1d10x10 + @apt + @bd + @modif", {
+      apt: aptitude, bd: bonusDanseur, modif
+    });
+    await roll.evaluate();
+    await this.actor._sendRollToChat(roll, label, {
+      sort:      { label: "Sort",  value: sort.name },
+      seuil:     { label: "Seuil", value: seuil, tooltip: "Score total à atteindre pour réussir le sort" },
+      danseur:   { label: "Danseur",                value: danseur.name },
+      endurance: { label: "Endurance",              value: `${endBefore} → ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
+      empBase:   { label: "Emprise (base)",          value: sd.emprise ?? 0, tooltip: empSourceLabel },
+      connDans:  { label: compDanseurs?.name ?? "Conn. Danseurs", value: `+${scoreConnDanseurs}` },
+      esprit:    { label: "Bonus Esprit",            value: `+${bonusEsprit}`,
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} − Esprit Noir ${sd.esprit?.noir ?? 0}` },
+      aptTotal:  { label: "Total Emprise",           value: aptitude },
+      bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
+      modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
+    });
+
+    // Décrémenter l'endurance du danseur
+    await danseur.update({ "system.enduranceActuelle": newEnd });
   }
 
   // ==============================
@@ -1415,12 +1557,38 @@ export class PersonnageSheet extends ActorSheet {
     const fromLocal   = Math.min(localExp, xpCout);
     const fromGeneral = xpCout - fromLocal;
 
-    // Si les XP locaux + généraux suffisent, propose directement la confirmation
-    // Sinon, propose de verser l'XP général disponible en réserve locale
+    // XP insuffisants
     if (fromGeneral > sd.experience.courante) {
-      return ui.notifications.error(
-        game.i18n.format("AGONE.PasAssezXP", { cout: xpCout, actuel: localExp + sd.experience.courante })
-      );
+      const totalDispo = localExp + sd.experience.courante;
+      // Si aucun XP disponible du tout → erreur directe
+      if (sd.experience.courante === 0) {
+        return ui.notifications.error(
+          game.i18n.format("AGONE.PasAssezXP", { cout: xpCout, actuel: totalDispo })
+        );
+      }
+      // Sinon, propose de verser les XP disponibles en réserve locale
+      const aVerser = sd.experience.courante;
+      const confirmed = await Dialog.confirm({
+        title:   game.i18n.localize("AGONE.XPInsuffisants"),
+        content: `<p>${game.i18n.format("AGONE.PasAssezXPReserve", {
+          cout:    xpCout,
+          actuel:  totalDispo,
+          reserve: aVerser
+        })}</p>`
+      });
+      if (!confirmed) return;
+      if (isCarac) {
+        await this.actor.update({
+          [`system.${key}.exp`]:           localExp + aVerser,
+          "system.experience.courante":    0,
+        });
+      } else if (type === "competence" && item) {
+        await Promise.all([
+          item.update({ "system.exp": localExp + aVerser }),
+          this.actor.update({ "system.experience.courante": 0 }),
+        ]);
+      }
+      return;
     }
 
     const confirmed = await Dialog.confirm({
@@ -1449,6 +1617,163 @@ export class PersonnageSheet extends ActorSheet {
       }));
       await Promise.all(updates);
     }
+  }
+
+  // ==============================
+  // Montée de niveau d'un Danseur (dépense XP danseur)
+  // ==============================
+  async _onLevelUpDanseur(event) {
+    event.preventDefault();
+    const btn    = event.currentTarget;
+    const itemId = btn.dataset.itemId;
+    const stat   = btn.dataset.stat;
+    const cout   = Number(btn.dataset.cout);
+    const danseur = this.actor.items.get(itemId);
+    if (!danseur) return;
+
+    const xpActuel = danseur.system.experience ?? 0;
+    if (xpActuel < cout) {
+      return ui.notifications.error(
+        game.i18n.format("AGONE.PasAssezXPDanseur", { cout, actuel: xpActuel, nom: danseur.name })
+      );
+    }
+    const label = btn.dataset.label ?? stat;
+    const confirmed = await Dialog.confirm({
+      title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
+      content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpDanseur", { nom: danseur.name, stat: label, cout })}</p>`
+    });
+    if (!confirmed) return;
+
+    await danseur.update({
+      [`system.${stat}`]:       (danseur.system[stat] ?? 0) + 1,
+      "system.experience":      xpActuel - cout,
+    });
+  }
+
+  // ==============================
+  // Envoyer manœuvre/botte dans le chat
+  // ==============================
+  async _onChatManoeuvre(event) {
+    event.preventDefault();
+    const id   = event.currentTarget.dataset.itemId;
+    const item = this.actor.items.get(id);
+    if (item) await item.toChat();
+  }
+
+  // ==============================
+  // Envoyer pouvoir de flamme dans le chat
+  // ==============================
+  async _onChatPouvoir(event) {
+    event.preventDefault();
+    const id   = event.currentTarget.dataset.itemId;
+    const item = this.actor.items.get(id);
+    if (item) await item.toChat();
+  }
+
+  // ==============================
+  // Danseur — +/− niveau en mode création
+  // ==============================
+  async _onDanseurNiveau(event, delta) {
+    event.preventDefault();
+    const btn     = event.currentTarget;
+    const itemId  = btn.dataset.itemId;
+    const stat    = btn.dataset.stat;          // ex. "memoireNiveau"
+    const danseur = this.actor.items.get(itemId);
+    if (!danseur) return;
+    const current = danseur.system[stat] ?? 1;
+    const next    = Math.max(1, Math.min(7, current + delta));
+    if (next === current) return;
+    // Vérifier les pts restants si montée
+    if (delta > 0 && (danseur.system.ptsCreationRestants ?? 0) <= 0) {
+      return ui.notifications.warn(game.i18n.localize("AGONE.PasAssezPtsCrea") || "Plus de points de création disponibles.");
+    }
+    await danseur.update({ [`system.${stat}`]: next });
+  }
+
+  // ==============================
+  // Danseur — valider la création
+  // ==============================
+  async _onValiderCreationDanseur(event) {
+    event.preventDefault();
+    const id      = event.currentTarget.dataset.itemId;
+    const danseur = this.actor.items.get(id);
+    if (!danseur) return;
+    const sd = danseur.system;
+    if ((sd.ptsCreationRestants ?? 0) < 0) {
+      return ui.notifications.warn(game.i18n.localize("AGONE.DanseurPtsDeficit"));
+    }
+    const confirmed = await Dialog.confirm({
+      title:   game.i18n.localize("AGONE.DanseurValiderCrea"),
+      content: `<p>${game.i18n.format("AGONE.DanseurValiderCreaConfirm", { nom: danseur.name })}</p>`
+    });
+    if (!confirmed) return;
+    // Initialise les valeurs courantes = max
+    await danseur.update({
+      "system.modeCreation":      false,
+      "system.memoireActuelle":   sd.memoireMax,
+      "system.enduranceActuelle": sd.enduranceMax,
+    });
+  }
+
+  // ==============================
+  // Danseur — réactiver le mode création
+  // ==============================
+  async _onReactiverCreationDanseur(event) {
+    event.preventDefault();
+    const id = event.currentTarget.dataset.itemId;
+    const danseur = this.actor.items.get(id);
+    if (!danseur) return;
+    await danseur.update({ "system.modeCreation": true });
+  }
+
+  // ==============================
+  // Danseur — édition inline stat courante (memoireActuelle, enduranceActuelle, experience)
+  // ==============================
+  async _onDanseurStatEdit(event) {
+    event.preventDefault();
+    const input   = event.currentTarget;
+    const itemId  = input.dataset.itemId;
+    const field   = input.dataset.field;
+    const value   = Number(input.value);
+    const danseur = this.actor.items.get(itemId);
+    if (!danseur || !field) return;
+    await danseur.update({ [`system.${field}`]: value });
+  }
+
+  // ==============================
+  // Démon — valider la création
+  // ==============================
+  async _onValiderCreationDemon(event) {
+    event.preventDefault();
+    const id    = event.currentTarget.dataset.itemId;
+    const demon = this.actor.items.get(id);
+    if (!demon) return;
+    await demon.update({ "system.modeCreation": false });
+  }
+
+  // ==============================
+  // Démon — réactiver le mode création
+  // ==============================
+  async _onReactiverCreationDemon(event) {
+    event.preventDefault();
+    const id    = event.currentTarget.dataset.itemId;
+    const demon = this.actor.items.get(id);
+    if (!demon) return;
+    await demon.update({ "system.modeCreation": true });
+  }
+
+  // ==============================
+  // Démon — édition inline d'un champ
+  // ==============================
+  async _onDemonStatEdit(event) {
+    event.preventDefault();
+    const input  = event.currentTarget;
+    const itemId = input.dataset.itemId;
+    const field  = input.dataset.field;
+    const value  = Number(input.value);
+    const demon  = this.actor.items.get(itemId);
+    if (!demon || !field) return;
+    await demon.update({ [`system.${field}`]: value });
   }
 
   // Mode création — activer/désactiver

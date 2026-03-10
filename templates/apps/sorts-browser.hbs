@@ -70,6 +70,9 @@
             {{#if sort.hasInActor}}
             <i class="fas fa-check sb-check" title="Déjà possédé"></i>
             {{/if}}
+            <button type="button" class="sb-impro-btn btn-icon" data-action="rollSortImpro" title="Jet improvisé — seuil × 2 ({{multiply sort.seuil 2}})">
+              <i class="fas fa-random"></i>
+            </button>
             <button type="button" class="sb-add-btn btn-icon" data-action="addSort" title="Ajouter au personnage">
               <i class="fas fa-plus"></i>
             </button>

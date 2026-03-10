@@ -10,6 +10,38 @@
     </button>
   </div>
 
+  <!-- Compteur de Charges -->
+  <div class="charges-compteur">
+    <div class="charges-titre">Charges</div>
+    <div class="charges-sous-titre">10 pts de base (+ 5 pour une Charge sociale optionnelle)</div>
+    <div class="charges-ligne">
+      <span class="charges-label">Budget initial&nbsp;:</span>
+      <input type="number" name="system.ptsCharges.max" value="{{system.ptsCharges.max}}" class="charges-input" min="0" data-dtype="Number">
+    </div>
+    <div class="charges-ligne">
+      <span class="charges-label">Récupérées (défauts)&nbsp;:</span>
+      <span class="charges-valeur charges-plus">+{{system.chargesRecuperees}}</span>
+    </div>
+    <div class="charges-ligne charges-disponibles-ligne">
+      <span class="charges-label"><strong>Disponibles&nbsp;:</strong></span>
+      <span class="charges-valeur charges-disponibles">{{system.chargesDisponibles}}</span>
+    </div>
+    <div class="charges-ligne charges-depensees-ligne">
+      <span class="charges-label">Dépensées (avantages)&nbsp;:</span>
+      <span class="charges-valeur charges-moins">{{system.chargesDepensees}}</span>
+    </div>
+    <div class="charges-ligne charges-solde-ligne">
+      <span class="charges-label"><strong>Solde&nbsp;:</strong></span>
+      <span class="charges-valeur {{system.chargesSoldeClass}}">{{system.chargesSolde}}</span>
+    </div>
+    {{#if system.chargesJeune}}
+    <p class="charges-note"><i class="fas fa-exclamation-triangle"></i> Jeune : coûts des avantages ×2</p>
+    {{/if}}
+    {{#if system.chargesVieillard}}
+    <p class="charges-note">Vieillard : coûts des avantages −2 (min 1)</p>
+    {{/if}}
+  </div>
+
   <!-- Avantages -->
   <div class="avantages-groupe">
     <h4>{{localize "AGONE.Avantages"}}</h4>

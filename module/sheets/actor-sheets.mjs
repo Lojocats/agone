@@ -1,7 +1,7 @@
 /**
  * Feuille de Compagnon / Monture
  */
-export class CompagnonSheet extends ActorSheet {
+export class CompagnonSheet extends foundry.appv1.sheets.ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["agone", "sheet", "actor", "compagnon"],
@@ -73,7 +73,7 @@ export class CompagnonSheet extends ActorSheet {
 /**
  * Feuille de Démon
  */
-export class DemonSheet extends ActorSheet {
+export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["agone", "sheet", "actor", "demon"],
@@ -134,7 +134,7 @@ export class DemonSheet extends ActorSheet {
 /**
  * Feuille de PNJ
  */
-export class PnjSheet extends ActorSheet {
+export class PnjSheet extends foundry.appv1.sheets.ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["agone", "sheet", "actor", "pnj"],

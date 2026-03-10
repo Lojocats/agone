@@ -162,7 +162,7 @@
           <td>
             {{#if sort.system.danseurNom}}<span class="sort-danseur-badge">{{sort.system.danseurNom}}</span>{{/if}}
           </td>
-          <td>
+          <td class="sort-actions-cell">
             <a class="item-edit" data-item-id="{{sort.id}}"><i class="fas fa-edit"></i></a>
             <a class="item-delete" data-item-id="{{sort.id}}"><i class="fas fa-trash"></i></a>
           </td>
@@ -193,36 +193,82 @@
     {{#if danseurs.length}}
     {{#each danseurs as |d|}}
     <div class="danseur-card item-row" data-item-id="{{d.id}}">
+      <!-- HEADER : nom + stats + actions -->
       <div class="danseur-header">
         <div class="danseur-info">
           <span class="danseur-nom">{{d.name}}</span>
-          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title="Mémoire">Mém : {{d.assignedCount}}/{{d.system.memoireMax}}</span>
-          <span class="danseur-stat" title="Endurance">End : {{d.system.enduranceActuelle}}/{{d.system.enduranceMax}}</span>
+          {{#if d.system.modeCreation}}
+          <span class="danseur-pts-badge {{#if (lt d.system.ptsCreationRestants 0)}}pts-deficit{{/if}}">
+            {{d.system.ptsCreationDepense}}/{{d.system.ptsCreationMax}} pts
+          </span>
+          {{else}}
+          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title="Mémoire">Mém : {{d.assignedCount}}/{{d.system.memoireMax}}</span>
+          <span class="danseur-stat" title="Endurance">End :
+            <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0">
+            /{{d.system.enduranceMax}}
+          </span>
           <span class="danseur-stat" title="Bonus d'Emprise">EMP+{{d.system.bonusEmprise}}</span>
+          <span class="danseur-stat" title="Empathie">Emp {{d.system.empathie}}</span>
+
+          {{/if}}
         </div>
         <div class="danseur-actions">
+          {{#unless d.system.modeCreation}}
           <button type="button" class="danseur-roll-btn" data-action="rollEmprise" data-item-id="{{d.id}}" title='{{localize "AGONE.JeterEmprise"}}'>
             <i class="fas fa-dice-d10"></i> Emprise
           </button>
           <button type="button" class="danseur-roll-btn" data-action="rollImprovisation" data-item-id="{{d.id}}" title='{{localize "AGONE.JeterImprovisation"}}'>
             <i class="fas fa-dice-d10"></i> Impro
           </button>
-          <a class="item-edit" data-item-id="{{d.id}}"><i class="fas fa-edit"></i></a>
-          <a class="item-delete" data-item-id="{{d.id}}"><i class="fas fa-trash"></i></a>
+          <button type="button" class="danseur-recrea-btn btn-icon" data-action="reactiverCreationDanseur" data-item-id="{{d.id}}" title='{{localize "AGONE.DanseurReactiverCrea"}}'>
+            <i class="fas fa-table"></i>
+          </button>
+          {{else}}
+          <button type="button" class="danseur-valider-btn" data-action="validerCreationDanseur" data-item-id="{{d.id}}" title='{{localize "AGONE.DanseurValiderCrea"}}'>
+            <i class="fas fa-check"></i> Valider
+          </button>
+          {{/unless}}
+          <a class="item-delete" data-item-id="{{d.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
         </div>
       </div>
+
+      {{#if d.system.modeCreation}}
+      <!-- MODE CRÉATION : table officielle +/- niveaux -->
+      <div class="danseur-crea-section">
+        {{#each d.creaNiveaux as |cn|}}
+        <div class="danseur-crea-row">
+          <span class="danseur-crea-label">{{cn.label}}</span>
+          <button type="button" class="danseur-niv-btn" data-action="danseurNiveauDown"
+                  data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
+                  {{#unless cn.canDown}}disabled{{/unless}}>-</button>
+          <span class="danseur-niv-num">{{cn.niv}}</span>
+          <button type="button" class="danseur-niv-btn" data-action="danseurNiveauUp"
+                  data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
+                  {{#unless cn.canUp}}disabled{{/unless}}>+</button>
+          <span class="danseur-crea-arrow">&#8594;</span>
+          <span class="danseur-crea-val">{{cn.prefix}}{{cn.val}}</span>
+          {{#if cn.nextVal}}<span class="danseur-next-val">(niv.{{cn.nextNiv}} &#8594; {{cn.prefix}}{{cn.nextVal}})</span>{{/if}}
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      {{/if}}
+
+      <!-- SORTS mémorisés (toujours visible) -->
       <div class="danseur-slots" data-danseur-id="{{d.id}}">
         {{#each d.assignedSorts as |s|}}
         <div class="danseur-slot-sort" data-sort-id="{{s.id}}">
           <div class="slot-main">
-            <span class="slot-name">{{s.name}}</span>
+            <button type="button" class="slot-name" data-action="rollSortDanseur"
+                    data-sort-id="{{s.id}}" data-danseur-id="{{d.id}}"
+                    title="Lancer {{s.name}} (End. {{../system.enduranceActuelle}}/{{../system.enduranceMax}})">{{s.name}}</button>
             <button type="button" class="slot-remove" data-sort-id="{{s.id}}" title="Retirer">×</button>
           </div>
           <div class="slot-meta">
-            {{#if s.seuil}}<span>Seuil : {{s.seuil}}</span>{{/if}}
-            {{#if s.portee}}<span>Portée : {{s.portee}}</span>{{/if}}
-            {{#if s.duree}}<span>Durée : {{s.duree}}</span>{{/if}}
-            {{#if s.danse}}<span>Incant. : {{s.danse}}</span>{{/if}}
+            {{#if s.seuil}}<span>Seuil : {{s.seuil}}</span>{{/if}}
+            {{#if s.portee}}<span>Portée : {{s.portee}}</span>{{/if}}
+            {{#if s.duree}}<span>Durée : {{s.duree}}</span>{{/if}}
+            {{#if s.danse}}<span>Incant. : {{s.danse}}</span>{{/if}}
           </div>
         </div>
         {{/each}}
@@ -262,7 +308,7 @@
         <span style="width:14px;display:inline-block"></span>
         {{/if}}
         <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
-        <span class="pouvoir-name">{{pouvoir.name}}</span>
+        <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" title='Envoyer dans le chat'>{{pouvoir.name}}</button>
         <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
         <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
       </li>

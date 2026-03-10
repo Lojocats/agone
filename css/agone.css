@@ -834,6 +834,25 @@
   line-height: 1.5;
 }
 
+.agone .sort-impro-btn {
+  background: transparent;
+  border: 1px solid rgba(80,45,10,0.30);
+  border-radius: 3px;
+  padding: 1px 5px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3310);
+  font-size: 11px;
+  opacity: 0.75;
+  margin-right: 2px;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+.agone .sort-impro-btn:hover {
+  background: rgba(201,162,39,0.15);
+  border-color: var(--agone-brown, #5c3310);
+  opacity: 1;
+}
+
 /* ── Navigateur de Sorts ────────────────────────────────────── */
 .sorts-browser .window-content {
   padding: 0;
@@ -937,7 +956,29 @@
 .sorts-browser .sb-seuil { text-align: center; }
 .sorts-browser .sb-col-toggle { width: 24px; }
 .sorts-browser .sb-col-seuil  { width: 50px; }
-.sorts-browser .sb-col-action { width: 32px; text-align: center; }
+.sorts-browser .sb-col-action { width: 56px; text-align: center; }
+.sorts-browser .sb-impro-btn {
+  background: transparent;
+  border: 1px solid rgba(80,45,10,0.35);
+  color: var(--agone-brown, #5c3310);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.70;
+  margin-right: 3px;
+  transition: background 0.15s, opacity 0.15s;
+}
+.sorts-browser .sb-impro-btn:hover {
+  background: rgba(201,162,39,0.18);
+  border-color: var(--agone-brown, #5c3310);
+  opacity: 1;
+}
 .sorts-browser .sb-add-btn {
   background: var(--agone-brown);
   border: 1px solid var(--agone-gold);
@@ -1739,6 +1780,63 @@
   color: rgba(140,80,30,0.75);
 }
 
+/* ── Compteur de Charges (onglet Avantages) ─────────────────── */
+.charges-compteur {
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(80,45,10,0.45);
+  border-radius: 5px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.charges-titre {
+  font-size: 13px;
+  font-weight: bold;
+  color: #2d1a05;
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.charges-sous-titre {
+  font-size: 10px;
+  color: #5a3515;
+  font-style: italic;
+  margin-bottom: 6px;
+}
+.charges-ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 2px 0;
+}
+.charges-label { color: #3a2010; }
+.charges-valeur { font-weight: bold; min-width: 28px; text-align: right; color: #1a0a00; }
+.charges-input {
+  width: 48px;
+  text-align: center;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(80,45,10,0.5);
+  border-radius: 3px;
+  color: #1a0a00;
+  font-size: 12px;
+  padding: 1px 4px;
+}
+.charges-plus    { color: #1a6b30; }
+.charges-moins   { color: #7b1010; }
+.charges-disponibles { color: #2d1a05; }
+.charges-disponibles-ligne { border-top: 1px solid rgba(80,45,10,0.25); margin-top: 4px; padding-top: 4px; }
+.charges-depensees-ligne   { margin-top: 2px; }
+.charges-solde-ligne { border-top: 1px solid rgba(80,45,10,0.25); margin-top: 4px; padding-top: 4px; font-size: 13px; }
+.charges-ok      { color: #1a6b30; }
+.charges-deficit { color: #7b1010; }
+.charges-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: #7b3010;
+  font-style: italic;
+}
+
 /* ── Manœuvres Browser ────────────────────────────────────── */
 .manoeuvres-browser .window-content {
   padding: 0;
@@ -2004,7 +2102,20 @@
   align-items: center;
   gap: 6px;
 }
-.agone .slot-name { flex: 1; }
+.agone .slot-name {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--agone-brown);
+  text-align: left;
+  cursor: pointer;
+  line-height: inherit;
+}
+.agone .slot-name:hover { color: var(--agone-gold); text-decoration: underline; }
 .agone .slot-desc-toggle {
   background: transparent;
   border: none;
@@ -2030,6 +2141,277 @@
 .agone .danseur-slot-sort.dragging { opacity: 0.4; }
 .agone .danseur-slot-sort.slot-drop-above { box-shadow: inset 0 2px 0 0 var(--agone-gold); }
 .agone .danseur-slot-sort.slot-drop-below { box-shadow: inset 0 -2px 0 0 var(--agone-gold); }
+/* Barre de montée de niveau des Danseurs */
+.agone .danseur-levelup-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  background: rgba(201,162,39,0.07);
+  border-top: 1px solid rgba(80,45,10,0.2);
+  border-radius: 0 0 4px 4px;
+  font-size: 11px;
+}
+.agone .danseur-xp-pool {
+  color: var(--agone-brown);
+  font-weight: 600;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.agone .danseur-levelup-btn {
+  background: rgba(80,45,10,0.10);
+  border: 1px solid rgba(80,45,10,0.35);
+  color: var(--agone-dark-text, #2a1a08);
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.agone .danseur-levelup-btn:hover {
+  background: var(--agone-gold);
+  border-color: var(--agone-brown);
+}
+.agone .danseur-levelup-btn .lu-cout {
+  opacity: 0.7;
+  font-size: 10px;
+}
+
+/* ---- Mode Création Danseur : section niveaux +/- ---- */
+.agone .danseur-crea-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  background: rgba(201,162,39,0.06);
+  border-top: 1px solid rgba(80,45,10,0.15);
+}
+.agone .danseur-crea-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+.agone .danseur-crea-label {
+  min-width: 72px;
+  color: var(--agone-dark-text, #2a1a08);
+  font-weight: 500;
+}
+.agone .danseur-niv-btn {
+  background: rgba(80,45,10,0.12);
+  border: 1px solid rgba(80,45,10,0.4);
+  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--agone-brown, #5c3310);
+}
+.agone .danseur-niv-btn:hover:not([disabled]) {
+  background: var(--agone-gold, #c9a227);
+  border-color: var(--agone-brown, #5c3310);
+}
+.agone .danseur-niv-btn[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.agone .danseur-niv-num {
+  min-width: 22px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3310);
+}
+.agone .danseur-crea-arrow {
+  color: var(--agone-brown, #5c3310);
+  opacity: 0.55;
+  font-size: 13px;
+}
+.agone .danseur-crea-val {
+  font-weight: 600;
+  color: var(--agone-dark-text, #2a1a08);
+  min-width: 24px;
+  font-size: 13px;
+}
+.agone .danseur-next-val {
+  font-size: 10px;
+  color: var(--agone-brown, #5c3310);
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+/* Badge pts création dans l'en-tête */
+.agone .danseur-pts-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(80,45,10,0.10);
+  color: var(--agone-brown, #5c3310);
+  white-space: nowrap;
+}
+.agone .danseur-pts-badge.pts-deficit {
+  background: rgba(180,30,30,0.12);
+  color: #8b1a1a;
+}
+
+/* Saisies inline (enduranceActuelle, experience) dans le header normal */
+.agone .danseur-inline-num {
+  width: 40px;
+  text-align: center;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(80,45,10,0.35);
+  border-radius: 3px;
+  color: var(--agone-dark-text, #2a1a08);
+  font-size: 12px;
+  padding: 1px 2px;
+  -moz-appearance: textfield;
+}
+.agone .danseur-inline-num::-webkit-outer-spin-button,
+.agone .danseur-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* Bouton Valider création */
+.agone .danseur-valider-btn {
+  background: rgba(26,107,48,0.13);
+  border: 1px solid rgba(26,107,48,0.45);
+  color: #1a6b30;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.agone .danseur-valider-btn:hover { background: rgba(26,107,48,0.28); }
+
+/* Bouton Retour mode création (icône table) */
+.agone .danseur-recrea-btn {
+  background: transparent;
+  border: 1px solid rgba(80,45,10,0.30);
+  border-radius: 3px;
+  padding: 2px 5px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3310);
+  font-size: 12px;
+  opacity: 0.7;
+}
+.agone .danseur-recrea-btn:hover { opacity: 1; background: rgba(80,45,10,0.08); }
+
+/* ── Démons intérieurs ─────────────────────────────────────────── */
+.agone .demons-block { margin-top: 10px; }
+.agone .demon-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(60,15,30,0.06);
+  border: 1px solid rgba(120,30,60,0.25);
+  border-radius: var(--radius, 4px);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.agone .demon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.agone .demon-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.agone .demon-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone .demon-nom { font-weight: 600; font-size: 13px; color: #5a1530; }
+.agone .demon-stat {
+  font-size: 11px;
+  color: rgba(90,21,48,0.85);
+  white-space: nowrap;
+}
+.agone .demon-creation-badge {
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(90,21,48,0.75);
+}
+.agone .demon-stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.agone .demon-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.agone .demon-stat-row label {
+  color: rgba(90,21,48,0.8);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.agone .demon-inline-num {
+  width: 40px;
+  text-align: center;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(120,30,60,0.30);
+  border-radius: 3px;
+  color: var(--agone-dark-text, #2a1a08);
+  font-size: 12px;
+  padding: 1px 2px;
+  -moz-appearance: textfield;
+}
+.agone .demon-inline-num::-webkit-outer-spin-button,
+.agone .demon-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+.agone .demon-valider-btn {
+  background: rgba(26,107,48,0.13);
+  border: 1px solid rgba(26,107,48,0.45);
+  color: #1a6b30;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.agone .demon-valider-btn:hover { background: rgba(26,107,48,0.28); }
+.agone .demon-recrea-btn {
+  background: transparent;
+  border: 1px solid rgba(120,30,60,0.30);
+  border-radius: 3px;
+  padding: 2px 5px;
+  cursor: pointer;
+  color: rgba(90,21,48,0.8);
+  font-size: 12px;
+  opacity: 0.7;
+}
+.agone .demon-recrea-btn:hover { opacity: 1; background: rgba(120,30,60,0.08); }
+
+/* Bouton nom-pouvoir cliquable (envoyer chat) */
+.agone .pouvoir-name-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  color: var(--agone-dark-text, #2a1a08);
+  text-align: left;
+  flex: 1;
+}
+.agone .pouvoir-name-btn:hover {
+  text-decoration: underline;
+  color: var(--agone-brown);
+}
 /* Table domaines Arts Magiques */
 .agone .arts-domaines-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12px; }
 .agone .arts-domaines-table th { text-align: left; padding: 2px 4px; color: var(--agone-gold); border-bottom: 1px solid var(--agone-gold); font-size: 11px; }

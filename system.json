@@ -29,7 +29,6 @@
     "Actor": {
       "personnage": {},
       "compagnon": {},
-      "demon": {},
       "pnj": {}
     },
     "Item": {
@@ -42,7 +41,8 @@
       "pouvoir": {},
       "manoeuvre": {},
       "peuple": {},
-      "danseur": {}
+      "danseur": {},
+      "demon": {}
     }
   },
   "packs": [

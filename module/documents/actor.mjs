@@ -1,3 +1,5 @@
+import { AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
+
 /**
  * AgoneActor — Classe Actor étendue pour le système Agone
  * Gère les jets de dés et la préparation des données
@@ -98,8 +100,172 @@ export class AgoneActor extends Actor {
         );
         const scoreConnDanseurs = compDanseurs ? compDanseurs.system.score : 0;
         systemData.aptitudeEmprise = (systemData.emprise ?? 0) + scoreConnDanseurs + (systemData.bonusEsprit ?? 0);
+
+        // Effets mécaniques des avantages & défauts
+        this._applyAvantagesEffets();
       }
     }
+  }
+
+  /**
+   * Applique les effets mécaniques des avantages & défauts (type "don") sur les stats.
+   * Modifie uniquement les propriétés calculées (transient), jamais le stockage persistant.
+   * Appelée à la FIN de prepareDerivedData() pour le type personnage.
+   */
+  _applyAvantagesEffets() {
+    const sd = this.system;
+    const T  = CONFIG.AGONE;
+
+    const dons = this.items.filter(i => i.type === "don");
+    if (!dons.length) return;
+
+    // Accumulation des deltas
+    const b = {
+      agilite: 0, force: 0, resistance: 0, intelligence: 0,
+      volonte: 0, charisma: 0, creativite: 0, perception: 0,
+      corps: 0, esprit: 0, ame: 0,
+      corps_noir: 0, esprit_noir: 0, ame_noir: 0,
+      tai: 0,
+      initiative_bonus: 0,
+      art_bonus: 0,
+      emprise_bonus: 0,
+      mv_divisor: 1,
+      ptsCreationComp_bonus: 0,
+      charges_double: false,
+      charges_reduction: 0,
+    };
+
+    for (const don of dons) {
+      const effets = AVANTAGES_EFFETS[don.name] ?? [];
+      for (const e of effets) {
+        if (e.stat === "mv_divisor") {
+          b.mv_divisor = Math.max(b.mv_divisor, e.value ?? 1);
+        } else if (e.stat === "charges_double") {
+          b.charges_double = true;
+        } else if (e.delta !== undefined) {
+          b[e.stat] = (b[e.stat] ?? 0) + e.delta;
+        }
+      }
+    }
+
+    // Rien à faire si aucun effet
+    const anyDelta = Object.entries(b).some(([k, v]) => {
+      if (k === "mv_divisor")     return v > 1;
+      if (k === "charges_double") return v === true;
+      return typeof v === "number" && v !== 0;
+    });
+    if (!anyDelta) return;
+
+    // --- 1. Application des deltas sur les stats brutes ---
+    sd.agilite.score      += b.agilite;
+    sd.force.score        += b.force;
+    sd.resistance.score   += b.resistance;
+    sd.intelligence.score += b.intelligence;
+    sd.volonte.score      += b.volonte;
+    sd.charisma.score     += b.charisma;
+    sd.creativite.score   += b.creativite;
+    sd.perception.score   += b.perception;
+    sd.corps.score        += b.corps;
+    sd.esprit.score       += b.esprit;
+    sd.ame.score          += b.ame;
+    sd.corps.noir         += b.corps_noir;
+    sd.esprit.noir        += b.esprit_noir;
+    sd.ame.noir           += b.ame_noir;
+    sd.tai                += b.tai;
+
+    // --- 1b. Points de création compétences (ex: Orphelin -10) ---
+    if (b.ptsCreationComp_bonus !== 0) {
+      sd.ptsCreationComp.max = Math.max(0, sd.ptsCreationComp.max + b.ptsCreationComp_bonus);
+    }
+
+    // --- 2. Re-dérivation des bonus d'aspects ---
+    sd.bonusCorps  = Math.max(0, sd.corps.score  - sd.corps.noir);
+    sd.bonusEsprit = Math.max(0, sd.esprit.score - sd.esprit.noir);
+    sd.bonusAme    = Math.max(0, sd.ame.score    - sd.ame.noir);
+    sd.flamme      = Math.min(sd.corps.score, sd.esprit.score, sd.ame.score);
+    sd.flammeNoire = Math.min(sd.corps.noir,  sd.esprit.noir,  sd.ame.noir);
+
+    // --- 3. Re-dérivation TAI (si TAI modifié) ---
+    if (b.tai !== 0) {
+      if (!sd.mvOverride) sd.mv = T.lookupTai(T.taiToMv, sd.tai);
+      sd.modPoids = T.lookupTai(T.taiToModPoids, sd.tai);
+    }
+
+    // --- 4. Re-dérivation dépendant de force / résistance ---
+    const peupleKey = T.peupleNomVersKey?.[sd.peuple] ?? "humain";
+    const pData     = T.peuplesData?.[peupleKey] ?? T.peuplesData?.humain;
+    const bpdv      = pData?.bpdv ?? T.lookupTai(T.taiToBpdv, sd.tai);
+    sd.pdv.max   = bpdv + sd.resistance.score * 3 + sd.pdv.bonusDe;
+    sd.bd        = T.lookupBd(sd.force.score, sd.tai);
+    sd.chargeMax = (sd.force.score + sd.resistance.score) * sd.modPoids;
+    sd.demiCharge = Math.floor(sd.chargeMax / 2);
+    sd.chargeJour = Math.floor(sd.chargeMax / 4);
+    sd.seuilBlessureGrave    = Math.max(1, Math.floor(sd.pdv.max / 3));
+    sd.seuilBlessureCritique = Math.max(1, Math.floor(sd.pdv.max / 2));
+
+    // --- 5. Re-dérivation des caractéristiques secondaires ---
+    sd.melee = Math.round((sd.force.score + sd.agilite.score * 2) / 3);
+    sd.tir   = Math.round((sd.agilite.score + sd.perception.score) / 2);
+
+    if (sd.typeMage === "jorniste")           sd.emprise = sd.intelligence.score;
+    else if (sd.typeMage === "obscurantiste") sd.emprise = sd.volonte.score;
+    else sd.emprise = Math.round((sd.intelligence.score + sd.volonte.score) / 2);
+    sd.emprise += b.emprise_bonus;
+
+    sd.art              = Math.round((sd.charisma.score + sd.creativite.score) / 2) + b.art_bonus;
+    sd.initiative       = sd.agilite.score + sd.perception.score + sd.bonusCorps + b.initiative_bonus;
+    sd.initMagique      = sd.initiative + 10;
+    sd.defenseNaturelle = sd.agilite.score + sd.bonusCorps;
+    sd.noirceur         = Math.floor(sd.tenebres / 10);
+
+    // MV diviseur (Boiteux ÷2, Un membre en moins ÷3)
+    if (b.mv_divisor > 1) {
+      sd.mv = Math.max(1, Math.floor(sd.mv / b.mv_divisor));
+    }
+
+    // --- 6. Calcul des Charges (avantages & défauts) ---
+    {
+      let depense = 0;
+      let recupere = 0;
+      for (const don of dons) {
+        const cout = don.system.cout ?? 0;
+        if (don.system.categorie === "avantage") {
+          let coutEff = cout;
+          if (b.charges_double && don.name !== "Jeune")     coutEff *= 2;
+          if (b.charges_reduction > 0 && don.name !== "Vieillard") coutEff = Math.max(1, coutEff - b.charges_reduction);
+          depense += Math.max(0, coutEff);
+        } else {
+          // défauts : cout stocké négatif → on prend la valeur absolue
+          recupere += Math.abs(cout);
+        }
+      }
+      sd.chargesDepensees   = depense;
+      sd.chargesRecuperees  = recupere;
+      sd.chargesDisponibles = (sd.ptsCharges?.max ?? 0) + recupere;
+      sd.chargesSolde       = sd.chargesDisponibles - depense;
+      sd.chargesSoldeClass  = sd.chargesSolde < 0 ? "charges-deficit" : "charges-ok";
+      // booléens utiles dans le template
+      sd.chargesJeune       = b.charges_double;
+      sd.chargesVieillard   = b.charges_reduction > 0;
+    }
+
+    // --- 7. Re-dérivation des stats basées sur les items ---
+    const compEsquive  = this.items.find(i => i.type === "competence" && i.name === "Esquive (Épreuve)");
+    const scoreEsquive = compEsquive?.system.score ?? 0;
+    sd.esquiveTotal    = sd.agilite.score + scoreEsquive + sd.bonusCorps;
+    sd.esquiveDistance = Math.round((sd.agilite.score + scoreEsquive) / 2);
+
+    const compDemono       = this.items.find(i => i.type === "competence" && i.name === "Démonologie (Occulte)");
+    const scoreDemono      = compDemono?.system.score ?? 0;
+    sd.aptitudeConjuration = sd.noirceur + scoreDemono + sd.bonusAme;
+
+    const compArts          = this.items.find(i => i.type === "competence" && i.name === "Arts Magiques (Occulte)");
+    const scoreArts         = compArts?.system.score ?? 0;
+    sd.aptitudeArtsMagiques = sd.art + scoreArts + sd.bonusAme;
+
+    const compDanseurs      = this.items.find(i => i.type === "competence" && i.name.toLowerCase().includes("danseur"));
+    const scoreConnDanseurs = compDanseurs?.system.score ?? 0;
+    sd.aptitudeEmprise      = sd.emprise + scoreConnDanseurs + sd.bonusEsprit;
   }
 
   // ==============================
@@ -393,12 +559,49 @@ export class AgoneActor extends Actor {
   /**
    * Jet de sort / magie
    */
-  async rollSort(itemId) {
+  async rollSort(itemIdOrData, { impro = false } = {}) {
     const sd = this.system;
-    const sort = this.items.get(itemId);
-    if (!sort || sort.type !== "sort") return;
+    let sort;
+    if (typeof itemIdOrData === "string") {
+      sort = this.items.get(itemIdOrData);
+      if (!sort || sort.type !== "sort") return;
+    } else {
+      // Données brutes depuis le navigateur de sorts (SORTS_DATA)
+      sort = { name: itemIdOrData.name, system: {
+        seuil      : itemIdOrData.seuil      ?? 0,
+        typeMagie  : itemIdOrData.typeMagie  ?? "",
+        compAlt    : itemIdOrData.compAlt    ?? "",
+        attrAlt    : itemIdOrData.attrAlt    ?? "",
+      }};
+    }
 
-    const seuil = sort.system.seuil ?? 0;
+    // ── Guard : le personnage doit avoir Arts Magiques pour ce domaine ──────
+    // Correspondance typeMagie (clé minuscule de SORTS_DATA) → domaine réel dans les compétences
+    const TYPES_TO_DOMAINE = {
+      accord:        "Accord",
+      cyse:          "Cyse",
+      decorum:       "Décorum",
+      geste:         "Geste",
+      // jorniste / obscurantiste / eclipsiste → vérification sans domaine précis
+    };
+    const typeMagie  = sort.system.typeMagie?.trim() ?? "";
+    const compAltNomGuard = sort.system.compAlt?.trim() ?? "";
+    if (!compAltNomGuard) {
+      const domaineCible = TYPES_TO_DOMAINE[typeMagie] ?? null;
+      const hasArts = this.items.some(i =>
+        i.type === "competence" &&
+        i.name === "Arts Magiques (Occulte)" &&
+        (domaineCible === null ? true : i.system.domaine === domaineCible)
+      );
+      if (!hasArts) {
+        const domainLabel = domaineCible ?? (typeMagie || "ce domaine");
+        ui.notifications.warn(`${this.name} ne possède pas Arts Magiques (${domainLabel}) pour lancer ce sort.`);
+        return null;
+      }
+    }
+
+    const seuilBase = sort.system.seuil ?? 0;
+    const seuil = impro ? seuilBase * 2 : seuilBase;
     let aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
 
     // Compétence alternative : min(artsMagiques, compAlt + attrAlt + bonusAspect)
@@ -418,7 +621,7 @@ export class AgoneActor extends Actor {
       }
     }
 
-    const label = sort.name;
+    const label = impro ? `${sort.name} (improvisé)` : sort.name;
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
@@ -432,9 +635,10 @@ export class AgoneActor extends Actor {
     const aptitudeLabel = compAltNom
       ? `Arts Magiques (min avec ${compAltNom}) : ${aptitude}`
       : `Arts Magiques : ${aptitude}`;
+    const seuilLabel = impro ? `Seuil : ${seuil} (${seuilBase} × 2, improvisé)` : `Seuil : ${seuil}`;
     await this._sendRollToChat(roll, label, {
       aptitude: aptitudeLabel,
-      seuil:    `Seuil : ${seuil}`,
+      seuil:    seuilLabel,
       resultat: succes ? "✔ Succès" : "✘ Échec",
       modif:    `Bonus/Malus : ${modif}`
     });

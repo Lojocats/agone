@@ -117,18 +117,41 @@ export class SortData extends foundry.abstract.TypeDataModel {
 // ================================
 // Danseur
 // ================================
+// Table officielle Agone : investissement (1-7 pts) → valeur stat
+export const DANSEUR_TABLE = {
+  memoire:   [12, 14, 16, 18, 24, 30, 40],
+  emprise:   [ 0,  1,  2,  3,  4,  5,  6],
+  empathie:  [ 2,  3,  4,  5,  6,  7,  8],
+  endurance: [ 1,  2,  3,  4,  5,  6,  7],
+};
+
 export class DanseurData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       description:       new fields.HTMLField({ initial: "" }),
       experience:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      modeCreation:      new fields.BooleanField({ initial: true }),
+      ptsCreationMax:    new fields.NumberField({ initial: 17, integer: true, min: 0 }),
+      // Niveaux de création (1-7) → valeurs dérivées via table officielle
+      memoireNiveau:     new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
+      empriseNiveau:     new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
+      empathieNiveau:    new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
+      enduranceNiveau:   new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
+      // Valeurs courantes (état actuel)
       memoireActuelle:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-      memoireMax:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-      bonusEmprise:      new fields.NumberField({ initial: 0, integer: true }),
-      empathie:          new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       enduranceActuelle: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-      enduranceMax:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
     };
+  }
+
+  prepareDerivedData() {
+    const niv = n => Math.max(0, Math.min(6, (n ?? 1) - 1));
+    this.memoireMax   = DANSEUR_TABLE.memoire[niv(this.memoireNiveau)];
+    this.bonusEmprise = DANSEUR_TABLE.emprise[niv(this.empriseNiveau)];
+    this.empathie     = DANSEUR_TABLE.empathie[niv(this.empathieNiveau)];
+    this.enduranceMax = DANSEUR_TABLE.endurance[niv(this.enduranceNiveau)];
+    this.ptsCreationDepense  = (this.memoireNiveau ?? 1) + (this.empriseNiveau ?? 1)
+                             + (this.empathieNiveau ?? 1) + (this.enduranceNiveau ?? 1);
+    this.ptsCreationRestants = (this.ptsCreationMax ?? 17) - this.ptsCreationDepense;
   }
 }
 
@@ -171,6 +194,37 @@ export class ManoeuvreData extends foundry.abstract.TypeDataModel {
       score:       new fields.NumberField({ initial: 0, integer: true }),
       malus:       new fields.NumberField({ initial: 0, integer: true }),
       description: new fields.HTMLField({ initial: "" })
+    };
+  }
+}
+
+// ================================
+// Démon (item embarqué dans un personnage)
+// ================================
+export class DemonItemData extends foundry.abstract.TypeDataModel {
+  static defineSchema() {
+    return {
+      description:         new fields.HTMLField({ initial: "" }),
+      origine:             new fields.StringField({ initial: "" }),
+      modeCreation:        new fields.BooleanField({ initial: true }),
+      opacite:             new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      densite: new fields.SchemaField({
+        valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
+      dif:                 new fields.NumberField({ initial: 0, integer: true }),
+      aptitudeConjuration: new fields.NumberField({ initial: 0, integer: true }),
+      empathie:            new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      endurance: new fields.SchemaField({
+        valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
+      memoire: new fields.SchemaField({
+        valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
+      connivances: new fields.HTMLField({ initial: "" }),
+      notes:       new fields.HTMLField({ initial: "" }),
     };
   }
 }

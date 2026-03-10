@@ -9,41 +9,61 @@
   </header>
 
   <section class="sheet-body">
-    <!-- Stats principales -->
+    <!-- Niveaux de création (1–7) → valeurs via table officielle -->
     <div class="danseur-stats-grid">
       <!-- Mémoire -->
       <div class="danseur-stat-group">
-        <label>{{localize "AGONE.MemoreDanseur"}}</label>
+        <label>{{localize "AGONE.MemoreDanseur"}} (niv)</label>
         <div class="curr-max-pair">
-          <input type="number" name="system.memoireActuelle" value="{{system.memoireActuelle}}" min="0" placeholder="0">
-          <span>/</span>
-          <input type="number" name="system.memoireMax" value="{{system.memoireMax}}" min="0" placeholder="0">
+          <input type="number" name="system.memoireNiveau" value="{{system.memoireNiveau}}" min="1" max="7" placeholder="1">
+          <span class="derived-val">→ {{system.memoireMax}}</span>
         </div>
+        <label style="font-size:10px;opacity:0.6">Courante</label>
+        <input type="number" name="system.memoireActuelle" value="{{system.memoireActuelle}}" min="0">
       </div>
       <!-- Endurance -->
       <div class="danseur-stat-group">
-        <label>{{localize "AGONE.EnduranceDanseur"}}</label>
+        <label>{{localize "AGONE.EnduranceDanseur"}} (niv)</label>
         <div class="curr-max-pair">
-          <input type="number" name="system.enduranceActuelle" value="{{system.enduranceActuelle}}" min="0" placeholder="0">
-          <span>/</span>
-          <input type="number" name="system.enduranceMax" value="{{system.enduranceMax}}" min="0" placeholder="0">
+          <input type="number" name="system.enduranceNiveau" value="{{system.enduranceNiveau}}" min="1" max="7" placeholder="1">
+          <span class="derived-val">→ {{system.enduranceMax}}</span>
         </div>
+        <label style="font-size:10px;opacity:0.6">Courante</label>
+        <input type="number" name="system.enduranceActuelle" value="{{system.enduranceActuelle}}" min="0">
       </div>
-      <!-- Bonus Emprise -->
+      <!-- Emprise -->
       <div class="danseur-stat-group">
-        <label>{{localize "AGONE.BonusEmprise"}}</label>
-        <input type="number" name="system.bonusEmprise" value="{{system.bonusEmprise}}" placeholder="0">
+        <label>{{localize "AGONE.BonusEmprise"}} (niv)</label>
+        <div class="curr-max-pair">
+          <input type="number" name="system.empriseNiveau" value="{{system.empriseNiveau}}" min="1" max="7" placeholder="1">
+          <span class="derived-val">→ +{{system.bonusEmprise}}</span>
+        </div>
       </div>
       <!-- Empathie -->
       <div class="danseur-stat-group">
-        <label>{{localize "AGONE.EmpathieDanseur"}}</label>
-        <input type="number" name="system.empathie" value="{{system.empathie}}" min="0" placeholder="0">
+        <label>{{localize "AGONE.EmpathieDanseur"}} (niv)</label>
+        <div class="curr-max-pair">
+          <input type="number" name="system.empathieNiveau" value="{{system.empathieNiveau}}" min="1" max="7" placeholder="1">
+          <span class="derived-val">→ {{system.empathie}}</span>
+        </div>
       </div>
       <!-- Expérience -->
       <div class="danseur-stat-group">
         <label>{{localize "AGONE.ExperienceDanseur"}}</label>
         <input type="number" name="system.experience" value="{{system.experience}}" min="0" placeholder="0">
       </div>
+      <!-- Points de création max -->
+      <div class="danseur-stat-group">
+        <label>Pts création max</label>
+        <input type="number" name="system.ptsCreationMax" value="{{system.ptsCreationMax}}" min="0" placeholder="17">
+        <small style="font-size:10px;opacity:0.6">Dépensés : {{system.ptsCreationDepense}} / Restants : {{system.ptsCreationRestants}}</small>
+      </div>
+    </div>
+
+    <!-- Mode création -->
+    <div class="form-group">
+      <label>Mode création actif</label>
+      <input type="checkbox" name="system.modeCreation" {{#if system.modeCreation}}checked{{/if}}>
     </div>
 
     <!-- Description -->

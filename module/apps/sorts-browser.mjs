@@ -162,6 +162,21 @@ export class SortsBrowser extends Application {
       }
     });
 
+    // Jet improvisé depuis le navigateur
+    html.find("[data-action='rollSortImpro']").on("click", async e => {
+      const idx = parseInt(e.currentTarget.closest("[data-sort-idx]")?.dataset?.sortIdx ?? "");
+      if (isNaN(idx)) return;
+      const d = SORTS_DATA[idx];
+      if (!d) return;
+      // Priorité à l'item acteur (pour les compAlt et bonus éventuels)
+      const actorItem = this.actor.items.find(i => i.type === "sort" && i.name === d.name);
+      if (actorItem) {
+        await this.actor.rollSort(actorItem.id, { impro: true });
+      } else {
+        await this.actor.rollSort(d, { impro: true });
+      }
+    });
+
     // Ajouter un sort au personnage
     html.find("[data-action='addSort']").on("click", async e => {
       const idx = parseInt(e.currentTarget.closest("[data-sort-idx]")?.dataset?.sortIdx ?? "");

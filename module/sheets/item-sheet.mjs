@@ -1,7 +1,7 @@
 /**
  * Feuille d'item générique – gère tous les types d'items Agone.
  */
-export class AgoneItemSheet extends ItemSheet {
+export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["agone", "sheet", "item"],
