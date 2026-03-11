@@ -312,6 +312,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Jets de dés — Combat
     html.find("[data-action='rollInitiative']").click(this._onRollInitiative.bind(this));
+    html.find("[data-action='rollInitiativeMagique']").click(this._onRollInitiativeMagique.bind(this));
     html.find("[data-action='rollAttaque']").click(this._onRollAttaque.bind(this));
     html.find("[data-action='rollParade']").click(this._onRollParade.bind(this));
     html.find("[data-action='rollEsquive']").click(this._onRollEsquive.bind(this));
@@ -486,7 +487,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       const itemId = ev.currentTarget.dataset.itemId;
       const peine  = this.actor.items.get(itemId);
       if (!peine) return;
-      const confirmed = await Dialog.confirm({
+      const confirmed = await foundry.applications.api.DialogV2.confirm({
         title  : "Acquérir un Bienfait",
         content: `<p>Acquérir <strong>${peine.system.bienfait}</strong> et dépenser <strong>+1 Perfidie</strong> ?</p>`,
       });
@@ -563,7 +564,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const li   = event.currentTarget.closest("[data-item-id]");
     const item = this.actor.items.get(li.dataset.itemId);
     if (!item) return;
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title: game.i18n.localize("AGONE.Supprimer"),
       content: `<p>${game.i18n.format("AGONE.ConfirmationSuppression", { nom: item.name })}</p>`
     });
@@ -597,6 +598,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     event.preventDefault();
     const armeId = event.currentTarget.dataset.armeId ?? null;
     await this.actor.rollInitiative(armeId);
+  }
+
+  async _onRollInitiativeMagique(event) {
+    event.preventDefault();
+    await this.actor.rollInitiativeMagique();
   }
 
   async _onRollAttaque(event) {
@@ -1600,7 +1606,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
           game.i18n.format("AGONE.PasAssezPtsCrea", { cout: creaCout, actuel: restePts })
         );
       }
-      const confirmed = await Dialog.confirm({
+      const confirmed = await foundry.applications.api.DialogV2.confirm({
         title:   game.i18n.localize("AGONE.MonterNiveau"),
         content: `<p>${game.i18n.format("AGONE.ConfirmerMonteeNiveau", { cout: `${creaCout} ${game.i18n.localize("AGONE.PointsCreation")}` })}</p>`
       });
@@ -1636,7 +1642,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
       // Sinon, propose de verser les XP disponibles en réserve locale
       const aVerser = sd.experience.courante;
-      const confirmed = await Dialog.confirm({
+      const confirmed = await foundry.applications.api.DialogV2.confirm({
         title:   game.i18n.localize("AGONE.XPInsuffisants"),
         content: `<p>${game.i18n.format("AGONE.PasAssezXPReserve", {
           cout:    xpCout,
@@ -1659,7 +1665,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       return;
     }
 
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.MonterNiveau"),
       content: `<p>${game.i18n.format("AGONE.ConfirmerMonteeNiveau", { cout: xpCout })}</p>`
     });
@@ -1706,7 +1712,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       );
     }
     const label = btn.dataset.label ?? stat;
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
       content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpDanseur", { nom: danseur.name, stat: label, cout })}</p>`
     });
@@ -1770,7 +1776,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     if ((sd.ptsCreationRestants ?? 0) < 0) {
       return ui.notifications.warn(game.i18n.localize("AGONE.DanseurPtsDeficit"));
     }
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.DanseurValiderCrea"),
       content: `<p>${game.i18n.format("AGONE.DanseurValiderCreaConfirm", { nom: danseur.name })}</p>`
     });
@@ -1862,7 +1868,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   // ==============================
   async _onResetCaracs(event) {
     event.preventDefault();
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.ResetCreation"),
       content: `<p>${game.i18n.localize("AGONE.ResetCreationCaracConfirm")}</p>`
     });
@@ -1889,7 +1895,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   // ==============================
   async _onResetComps(event) {
     event.preventDefault();
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.ResetCreation"),
       content: `<p>${game.i18n.localize("AGONE.ResetCreationCompConfirm")}</p>`
     });
@@ -1909,7 +1915,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   // ==============================
   async _onValiderCreation(event) {
     event.preventDefault();
-    const confirmed = await Dialog.confirm({
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.ValiderCreation"),
       content: `<p>${game.i18n.localize("AGONE.ValiderCreationConfirm")}</p>`
     });

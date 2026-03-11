@@ -44,6 +44,12 @@ Hooks.once("init", () => {
   game.agone = { AgoneActor, AgoneItem };
   CONFIG.AGONE = AGONE;
 
+  // ── Initiative : formule pour le tracker de combat natif ────────────────
+  CONFIG.Combat.initiative = {
+    formula:  "1d10 + @initiative",
+    decimals: 0,
+  };
+
   // ── Documents personnalisés ─────────────────────────────────────────────
   CONFIG.Actor.documentClass = AgoneActor;
   CONFIG.Item.documentClass  = AgoneItem;

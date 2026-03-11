@@ -64,7 +64,7 @@ export class CompagnonSheet extends foundry.appv1.sheets.ActorSheet {
     event.preventDefault();
     const li   = event.currentTarget.closest("[data-item-id]");
     const item = this.actor.items.get(li.dataset.itemId);
-    if (item && await Dialog.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
+    if (item && await foundry.applications.api.DialogV2.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
       await item.delete();
     }
   }
@@ -124,7 +124,7 @@ export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
       e.preventDefault();
       const li   = e.currentTarget.closest("[data-item-id]");
       const item = this.actor.items.get(li.dataset.itemId);
-      if (item && await Dialog.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
+      if (item && await foundry.applications.api.DialogV2.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
         await item.delete();
       }
     });
@@ -184,7 +184,7 @@ export class PnjSheet extends foundry.appv1.sheets.ActorSheet {
       e.preventDefault();
       const li   = e.currentTarget.closest("[data-item-id]");
       const item = this.actor.items.get(li.dataset.itemId);
-      if (item && await Dialog.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
+      if (item && await foundry.applications.api.DialogV2.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
         await item.delete();
       }
     });

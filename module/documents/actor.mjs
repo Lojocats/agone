@@ -407,6 +407,22 @@ export class AgoneActor extends Actor {
   }
 
   /**
+   * Expose les statistiques dérivées pour les formules de jet FoundryVTT
+   * (p. ex. CONFIG.Combat.initiative.formula = "1d10 + @initiative")
+   * @override
+   */
+  getRollData() {
+    const data = super.getRollData();
+    const sd   = this.system;
+    data.initiative  = sd.initiative  ?? 0;
+    data.initMagique = sd.initMagique ?? 0;
+    data.bonusCorps  = sd.bonusCorps  ?? 0;
+    data.bonusEsprit = sd.bonusEsprit ?? 0;
+    data.bonusAme    = sd.bonusAme    ?? 0;
+    return data;
+  }
+
+  /**
    * Jet d'initiative (fermé)
    */
   async rollInitiative(armeId = null) {
@@ -436,11 +452,35 @@ export class AgoneActor extends Actor {
       modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
     });
 
-    // Envoyer au tracker d'initiative
-    const combatant = this.combatant;
-    if (combatant) {
-      await combatant.update({ initiative: roll.total });
-    }
+    // Mettre à jour le tracker de combat
+    await this._setInitiativeInCombat(roll.total);
+    return roll;
+  }
+
+  /**
+   * Jet d'initiative magique (Initiative + 10, fermé)
+   */
+  async rollInitiativeMagique() {
+    const sd    = this.system;
+    const base  = sd.initMagique ?? 0;
+    const label = game.i18n.localize("AGONE.InitMagique");
+
+    const modif = await this._dialogModificateur(label);
+    if (modif === null) return;
+
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
+    const roll = new Roll(
+      "1d10 + @base + @modif",
+      { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure }
+    );
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      base:  `Initiative Magique : ${base}`,
+      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
+    });
+
+    // Mettre à jour le tracker de combat
+    await this._setInitiativeInCombat(roll.total);
     return roll;
   }
 
@@ -618,7 +658,7 @@ export class AgoneActor extends Actor {
     const roll = new Roll("1d10");
     await roll.evaluate();
 
-    const content = await renderTemplate(
+    const content = await foundry.applications.handlebars.renderTemplate(
       "systems/agone/templates/chat/roll-result.hbs",
       {
         actor:        this,
@@ -637,7 +677,6 @@ export class AgoneActor extends Actor {
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: this }),
       content,
-      type:  CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 5,
       rolls: [roll]
     });
     return roll;
@@ -737,6 +776,19 @@ export class AgoneActor extends Actor {
   // ==============================
 
   /**
+   * Met à jour l'initiative du combattant lié à cet acteur dans le combat actif.
+   * Utilise game.combat.setInitiative() qui est l'API officielle v13.
+   * @param {number} value
+   */
+  async _setInitiativeInCombat(value) {
+    const combat = game.combat;
+    if (!combat) return;
+    // Cherche dans tous les combattants du combat actif (token lié ou non)
+    const combatant = combat.combatants.find(c => c.actor?.id === this.id);
+    if (combatant) await combat.setInitiative(combatant.id, value);
+  }
+
+  /**
    * Affiche un dialog pour saisir le modificateur (bonus/malus)
    * @returns {Promise<number|null>} modificateur ou null si annulé
    */
@@ -746,51 +798,50 @@ export class AgoneActor extends Actor {
                 <input type="checkbox" id="bonusSpe" name="bonusSpe" />
                 <label for="bonusSpe">${game.i18n.localize("AGONE.BonusSpecialite")} <em>${specialite}</em> (+1)</label>
               </div>` : "";
-    return new Promise((resolve) => {
-      new Dialog({
-        title: label,
-        content: `
-          <form>
-            <div class="agone-roll-dialog">
-              <p><strong>${label}</strong></p>
-              <div class="form-group">
-                <label>${game.i18n.localize("AGONE.BonusMalus")}</label>
-                <input type="number" id="modif" name="modif" value="0" autofocus/>
-              </div>
-              <div class="form-group form-check">
-                <input type="checkbox" id="typeJet" name="typeJet" checked />
-                <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
-              </div>${speRow}
+
+    const result = await foundry.applications.api.DialogV2.wait({
+      window:  { title: label },
+      content: `
+        <form>
+          <div class="agone-roll-dialog">
+            <p><strong>${label}</strong></p>
+            <div class="form-group">
+              <label>${game.i18n.localize("AGONE.BonusMalus")}</label>
+              <input type="number" id="modif" name="modif" value="0" autofocus/>
             </div>
-          </form>
-        `,
-        buttons: {
-          lancer: {
-            icon: '<i class="fas fa-dice-d10"></i>',
-            label: game.i18n.localize("AGONE.Lancer"),
-            callback: (html) => {
-              const modif    = parseInt(html.find("#modif").val()) || 0;
-              const type     = html.find("#typeJet").prop("checked") ? "ouvert" : "ferme";
-              const bonusSpe = specialite && html.find("#bonusSpe").prop("checked") ? 1 : 0;
-              resolve({ modif, type, bonusSpe });
-            }
-          },
-          annuler: {
-            icon: '<i class="fas fa-times"></i>',
-            label: game.i18n.localize("AGONE.Annuler"),
-            callback: () => resolve(null)
-          }
+            <div class="form-group form-check">
+              <input type="checkbox" id="typeJet" name="typeJet" checked />
+              <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
+            </div>${speRow}
+          </div>
+        </form>
+      `,
+      buttons: [
+        {
+          action:   "lancer",
+          icon:     "fas fa-dice-d10",
+          label:    game.i18n.localize("AGONE.Lancer"),
+          default:  true,
+          callback: (event, button) => ({
+            modif:    parseInt(button.form.elements.modif.value) || 0,
+            type:     button.form.elements.typeJet.checked ? "ouvert" : "ferme",
+            bonusSpe: specialite && button.form.elements.bonusSpe?.checked ? 1 : 0,
+          })
         },
-        default: "lancer",
-        close: () => resolve(null)
-      }).render(true);
-    }).then(result => {
-      if (!result) return null;
-      // Mémoriser le type de jet et le bonus spécialité pour les callers
-      this._lastRollType = result.type;
-      this._lastBonusSpe = result.bonusSpe ?? 0;
-      return result.modif;
+        {
+          action: "annuler",
+          icon:   "fas fa-times",
+          label:  game.i18n.localize("AGONE.Annuler"),
+        }
+      ],
+      rejectClose: false,
     });
+
+    if (!result || typeof result === "string") return null;
+    // Mémoriser le type de jet et le bonus spécialité pour les callers
+    this._lastRollType = result.type;
+    this._lastBonusSpe = result.bonusSpe ?? 0;
+    return result.modif;
   }
 
   /**
@@ -842,7 +893,7 @@ export class AgoneActor extends Actor {
       if (isMegaFumble) Hooks.callAll("agone.megaFumble", { actor: this, roll: finalRoll, fumbleRoll });
     }
 
-    const content = await renderTemplate(
+    const content = await foundry.applications.handlebars.renderTemplate(
       "systems/agone/templates/chat/roll-result.hbs",
       {
         actor:         this,
@@ -865,7 +916,6 @@ export class AgoneActor extends Actor {
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: this }),
       content,
-      type:  CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 5,
       rolls: [finalRoll]
     });
     return finalRoll;
