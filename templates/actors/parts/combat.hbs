@@ -29,8 +29,19 @@
       </div>
       <div class="sante-row">
         <label>{{localize "AGONE.BlessuresGraves"}}</label>
-        <input type="number" name="system.blessuresGraves" value="{{system.blessuresGraves}}" class="stat-num" max="3" min="0" />
-        <span class="hint">(max 3)</span>
+        <label class="blessure-grave-label" title="{{localize "AGONE.BlessureGrave1Hint"}}">
+          <input type="checkbox" name="system.blessureGrave1" {{#if system.blessureGrave1}}checked{{/if}} />
+          <span class="bg-malus">1 (−2)</span>
+        </label>
+        <label class="blessure-grave-label" title="{{localize "AGONE.BlessureGrave2Hint"}}">
+          <input type="checkbox" name="system.blessureGrave2" {{#if system.blessureGrave2}}checked{{/if}} />
+          <span class="bg-malus">2 (−6)</span>
+        </label>
+        <label class="blessure-grave-label" title="{{localize "AGONE.BlessureGrave3Hint"}}">
+          <input type="checkbox" name="system.blessureGrave3" {{#if system.blessureGrave3}}checked{{/if}} />
+          <span class="bg-malus">3 (−12)</span>
+        </label>
+        {{#if system.malusBlessureGrave}}<span class="hint malus-blessure-total">{{localize "AGONE.MalusTotal"}} {{system.malusBlessureGrave}}</span>{{/if}}
       </div>
       <div class="sante-row">
         <label>{{localize "AGONE.BlessuresCritiques"}}</label>

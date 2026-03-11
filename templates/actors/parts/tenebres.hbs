@@ -1,63 +1,152 @@
-<!-- PARTIAL : TÉNÈBRES, PEINES & PERFIDIE -->
+<!-- PARTIAL : TÉNÈBRES, PEINES & BIENFAITS -->
 <div class="tenebres-section">
 
-  <!-- Ténèbres & Noirceur -->
-  <div class="tenebres-block">
-    <h3 class="section-title">{{localize "AGONE.Tenebres"}}</h3>
-    <div class="tenebres-grid">
-      <div class="tene-row">
-        <label>{{localize "AGONE.Tenebres"}}</label>
-        <input type="number" name="system.tenebres" value="{{system.tenebres}}" class="stat-num" min="0" max="100" />
-        <span class="hint">/100</span>
+  <!-- ── Barre de stats ─────────────────────────────────────── -->
+  <div class="tene-stats-bar">
+    <div class="tene-stat-item">
+      <label>{{localize "AGONE.Tenebres"}}</label>
+      <input type="number" name="system.tenebres" value="{{system.tenebres}}" class="stat-num" min="0" max="100" />
+      <div class="tene-progress-track" title="{{system.tenebres}} / 100">
+        <div class="tene-progress-bar" style="width:{{system.tenebres}}%"></div>
       </div>
-      <div class="tene-row">
-        <label>{{localize "AGONE.Noirceur"}}</label>
-        <span class="derived-val">{{system.noirceur}}</span>
-      </div>
-      <div class="tene-row">
-        <label>{{localize "AGONE.Perfidie"}}</label>
-        <input type="number" name="system.perfidie" value="{{system.perfidie}}" class="stat-num" min="0" />
-      </div>
+      <span class="hint">/ 100</span>
+    </div>
+    <div class="tene-stat-separator"></div>
+    <div class="tene-stat-item">
+      <label title="{{localize "AGONE.Tenebres"}} ÷ 10">{{localize "AGONE.Noirceur"}}</label>
+      <span class="derived-val tene-noirceur">{{system.noirceur}}</span>
     </div>
   </div>
 
-  <!-- Peines -->
-  <div class="peines-block">
-    <h3 class="section-title">{{localize "AGONE.Peines"}}</h3>
-    <div class="peines-grid">
-      <div class="peine-cell"><label>1 {{localize "AGONE.Peine.diablotin"}}</label><input type="checkbox" name="system.peines.diablotin" {{checked system.peines.diablotin}} /></div>
-      <div class="peine-cell"><label>2 {{localize "AGONE.Peine.cauchemars"}}</label><input type="checkbox" name="system.peines.cauchemars" {{checked system.peines.cauchemars}} /></div>
-      <div class="peine-cell"><label>3 {{localize "AGONE.Peine.demonFacetieux"}}</label><input type="checkbox" name="system.peines.demonFacetieux" {{checked system.peines.demonFacetieux}} /></div>
-      <div class="peine-cell"><label>4 {{localize "AGONE.Peine.somnambule"}}</label><input type="checkbox" name="system.peines.somnambule" {{checked system.peines.somnambule}} /></div>
-      <div class="peine-cell"><label>5 {{localize "AGONE.Peine.insomniaque"}}</label><input type="checkbox" name="system.peines.insomniaque" {{checked system.peines.insomniaque}} /></div>
-      <div class="peine-cell"><label>6 {{localize "AGONE.Peine.mepris"}}</label><input type="checkbox" name="system.peines.mepris" {{checked system.peines.mepris}} /></div>
-      <div class="peine-cell"><label>7 {{localize "AGONE.Peine.devianceSexuelle"}}</label><input type="checkbox" name="system.peines.devianceSexuelle" {{checked system.peines.devianceSexuelle}} /></div>
-      <div class="peine-cell"><label>8 {{localize "AGONE.Peine.scarificationsLunaires"}}</label><input type="checkbox" name="system.peines.scarificationsLunaires" {{checked system.peines.scarificationsLunaires}} /></div>
-      <div class="peine-cell"><label>9 {{localize "AGONE.Peine.jumeauDemoniaque"}}</label><input type="checkbox" name="system.peines.jumeauDemoniaque" {{checked system.peines.jumeauDemoniaque}} /></div>
-      <div class="peine-cell"><label>10 {{localize "AGONE.Peine.obsessionOmbre"}}</label><input type="checkbox" name="system.peines.obsessionOmbre" {{checked system.peines.obsessionOmbre}} /></div>
-      <div class="peine-cell"><label>11 {{localize "AGONE.Peine.presenceOppressante"}}</label><input type="checkbox" name="system.peines.presenceOppressante" {{checked system.peines.presenceOppressante}} /></div>
-      <div class="peine-cell"><label>12 {{localize "AGONE.Peine.alterationSens"}}</label><input type="checkbox" name="system.peines.alterationSens" {{checked system.peines.alterationSens}} /></div>
-      <div class="peine-cell"><label>13 {{localize "AGONE.Peine.sangNoir"}}</label><input type="checkbox" name="system.peines.sangNoir" {{checked system.peines.sangNoir}} /></div>
-      <div class="peine-cell"><label>14 {{localize "AGONE.Peine.apparenceDemoniaque"}}</label><input type="checkbox" name="system.peines.apparenceDemoniaque" {{checked system.peines.apparenceDemoniaque}} /></div>
-      <div class="peine-cell"><label>15 {{localize "AGONE.Peine.siamoisTenebres"}}</label><input type="checkbox" name="system.peines.siamoisTenebres" {{checked system.peines.siamoisTenebres}} /></div>
-      <div class="peine-cell"><label>16 {{localize "AGONE.Peine.malediction"}}</label><input type="checkbox" name="system.peines.malediction" {{checked system.peines.malediction}} /></div>
-      <div class="peine-cell"><label>17 {{localize "AGONE.Peine.ombreVivante"}}</label><input type="checkbox" name="system.peines.ombreVivante" {{checked system.peines.ombreVivante}} /></div>
-      <div class="peine-cell"><label>18 {{localize "AGONE.Peine.marqueHautsDiables"}}</label><input type="checkbox" name="system.peines.marqueHautsDiables" {{checked system.peines.marqueHautsDiables}} /></div>
-      <div class="peine-cell"><label>19 {{localize "AGONE.Peine.portailInterieur"}}</label><input type="checkbox" name="system.peines.portailInterieur" {{checked system.peines.portailInterieur}} /></div>
-      <div class="peine-cell"><label>20 {{localize "AGONE.Peine.ombrePerfidie"}}</label><input type="checkbox" name="system.peines.ombrePerfidie" {{checked system.peines.ombrePerfidie}} /></div>
-      <div class="peine-cell"><label>21 {{localize "AGONE.Peine.dechu"}}</label><input type="checkbox" name="system.peines.dechu" {{checked system.peines.dechu}} /></div>
+  <!-- ── Corps principal ────────────────────────────────────── -->
+  <div class="tene-content">
+
+    <!-- Tableau des Paliers / Peines / Bienfaits -->
+    <div class="paliers-section">
+      <h3 class="section-title paliers-title">{{localize "AGONE.TableauPaliers"}}</h3>
+      <table class="paliers-table" summary="Tableau récapitulatif des paliers, peines et bienfaits">
+        <thead>
+          <tr>
+            <th class="col-palier">{{localize "AGONE.Palier"}}</th>
+            <th class="col-peine">{{localize "AGONE.Peines"}}</th>
+            <th class="col-bienfait">{{localize "AGONE.Bienfaits"}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="palier-row{{#ifGT system.tenebres 9}} palier-reached{{/ifGT}}">
+            <td class="col-palier">10</td>
+            <td class="col-peine" data-tooltip="Un Diablotin de Ténèbre veille sur votre progression (10 XP attribués en secret par l’EG). +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.diablotin"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Au 10e point de Ténèbre, une voix surgit de votre ombre : un Diablotin. Il peut vous conseiller lors des Invocations et vous ouvre la voie vers la conjuration des Démons mineurs (Opalins).">{{localize "AGONE.Bienfait.cercle1"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 19}} palier-reached{{/ifGT}}">
+            <td class="col-palier">20</td>
+            <td class="col-peine" data-tooltip="Les songes du passé reviennent sous une lune de sang. Certaines nuits particulièrement éprouvantes : −2 à toutes les actions physiques du lendemain. +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.cauchemars"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Votre Diablotin peut évoluer avec vos points d’expérience. +1 carac = 2 XP, +1 compétence = 1 XP. Nombre de compétences max = votre INT, score max 5.">{{localize "AGONE.Bienfait.diablotin2"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 29}} palier-reached{{/ifGT}}">
+            <td class="col-palier">30</td>
+            <td class="col-peine" data-tooltip="Un Démon de 1er ou 2e Cercle jaillit de tous les orifices du Ténébreux pour le guider (et l’agacer). +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.demonFacetieux"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Le Démon facétieux jaillissant de votre corps vous offre la clé de l’Invocation des créatures de Deuxième Cercle.">{{localize "AGONE.Bienfait.cercle2"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 39}} palier-reached{{/ifGT}}">
+            <td class="col-palier">40</td>
+            <td class="col-peine" data-tooltip="La nuit, le corps suit le contour des ombres en somnambule. Jet de VOL DIF 20 nécessaire pour ne pas tomber. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.somnambule"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 49}} palier-reached{{/ifGT}}">
+            <td class="col-palier">50</td>
+            <td class="col-peine" data-tooltip="Nuits sans sommeil véritable, peuplées de cauchemars et crises de somnambulisme. Le sommeil n’est plus réparateur. +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.insomniaque"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 54}} palier-reached{{/ifGT}}">
+            <td class="col-palier">55</td>
+            <td class="col-peine" data-tooltip="Animosité se traduisant par des violences envers un type d’individu (sexe opposé, Décan, Saison, caste…). +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.mepris"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 59}} palier-reached{{/ifGT}}">
+            <td class="col-palier">60</td>
+            <td class="col-peine" data-tooltip="Libido orientée vers des pratiques sexuelles franchement perverses (sadisme, formes de relations absurdes…). +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.devianceSexuelle"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 64}} palier-reached{{/ifGT}}">
+            <td class="col-palier">65</td>
+            <td class="col-peine" data-tooltip="À la pleine lune, besoin impérieux de tracer le tracé des ombres dans sa chair à l’aide d’une lame. La douleur suffit à déconcentrer. +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.scarificationsLunaires"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 69}} palier-reached{{/ifGT}}">
+            <td class="col-palier">70</td>
+            <td class="col-peine" data-tooltip="Double démoniaque hideux du Ténébreux. DIF de Conjuration −5. Peut transférer émotions et blessures. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.jumeauDemoniaque"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Les flashes perçus par les yeux du Jumeau vous permettent de percevoir la Ténèbre plus profondément. Vous pouvez invoquer les Démons de Troisième Cercle.">{{localize "AGONE.Bienfait.cercle3"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 74}} palier-reached{{/ifGT}}">
+            <td class="col-palier">75</td>
+            <td class="col-peine" data-tooltip="Obssédé par l’obscurité et l’ombre, fuit les zones éclairées. Vue baisse en pleine lumière (sans conséquences techniques). +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.obsessionOmbre"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Vision dans l’obscurité totale. Développez la compétence « Sens des ténèbres ». Les malus dus à un éclairage faible ou inexistant sont ignorés.">{{localize "AGONE.Bienfait.nyctalopie"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 77}} palier-reached{{/ifGT}}">
+            <td class="col-palier">78</td>
+            <td class="col-peine" data-tooltip="Présence sournoise constante (fantôme, spectre, bête…) générant des hallucinations paranoïaques. La distraction permanente est un fait. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.presenceOppressante"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Vous voyez les âmes des morts qui errent et pouvez leur parler. Jet de Noirceur + 1d10 contre DIF variable selon que le mort est disposé ou non à parler.">{{localize "AGONE.Bienfait.parlerMorts"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 80}} palier-reached{{/ifGT}}">
+            <td class="col-palier">81</td>
+            <td class="col-peine" data-tooltip="Tous les sens altérés : couleurs plus sombres, hurlements des Abysses, odeur de putréfaction, goût avariment, toucher froid comme du marbre. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.alterationSens"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Jet de Noirceur + Démonologie + 1d10 contre DIF 15 pour détecter automatiquement toute créature démoniaque. Ne protège pas contre leurs illusions.">{{localize "AGONE.Bienfait.detecterDemons"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 83}} palier-reached{{/ifGT}}">
+            <td class="col-palier">84</td>
+            <td class="col-peine" data-tooltip="Le sang est remplacé par une mélasse noire. L’Advocatus Diaboli se méfie ; les Démons n’hésiteront pas à contracter directement. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.sangNoir"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 86}} palier-reached{{/ifGT}}">
+            <td class="col-palier">87</td>
+            <td class="col-peine" data-tooltip="Corps monstrueux assimilable à un Démon. Risque d’être confondu avec un Démon en fuite et traqué par les Minotaures des Abysses. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.apparenceDemoniaque"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 89}} palier-reached{{/ifGT}}">
+            <td class="col-palier">90</td>
+            <td class="col-peine" data-tooltip="Récupère 10 points de Perfidie, accompagnés éventuellement des Peines et Bienfaits correspondants. (Pas de bonus de noir.)"><span class="peine-dot"></span>{{localize "AGONE.Peine.ombrePerfidie"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 91}} palier-reached{{/ifGT}}">
+            <td class="col-palier">92</td>
+            <td class="col-peine" data-tooltip="Excroissance noirâtre prenant l’aspect d’un visage d’obsidienne sur le corps, s’exprimant par la bouche. Peut être confident ou passager agaçant. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.siamoisTenebres"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="L’intelligence du Siamois vous ouvre les perspectives de l’Invocation des Démons de Quatrième Cercle... à vos risques et périls.">{{localize "AGONE.Bienfait.cercle4"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 93}} palier-reached{{/ifGT}}">
+            <td class="col-palier">94</td>
+            <td class="col-peine" data-tooltip="Les animaux réagissent avec hostilité ou peur. En meute ou tout autre rassemblement, ils attaqueront. +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.malediction"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 95}} palier-reached{{/ifGT}}">
+            <td class="col-palier">96</td>
+            <td class="col-peine" data-tooltip="L’ombre n’obéit plus au corps ni à la lumière ; elle agit selon les émotions et peut simuler des objets d’ombre, agresser d’autres ombres. +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.ombreVivante"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 97}} palier-reached{{/ifGT}}">
+            <td class="col-palier">98</td>
+            <td class="col-peine" data-tooltip="Relié à la Ténèbre par des liens si forts qu’en danger, un portail vers les Abysses s’ouvre par le ventre. Déforme définitivement le corps. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.portailInterieur"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Votre portail intérieur vous permet d’appeler les Obsidiens, seul type qui vous échappait encore. L’Invocation requiert de cerner votre propre ombre d’encre noire.">{{localize "AGONE.Bienfait.cercle5"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 98}} palier-reached{{/ifGT}}">
+            <td class="col-palier">99</td>
+            <td class="col-peine" data-tooltip="Un Haut Diable vous a repéré et surveille étroitement, apposant une marque physique qui crée d’étranges déformations dans votre silhouette. +1 Corps noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.marqueHautsDiables"}}</td>
+            <td class="col-bienfait bienfait-yes" data-tooltip="Jet de Noirceur + Vigilance + 1d10 contre DIF 20 pour ressentir la Ténèbre dans un objet ou un être. Marge × 10 = précision en % (MR 10 = chiffre exact).">{{localize "AGONE.Bienfait.detecterTenebres"}}</td>
+          </tr>
+          <tr class="palier-row{{#ifGT system.tenebres 99}} palier-reached{{/ifGT}}">
+            <td class="col-palier">100</td>
+            <td class="col-peine" data-tooltip="Ténébreux à potentiel maximal, appelé Déchu. Un Haut Diable dispose d’un lien empathique et peut converser télépathiquement. Plupart du temps dans la folie. +1 Esprit noir."><span class="peine-dot"></span>{{localize "AGONE.Peine.dechu"}}</td>
+            <td class="col-bienfait"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <p class="peines-hint">{{localize "AGONE.PeinesHint"}}</p>
-  </div>
 
-  <!-- Flamme & Saisonins -->
-  <div class="flamme-block">
-    <h3 class="section-title">{{localize "AGONE.FlammeEtSaisonins"}}</h3>
-    {{> systems/agone/templates/actors/parts/flamme.hbs}}
-  </div>
+    <!-- Colonne latérale : Flamme + Démons -->
+    <div class="tene-sidebar">
 
-  <!-- Démons intérieurs -->
-  <div class="demons-block">
+      <!-- Démons intérieurs -->
+      <div class="demons-block">
     <div class="section-header">
       <h3 class="section-title">{{localize "AGONE.Demons"}}</h3>
       <button type="button" class="item-create" data-type="demon" title='{{localize "AGONE.NouveauDemon"}}'>
@@ -136,6 +225,9 @@
     {{else}}
     <p class="empty-list">{{localize "AGONE.AucunDemon"}}</p>
     {{/if}}
-  </div>
+      </div>
+    </div><!-- .tene-sidebar -->
 
-</div>
+  </div><!-- .tene-content -->
+
+</div><!-- .tenebres-section -->

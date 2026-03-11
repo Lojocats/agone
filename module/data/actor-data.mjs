@@ -186,37 +186,14 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       }),
 
       // État de combat
-      blessuresGraves:   new fields.NumberField({ initial: 0, integer: true, min: 0, max: 3 }),
+      blessureGrave1:    new fields.BooleanField({ initial: false }),
+      blessureGrave2:    new fields.BooleanField({ initial: false }),
+      blessureGrave3:    new fields.BooleanField({ initial: false }),
       blessuresCritique: new fields.BooleanField({ initial: false }),
 
       // Ténèbres & Perfidie
       tenebres: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       perfidie: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-
-      // Peines (Ténèbres)
-      peines: new fields.SchemaField({
-        diablotin:             new fields.BooleanField({ initial: false }),
-        cauchemars:            new fields.BooleanField({ initial: false }),
-        demonFacetieux:        new fields.BooleanField({ initial: false }),
-        somnambule:            new fields.BooleanField({ initial: false }),
-        insomniaque:           new fields.BooleanField({ initial: false }),
-        mepris:                new fields.BooleanField({ initial: false }),
-        devianceSexuelle:      new fields.BooleanField({ initial: false }),
-        scarificationsLunaires:new fields.BooleanField({ initial: false }),
-        jumeauDemoniaque:      new fields.BooleanField({ initial: false }),
-        obsessionOmbre:        new fields.BooleanField({ initial: false }),
-        presenceOppressante:   new fields.BooleanField({ initial: false }),
-        alterationSens:        new fields.BooleanField({ initial: false }),
-        sangNoir:              new fields.BooleanField({ initial: false }),
-        apparenceDemoniaque:   new fields.BooleanField({ initial: false }),
-        siamoisTenebres:       new fields.BooleanField({ initial: false }),
-        malediction:           new fields.BooleanField({ initial: false }),
-        ombreVivante:          new fields.BooleanField({ initial: false }),
-        marqueHautsDiables:    new fields.BooleanField({ initial: false }),
-        portailInterieur:      new fields.BooleanField({ initial: false }),
-        ombrePerfidie:         new fields.BooleanField({ initial: false }),
-        dechu:                 new fields.BooleanField({ initial: false })
-      }),
 
       // Monnaie
       monnaie: new fields.SchemaField({
@@ -244,7 +221,50 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       this.ptsCreationCarac.max = pData.pointsCreationCarac ?? 80;
     }
 
-    // Bonus d'aspects
+    // Noirceur (stat dérivée = Ténèbres ÷ 10, utilisée pour la conjuration)
+    this.noirceur = Math.floor(this.tenebres / 10);
+
+    // Noirs auto-dérivés des Peines (transitoires — cumul selon les seuils de Ténèbres atteints)
+    const ten = this.tenebres;
+    const peineCorpsNoir =
+      (ten >= 30 ? 1 : 0) +   // Démon facétieux
+      (ten >= 40 ? 1 : 0) +   // Somnambule
+      (ten >= 70 ? 1 : 0) +   // Jumeau démoniaque
+      (ten >= 78 ? 1 : 0) +   // Présence oppressante
+      (ten >= 81 ? 1 : 0) +   // Altération des sens
+      (ten >= 84 ? 1 : 0) +   // Sang noir
+      (ten >= 87 ? 1 : 0) +   // Apparence démoniaque
+      (ten >= 92 ? 1 : 0) +   // Siamois de Ténèbre
+      (ten >= 98 ? 1 : 0) +   // Portail intérieur
+      (ten >= 99 ? 1 : 0);    // Marque des Hauts Diables
+    const peineEspritNoir =
+      (ten >= 10 ? 1 : 0) +   // Diablotin farceur
+      (ten >= 20 ? 1 : 0) +   // Cauchemars
+      (ten >= 50 ? 1 : 0) +   // Insomniaque
+      (ten >= 55 ? 1 : 0) +   // Mépris
+      (ten >= 60 ? 1 : 0) +   // Déviance sexuelle
+      (ten >= 65 ? 1 : 0) +   // Scarifications lunaires
+      (ten >= 75 ? 1 : 0) +   // Obsession de l’ombre
+      (ten >= 94 ? 1 : 0) +   // Malédiction
+      (ten >= 96 ? 1 : 0) +   // Ombre vivante
+      (ten >= 100 ? 1 : 0);   // Déchu
+    this.corps.noir  += peineCorpsNoir;
+    this.esprit.noir += peineEspritNoir;
+    // Noirs supplémentaires issus des Peines de Perfidie (items embarqués)
+    const peineItems = this.parent?.items?.filter(i => i.type === "peine") ?? [];
+    let peineCorpsNoirPerf = 0;
+    let peineAmeNoirPerf   = 0;
+    for (const p of peineItems) {
+      if (p.system.noirEffect === "corps") peineCorpsNoirPerf++;
+      else if (p.system.noirEffect === "ame") peineAmeNoirPerf++;
+    }
+    this.corps.noir += peineCorpsNoirPerf;
+    this.ame.noir   += peineAmeNoirPerf;
+
+    // Difficulté VOL contre la Corruption (tableau des Peines de Perfidie)
+    const perf = this.perfidie ?? 0;
+    this.difVolCorruption = perf >= 90 ? 30 : perf >= 76 ? 25 : perf >= 51 ? 20 : 15;
+    // Bonus d’aspects
     this.bonusCorps  = Math.max(0, this.corps.score - this.corps.noir);
     this.bonusEsprit = Math.max(0, this.esprit.score - this.esprit.noir);
     this.bonusAme    = Math.max(0, this.ame.score - this.ame.noir);
@@ -298,12 +318,26 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     this.demiCharge     = Math.floor(this.chargeMax / 2);
     this.chargeJour     = Math.floor(this.chargeMax / 4);
 
-    // Noirceur
-    this.noirceur = Math.floor(this.tenebres / 10);
+    // Cercle maximum de conjuration (bienfait automatique des Ténèbres)
+    this.maxCercleConjuration =
+      this.tenebres >= 98 ? 5 :
+      this.tenebres >= 90 ? 4 :
+      this.tenebres >= 70 ? 3 :
+      this.tenebres >= 30 ? 2 :
+      this.tenebres >= 10 ? 1 : 0;
+
+    // Bienfaits non-conjuration actifs (flags dérivés)
+    this.bienfaitsActifs = {
+      nyctalopie:       this.tenebres >= 75,
+      parlerMorts:      this.tenebres >= 78,
+      detecterDemons:   this.tenebres >= 81,
+      detecterTenebres: this.tenebres >= 96,
+    };
 
     // Malus Blessures Graves
-    const malusTable = [0, -1, -3, -6];
-    this.malusBlessureGrave = malusTable[Math.min(this.blessuresGraves, 3)];
+    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
+    const malusTable = [0, -2, -6, -12];
+    this.malusBlessureGrave = malusTable[this.blessuresGraves];
 
     // Malus armure selon type (Partielle: malusPer = malusAgi/2, Complète: malusPer = malusAgi)
     if (this.armure.portee) {
@@ -343,7 +377,9 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
       perception:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       resistance:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       chargeMax:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-      blessuresGraves: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 3 }),
+      blessureGrave1: new fields.BooleanField({ initial: false }),
+      blessureGrave2: new fields.BooleanField({ initial: false }),
+      blessureGrave3: new fields.BooleanField({ initial: false }),
       notes: new fields.HTMLField({ initial: "" })
     };
   }
@@ -352,8 +388,9 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
     this.initiative = this.agilite + this.perception;
     this.melee = Math.round((this.force + this.agilite * 2) / 3);
     this.demiCharge = Math.floor(this.chargeMax / 2);
-    const malusTable = [0, -1, -3, -6];
-    this.malusBlessureGrave = malusTable[Math.min(this.blessuresGraves, 3)];
+    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
+    const malusTable = [0, -2, -6, -12];
+    this.malusBlessureGrave = malusTable[this.blessuresGraves];
   }
 }
 
@@ -410,7 +447,9 @@ export class PnjData extends foundry.abstract.TypeDataModel {
       charisma:    new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       creativite:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       bd:          new fields.NumberField({ initial: 0, integer: true }),
-      blessuresGraves: new fields.NumberField({ initial: 0, integer: true, min: 0, max: 3 }),
+      blessureGrave1: new fields.BooleanField({ initial: false }),
+      blessureGrave2: new fields.BooleanField({ initial: false }),
+      blessureGrave3: new fields.BooleanField({ initial: false }),
       armure: new fields.SchemaField({
         protection: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         malusAgi:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
@@ -425,7 +464,8 @@ export class PnjData extends foundry.abstract.TypeDataModel {
     this.melee      = Math.round((this.force + this.agilite * 2) / 3);
     this.tir        = Math.round((this.perception + this.agilite) / 2);
     this.initiative = this.agilite + this.perception;
-    const malusTable = [0, -1, -3, -6];
-    this.malusBlessureGrave = malusTable[Math.min(this.blessuresGraves, 3)];
+    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
+    const malusTable = [0, -2, -6, -12];
+    this.malusBlessureGrave = malusTable[this.blessuresGraves];
   }
 }

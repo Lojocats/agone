@@ -7,6 +7,8 @@ import { AvantagesBrowser } from "../apps/avantages-browser.mjs";
 import { ManoeuvresBrowser } from "../apps/manoeuvres-browser.mjs";
 import { PeuplesBrowser } from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser } from "../apps/pouvoirs-browser.mjs";
+import { PeinesBrowser }  from "../apps/peines-browser.mjs";
+import { BIENFAITS_PERFIDIE_DATA } from "../helpers/compendium-data.mjs";
 
 /**
  * Feuille de personnage Agone (Personnage Joueur)
@@ -52,6 +54,29 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     context.pouvoirs     = actor.items.filter(i => i.type === "pouvoir");
     context.manoeuvres   = actor.items.filter(i => i.type === "manoeuvre").sort(bySort);
     context.demons       = actor.items.filter(i => i.type === "demon").sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+    // Peines de Perfidie
+    context.peines = actor.items.filter(i => i.type === "peine").sort(bySort);
+    // Bienfaits actifs : peines avec bienfaitAcquis=true, dedupliqué par nom de bienfait
+    const bienfaitsMap = new Map();
+    for (const peine of context.peines) {
+      if (peine.system.bienfaitAcquis && peine.system.bienfait) {
+        const key = peine.system.bienfait;
+        if (!bienfaitsMap.has(key)) {
+          bienfaitsMap.set(key, { name: key, sources: [] });
+        }
+        bienfaitsMap.get(key).sources.push(peine.name);
+      }
+    }
+    context.bienfaitsActifsPerfidie = [...bienfaitsMap.values()].map(b => {
+      const staticData = BIENFAITS_PERFIDIE_DATA.find(d => d.name === b.name);
+      return {
+        ...b,
+        sourceNames : b.sources.join(", "),
+        description : staticData?.description ?? "",
+      };
+    });
+
     const danseurItems = actor.items.filter(i => i.type === "danseur")
       .sort((a, b) => a.name.localeCompare(b.name, "fr"));
     context.danseurs = danseurItems.map(d => {
@@ -363,6 +388,13 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     html.find("[name='system.armure.malusAgi']").change(this._onArmureMalusChange.bind(this));
     html.find("[name='system.armure.type']").change(this._onArmureMalusChange.bind(this));
 
+    // 3e blessure grave → jet de VOL Difficulté 10
+    html.find("[name='system.blessureGrave3']").change(async (e) => {
+      if (e.currentTarget.checked) {
+        await this.actor.rollVolBlessure3();
+      }
+    });
+
     // Montée de niveau (dépense XP)
     html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
 
@@ -437,6 +469,33 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       icon?.classList.toggle("fa-chevron-right");
       icon?.classList.toggle("fa-chevron-down");
     });
+
+    // Toggle description peines de Perfidie
+    html.on("click", ".peine-desc-toggle", ev => {
+      const id = ev.currentTarget.dataset.itemId;
+      const row = html.find(`.peine-desc-expand[data-item-id="${id}"]`);
+      const icon = ev.currentTarget.querySelector(".peine-toggle-icon");
+      row.slideToggle(120);
+      icon?.classList.toggle("fa-chevron-right");
+      icon?.classList.toggle("fa-chevron-down");
+    });
+
+    // Acquérir un bienfait de Perfidie (+1 Perfidie, bienfaitAcquis = true)
+    html.on("click", "[data-action='acquerirBienfait']", async ev => {
+      ev.preventDefault();
+      const itemId = ev.currentTarget.dataset.itemId;
+      const peine  = this.actor.items.get(itemId);
+      if (!peine) return;
+      const confirmed = await Dialog.confirm({
+        title  : "Acquérir un Bienfait",
+        content: `<p>Acquérir <strong>${peine.system.bienfait}</strong> et dépenser <strong>+1 Perfidie</strong> ?</p>`,
+      });
+      if (!confirmed) return;
+      await peine.update({ "system.bienfaitAcquis": true });
+      await this.actor.update({ "system.perfidie": (this.actor.system.perfidie ?? 0) + 1 });
+      ui.notifications?.info(`Bienfait « ${peine.system.bienfait} » acquis.`);
+    });
+
   }
 
   // ==============================
@@ -1289,6 +1348,15 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         this._pouvoirsBrowser = new PouvoirsBrowser(this.actor);
       }
       this._pouvoirsBrowser.render(true);
+      return;
+    }
+
+    // Peines de Perfidie → navigateur personnalisé
+    if (packId === "agone.peines") {
+      if (!this._peinesBrowser) {
+        this._peinesBrowser = new PeinesBrowser(this.actor);
+      }
+      this._peinesBrowser.render(true);
       return;
     }
 

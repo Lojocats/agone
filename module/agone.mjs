@@ -15,7 +15,7 @@ import {
 import {
   CompetenceData, ArmeData, ArmureData, DonData,
   SortData, EquipementData, PouvoirData, ManoeuvreData, PeupleData,
-  DanseurData, DemonItemData
+  DanseurData, DemonItemData, PeineData
 } from "./data/item-data.mjs";
 
 // ── Documents ─────────────────────────────────────────────────────────────────
@@ -28,6 +28,7 @@ import { PersonnageSheet }   from "./sheets/personnage-sheet.mjs";
 // ── Apps ─────────────────────────────────────────────────────────────────────
 import { SortsBrowser }     from "./apps/sorts-browser.mjs";
 import { AvantagesBrowser } from "./apps/avantages-browser.mjs";
+import { PeinesBrowser }   from "./apps/peines-browser.mjs";
 import {
   CompagnonSheet, DemonSheet, PnjSheet
 } from "./sheets/actor-sheets.mjs";
@@ -66,6 +67,7 @@ Hooks.once("init", () => {
     peuple      : PeupleData,
     danseur     : DanseurData,
     demon       : DemonItemData,
+    peine       : PeineData,
   };
 
   // ── Feuilles ────────────────────────────────────────────────────────────
@@ -137,6 +139,9 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/armures-browser.hbs",
     "systems/agone/templates/apps/dons-browser.hbs",
     "systems/agone/templates/apps/avantages-browser.hbs",
+    "systems/agone/templates/apps/peines-browser.hbs",
+    // Partials Perfidie
+    "systems/agone/templates/actors/parts/perfidie.hbs",
     "systems/agone/templates/apps/manoeuvres-browser.hbs",
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",

@@ -36,7 +36,53 @@ export class AgoneActor extends Actor {
       }
       changed.system = foundry.utils.expandObject(flat);
     }
+
+    // — Peines : détection du franchissement des paliers démoniaques
+    if (this.type === "personnage" && changed.system?.tenebres !== undefined) {
+      const oldTene = this.system.tenebres ?? 0;
+      const newTene = Number(changed.system.tenebres);
+      if (newTene > oldTene) {
+        const PALIERS_DEMON = [
+          { palier: 10, origine: "diablotin"        },
+          { palier: 30, origine: "demonFacetieux"   },
+          { palier: 70, origine: "jumeauDemoniaque" },
+          { palier: 92, origine: "siamoisTenebres"  },
+        ];
+        options._demonCreations = [];
+        for (const { palier, origine } of PALIERS_DEMON) {
+          if (oldTene < palier && newTene >= palier) {
+            const alreadyExists = this.items.some(
+              i => i.type === "demon" && i.system.origine === origine
+            );
+            if (!alreadyExists) options._demonCreations.push(origine);
+          }
+        }
+      }
+    }
+
     return super._preUpdate(changed, options, user);
+  }
+
+  /** @override */
+  async _onUpdate(changed, options, userId) {
+    await super._onUpdate(changed, options, userId);
+    if (userId !== game.user.id) return;
+    if (!options._demonCreations?.length) return;
+
+    const NOM_DEMON = {
+      diablotin:        "AGONE.Peine.diablotin",
+      demonFacetieux:   "AGONE.Peine.demonFacetieux",
+      jumeauDemoniaque: "AGONE.Peine.jumeauDemoniaque",
+      siamoisTenebres:  "AGONE.Peine.siamoisTenebres",
+    };
+    const toCreate = options._demonCreations.map(origine => ({
+      type:   "demon",
+      name:   game.i18n.localize(NOM_DEMON[origine]) || origine,
+      system: { modeCreation: true, origine },
+    }));
+    await this.createEmbeddedDocuments("Item", toCreate);
+    const nomListe = toCreate.map(d => d.name).join(", ");
+    ui.notifications.info(game.i18n.format("AGONE.DemonAutoApparu", { name: nomListe }));
   }
 
   /** @override */
@@ -295,16 +341,17 @@ export class AgoneActor extends Actor {
 
     const malusArmure = (attributKey === "agilite" || attributKey === "perception")
       ? (sd.armure?._malusAgiActif ?? 0) : 0;
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
       "1d10x10 + @base + @malus + @modif",
-      { base: baseScore, malus: malusArmure + (sd.malusSurcharge ?? 0), modif }
+      { base: baseScore, malus: malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure, modif }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base: `${label} ×2 : ${attrScore * 2}`,
       aspect: `Bonus d'aspect : ${bonusAspect}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0)}`
+      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
     });
     return roll;
   }
@@ -338,6 +385,7 @@ export class AgoneActor extends Actor {
     const malusComp0  = compScore === 0 ? -3 : 0;
     const malusArmure = (attrKey === "agilite" || attrKey === "perception")
       ? (sd.armure?._malusAgiActif ?? 0) : 0;
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
       "1d10x10 + @comp + @attr + @bonus + @modif",
@@ -345,7 +393,7 @@ export class AgoneActor extends Actor {
         comp: compScore,
         attr: attrScore,
         bonus: bonusAspect + bonusSpe,
-        modif: modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0)
+        modif: modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure
       }
     );
     await roll.evaluate();
@@ -353,7 +401,7 @@ export class AgoneActor extends Actor {
       competence: `${label} : ${compScore}${compScore === 0 ? ` (${game.i18n.localize("AGONE.MalusCompNonApprise")})` : ""}`,
       attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
       aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0)}`
+      modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`
     });
     return roll;
   }
@@ -377,14 +425,15 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10 + @base + @modif",
-      { base, modif: modif + (sd.malusSurcharge ?? 0) }
+      { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Initiative : ${base}`,
-      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0)}`
+      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
     });
 
     // Envoyer au tracker d'initiative
@@ -422,9 +471,10 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + (sd.malusSurcharge ?? 0) }
+      { total, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
@@ -432,7 +482,7 @@ export class AgoneActor extends Actor {
       competence:`Compétence : ${scoreComp}`,
       arme:      `Bonus arme : ${attackBonus}`,
       aspect:    `Bonus Corps : ${bonusCorps}`,
-      modif:     `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0)}`
+      modif:     `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
     }, { arme, typeJet: "attaque" });
     return roll;
   }
@@ -462,9 +512,10 @@ export class AgoneActor extends Actor {
     if (modif === null) return;
 
     const malusArmure = sd.armure?._malusAgiActif ?? 0;
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) }
+      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
@@ -472,7 +523,7 @@ export class AgoneActor extends Actor {
       competence:`Compétence : ${scoreComp}`,
       arme:      `Bonus arme : ${defenseBonus}`,
       aspect:    `Bonus Corps : ${bonusCorps}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0)}`
+      modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
     }, { arme, typeJet: "parade" });
     return roll;
   }
@@ -488,14 +539,15 @@ export class AgoneActor extends Actor {
     if (modif === null) return;
 
     const malusArmure = sd.armure?._malusAgiActif ?? 0;
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) }
+      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Esquive : ${total}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0)}`
+      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
     });
     return roll;
   }
@@ -511,16 +563,51 @@ export class AgoneActor extends Actor {
     if (modif === null) return;
 
     const malusArmure = sd.armure?._malusAgiActif ?? 0;
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) }
+      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Défense Naturelle : ${total}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0)}`
+      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
     });
     return roll;
+  }
+
+  /**
+   * Jet de VOL à Difficulté 10 pour la 3e blessure grave
+   * (sans malus de blessures selon la règle)
+   */
+  async rollVolBlessure3() {
+    const sd = this.system;
+    const volScore = sd.volonte?.score ?? 0;
+    const bonusAme = sd.bonusAme ?? 0;
+    const base = volScore * 2 + bonusAme;
+    const label = game.i18n.localize("AGONE.JetVolBlessure3");
+    const DIFFICULTE = 10;
+
+    // On force le type ouvert pour que _sendRollToChat gère fumbles & critiques
+    this._lastRollType = "ouvert";
+    const roll = new Roll("1d10x10 + @base", { base });
+    await roll.evaluate();
+
+    const finalRoll = await this._sendRollToChat(roll, label, {
+      volonte: `${game.i18n.localize("AGONE.Volonte")} ×2 : ${volScore * 2}`,
+      ame:     `${game.i18n.localize("AGONE.BonusAme")} : ${bonusAme}`,
+      diff:    `${game.i18n.localize("AGONE.Difficulte")} : ${DIFFICULTE}`,
+    });
+
+    // Fumble (dé = 1) = échec automatique, sinon on compare le total
+    const firstFace = finalRoll?.dice[0]?.results?.[0]?.result ?? null;
+    const isFumble  = firstFace === 1;
+    const succes    = !isFumble && (finalRoll?.total ?? 0) >= DIFFICULTE;
+
+    if (!succes) {
+      ui.notifications.warn(`${this.name} — ${game.i18n.localize("AGONE.VolBlessureEchec")}`);
+    }
+    return finalRoll;
   }
 
   /**

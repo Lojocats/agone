@@ -1,0 +1,129 @@
+<!-- PARTIAL : PEINES DE PERFIDIE -->
+<div class="perfidie-section">
+
+  <!-- ── Barre de stats ─────────────────────────────────────── -->
+  <div class="perf-stats-bar">
+    <div class="perf-stat-item">
+      <label>{{localize "AGONE.Perfidie"}}</label>
+      <input type="number" name="system.perfidie" value="{{system.perfidie}}" class="stat-num" min="0" />
+    </div>
+    <div class="perf-stat-separator"></div>
+    <div class="perf-stat-item">
+      <label>{{localize "AGONE.DifVolCorruption"}}</label>
+      <span class="derived-val perf-dif-val">{{system.difVolCorruption}}</span>
+    </div>
+    <div class="perf-stat-separator"></div>
+    <div class="perf-dif-legend">
+      <span class="perf-dif-range {{#ifGT system.perfidie 0}}perf-range-active{{/ifGT}}">0–50 → DIF 15</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 50}}perf-range-active{{/ifGT}}">51–75 → DIF 20</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 75}}perf-range-active{{/ifGT}}">76–90 → DIF 25</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 89}}perf-range-active{{/ifGT}}">90+ → DIF 30</span>
+    </div>
+    {{#if isOwner}}
+    <button type="button" class="perf-browser-btn compendium-browse" data-pack="agone.peines" title="{{localize "AGONE.OuvrirListePeines"}}">
+      <i class="fas fa-list"></i> {{localize "AGONE.OuvrirListePeines"}}
+    </button>
+    {{/if}}
+  </div>
+
+  <!-- ── Corps principal ────────────────────────────────────── -->
+  <div class="perf-content">
+
+    <!-- Tableau des Peines acquises -->
+    <div class="peines-perfidie-section">
+      <h3 class="section-title">{{localize "AGONE.PeinesPerfidie"}}</h3>
+
+      {{#if peines.length}}
+      <table class="peines-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>{{localize "AGONE.NomPeine"}}</th>
+            <th>{{localize "AGONE.NoirEffect"}}</th>
+            <th>{{localize "AGONE.Bienfaits"}}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each peines as |peine|}}
+          <tr class="peine-row item-row" data-item-id="{{peine.id}}">
+            <td>
+              {{#if peine.system.description}}
+              <button type="button" class="peine-desc-toggle btn-icon" data-item-id="{{peine.id}}" title="Description">
+                <i class="fas fa-chevron-right peine-toggle-icon"></i>
+              </button>
+              {{/if}}
+            </td>
+            <td class="peine-name">{{peine.name}}</td>
+            <td class="peine-noir">
+              {{#if (eq peine.system.noirEffect "corps")}}
+              <span class="pn-noir-badge pn-noir-corps" data-tooltip="Corps noir +1">Corps</span>
+              {{else if (eq peine.system.noirEffect "ame")}}
+              <span class="pn-noir-badge pn-noir-ame" data-tooltip="Âme noire +1">Âme</span>
+              {{else}}
+              <span class="pn-noir-none">—</span>
+              {{/if}}
+            </td>
+            <td class="peine-bienfait-cell">
+              {{#if peine.system.bienfait}}
+                {{#if peine.system.bienfaitAcquis}}
+                  <span class="pn-bienfait-acquis" data-tooltip="Bienfait acquis : {{peine.system.bienfait}}">
+                    <i class="fas fa-star"></i> {{peine.system.bienfait}}
+                  </span>
+                {{else if isOwner}}
+                  <button type="button" class="pn-acquerir-btn" data-action="acquerirBienfait" data-item-id="{{peine.id}}"
+                          data-tooltip="Acquérir « {{peine.system.bienfait}} » (+1 Perfidie)">
+                    <i class="fas fa-unlock"></i> {{peine.system.bienfait}}
+                  </button>
+                {{else}}
+                  <span class="pn-bienfait-dispo" data-tooltip="{{peine.system.bienfait}} (non acquis)">
+                    <i class="fas fa-lock"></i> {{peine.system.bienfait}}
+                  </span>
+                {{/if}}
+              {{else}}
+                <span class="pn-bienfait-none">Aucun</span>
+              {{/if}}
+            </td>
+            <td class="peine-actions">
+              {{#if isOwner}}
+              <a class="item-delete" data-item-id="{{peine.id}}" title="Supprimer" tabindex="-1">
+                <i class="fas fa-trash fa-xs"></i>
+              </a>
+              {{/if}}
+            </td>
+          </tr>
+          <tr class="peine-desc-expand" data-item-id="{{peine.id}}" style="display:none">
+            <td></td>
+            <td colspan="4" class="peine-desc-cell">{{{peine.system.description}}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{else}}
+      <p class="perf-empty">{{localize "AGONE.AucunePeinePerfidie"}}</p>
+      {{/if}}
+    </div>
+
+    <!-- Bienfaits acquis -->
+    {{#if bienfaitsActifsPerfidie.length}}
+    <div class="bienfaits-perfidie-section">
+      <h3 class="section-title">{{localize "AGONE.BienfaitsPerfidie"}}</h3>
+      <ul class="bienfaits-perfidie-list">
+        {{#each bienfaitsActifsPerfidie as |b|}}
+        <li class="bienfait-perfidie-item">
+          <div class="bienfait-perfidie-header">
+            <i class="fas fa-star pn-star-icon"></i>
+            <strong>{{b.name}}</strong>
+            <span class="bienfait-peines-src">({{b.sourceNames}})</span>
+          </div>
+          {{#if b.description}}
+          <p class="bienfait-perfidie-desc">{{b.description}}</p>
+          {{/if}}
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{/if}}
+
+  </div><!-- /.perf-content -->
+</div><!-- /.perfidie-section -->

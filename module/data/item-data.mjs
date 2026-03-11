@@ -230,6 +230,28 @@ export class DemonItemData extends foundry.abstract.TypeDataModel {
 }
 
 // ================================
+// Peine de Perfidie
+// ================================
+export class PeineData extends foundry.abstract.TypeDataModel {
+  static defineSchema() {
+    return {
+      // Contexte d'acquisition (règle p.xx)
+      categorie: new fields.StringField({
+        initial: "autre",
+        choices: ["creature_masque", "lieu_perfidie", "autre"]
+      }),
+      // Aspect corrompu : "corps" | "ame" | "" (Sang venimeux = aucun)
+      noirEffect: new fields.StringField({ initial: "corps" }),
+      // Nom du Bienfait lié (vide si aucun)
+      bienfait: new fields.StringField({ initial: "" }),
+      // Le personnage a-t-il payé le Bienfait (+1 Perfidie) ?
+      bienfaitAcquis: new fields.BooleanField({ initial: false }),
+      description: new fields.HTMLField({ initial: "" }),
+    };
+  }
+}
+
+// ================================
 // Peuple / Espèce
 // ================================
 export class PeupleData extends foundry.abstract.TypeDataModel {

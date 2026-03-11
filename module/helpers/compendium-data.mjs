@@ -584,7 +584,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Artisanat", "Apprécier les métaux"],
     corpsBonus: 2, espritBonus: 0, ameBonus: 0,
-    description: "Robustes et tenaces, les Nains vivent sous les montagnes et s'illustrent comme forgerons hors pair. Bonus de +2 en Corps, TAI -1, MV 3. Rang 1 offert en Artisanat et Apprécier les métaux."
+    description: ""
   },
   {
     name: "Géant",
@@ -592,7 +592,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Résistance à la douleur"],
     corpsBonus: 4, espritBonus: 0, ameBonus: 0,
-    description: "Imposants et puissants, les Géants dominent physiquement tous les autres peuples. Bonus de +4 en Corps, TAI +3, MV 6. Rang 1 offert en Résistance à la douleur."
+    description: ""
   },
   {
     name: "Farfadet",
@@ -600,7 +600,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Acrobaties", "Esquive"],
     corpsBonus: 0, espritBonus: 0, ameBonus: 2,
-    description: "Agiles et malicieux, les Farfadets sont de petits êtres allégeant leur propre poids. Bonus de +2 en Âme, TAI -2, MV 5. Rang 1 offert en Acrobaties et Esquive. Accès aux manœuvres raciales Farfadet."
+    description: ""
   },
   {
     name: "Lutin",
@@ -608,7 +608,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Acrobaties", "Vol"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 1,
-    description: "Les Lutins sont les plus petits des peuples ailés d'Agone. Ils peuvent voler (MV vol = 8). Bonus de +1 en Esprit et +1 en Âme, TAI -3, MV 6. Rang 1 offert en Acrobaties et Vol."
+    description: ""
   },
   {
     name: "Satyre",
@@ -616,7 +616,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Chant", "Instruments de musique"],
     corpsBonus: 0, espritBonus: 0, ameBonus: 3,
-    description: "Artistes nés, les Satyres sont des amoureux des arts et de la fête. Bonus de +3 en Âme, TAI 0, MV 5. Rang 1 offert en Chant et Instruments de musique."
+    description: ""
   },
   {
     name: "Minotaure",
@@ -624,7 +624,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Corps-à-corps", "Intimidation"],
     corpsBonus: 3, espritBonus: 0, ameBonus: 0,
-    description: "Guerriers dans l'âme, les Minotaures tirent leur force de leur imposante stature et de leurs cornes redoutables. Bonus de +3 en Corps, TAI +2, MV 4. Rang 1 offert en Corps-à-corps et Intimidation. Accès aux manœuvres raciales Minotaure."
+    description: ""
   },
   {
     name: "Ogre",
@@ -632,7 +632,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 10,
     competencesRaciales: ["Intimidation", "Résistance à la douleur"],
     corpsBonus: 4, espritBonus: -1, ameBonus: 0,
-    description: "Massifs et brutaux mais souvent sous-estimés, les Ogres compensent leur lenteur intellectuelle par une force phénoménale. Bonus de +4 en Corps, -1 en Esprit, TAI +2, MV 4. Accès aux manœuvres raciales Ogre."
+    description: ""
   },
   {
     name: "Drakonien",
@@ -640,7 +640,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Magie drakonienne", "Résistance au feu"],
     corpsBonus: 1, espritBonus: 1, ameBonus: 1,
-    description: "Descendants de dragons, les Drakoniens allient puissance et intelligence. Bonus de +1 en Corps, Esprit et Âme. TAI +1, MV 4. Rang 1 offert en Magie drakonienne et Résistance au feu."
+    description: ""
   },
   {
     name: "Morgane",
@@ -648,7 +648,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 16,
     competencesRaciales: ["Magie lunaire", "Navigation"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 2,
-    description: "Liées aux marées et à la lune, les Morganes sont des magiciennes naturelles. Bonus de +1 en Esprit, +2 en Âme. Rang 1 offert en Magie lunaire et Navigation."
+    description: ""
   },
   {
     name: "Pixie",
@@ -656,7 +656,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 18,
     competencesRaciales: ["Magie des fées", "Furtivité"],
     corpsBonus: 0, espritBonus: 2, ameBonus: 2,
-    description: "Minuscules créatures ailées à la magie indomptable, les Pixies sont insaisissables. Bonus de +2 en Esprit et +2 en Âme. TAI -4, MV 7 (vol 18). Rang 1 offert en Magie des fées et Furtivité."
+    description: ""
   },
   {
     name: "Fée Noire",
@@ -664,7 +664,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 14,
     competencesRaciales: ["Manipulation", "Magie sombre"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 2,
-    description: "Séduisantes et imprévisibles, les Fées Noires pratiquent une magie d'illusion et de séduction. Bonus de +1 en Esprit, +2 en Âme. TAI -1, MV 5. Rang 1 offert en Manipulation et Magie sombre."
+    description: ""
   },
   {
     name: "Méduse",
@@ -672,7 +672,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Pétrification", "Regard fascinant"],
     corpsBonus: 1, espritBonus: 0, ameBonus: 2,
-    description: "Créatures mi-humaines mi-serpentines, les Méduses possèdent un regard dévastateur. Bonus de +1 en Corps, +2 en Âme. Rang 1 offert en Pétrification (pouvoir naturel) et Regard fascinant."
+    description: ""
   },
 ];
 
@@ -936,4 +936,91 @@ export const AVANTAGES_DATA = [
   { name:"Hanté (1 point d'Aspect Noir)",           categorie:"flamme", type:"defaut",   charge: -4, prerequis:"",                                   description:"L'un des anciens porteurs de votre Flamme a été séduit par le Masque. À chaque exposition au Masque, risque d'effets négatifs (jet secret EG). Vous gagnez 1 point d'Aspect Noir." },
   { name:"Hanté (2 points d'Aspect Noir)",          categorie:"flamme", type:"defaut",   charge: -5, prerequis:"",                                   description:"L'un des anciens porteurs de votre Flamme a été séduit par le Masque. À chaque exposition au Masque, risque d'effets négatifs (jet secret EG). Vous gagnez 2 points d'Aspect Noir." },
   { name:"Tenté par la Menace",                     categorie:"flamme", type:"defaut",   charge: -4, prerequis:"Incompatible avec Marque de l'Automne et Oublié des Muses", description:"Vous êtes séduit par le Masque. Ses suppôts savent intuitivement que vous luttez contre eux. Vous commencez avec +1 de Corps noir, Esprit noir ou Âme noire (cumulable avec d'autres défauts donnant des points d'Aspect Noir)." },
+];
+
+// ── PEINES DE PERFIDIE ────────────────────────────────────────────────────────
+// noirEffect : "corps" | "ame" | "" (Sang venimeux = aucun bienfait + pas de noir fixe)
+// bienfait   : nom du Bienfait lié, "" si aucun
+export const PEINES_PERFIDIE_DATA = [
+  // ── SUITE À LA RENCONTRE DES CRÉATURES DU MASQUE ──────────────────────────
+  { name:"Couvert de vers",         categorie:"creature_masque", noirEffect:"corps", bienfait:"Fulgurance",
+    description:"D'immondes vers gluants courent sous votre peau ou passent en se traînant paresseusement sur vos avant-bras. Vous êtes écœurant et vous gagnez 1 point de Corps noir." },
+  { name:"Cruauté",                  categorie:"creature_masque", noirEffect:"ame",   bienfait:"Hargne",
+    description:"La souffrance vous donne chaud au cœur. Votre caractère est inexorablement nuisible et seule la vue du sang amène un peu de gaieté dans votre lugubre existence. De ce fait, si vous en avez les capacités, vous êtes violemment attiré par l'Obscurantisme. Cette nouvelle inclination vous permet de bénéficier d'1 point supplémentaire en Âme noir." },
+  { name:"Difformité",               categorie:"creature_masque", noirEffect:"corps", bienfait:"Chronique du futur",
+    description:"Vous êtes voûté, tordu, bossu même, d'une manière générale vous êtes difforme. Votre corps s'est déformé d'une façon qui n'est ni naturelle ni plaisante à l'œil. Vous gagnez 1 point de Corps noir." },
+  { name:"Gueule de traître",        categorie:"creature_masque", noirEffect:"corps", bienfait:"Hypnotisme",
+    description:"Avec votre peau vérolée et graisseuse, vous avez imaginé un profil de mauvais aloi. Vos yeux chassieux semblent définitivement incapables de fixer quelqu'un franchement. Lorsqu'une personne est soupçonnée de félonie, c'est toujours vous. Vous gagnez 1 point de Corps noir." },
+  { name:"Lubricité",                categorie:"creature_masque", noirEffect:"ame",   bienfait:"Sensualité",
+    description:"Vous avez un pendant effréné et irrésistible pour la luxure et la sensualité brutale. Votre impudeur est bien connue et vous adorez la compagnie des satyres. Votre Âme noire augmente de 1 point." },
+  { name:"Méchanceté",               categorie:"creature_masque", noirEffect:"ame",   bienfait:"Hargne",
+    description:"Vous faites délibérément du mal ou, plus exactement, vous cherchez à en faire le plus souvent possible, de façon ouverte et agressive. Votre Âme noire augmente d'1 point." },
+  { name:"Puanteur",                 categorie:"creature_masque", noirEffect:"corps", bienfait:"Anticipation",
+    description:"Une odeur infecte et fétide imprègne l'atmosphère autour de vous. Passer inaperçu est très difficile pour vous car votre odeur insupportable est très forte et attire souvent l'attention. Vous gagnez 1 point de Corps noir." },
+  { name:"Sang venimeux",            categorie:"creature_masque", noirEffect:"corps", bienfait:"",
+    description:"Votre sang est corrompu. Vous pouvez générer des poisons ingestifs et de contact d'une Virulence de 30 et de durée d'une heure qui transforment le sang de votre victime en sang noir. Si d'aventure votre victime parvient à survivre, elle est aussi contaminée par un dixième de vos points de Perfidie. En cas de blessure grave, aucun soin ne pourra être pratiqué sur votre anatomie. Cette Peine ne génère aucun Bienfait." },
+  { name:"Tuméfaction",              categorie:"creature_masque", noirEffect:"corps", bienfait:"Brouillard",
+    description:"Votre visage porte de grosses marques bleues et violettes qui semblent être des hématomes. Ces enflures déforment les traits de votre visage. Vous gagnez 1 point de Corps noir et vous feriez bien de prendre l'habitude de dissimuler votre visage." },
+  { name:"Vieillissement prématuré", categorie:"creature_masque", noirEffect:"corps", bienfait:"Chronique du futur",
+    description:"Votre apparence ne correspond plus à votre âge. Vous avez des cheveux blancs bien avant l'heure. De nombreuses rides courent sur votre peau parcheminée. Bien malin celui qui réussira à deviner votre âge derrière cette apparence sénile. Votre Corps noir augmente d'1 point." },
+
+  // ── DANS UN LIEU TOUCHÉ PAR LA PERFIDIE ───────────────────────────────────
+  { name:"Acrimonie",                categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Hargne",
+    description:"Vous vous levez du pied gauche tous les matins et votre mauvaise humeur est devenue légendaire. Elle s'exprime par des propos acerbes ou hargneux et fait de vous une personne peu prisée pour la qualité de sa compagnie. Vous gagnez 1 point d'Âme noire." },
+  { name:"Cœur de pierre",           categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Comédie",
+    description:"Vous êtes insensible aux émotions. Rien ne vous fait plus sourire. Vous êtes froid comme une roche. Votre Âme noire augmente d'1 point." },
+  { name:"Décrépitude",              categorie:"lieu_perfidie",   noirEffect:"corps", bienfait:"Brouillard",
+    description:"Vous êtes caractérisé par un affaiblissement physique. Bien que vous n'en ayez pas l'apparence, vous vous sentez souvent vieux, très vieux et pratiquement impotent. Votre Corps noir augmente d'1 point." },
+  { name:"Fielleux",                 categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Beauté fatale",
+    description:"Vous êtes plein de fiel. Votre amertume s'accompagne de mauvaise humeur, de méchanceté et fait de vous un individu peu prisé dans les soirées animées et conviviales. Vous êtes toujours le premier à remarquer les défauts des autres et à les critiquer. Votre Âme noire augmente d'1 point." },
+  { name:"Grandiloquence",           categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Beau parleur",
+    description:"Vous aimez user d'une éloquence de style affecté qui abuse des grands mots et des effets faciles. Votre Âme noire augmente d'1 point." },
+  { name:"Hypocrisie",               categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Comédie",
+    description:"Votre attitude consiste à déguiser votre véritable caractère et à manifester des opinions, des sentiments et spécialement des vertus que vous n'avez pas. Vous privilégiez la dissimulation, la duplicité et la fausseté, et vous le savez. Votre Âme noire augmente d'1 point." },
+  { name:"Mensonge",                 categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Beau parleur",
+    description:"Vos assertions sont toujours contraires à la vérité. Vous ne pouvez pas vous empêcher de tromper ou d'induire en erreur votre Compagnie, votre entourage. Vous êtes un menteur pathologique. Vous avez gagné 1 point d'Âme noire." },
+  { name:"Sueurs froides",           categorie:"lieu_perfidie",   noirEffect:"corps", bienfait:"Chronique du futur",
+    description:"Vous êtes sans cesse parcouru de frissons galopants ou de brusques tressaillements. Vous avez tout le temps l'air agité et vous vous massez souvent les avant-bras pour faire disparaître la chair de poule qui recouvre votre peau. Votre Corps noir augmente d'1 point." },
+  { name:"Vantardise",               categorie:"lieu_perfidie",   noirEffect:"ame",   bienfait:"Comédie",
+    description:"Vous aimez exagérer vos mérites ou déformer la vérité par vanité. Chaque jour, vous vous glorifiez d'actes nouveaux alors que vous n'avez rien fait. Votre Âme noire augmente d'1 point." },
+  { name:"Voix éraillée",            categorie:"lieu_perfidie",   noirEffect:"corps", bienfait:"Sensualité",
+    description:"Le son de votre voix est rauque comme si des cordes vocales avaient été arrachées. Elle n'est guère agréable à entendre. Vous gagnez 1 point de Corps noir." },
+
+  // ── DANS D'AUTRES CIRCONSTANCES ───────────────────────────────────────────
+  { name:"Altération du corps",      categorie:"autre",           noirEffect:"corps", bienfait:"Fulgurance",
+    description:"Une partie de votre corps se transforme. Vous devez déterminer la partie de votre anatomie qui est sujette à la transformation. Cette Peine peut être attribuée plusieurs fois. Elle augmente à chaque fois votre Corps noir d'1 point." },
+  { name:"Aveuglement",              categorie:"autre",           noirEffect:"corps", bienfait:"Funeste sapience",
+    description:"Votre vue se brouille et vos yeux ruissellent perpétuellement de larmes. Vous gagnez 1 point de Corps noir." },
+  { name:"Crise d'identité physique",categorie:"autre",           noirEffect:"ame",   bienfait:"Brouillard",
+    description:"Un conflit permanent oppose ce que vous êtes et ce que vous croyez être. Vous ne reconnaissez plus votre reflet dans un miroir et vous n'êtes plus sûr de qui vous êtes réellement. Vous êtes troublé et perturbé. Vous gagnez 1 point d'Âme noire." },
+  { name:"Inversion de la main",     categorie:"autre",           noirEffect:"corps", bienfait:"Anticipation",
+    description:"Vous êtes incapable de déterminer si vous étiez droitier ou gaucher et cela vous joue des tours. Chaque fois que vous parvenez à déterminer quelle est votre bonne main, vous avez l'impression de vous être trompé ou d'avoir de nouveau changé. Cela ne génère pas d'autre technique que de vous faire gagner 1 point de Corps noir." },
+  { name:"Lectures diaboliques",     categorie:"autre",           noirEffect:"ame",   bienfait:"Funeste sapience",
+    description:"Vous adorez lire des livres impies à la réputation sulfureuse. Tandis que vous vous découvrez un goût nouveau pour le macabre, vous gagnez 1 point d'Âme noire." },
+];
+
+// ── BIENFAITS DE PERFIDIE ─────────────────────────────────────────────────────
+export const BIENFAITS_PERFIDIE_DATA = [
+  { name:"Anticipation",       peines:["Inversion de la main","Puanteur"],
+    description:"Votre pensée est en mouvement permanent et vous arrivez à imaginer ou à vivre un événement avec quelques instants d'avance. Vous avez entre autres la faculté de prévoir l'attaque d'un adversaire — il vous indique quelle manœuvre, botte ou défense il compte entreprendre, même s'il a l'initiative sur vous. Ce pouvoir ne fonctionne pas contre des personnes : la chute d'un rocher ne peut être anticipée, par exemple." },
+  { name:"Beau parleur",       peines:["Grandiloquence","Mensonge"],
+    description:"Vous êtes très éloquent bien que vos phrases soient plus brillantes sémantiquement parlant que pleines de profondeur et de sagesse. Vos DIF concernant le Baratin sont baissées de 5 points." },
+  { name:"Beauté fatale",      peines:["Fielleux"],
+    description:"Vous êtes étonnamment charismatique et vous attirez tous les regards. Lorsque vous usez de vos charmes, bien peu de personnes sont capables de vous résister. Lorsque vous mentez ou tentez de dissimuler derrière votre apparence des intentions malveillantes, aucun jet ne peut être tenté afin de vous démasquer." },
+  { name:"Brouillard",         peines:["Crise d'identité physique","Tuméfaction","Décrépitude"],
+    description:"Les traits de votre visage ne sont jamais clairement visibles, même votre entourage éprouve de grandes difficultés à les distinguer. Vous ne pouvez être reconnu que par des gens qui vous connaissent bien ; les autres ne fourniront que des descriptions contradictoires et embrouillées." },
+  { name:"Chronique du futur", peines:["Difformité","Sueurs froides","Vieillissement prématuré"],
+    description:"Vous avez régulièrement des visions prophétiques qui vous annoncent toujours la venue d'événements désagréables vous touchant de près ou de loin. Vous pouvez, par exemple, déterminer avec une certaine justesse si des embûches vous guettent dans les 24 prochaines heures. Ce phénomène est entièrement contrôlé par le Masque (l'EG choisit quand ce pouvoir doit se manifester)." },
+  { name:"Comédie",            peines:["Cœur de pierre","Hypocrisie","Vantardise"],
+    description:"Vous êtes un acteur né et nul n'est capable de dire si vous interprétez un rôle ou si vous êtes sérieux. Cette capacité à improviser et à vous adapter à tous les types de situations empêche définitivement quiconque de percer à jour les rôles que vous endossez. Cela ne vous dispense pas d'un minimum de préparation." },
+  { name:"Fulgurance",         peines:["Altération du corps","Couvert de vers"],
+    description:"Vous êtes très rapide. À tel point que vous n'avez votre pareil pour attraper des poissons à mains nues ou pour dégainer votre arme de prédilection. Vous gagnez un bonus gratuit d'1 point pour tout ce qui concerne l'initiative ou la rapidité." },
+  { name:"Funeste sapience",   peines:["Aveuglement","Lectures diaboliques"],
+    description:"Vous progressez dans votre connaissance de la hiérarchie du Masque. Face à une créature du Masque, vous pouvez faire un jet de PER afin de déterminer son niveau d'implication dans les projets du Masque. La DIF est de 15 si vous souhaitez aider les projets de l'être sondé, de 30 si au contraire vous allez vous y opposer." },
+  { name:"Hargne",             peines:["Acrimonie","Cruauté","Méchanceté"],
+    description:"Vous avez un comportement agressif, parfois méchant ou haineux, qui fait de vous un adversaire coriace et opiniâtre. Tel un dogue fou, vous ne lâchez jamais prise. Vous ne vous évanouissez plus lorsque vous échouez aux jets de VOL en cas de blessure grave, tant que vous continuez de vous battre contre le même adversaire (ou groupe d'adversaires)." },
+  { name:"Hypnotisme",         peines:["Gueule de traître"],
+    description:"Vous maîtrisez l'ensemble des procédés mis en œuvre pour provoquer un état d'hypnose. Au prix d'un jet de VOL opposé à la VOL de la cible et à condition que vous puissiez disposer de temps et d'un endroit calme, vous pouvez implanter une suggestion dans l'esprit d'un mortel. La cible se conformera alors à ce que vous lui avez ordonné de faire." },
+  { name:"Sensualité",         peines:["Lubricité","Voix éraillée"],
+    description:"Votre tempérament voluptueux vous pousse à rechercher et à goûter tout ce qui flatte et touche les sens. Vous êtes un expert en goût et en parfum. Quelles que soient votre apparence actuelle ou votre extraction, vous êtes toujours bien accueilli (au début du moins) dans les endroits dédiés aux plaisirs des sens." },
 ];
