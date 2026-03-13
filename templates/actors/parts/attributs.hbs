@@ -18,7 +18,8 @@
           </div>
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
-            <input type="number" name="system.corps.noir" value="{{system.corps.noir}}" class="stat-num aspect-num" />
+            <span class="derived-val noir-val">{{system.corpsNoirTotal}}</span>
+            <input type="number" name="system.corps.noir" value="{{system.corps.noir}}" class="stat-num aspect-num noir-base" title="Valeur de base (total = base + Ténèbres + Peines)" />
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
@@ -48,7 +49,8 @@
           </div>
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
-            <input type="number" name="system.esprit.noir" value="{{system.esprit.noir}}" class="stat-num aspect-num" />
+            <span class="derived-val noir-val">{{system.espritNoirTotal}}</span>
+            <input type="number" name="system.esprit.noir" value="{{system.esprit.noir}}" class="stat-num aspect-num noir-base" title="Valeur de base (total = base + Ténèbres + Peines)" />
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
@@ -78,7 +80,8 @@
           </div>
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
-            <input type="number" name="system.ame.noir" value="{{system.ame.noir}}" class="stat-num aspect-num" />
+            <span class="derived-val noir-val">{{system.ameNoirTotal}}</span>
+            <input type="number" name="system.ame.noir" value="{{system.ame.noir}}" class="stat-num aspect-num noir-base" title="Valeur de base (total = base + Ténèbres + Peines)" />
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>

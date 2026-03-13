@@ -298,6 +298,13 @@
 }
 .agone .aspect-num.exp { width: 42px; }
 .agone .aspect-stat.noir .aspect-num { border-color: var(--agone-noir); }
+.agone .aspect-stat.noir .noir-base {
+  width: 36px;
+  font-size: 10px;
+  opacity: 0.75;
+  border-style: dashed;
+  margin-top: 2px;
+}
 .agone .aspect-stat.derived .derived-val {
   font-weight: bold;
   color: var(--agone-brown-dark);

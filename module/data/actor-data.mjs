@@ -248,8 +248,6 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       (ten >= 94 ? 1 : 0) +   // Malédiction
       (ten >= 96 ? 1 : 0) +   // Ombre vivante
       (ten >= 100 ? 1 : 0);   // Déchu
-    this.corps.noir  += peineCorpsNoir;
-    this.esprit.noir += peineEspritNoir;
     // Noirs supplémentaires issus des Peines de Perfidie (items embarqués)
     const peineItems = this.parent?.items?.filter(i => i.type === "peine") ?? [];
     let peineCorpsNoirPerf = 0;
@@ -258,20 +256,26 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       if (p.system.noirEffect === "corps") peineCorpsNoirPerf++;
       else if (p.system.noirEffect === "ame") peineAmeNoirPerf++;
     }
-    this.corps.noir += peineCorpsNoirPerf;
-    this.ame.noir   += peineAmeNoirPerf;
+
+    // Totaux calculés sans modifier les champs stockés (évite l'accumulation infinie au submit)
+    const corpsNoirTotal  = this.corps.noir  + peineCorpsNoir + peineCorpsNoirPerf;
+    const espritNoirTotal = this.esprit.noir + peineEspritNoir;
+    const ameNoirTotal    = this.ame.noir    + peineAmeNoirPerf;
+    this.corpsNoirTotal  = corpsNoirTotal;
+    this.espritNoirTotal = espritNoirTotal;
+    this.ameNoirTotal    = ameNoirTotal;
 
     // Difficulté VOL contre la Corruption (tableau des Peines de Perfidie)
     const perf = this.perfidie ?? 0;
     this.difVolCorruption = perf >= 90 ? 30 : perf >= 76 ? 25 : perf >= 51 ? 20 : 15;
-    // Bonus d’aspects
-    this.bonusCorps  = Math.max(0, this.corps.score - this.corps.noir);
-    this.bonusEsprit = Math.max(0, this.esprit.score - this.esprit.noir);
-    this.bonusAme    = Math.max(0, this.ame.score - this.ame.noir);
+    // Bonus/malus d'aspects (utilise les totaux)
+    this.bonusCorps  = this.corps.score  - corpsNoirTotal;
+    this.bonusEsprit = this.esprit.score - espritNoirTotal;
+    this.bonusAme    = this.ame.score    - ameNoirTotal;
 
     // Flamme = minimum des trois aspects (règle Agone)
     this.flamme      = Math.min(this.corps.score, this.esprit.score, this.ame.score);
-    this.flammeNoire = Math.min(this.corps.noir, this.esprit.noir, this.ame.noir);
+    this.flammeNoire = Math.min(corpsNoirTotal, espritNoirTotal, ameNoirTotal);
 
     // PH max = Flamme × 2 (si non défini manuellement)
     if (this.ph.max === 0) this.ph.max = this.flamme * 2;

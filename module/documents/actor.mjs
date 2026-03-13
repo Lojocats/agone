@@ -214,9 +214,10 @@ export class AgoneActor extends Actor {
     sd.corps.score        += b.corps;
     sd.esprit.score       += b.esprit;
     sd.ame.score          += b.ame;
-    sd.corps.noir         += b.corps_noir;
-    sd.esprit.noir        += b.esprit_noir;
-    sd.ame.noir           += b.ame_noir;
+    // Ajouter les noirs des dons aux totaux dérivés (pas aux champs stockés)
+    sd.corpsNoirTotal  = (sd.corpsNoirTotal  ?? sd.corps.noir)  + b.corps_noir;
+    sd.espritNoirTotal = (sd.espritNoirTotal ?? sd.esprit.noir) + b.esprit_noir;
+    sd.ameNoirTotal    = (sd.ameNoirTotal    ?? sd.ame.noir)    + b.ame_noir;
     sd.tai                += b.tai;
 
     // --- 1b. Points de création compétences (ex: Orphelin -10) ---
@@ -224,12 +225,12 @@ export class AgoneActor extends Actor {
       sd.ptsCreationComp.max = Math.max(0, sd.ptsCreationComp.max + b.ptsCreationComp_bonus);
     }
 
-    // --- 2. Re-dérivation des bonus d'aspects ---
-    sd.bonusCorps  = Math.max(0, sd.corps.score  - sd.corps.noir);
-    sd.bonusEsprit = Math.max(0, sd.esprit.score - sd.esprit.noir);
-    sd.bonusAme    = Math.max(0, sd.ame.score    - sd.ame.noir);
+    // --- 2. Re-dérivation des bonus/malus d'aspects (utilise les totaux dérivés) ---
+    sd.bonusCorps  = sd.corps.score  - sd.corpsNoirTotal;
+    sd.bonusEsprit = sd.esprit.score - sd.espritNoirTotal;
+    sd.bonusAme    = sd.ame.score    - sd.ameNoirTotal;
     sd.flamme      = Math.min(sd.corps.score, sd.esprit.score, sd.ame.score);
-    sd.flammeNoire = Math.min(sd.corps.noir,  sd.esprit.noir,  sd.ame.noir);
+    sd.flammeNoire = Math.min(sd.corpsNoirTotal, sd.espritNoirTotal, sd.ameNoirTotal);
 
     // --- 3. Re-dérivation TAI (si TAI modifié) ---
     if (b.tai !== 0) {
