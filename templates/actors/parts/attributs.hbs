@@ -116,59 +116,68 @@
     <!-- Caractéristiques dérivées -->
     <h3 class="section-title">{{localize "AGONE.CaracDerivees"}}</h3>
     <div class="derived-grid">
-      <div class="derived-row" title="(FOR + AGI×2) ÷ 3">
-        <label>{{localize "AGONE.Melee"}}</label>
-        <span class="derived-val">{{system.melee}}</span>
+
+      <div class="cstat-item" title="(FOR + AGI×2) ÷ 3">
+        <span class="cstat-roll cstat-passive"><i class="fas fa-fist-raised"></i></span>
+        <span class="cstat-score">{{system.melee}}</span>
+        <span class="cstat-label">{{localize "AGONE.Melee"}}</span>
       </div>
-      <div class="derived-row" title="(AGI + PER) ÷ 2">
-        <label>{{localize "AGONE.Tir"}}</label>
-        <span class="derived-val">{{system.tir}}</span>
+
+      <div class="cstat-item" title="(AGI + PER) ÷ 2">
+        <span class="cstat-roll cstat-passive"><i class="fas fa-crosshairs"></i></span>
+        <span class="cstat-score">{{system.tir}}</span>
+        <span class="cstat-label">{{localize "AGONE.Tir"}}</span>
       </div>
-      <div class="derived-row" title="(CHA + CRÉ) ÷ 2">
-        <label>{{localize "AGONE.Art"}}</label>
-        <span class="derived-val">{{system.art}}</span>
+
+      <div class="cstat-item" title="(CHA + CRÉ) ÷ 2">
+        <span class="cstat-roll cstat-passive"><i class="fas fa-palette"></i></span>
+        <span class="cstat-score">{{system.art}}</span>
+        <span class="cstat-label">{{localize "AGONE.Art"}}</span>
       </div>
-      <div class="derived-row" title="AGI + PER + Bonus Corps">
-        <label>{{localize "AGONE.Initiative"}}</label>
-        <span class="derived-val">{{system.initiative}}</span>
-        <button type="button" class="roll-btn-small" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'>
-          <i class="fas fa-dice-d10"></i>
-        </button>
+
+      <div class="cstat-item" title="AGI + PER + Bonus Corps">
+        <button type="button" class="cstat-roll" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
+        <span class="cstat-score">{{system.initiative}}</span>
+        <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
       </div>
-      <div class="derived-row" title="Initiative + 10 (sortilège)">
-        <label>{{localize "AGONE.InitMagique"}}</label>
-        <span class="derived-val">{{system.initMagique}}</span>
-        <button type="button" class="roll-btn-small" data-action="rollInitiativeMagique" title='{{localize "AGONE.JeterInitMagique"}}'>
-          <i class="fas fa-dice-d10"></i>
-        </button>
+
+      <div class="cstat-item" title="Initiative + 10 (sortilège)">
+        <button type="button" class="cstat-roll" data-action="rollInitiativeMagique" title='{{localize "AGONE.JeterInitMagique"}}'><i class="fas fa-magic"></i></button>
+        <span class="cstat-score">{{system.initMagique}}</span>
+        <span class="cstat-label">{{localize "AGONE.InitMagique"}}</span>
       </div>
-      <div class="derived-row" title="AGI + Bonus Corps">
-        <label>{{localize "AGONE.DefenseNaturelle"}}</label>
-        <span class="derived-val">{{system.defenseNaturelle}}</span>
-        <button type="button" class="roll-btn-small" data-action="rollDefenseNaturelle" title='{{localize "AGONE.JeterDefenseNat"}}'>
-          <i class="fas fa-dice-d10"></i>
-        </button>
+
+      <div class="cstat-item" title="AGI + Bonus Corps">
+        <button type="button" class="cstat-roll" data-action="rollDefenseNaturelle" title='{{localize "AGONE.JeterDefenseNat"}}'><i class="fas fa-shield-alt"></i></button>
+        <span class="cstat-score">{{system.defenseNaturelle}}</span>
+        <span class="cstat-label">{{localize "AGONE.DefenseNaturelle"}}</span>
       </div>
-      <div class="derived-row" title="Table FOR + TAI">
-        <label>{{localize "AGONE.BD"}}</label>
-        <span class="derived-val">{{system.bd}}</span>
+
+      <div class="cstat-item" title="Table FOR + TAI">
+        <span class="cstat-roll cstat-passive"><i class="fas fa-hammer"></i></span>
+        <span class="cstat-score">{{system.bd}}</span>
+        <span class="cstat-label">{{localize "AGONE.BD"}}</span>
       </div>
-      <div class="derived-row" title="Compétences Esquive + AGI + Bonus Corps">
-        <label>{{localize "AGONE.EsquiveTotal"}}</label>
-        <span class="derived-val">{{system.esquiveTotal}}</span>
-        <button type="button" class="roll-btn-small" data-action="rollEsquive" title='{{localize "AGONE.JeterEsquive"}}'>
-          <i class="fas fa-dice-d10"></i>
-        </button>
+
+      <div class="cstat-item" title="Compétences Esquive + AGI + Bonus Corps">
+        <button type="button" class="cstat-roll" data-action="rollEsquive" title='{{localize "AGONE.JeterEsquive"}}'><i class="fas fa-running"></i></button>
+        <span class="cstat-score">{{system.esquiveTotal}}</span>
+        <span class="cstat-label">{{localize "AGONE.EsquiveTotal"}}</span>
       </div>
-      <div class="derived-row">
-        <label>{{localize "AGONE.Emprise"}}</label>
-        <span class="derived-val">{{system.emprise}}</span>
-        <select name="system.typeMage" class="emprise-type-select" title="Obédience magique">
-          <option value="jorniste"      {{#if (eq system.typeMage "jorniste")}}selected{{/if}}>Jorniste (INT)</option>
-          <option value="eclipsiste"    {{#if (eq system.typeMage "eclipsiste")}}selected{{/if}}>Éclipsiste (INT+VOL/2)</option>
-          <option value="obscurantiste" {{#if (eq system.typeMage "obscurantiste")}}selected{{/if}}>Obscurantiste (VOL)</option>
-        </select>
+
+      <div class="cstat-item cstat-emprise">
+        <span class="cstat-roll cstat-passive"><i class="fas fa-fire"></i></span>
+        <span class="cstat-score">{{system.emprise}}</span>
+        <div class="cstat-emprise-wrap">
+          <span class="cstat-label">{{localize "AGONE.Emprise"}}</span>
+          <select name="system.typeMage" class="emprise-type-select" title="Obédience magique">
+            <option value="jorniste"      {{#if (eq system.typeMage "jorniste")}}selected{{/if}}>Jorniste (INT)</option>
+            <option value="eclipsiste"    {{#if (eq system.typeMage "eclipsiste")}}selected{{/if}}>Éclipsiste (INT+VOL/2)</option>
+            <option value="obscurantiste" {{#if (eq system.typeMage "obscurantiste")}}selected{{/if}}>Obscurantiste (VOL)</option>
+          </select>
+        </div>
       </div>
+
     </div><!-- /derived-grid -->
   </div><!-- /aspects-section -->
 

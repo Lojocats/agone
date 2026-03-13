@@ -260,6 +260,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const peupleKey = CONFIG.AGONE?.peupleNomVersKey?.[system.peuple] ?? "humain";
     const peupleData = CONFIG.AGONE?.peuplesData?.[peupleKey] ?? CONFIG.AGONE?.peuplesData?.humain;
     context.bpdv = peupleData?.bpdv ?? 25;
+    context.pdvPercent = system.pdv.max > 0
+      ? Math.round(Math.min(100, (system.pdv.valeur / system.pdv.max) * 100))
+      : 0;
 
     // Min/Max raciaux par carac — seuils sur score BRUT (hors bonus racial)
     const caracsKeys = ['agilite', 'force', 'perception', 'resistance', 'intelligence', 'volonte', 'charisma', 'creativite'];

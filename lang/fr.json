@@ -158,6 +158,7 @@
 
     "Combat":          "Combat",
     "EtatSante":       "État de santé",
+    "StatsCombat":     "Stats de combat",
     "PointsDeVie":     "Points de Vie",
     "BonusDePv":        "Bonus de PdV (1d10)",
     "LancerBonusDe":    "Lancer 1d10 PdV",
