@@ -19,11 +19,6 @@
       <span class="perf-dif-range {{#ifGT system.perfidie 75}}perf-range-active{{/ifGT}}">76–90 → DIF 25</span>
       <span class="perf-dif-range {{#ifGT system.perfidie 89}}perf-range-active{{/ifGT}}">90+ → DIF 30</span>
     </div>
-    {{#if isOwner}}
-    <button type="button" class="perf-browser-btn compendium-browse" data-pack="agone.peines" title="{{localize "AGONE.OuvrirListePeines"}}">
-      <i class="fas fa-list"></i> {{localize "AGONE.OuvrirListePeines"}}
-    </button>
-    {{/if}}
   </div>
 
   <!-- ── Corps principal ────────────────────────────────────── -->
@@ -31,12 +26,20 @@
 
     <!-- Tableau des Peines acquises -->
     <div class="peines-perfidie-section">
-      <h3 class="section-title">{{localize "AGONE.PeinesPerfidie"}}</h3>
+      <div class="section-header">
+        <h3 class="section-title">{{localize "AGONE.PeinesPerfidie"}}</h3>
+        {{#if isOwner}}
+        <button type="button" class="btn-icon compendium-browse" data-pack="agone.peines" title="{{localize "AGONE.OuvrirListePeines"}}">
+          <i class="fas fa-search"></i>
+        </button>
+        {{/if}}
+      </div>
 
       {{#if peines.length}}
       <table class="peines-table">
         <thead>
           <tr>
+            <th class="item-drag-handle-col"></th>
             <th></th>
             <th>{{localize "AGONE.NomPeine"}}</th>
             <th>{{localize "AGONE.NoirEffect"}}</th>
@@ -47,6 +50,7 @@
         <tbody>
           {{#each peines as |peine|}}
           <tr class="peine-row item-row" data-item-id="{{peine.id}}">
+            <td class="item-drag-handle"><i class="fas fa-grip-vertical"></i></td>
             <td>
               {{#if peine.system.description}}
               <button type="button" class="peine-desc-toggle btn-icon" data-item-id="{{peine.id}}" title="Description">
@@ -93,6 +97,7 @@
             </td>
           </tr>
           <tr class="peine-desc-expand" data-item-id="{{peine.id}}" style="display:none">
+            <td></td>
             <td></td>
             <td colspan="4" class="peine-desc-cell">{{{peine.system.description}}}</td>
           </tr>

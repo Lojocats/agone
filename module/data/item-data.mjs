@@ -137,6 +137,7 @@ export class DanseurData extends foundry.abstract.TypeDataModel {
       empriseNiveau:     new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
       empathieNiveau:    new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
       enduranceNiveau:   new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
+      saison:            new fields.StringField({ initial: "" }),
       // Valeurs courantes (état actuel)
       memoireActuelle:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       enduranceActuelle: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
@@ -298,6 +299,7 @@ export class PeupleData extends foundry.abstract.TypeDataModel {
       creativiteBonus:   new fields.NumberField({ initial: 0,    integer: true }),
       creativiteMin:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
       creativiteMax:     new fields.NumberField({ initial: null, nullable: true, integer: true }),
+      saisonDefaut:     new fields.StringField({ initial: "" }),
     };
   }
 }

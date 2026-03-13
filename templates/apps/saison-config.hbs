@@ -1,0 +1,18 @@
+<form class="agone saison-config-form" autocomplete="off">
+  <div class="saison-config-body">
+    <div class="saison-icon-row">
+      <i class="fas fa-sun saison-sun-icon"></i>
+      <h2>{{localize "AGONE.SaisonMonde"}}</h2>
+    </div>
+    <p class="saison-hint">{{localize "AGONE.SaisonMondeHint"}}</p>
+    <div class="saison-options">
+      {{#each saisons as |s|}}
+      <label class="saison-option {{#if (eq s.value ../current)}}active{{/if}}">
+        <input type="radio" name="saison" value="{{s.value}}" class="saison-select"
+               {{#if (eq s.value ../current)}}checked{{/if}} />
+        <span class="saison-label">{{s.label}}</span>
+      </label>
+      {{/each}}
+    </div>
+  </div>
+</form>

@@ -1,61 +1,139 @@
 <!-- PARTIAL : IDENTITÉ / BIOGRAPHIE -->
 <div class="identite-section">
 
-  <h3 class="section-title">{{localize "AGONE.Identite"}}</h3>
-  <div class="identite-grid">
+  <div class="section-header">
+    <h3 class="section-title">{{localize "AGONE.Identite"}}</h3>
+  </div>
 
-    <!-- Peuple : zone de dépôt depuis le compendium -->
-    <div class="identite-row identite-peuple-row">
-      <label>{{localize "AGONE.PeupleLabel"}}</label>
-      <div class="peuple-drop-zone {{#unless system.peuple}}empty{{/unless}}"
-           data-drop-type="peuple"
-           title='{{localize "AGONE.GlisserPeuple"}}'>
-        {{#if system.peuple}}
-          <span class="peuple-name">{{system.peuple}}</span>
-          <button type="button" class="btn-icon peuple-clear" title='{{localize "AGONE.RetirerPeuple"}}'>
-            <i class="fas fa-times"></i>
+  <!-- ── Grille principale : 2 cartes côte à côte ── -->
+  <div class="identite-main-grid">
+
+    <!-- Carte : État civil -->
+    <div class="identite-card">
+      <div class="identite-card-header">{{localize "AGONE.EtatCivilLabel"}}</div>
+      <div class="identite-card-body">
+
+        <!-- Peuple : zone de dépôt depuis le compendium -->
+        <div class="identite-row identite-peuple-row">
+          <label>{{localize "AGONE.PeupleLabel"}}</label>
+          <div class="peuple-drop-zone {{#unless system.peuple}}empty{{/unless}}"
+               data-drop-type="peuple"
+               title='{{localize "AGONE.GlisserPeuple"}}'>
+            {{#if system.peuple}}
+              <span class="peuple-name">{{system.peuple}}</span>
+              <button type="button" class="btn-icon peuple-clear" title='{{localize "AGONE.RetirerPeuple"}}'>
+                <i class="fas fa-times"></i>
+              </button>
+            {{else}}
+              <span class="peuple-placeholder">
+                <i class="fas fa-dragon"></i> {{localize "AGONE.GlisserPeuple"}}
+              </span>
+            {{/if}}
+          </div>
+          <button type="button" class="btn-icon compendium-browse" data-pack="agone.peuples"
+                  title='{{localize "AGONE.ParcourirPeuples"}}'>
+            <i class="fas fa-search"></i>
           </button>
-        {{else}}
-          <span class="peuple-placeholder">
-            <i class="fas fa-dragon"></i> {{localize "AGONE.GlisserPeuple"}}
-          </span>
-        {{/if}}
+        </div>
+
+        <div class="identite-row">
+          <label>{{localize "AGONE.Origine"}}</label>
+          <input type="text" name="system.origine" value="{{system.origine}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Occupation"}}</label>
+          <input type="text" name="system.occupation" value="{{system.occupation}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Sexe"}}</label>
+          <input type="text" name="system.sexe" value="{{system.sexe}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Age"}}</label>
+          <input type="text" name="system.age" value="{{system.age}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Parrain"}}</label>
+          <input type="text" name="system.parrain" value="{{system.parrain}}" />
+        </div>
+
       </div>
-      <button type="button" class="btn-icon compendium-browse" data-pack="agone.peuples"
-              title='{{localize "AGONE.ParcourirPeuples"}}'>
-        <i class="fas fa-search"></i>
-      </button>
     </div>
 
-    <div class="identite-row">
-      <label>{{localize "AGONE.Origine"}}</label>
-      <input type="text" name="system.origine" value="{{system.origine}}" />
+    <!-- Carte : Physique -->
+    <div class="identite-card">
+      <div class="identite-card-header">{{localize "AGONE.PhysiqueLabel"}}</div>
+      <div class="identite-card-body">
+
+        <div class="identite-row">
+          <label>{{localize "AGONE.Taille"}}</label>
+          <input type="text" name="system.taille" value="{{system.taille}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.TAI"}}</label>
+          <input type="number" name="system.tai" value="{{system.tai}}" class="stat-num" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Masse"}}</label>
+          <input type="text" name="system.masse" value="{{system.masse}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Cheveux"}}</label>
+          <input type="text" name="system.cheveux" value="{{system.cheveux}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Yeux"}}</label>
+          <input type="text" name="system.yeux" value="{{system.yeux}}" />
+        </div>
+        <div class="identite-row">
+          <label>{{localize "AGONE.Signes"}}</label>
+          <input type="text" name="system.signes" value="{{system.signes}}" />
+        </div>
+
+      </div>
     </div>
-    <div class="identite-row">
-      <label>{{localize "AGONE.Occupation"}}</label>
-      <input type="text" name="system.occupation" value="{{system.occupation}}" />
-    </div>
-    <div class="identite-row">
-      <label>{{localize "AGONE.Sexe"}}</label>
-      <input type="text" name="system.sexe" value="{{system.sexe}}" />
-    </div>
-    <div class="identite-row">
-      <label>{{localize "AGONE.Age"}}</label>
-      <input type="text" name="system.age" value="{{system.age}}" />
-    </div>
-    <div class="identite-row">
-      <label>{{localize "AGONE.Taille"}}</label>
-      <input type="text" name="system.taille" value="{{system.taille}}" />
-    </div>
-    <div class="identite-row">
-      <label>{{localize "AGONE.TAI"}}</label>
-      <input type="number" name="system.tai" value="{{system.tai}}" class="stat-num" />
+
+  </div>
+
+  <!-- ── Culture & Croyances ── -->
+  <div class="identite-card identite-card-wide">
+    <div class="identite-card-header">{{localize "AGONE.CultureLabel"}}</div>
+    <div class="identite-card-body identite-card-body-culture">
+      <div class="identite-row">
+        <label>{{localize "AGONE.Langues"}}</label>
+        <input type="text" name="system.langues" value="{{system.langues}}" />
+      </div>
+      <div class="identite-row">
+        <label>{{localize "AGONE.Dieu"}}</label>
+        <input type="text" name="system.dieu" value="{{system.dieu}}" />
+      </div>
+      <div class="identite-row">
+        <label>{{localize "AGONE.SaisonPerso"}}</label>
+        <select name="system.saisonPerso">
+          {{#each saisons as |s|}}
+          <option value="{{s.value}}" {{#if (eq s.value ../system.saisonPerso)}}selected{{/if}}>{{s.label}}</option>
+          {{/each}}
+        </select>
+      </div>
     </div>
   </div>
 
+  <!-- ── Notes & Historique ── -->
+  <div class="identite-notes-zone">
+    <div class="section-header">
+      <h3 class="section-title">{{localize "AGONE.Historique"}}</h3>
+    </div>
+    <div class="editor-content identite-editor" data-edit="system.historique">{{{historiqueHTML}}}</div>
+  </div>
+
+  <!-- ── Description (si renseignée) ── -->
   {{#if system.description}}
-  <h3 class="section-title" style="margin-top:16px;">{{localize "AGONE.Description"}}</h3>
-  <div class="editor-content">{{{descriptionHTML}}}</div>
+  <div class="identite-notes-zone">
+    <div class="section-header">
+      <h3 class="section-title">{{localize "AGONE.Description"}}</h3>
+    </div>
+    <div class="editor-content">{{{descriptionHTML}}}</div>
+  </div>
   {{/if}}
 
 </div>

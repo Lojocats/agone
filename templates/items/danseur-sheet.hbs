@@ -58,6 +58,17 @@
         <input type="number" name="system.ptsCreationMax" value="{{system.ptsCreationMax}}" min="0" placeholder="17">
         <small style="font-size:10px;opacity:0.6">Dépensés : {{system.ptsCreationDepense}} / Restants : {{system.ptsCreationRestants}}</small>
       </div>
+      <!-- Saison du Saisonin -->
+      <div class="danseur-stat-group">
+        <label>{{localize "AGONE.SaisonSaisonin"}}</label>
+        <select name="system.saison">
+          <option value="" {{#if (eq system.saison "")}}selected{{/if}}>—</option>
+          <option value="printemps" {{#if (eq system.saison "printemps")}}selected{{/if}}>Printemps</option>
+          <option value="ete"       {{#if (eq system.saison "ete")}}selected{{/if}}>Été</option>
+          <option value="automne"   {{#if (eq system.saison "automne")}}selected{{/if}}>Automne</option>
+          <option value="hiver"     {{#if (eq system.saison "hiver")}}selected{{/if}}>Hiver</option>
+        </select>
+      </div>
     </div>
 
     <!-- Mode création -->

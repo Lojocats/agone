@@ -1,0 +1,43 @@
+<div class="agone-calendrier-wrap">
+
+  <!-- En-tête saison / mois / an -->
+  <div class="cal-header cal-saison-{{saison}}">
+    <span class="cal-saison-badge">{{saisonLabel}}</span>
+    <h2 class="cal-mois-nom">{{moisData.nom}}</h2>
+    <span class="cal-an">An {{date.an}}</span>
+  </div>
+
+  <!-- Navigation (GM uniquement) -->
+  {{#if isGM}}
+  <div class="cal-nav-bar">
+    <button type="button" class="cal-nav-btn" data-nav="1" data-delta="-1" data-unit="an"   title="Année précédente">◀◀</button>
+    <button type="button" class="cal-nav-btn" data-nav="1" data-delta="-1" data-unit="mois" title="Mois précédent">◀</button>
+    <span class="cal-date-label">{{ordinal}}</span>
+    <button type="button" class="cal-nav-btn" data-nav="1" data-delta="1"  data-unit="mois" title="Mois suivant">▶</button>
+    <button type="button" class="cal-nav-btn" data-nav="1" data-delta="1"  data-unit="an"   title="Année suivante">▶▶</button>
+  </div>
+  <div class="cal-nav-bar cal-jour-bar">
+    <button type="button" class="cal-nav-btn" data-nav="1" data-delta="-1" data-unit="jour" title="Jour précédent">◀ Jour</button>
+    <button type="button" class="cal-nav-btn" data-nav="1" data-delta="1"  data-unit="jour" title="Jour suivant">Jour ▶</button>
+  </div>
+  {{else}}
+  <div class="cal-date-display">{{ordinal}}</div>
+  {{/if}}
+
+  <!-- Grille 30 jours (5 × 6) -->
+  <div class="cal-grid">
+    {{#each jours as |j|}}
+    <div class="cal-day {{#if j.actif}}today{{/if}}{{#if ../isGM}} clickable{{/if}}" data-jour="{{j.num}}">{{j.num}}</div>
+    {{/each}}
+  </div>
+
+  <!-- Note du jour (GM uniquement) -->
+  {{#if isGM}}
+  <div class="cal-note-area">
+    <label class="cal-note-label">Note du jour :</label>
+    <textarea class="cal-note-input" rows="2" placeholder="Événement, note roleplay…">{{noteJour}}</textarea>
+    <button type="button" class="cal-note-save btn-agone-small">Sauvegarder</button>
+  </div>
+  {{/if}}
+
+</div>

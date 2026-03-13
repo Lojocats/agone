@@ -3141,46 +3141,90 @@
 .agone-fumble-btn:hover { background: #6e0d0d; }
 
 /* ── Onglet Identité ─────────────────────────────────────── */
-.agone .identite-section { padding: 8px 4px; }
+.agone .identite-section {
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-.agone .identite-grid {
+/* Grille 2 cartes côte à côte */
+.agone .identite-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+/* Cartes */
+.agone .identite-card {
+  border: 1px solid var(--agone-gold-light, #c9a22740);
+  border-radius: var(--radius, 4px);
+  overflow: hidden;
+  background: rgba(201,162,39,0.03);
+}
+.agone .identite-card-header {
+  background: rgba(201,162,39,0.10);
+  border-bottom: 1px solid var(--agone-gold-light, #c9a22740);
+  padding: 4px 10px;
+  font-family: 'MedievalSharp', 'Crimson Text', serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--agone-brown-dark);
+}
+.agone .identite-card-body {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 6px 12px;
+  gap: 5px 10px;
   align-items: center;
+  padding: 8px 10px;
 }
+/* Variante Culture : 2 couples label/input côte à côte */
+.agone .identite-card-body-culture {
+  grid-template-columns: max-content 1fr max-content 1fr;
+}
+@media (max-width: 600px) {
+  .agone .identite-main-grid { grid-template-columns: 1fr; }
+  .agone .identite-card-body-culture { grid-template-columns: max-content 1fr; }
+}
+
 .agone .identite-row {
   display: contents;
 }
 .agone .identite-row label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--agone-brown);
   white-space: nowrap;
 }
 .agone .identite-row input,
 .agone .identite-row select {
   width: 100%;
+  font-size: 12px;
+}
+.agone .identite-row .stat-num {
+  width: 56px;
+  text-align: center;
 }
 
-.agone .identite-stats {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-
+/* Ligne peuple : pleine largeur dans la grille de la carte */
 .agone .identite-peuple-row {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
+  margin-bottom: 2px;
+}
+.agone .identite-peuple-row > label {
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--agone-brown);
 }
 .agone .peuple-drop-zone {
   flex: 1;
-  min-height: 28px;
+  min-height: 26px;
   border: 2px dashed var(--agone-gold);
-  border-radius: var(--radius);
+  border-radius: var(--radius, 4px);
   display: flex;
   align-items: center;
   padding: 2px 8px;
@@ -3204,7 +3248,36 @@
   color: var(--agone-brown);
   opacity: 0.6;
   font-style: italic;
-  font-size: 12px;
+  font-size: 11px;
+}
+
+/* Zone Notes / Historique */
+.agone .identite-notes-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.agone .identite-editor {
+  min-height: 80px;
+  padding: 6px 8px;
+  border: 1px solid var(--agone-gold-light, #c9a22740);
+  border-radius: 0 0 var(--radius, 4px) var(--radius, 4px);
+  background: rgba(201,162,39,0.02);
+  cursor: text;
+  line-height: 1.5;
+  font-size: 13px;
+}
+.agone .identite-notes-zone .section-header {
+  margin-bottom: 0;
+}
+.agone .identite-notes-zone .section-title {
+  margin: 0;
+  border-bottom: none;
+  border: 1px solid var(--agone-gold-light, #c9a22740);
+  border-bottom: none;
+  border-radius: var(--radius, 4px) var(--radius, 4px) 0 0;
+  padding: 4px 10px;
+  background: rgba(201,162,39,0.10);
 }
 
 /* ── Feuille de peuple ───────────────────────────────────── */
@@ -3965,3 +4038,114 @@
   transition: background 0.15s;
 }
 .pouvoirs-browser .pvb-add-btn:hover { background: rgba(220,80,30,0.32); }
+
+/* ── Config Saison (Bouton GM) ──────────────────────────────────────────── */
+.agone-saison-config .window-content { padding: 0; }
+.agone-saison-config .saison-config-body { padding: 16px; }
+.agone-saison-config .saison-icon-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.agone-saison-config .saison-icon-row h2 { margin: 0; font-size: 1em; }
+.agone-saison-config .saison-sun-icon { font-size: 22px; color: var(--agone-gold, #c9a227); }
+.agone-saison-config .saison-hint {
+  font-size: 11px; color: var(--agone-brown, #6b4c2a);
+  margin-bottom: 12px; font-style: italic;
+}
+.agone-saison-config .saison-options {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+}
+.agone-saison-config .saison-option {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px; border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 4px; cursor: pointer; transition: background 0.15s;
+}
+.agone-saison-config .saison-option.active,
+.agone-saison-config .saison-option:hover {
+  background: rgba(201,162,39,0.18); border-color: var(--agone-gold, #c9a227);
+}
+.agone-saison-config .saison-option input[type="radio"] { display: none; }
+.agone-saison-config .saison-label { font-size: 11px; text-align: center; }
+/* Couleurs par saison */
+.agone-saison-config .saison-option[data-value="printemps"].active { border-color: #4caf50; background: rgba(76,175,80,0.15); }
+.agone-saison-config .saison-option[data-value="ete"].active       { border-color: #ff9800; background: rgba(255,152,0,0.15); }
+.agone-saison-config .saison-option[data-value="automne"].active   { border-color: #795548; background: rgba(121,85,72,0.15); }
+.agone-saison-config .saison-option[data-value="hiver"].active     { border-color: #90caf9; background: rgba(144,202,249,0.15); }
+
+/* ── Calendrier d'Harmonde ──────────────────────────────────────── */
+.agone-calendrier .window-content { padding: 0; }
+.agone-calendrier-wrap { padding: 12px; }
+
+/* En-tête */
+.cal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-radius: 4px 4px 0 0; margin-bottom: 8px;
+  background: rgba(201,162,39,0.12); border-bottom: 1px solid var(--agone-gold, #c9a227);
+}
+.cal-header h2 { margin: 0; font-size: 1.1em; }
+.cal-saison-badge {
+  font-size: 10px; font-weight: bold; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 10px; text-transform: uppercase;
+  background: rgba(201,162,39,0.2); border: 1px solid rgba(201,162,39,0.4);
+}
+.cal-an { font-size: 12px; opacity: 0.75; }
+/* Couleurs de saison */
+.cal-saison-printemps { background: rgba(76,175,80,0.12);  border-color: #4caf50; }
+.cal-saison-ete       { background: rgba(255,152,0,0.12);  border-color: #ff9800; }
+.cal-saison-automne   { background: rgba(121,85,72,0.12);  border-color: #795548; }
+.cal-saison-hiver     { background: rgba(144,202,249,0.12);border-color: #90caf9; }
+.cal-saison-printemps .cal-saison-badge { background: rgba(76,175,80,0.25);   border-color: #4caf50; }
+.cal-saison-ete       .cal-saison-badge { background: rgba(255,152,0,0.25);   border-color: #ff9800; }
+.cal-saison-automne   .cal-saison-badge { background: rgba(121,85,72,0.25);   border-color: #795548; }
+.cal-saison-hiver     .cal-saison-badge { background: rgba(144,202,249,0.25); border-color: #90caf9; }
+
+/* Navigation */
+.cal-nav-bar {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.cal-jour-bar { margin-bottom: 8px; }
+.cal-nav-btn {
+  padding: 2px 8px; font-size: 12px; cursor: pointer;
+  background: rgba(201,162,39,0.1); border: 1px solid rgba(201,162,39,0.4);
+  border-radius: 3px; transition: background 0.15s;
+}
+.cal-nav-btn:hover { background: rgba(201,162,39,0.28); }
+.cal-date-label { font-size: 11px; font-style: italic; flex: 1; text-align: center; }
+.cal-date-display {
+  text-align: center; font-style: italic; font-size: 11px;
+  margin-bottom: 8px; opacity: 0.8;
+}
+
+/* Grille 5 × 6 */
+.cal-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px;
+  margin-bottom: 10px;
+}
+.cal-day {
+  text-align: center; padding: 4px 2px; font-size: 12px;
+  border: 1px solid rgba(201,162,39,0.2); border-radius: 3px;
+  cursor: default;
+}
+.cal-day.clickable { cursor: pointer; transition: background 0.12s; }
+.cal-day.clickable:hover { background: rgba(201,162,39,0.18); }
+.cal-day.today {
+  background: rgba(201,162,39,0.3);
+  border-color: var(--agone-gold, #c9a227);
+  font-weight: bold;
+}
+
+/* Note du jour */
+.cal-note-area { display: flex; flex-direction: column; gap: 4px; }
+.cal-note-label { font-size: 11px; font-weight: bold; }
+.cal-note-input {
+  width: 100%; resize: vertical; font-size: 12px;
+  border: 1px solid rgba(201,162,39,0.4); border-radius: 3px; padding: 4px;
+  background: rgba(0,0,0,0.04);
+}
+.cal-note-save {
+  align-self: flex-end; padding: 3px 10px; font-size: 11px; cursor: pointer;
+  background: rgba(201,162,39,0.15); border: 1px solid rgba(201,162,39,0.5);
+  border-radius: 3px; transition: background 0.15s;
+}
+.cal-note-save:hover { background: rgba(201,162,39,0.35); }
+

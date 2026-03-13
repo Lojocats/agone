@@ -339,19 +339,21 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = (attributKey === "agilite" || attributKey === "perception")
       ? (sd.armure?._malusAgiActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
       "1d10x10 + @base + @malus + @modif",
-      { base: baseScore, malus: malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure, modif }
+      { base: baseScore, malus: malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure, modif: modif + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base: `${label} ×2 : ${attrScore * 2}`,
+      base:   `${label} ×2 : ${attrScore * 2}`,
       aspect: `Bonus d'aspect : ${bonusAspect}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif:  `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
     return roll;
   }
@@ -381,6 +383,7 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label, { specialite });
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const bonusSpe    = this._lastBonusSpe ?? 0;
     const malusComp0  = compScore === 0 ? -3 : 0;
     const malusArmure = (attrKey === "agilite" || attrKey === "perception")
@@ -393,7 +396,7 @@ export class AgoneActor extends Actor {
         comp: compScore,
         attr: attrScore,
         bonus: bonusAspect + bonusSpe,
-        modif: modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure
+        modif: modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin
       }
     );
     await roll.evaluate();
@@ -401,7 +404,8 @@ export class AgoneActor extends Actor {
       competence: `${label} : ${compScore}${compScore === 0 ? ` (${game.i18n.localize("AGONE.MalusCompNonApprise")})` : ""}`,
       attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
       aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
     return roll;
   }
@@ -441,19 +445,21 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10 + @base + @modif",
-      { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure }
+      { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Initiative : ${base}`,
-      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
 
     // Mettre à jour le tracker de combat
-    await this._setInitiativeInCombat(roll.total);
+    await this._setInitiativeInCombat(Math.max(0, roll.total));
     return roll;
   }
 
@@ -468,19 +474,21 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10 + @base + @modif",
-      { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure }
+      { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Initiative Magique : ${base}`,
-      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
 
     // Mettre à jour le tracker de combat
-    await this._setInitiativeInCombat(roll.total);
+    await this._setInitiativeInCombat(Math.max(0, roll.total));
     return roll;
   }
 
@@ -511,10 +519,11 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure }
+      { total, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
@@ -522,7 +531,8 @@ export class AgoneActor extends Actor {
       competence:`Compétence : ${scoreComp}`,
       arme:      `Bonus arme : ${attackBonus}`,
       aspect:    `Bonus Corps : ${bonusCorps}`,
-      modif:     `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif:     `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     }, { arme, typeJet: "attaque" });
     return roll;
   }
@@ -551,11 +561,12 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = sd.armure?._malusAgiActif ?? 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure }
+      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
@@ -563,7 +574,8 @@ export class AgoneActor extends Actor {
       competence:`Compétence : ${scoreComp}`,
       arme:      `Bonus arme : ${defenseBonus}`,
       aspect:    `Bonus Corps : ${bonusCorps}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     }, { arme, typeJet: "parade" });
     return roll;
   }
@@ -578,16 +590,18 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = sd.armure?._malusAgiActif ?? 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure }
+      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Esquive : ${total}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
     return roll;
   }
@@ -602,16 +616,18 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = sd.armure?._malusAgiActif ?? 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
-      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure }
+      { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       base:  `Défense Naturelle : ${total}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`
+      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
     return roll;
   }
@@ -751,9 +767,10 @@ export class AgoneActor extends Actor {
     const modif = await this._dialogModificateur(label);
     if (modif === null) return;
 
+    const bonusSaisonin = this._getBonusSaisonin();
     const roll = new Roll(
       "1d10x10 + @aptitude + @modif",
-      { aptitude, modif }
+      { aptitude, modif: modif + bonusSaisonin }
     );
     await roll.evaluate();
 
@@ -766,7 +783,8 @@ export class AgoneActor extends Actor {
       aptitude: aptitudeLabel,
       seuil:    seuilLabel,
       resultat: succes ? "✔ Succès" : "✘ Échec",
-      modif:    `Bonus/Malus : ${modif}`
+      modif:    `Bonus/Malus : ${modif}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
     return roll;
   }
@@ -783,9 +801,28 @@ export class AgoneActor extends Actor {
   async _setInitiativeInCombat(value) {
     const combat = game.combat;
     if (!combat) return;
-    // Cherche dans tous les combattants du combat actif (token lié ou non)
-    const combatant = combat.combatants.find(c => c.actor?.id === this.id);
+    // Priorité 1 : via le TokenDocument associé à cet acteur (fonctionne même pour les tokens non-liés)
+    const token = this.token;
+    let combatant = token
+      ? combat.combatants.find(c => c.tokenId === token.id)
+      : null;
+    // Priorité 2 : via actorId (tokens liés dont la feuille est ouverte depuis le sidebar)
+    if (!combatant) combatant = combat.combatants.find(c => c.actorId === this.id);
     if (combatant) await combat.setInitiative(combatant.id, value);
+  }
+
+  /**
+   * Retourne +1 si la saison du monde correspond à la saison personnelle du personnage
+   * (via saisonPerso ou un item de type danseur avec saison correspondante).
+   */
+  _getBonusSaisonin() {
+    try {
+      const saisonMonde = game.settings?.get("agone", "saisonMonde") ?? "";
+      if (!saisonMonde) return 0;
+      const sd = this.system;
+      if (sd.saisonPerso && sd.saisonPerso === saisonMonde) return 1;
+      return this.items.some(i => i.type === "danseur" && i.system.saison === saisonMonde) ? 1 : 0;
+    } catch { return 0; }
   }
 
   /**

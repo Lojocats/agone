@@ -422,3 +422,49 @@ AGONE.competences = [
   { name: "Harmonie (Occulte)",           domaine: "Occulte",  attributLie: "creativite"   },
   { name: "Résonance (Occulte)",          domaine: "Occulte",  attributLie: "creativite"   },
 ];
+
+// ── Saisons du Monde ────────────────────────────────────────────────────────
+AGONE.saisons = {
+  "": "—",
+  printemps: "Printemps",
+  ete:       "Été",
+  automne:   "Automne",
+  hiver:     "Hiver",
+};
+
+// ── Calendrier d'Harmonde (10 mois × 30 jours) ──────────────────────────────
+AGONE.calendrier = {
+  joursParMois: 30,
+  mois: [
+    { nom: "Nymphe",   saison: "printemps" },
+    { nom: "Dryade",   saison: "printemps" },
+    { nom: "Troll",    saison: "printemps" },
+    { nom: "Phénix",   saison: "ete"       },
+    { nom: "Wyvern",   saison: "ete"       },
+    { nom: "Centaure", saison: "ete"       },
+    { nom: "Automne",  saison: "automne"   },
+    { nom: "Harpie",   saison: "hiver"     },
+    { nom: "Hydre",    saison: "hiver"     },
+    { nom: "Tarasque", saison: "hiver"     },
+  ],
+};
+
+// ── Saison par défaut pour chaque peuple ────────────────────────────────────
+AGONE.saisonParPeuple = {
+  humain:    "",
+  lutin:     "printemps",
+  farfadet:  "printemps",
+  satyre:    "printemps",
+  ogre:      "ete",
+  minotaure: "ete",
+  geant:     "ete",
+  drakonien: "automne",
+  morgane:   "automne",
+  pixie:     "automne",
+  feeNoire:  "hiver",
+  nain:      "hiver",
+  meduse:    "hiver",
+};
+for (const [k, s] of Object.entries(AGONE.saisonParPeuple)) {
+  if (AGONE.peuplesData[k]) AGONE.peuplesData[k].saisonDefaut = s;
+}

@@ -131,11 +131,15 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       system.description ?? "", { async: true, secrets: actor.isOwner }
     );
+    context.historiqueHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      system.historique ?? "", { async: true, secrets: actor.isOwner }
+    );
 
     // Config pour les selects
     context.peuples   = Object.entries(CONFIG.AGONE.peuples).map(([k, v]) => ({
       value: k, label: game.i18n.localize(v)
     }));
+    context.saisons = Object.entries(CONFIG.AGONE.saisons ?? {}).map(([value, label]) => ({ value, label }));
     context.attributsConfig = CONFIG.AGONE.attributs;
     context.typsArme  = CONFIG.AGONE.typesArme;
     context.competencesListe = CONFIG.AGONE.competences;
@@ -368,6 +372,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     this._setupDragReorder(html, ".armes-table tbody .item-row", ".armes-table tbody");
     this._setupDragReorder(html, ".equip-table tbody .item-row", ".equip-table tbody");
     this._setupDragReorder(html, ".dons-list .item-row", ".dons-list");
+    this._setupDragReorder(html, ".peines-table tbody .item-row", ".peines-table tbody");
 
     // Ouvrir le compendium de compétences / peuples
     html.find(".compendium-browse").click(this._onBrowseCompendium.bind(this));
@@ -1557,6 +1562,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       "system.charisma.raceMax":     nw.charismaMax     ?? null,
       "system.creativite.raceMin":   nw.creativiteMin   ?? null,
       "system.creativite.raceMax":   nw.creativiteMax   ?? null,
+      "system.saisonPerso":          nw.saisonDefaut || (CONFIG.AGONE.peuplesData[peupleKey]?.saisonDefaut ?? ""),
     };
     await this.actor.update(update);
     ui.notifications?.info(game.i18n.format("AGONE.PeupleApplique", { name: peupleItem.name }));

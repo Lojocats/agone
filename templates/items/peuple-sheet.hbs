@@ -31,6 +31,16 @@
             <label>{{localize "AGONE.VitesseVol"}}</label>
             <input type="number" name="system.mvVolBase" value="{{system.mvVolBase}}" class="stat-num" />
           </div>
+          <div class="peuple-row">
+            <label>{{localize "AGONE.SaisonDefaut"}}</label>
+            <select name="system.saisonDefaut">
+              <option value="" {{#if (eq system.saisonDefaut "")}}selected{{/if}}>—</option>
+              <option value="printemps" {{#if (eq system.saisonDefaut "printemps")}}selected{{/if}}>Printemps</option>
+              <option value="ete"       {{#if (eq system.saisonDefaut "ete")}}selected{{/if}}>Été</option>
+              <option value="automne"   {{#if (eq system.saisonDefaut "automne")}}selected{{/if}}>Automne</option>
+              <option value="hiver"     {{#if (eq system.saisonDefaut "hiver")}}selected{{/if}}>Hiver</option>
+            </select>
+          </div>
         </div>
 
         <div class="peuple-stat-group">

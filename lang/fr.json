@@ -60,6 +60,17 @@
     "Age":        "Âge",
     "Taille":     "Taille",
     "TAI":        "TAI",
+    "Masse":      "Masse",
+    "Parrain":    "Parrain / Marraine",
+    "Cheveux":    "Cheveux",
+    "Yeux":       "Yeux",
+    "Signes":     "Signes particuliers",
+    "Dieu":       "Divinité / Culte",
+    "Langues":    "Langues",
+    "Historique": "Notes & Historique",
+    "EtatCivilLabel": "État civil",
+    "PhysiqueLabel":  "Physique",
+    "CultureLabel":   "Culture & Croyances",
     "MV":         "Mouvement",
     "Exp":        "Expérience",
 
@@ -492,6 +503,15 @@
     "Immobilise":  "Immobilisé",
     "Contraint":   "Contraint",
     "Aveugle":     "Aveugle",
-    "Sourd":       "Sourd"
+    "Sourd":       "Sourd",
+
+    "SaisonMonde":      "Saison du Monde",
+    "SaisonMondeHint":  "La saison actuelle d'Harmonde. Les personnages dont la saison correspond gagnent +1 à tous leurs jets.",
+    "SaisonPerso":      "Saison personnelle",
+    "SaisonSaisonin":   "Saison du Saisonin",
+    "SaisonDefaut":     "Saison par défaut",
+    "ConfigSaison":     "Configurer la Saison",
+    "BonusSaisonin":    "Bonus Saisonin",
+    "CalendrierHarmonde": "Calendrier d'Harmonde"
   }
 }

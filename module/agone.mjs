@@ -29,6 +29,8 @@ import { PersonnageSheet }   from "./sheets/personnage-sheet.mjs";
 import { SortsBrowser }     from "./apps/sorts-browser.mjs";
 import { AvantagesBrowser } from "./apps/avantages-browser.mjs";
 import { PeinesBrowser }   from "./apps/peines-browser.mjs";
+import { SaisonConfig }    from "./apps/saison-config.mjs";
+import { CalendrierAgone } from "./apps/calendrier.mjs";
 import {
   CompagnonSheet, DemonSheet, PnjSheet
 } from "./sheets/actor-sheets.mjs";
@@ -43,7 +45,32 @@ Hooks.once("init", () => {
   // Référence globale
   game.agone = { AgoneActor, AgoneItem };
   CONFIG.AGONE = AGONE;
+  // ── Saison du Monde (paramètre monde) ────────────────────────────────────
+  game.settings.register("agone", "saisonMonde", {
+    name: "AGONE.SaisonMonde",
+    hint: "AGONE.SaisonMondeHint",
+    scope: "world",
+    config: false,
+    type: String,
+    default: "",
+    onChange: () => {
+      for (const actor of game.actors ?? []) {
+        if (actor.sheet?.rendered) actor.sheet.render(false);
+      }
+    },
+  });
 
+  // ── Calendrier d'Harmonde ────────────────────────────────────────────
+  game.settings.register("agone", "calendrierDate", {
+    scope: "world", config: false,
+    type: Object,
+    default: { jour: 1, mois: 1, an: 1 },
+  });
+  game.settings.register("agone", "calendrierNotes", {
+    scope: "world", config: false,
+    type: Object,
+    default: {},
+  });
   // ── Initiative : formule pour le tracker de combat natif ────────────────
   CONFIG.Combat.initiative = {
     formula:  "1d10 + @initiative",
@@ -151,6 +178,8 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/manoeuvres-browser.hbs",
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",
+    "systems/agone/templates/apps/saison-config.hbs",
+    "systems/agone/templates/apps/calendrier.hbs",
   ];
   foundry.applications.handlebars.loadTemplates(templates);
 
@@ -175,6 +204,15 @@ Hooks.once("init", () => {
  * ========================================================================= */
 Hooks.once("ready", async () => {
   console.log("Agone | Système prêt");
+
+  // Synchroniser saisonMonde avec le mois courant du calendrier
+  if (game.user.isGM) {
+    try {
+      const date = game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1 };
+      const moisData = CONFIG.AGONE.calendrier.mois[(date.mois - 1)];
+      if (moisData) await game.settings.set("agone", "saisonMonde", moisData.saison);
+    } catch {}
+  }
 
   if (!game.user.isGM) return;
 
@@ -365,6 +403,42 @@ Hooks.on("renderChatMessageHTML", (message, html) => {
   if (message.flags?.agone?.rollType) {
     html.classList.add("agone-roll");
   }
+});
+
+// Boutons Agone dans la barre d'outils
+Hooks.on("getSceneControlButtons", (controls) => {
+  controls["agone"] = {
+    name: "agone",
+    title: "Agone",
+    icon: "fas fa-dice-d10",
+    order: 999,
+    activeTool: "select",
+    tools: {
+      select: {
+        name: "select",
+        title: "Agone",
+        icon: "fas fa-dice-d10",
+        order: 0,
+      },
+      calendrier: {
+        name: "calendrier",
+        title: game.i18n.localize("AGONE.CalendrierHarmonde"),
+        icon: "fas fa-calendar-alt",
+        order: 1,
+        button: true,
+        onChange: () => new CalendrierAgone().render(true),
+      },
+      saison: {
+        name: "saison",
+        title: game.i18n.localize("AGONE.ConfigSaison"),
+        icon: "fas fa-sun",
+        order: 2,
+        button: true,
+        visible: game.user?.isGM ?? false,
+        onChange: () => new SaisonConfig().render(true),
+      },
+    },
+  };
 });
 
 // Hotbar drag-drop
