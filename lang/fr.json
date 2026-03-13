@@ -386,15 +386,8 @@
     "Qte":              "Qté",
 
     "Monnaie":   "Monnaie",
-    "Aiglon":    "Aiglon (argent)",
-    "Sastre":    "Sastre (argent)",
-    "Pistole":   "Pistole (or)",
-    "Dirhem":    "Dirhem (argent)",
-    "Perle":     "Perle",
-    "Cristal":   "Cristal",
-    "PieceOr":   "Pièce d'Or",
-    "Sou":       "Sou (cuivre)",
-    "Bribe":     "Bribe (cuivre)",
+    "PieceOr":   "Pièce d'Or (PO)",
+    "Bribe":     "Bribe",
 
     "JeterDe":              "Jeter les dés pour",
     "JeterInitiative":      "Jeter l'initiative",

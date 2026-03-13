@@ -79,7 +79,7 @@
 
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>
-      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+      <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
     </div>
   </section>
 </form>

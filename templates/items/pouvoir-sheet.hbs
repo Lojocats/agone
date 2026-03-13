@@ -17,7 +17,7 @@
     </div>
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>
-      {{editor descriptionHTML target="system.description" button=true editable=owner}}
+      <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
     </div>
     <div class="send-to-chat">
       <button type="button" data-action="toChat"><i class="fas fa-comment"></i> {{localize "AGONE.EnvoyerChat"}}</button>

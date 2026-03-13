@@ -204,15 +204,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
       // Monnaie
       monnaie: new fields.SchemaField({
-        aiglon:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        sastre:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        pistole:  new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        dirhem:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        perle:    new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        cristal:  new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        pieceOr:  new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        sou:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        bribe:    new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        pieceOr: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        bribe:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
       })
     };
   }

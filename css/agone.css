@@ -1147,11 +1147,18 @@
   font-weight: bold;
 }
 
+.agone .monnaie-taux {
+  font-size: 11px;
+  color: var(--agone-brown);
+  text-align: center;
+  margin: 4px 0 6px;
+  font-style: italic;
+}
 .agone .monnaie-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 .agone .monnaie-row {
   display: flex;
