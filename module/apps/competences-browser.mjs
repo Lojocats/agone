@@ -89,6 +89,13 @@ export class CompetencesBrowser extends Application {
       this.render();
     }, 250));
 
+    // Effacer la recherche
+    html.find(".cb-search-clear").on("click", () => {
+      this._search = "";
+      this._refocusSelector = ".cb-search";
+      this.render();
+    });
+
     // Checkbox "Tous" — efface le filtre de domaine
     html.find(".cb-all-check").on("change", () => {
       this._filterDoms.clear();

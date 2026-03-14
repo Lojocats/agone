@@ -139,6 +139,18 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       .sort()
       .map(t => ({ value: t, label: TYPE_LABELS_MAGIE[t] ?? t }));
 
+    // Grouper les sorts par seuil (affichage en cartes)
+    const _sortsBySeuil = {};
+    for (const s of context.sorts) {
+      if (s.system.danseurNom) continue;
+      const seuil = s.system.seuil ?? 0;
+      if (!_sortsBySeuil[seuil]) _sortsBySeuil[seuil] = [];
+      _sortsBySeuil[seuil].push(s);
+    }
+    context.sortsBySeuil = Object.entries(_sortsBySeuil)
+      .sort(([a], [b]) => Number(a) - Number(b))
+      .map(([seuil, sorts]) => ({ seuil: Number(seuil), sorts }));
+
     // Enrichissement de la description HTML
     context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       system.description ?? "", { async: true, secrets: actor.isOwner }
@@ -160,6 +172,17 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const _acquisNoms = new Set(actor.items.filter(i => i.type === "competence").map(i => i.name));
     context.competencesNonAcquises = (CONFIG.AGONE.competences ?? [])
       .filter(c => !_acquisNoms.has(c.name));
+
+    // Grouper les compétences acquises par score (pour affichage en cartes)
+    const _compsByScore = {};
+    for (const c of context.competences) {
+      const s = c.system.score ?? 0;
+      if (!_compsByScore[s]) _compsByScore[s] = [];
+      _compsByScore[s].push(c);
+    }
+    context.competencesByDomaine = Object.entries(_compsByScore)
+      .sort(([a], [b]) => Number(b) - Number(a))   // scores décroissants
+      .map(([score, comps]) => ({ score: Number(score), comps }));
 
     // Coûts XP pour la montée de niveau (multiplicateurs, après création)
     const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
@@ -467,6 +490,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     // Jets de dés — Compétences
     html.find("[data-action='rollCompetence']").click(this._onRollCompetence.bind(this));
     html.find("[data-action='rollCompetenceNA']").click(this._onRollCompetenceNA.bind(this));
+    html.find("[data-action='apprendreCompetenceNA']").click(this._onApprendreCompetenceNA.bind(this));
 
     // Barre de recherche compétences
     html.find(".comp-search-input").on("input", (ev) => this._onFilterCompetences(ev, html));
@@ -503,9 +527,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Drag & drop sorts → danseurs (mémorisation) + réordonnancement
     // Tracking mousedown pour détecter si le drag vient bien de la poignée
-    html.find(".sort-drag-handle").on("mousedown", () => { this._sortDragFromHandle = true; });
-    html.find(".sort-main-row").on("mouseup", () => { this._sortDragFromHandle = false; });
-    html.find(".sort-main-row[draggable]").each((_, el) => {
+    html.find(".sort-card-drag-handle").on("mousedown", () => { this._sortDragFromHandle = true; });
+    html.find(".sort-card").on("mouseup", () => { this._sortDragFromHandle = false; });
+    html.find(".sort-card[draggable]").each((_, el) => {
       el.addEventListener("dragstart", this._onDragSortStart.bind(this));
       el.addEventListener("dragend",   this._onDragSortEnd.bind(this));
     });
@@ -514,8 +538,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       el.addEventListener("dragleave", this._onDragLeaveDanseur.bind(this));
       el.addEventListener("drop",      this._onDropSortOnDanseur.bind(this));
     });
-    // Déposer sur le tableau de sorts pour réordonner
-    html.find(".sorts-table tbody").each((_, el) => {
+    // Déposer sur la grille de cartes pour réordonner
+    html.find(".sorts-cards-container").each((_, el) => {
       el.addEventListener("dragover",  this._onDragOverSortReorder.bind(this));
       el.addEventListener("dragleave", this._onDragLeaveSortReorder.bind(this));
       el.addEventListener("drop",      this._onDropSortReorder.bind(this));
@@ -527,7 +551,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     this._setupDanseurSlotsDrag(html);
 
     // Réordonnancement items par glisser-déposer
-    this._setupDragReorder(html, ".competences-table tbody .item-row", ".competences-table tbody");
+    this._setupDragReorder(html, ".comp-cards-grid:not(.comp-na-cards) .comp-card", ".comp-cards-grid:not(.comp-na-cards)");
     this._setupDragReorder(html, ".manoeuvres-table tbody .item-row", ".manoeuvres-table tbody");
     this._setupDragReorder(html, ".armes-table tbody .item-row", ".armes-table tbody");
     this._setupDragReorder(html, ".equip-table tbody .item-row", ".equip-table tbody");
@@ -691,12 +715,12 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   _onToggleSortDesc(event) {
     event.preventDefault();
     event.stopPropagation();
-    const btn = event.currentTarget;
-    const mainRow = btn.closest("tr.sort-main-row");
-    const descRow = mainRow?.nextElementSibling;
-    if (!descRow?.classList.contains("sort-desc-row")) return;
-    const isOpen = descRow.style.display !== "none";
-    descRow.style.display = isOpen ? "none" : "";
+    const btn   = event.currentTarget;
+    const card  = btn.closest(".sort-card");
+    const panel = card?.querySelector(".sort-desc-panel");
+    if (!panel) return;
+    const isOpen = panel.style.display !== "none";
+    panel.style.display = isOpen ? "none" : "";
     btn.querySelector("i")?.classList.toggle("fa-chevron-right", isOpen);
     btn.querySelector("i")?.classList.toggle("fa-chevron-down", !isOpen);
   }
@@ -794,15 +818,31 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     );
   }
 
+  async _onApprendreCompetenceNA(event) {
+    event.preventDefault();
+    const btn = event.currentTarget;
+    await Item.create({
+      name  : btn.dataset.nom,
+      type  : "competence",
+      system: { domaine: btn.dataset.domaine ?? "", attributLie: btn.dataset.attributLie ?? "agilite", score: 0, exp: 0 },
+    }, { parent: this.actor });
+  }
+
   _onFilterCompetences(event, html) {
     const query = event.currentTarget.value.trim().toLowerCase();
     const clearBtn = html.find(".comp-search-clear")[0];
     if (clearBtn) clearBtn.style.display = query ? "" : "none";
 
-    // Filtrer les lignes acquises
-    html.find(".competences-table:not(.comps-na-table) tbody .item-row").each((_, row) => {
-      const name = (row.querySelector(".item-name")?.textContent ?? "").trim().toLowerCase();
-      row.style.display = (!query || name.includes(query)) ? "" : "none";
+    // Filtrer les cartes acquises et masquer les groupes vides
+    html.find(".comp-group").each((_, group) => {
+      let anyVisible = false;
+      group.querySelectorAll(".comp-card.item-row").forEach(card => {
+        const name = (card.querySelector(".comp-card-name")?.textContent ?? "").trim().toLowerCase();
+        const visible = !query || name.includes(query);
+        card.style.display = visible ? "" : "none";
+        if (visible) anyVisible = true;
+      });
+      group.style.display = (!query || anyVisible) ? "" : "none";
     });
 
     // Section non acquises : visible seulement si recherche active
@@ -812,11 +852,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     naSection.style.display = "";
 
     let anyVisible = false;
-    html.find(".comps-na-table .na-row").each((_, row) => {
-      const nom     = (row.dataset.nom     ?? "").toLowerCase();
-      const domaine = (row.dataset.domaine ?? "").toLowerCase();
+    html.find(".comp-card--na.na-row").each((_, card) => {
+      const nom     = (card.dataset.nom     ?? "").toLowerCase();
+      const domaine = (card.dataset.domaine ?? "").toLowerCase();
       const visible = nom.includes(query) || domaine.includes(query);
-      row.style.display = visible ? "" : "none";
+      card.style.display = visible ? "" : "none";
       if (visible) anyVisible = true;
     });
     naSection.style.display = anyVisible ? "" : "none";
@@ -971,34 +1011,37 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   // Mini-filtre sorts (onglet Magie)
   // ==============================
   _onFiltreSorts(event) {
-    const query = event.currentTarget.value.toLowerCase().trim();
-    const tbody = event.currentTarget.closest(".sorts-block")?.querySelector(".sorts-table tbody");
-    if (!tbody) return;
-    for (const row of tbody.querySelectorAll("tr.sort-main-row")) {
-      const name = row.querySelector(".item-name")?.textContent?.toLowerCase() ?? "";
-      const type = row.cells[1]?.textContent?.toLowerCase() ?? "";
-      const show = !query || name.includes(query) || type.includes(query);
-      row.style.display = show ? "" : "none";
-      // Si on cache la ligne, cacher aussi la desc row
-      const nextRow = row.nextElementSibling;
-      if (nextRow?.classList.contains("sort-desc-row")) {
-        nextRow.style.display = "none";
-      }
-    }
+    const query     = event.currentTarget.value.toLowerCase().trim();
+    const sortsBlock = event.currentTarget.closest(".sorts-block");
+    if (!sortsBlock) return;
+    sortsBlock.querySelectorAll(".sort-group").forEach(group => {
+      let anyVisible = false;
+      group.querySelectorAll(".sort-card").forEach(card => {
+        const name = (card.querySelector(".sort-card-name")?.textContent ?? "").toLowerCase().trim();
+        const type = (card.querySelector(".sort-type-badge")?.textContent ?? "").toLowerCase().trim();
+        const show = !query || name.includes(query) || type.includes(query);
+        card.style.display = show ? "" : "none";
+        if (show) anyVisible = true;
+      });
+      group.style.display = (!query || anyVisible) ? "" : "none";
+    });
   }
 
   _onFiltreTypeSorts(event) {
     const checks      = event.currentTarget.closest(".smf-checks")?.querySelectorAll(".smf-check");
     const activeTypes = new Set([...(checks ?? [])].filter(c => c.checked).map(c => c.value));
-    const tbody       = event.currentTarget.closest(".sorts-block")?.querySelector(".sorts-table tbody");
-    if (!tbody) return;
-    for (const row of tbody.querySelectorAll("tr.sort-main-row")) {
-      const rowType = row.querySelector("td:nth-child(2)")?.textContent?.trim().split(" / ")[0] ?? "";
-      const show    = activeTypes.size === 0 || activeTypes.has(rowType);
-      row.style.display = show ? "" : "none";
-      const nextRow = row.nextElementSibling;
-      if (nextRow?.classList.contains("sort-desc-row")) nextRow.style.display = "none";
-    }
+    const sortsBlock  = event.currentTarget.closest(".sorts-block");
+    if (!sortsBlock) return;
+    sortsBlock.querySelectorAll(".sort-group").forEach(group => {
+      let anyVisible = false;
+      group.querySelectorAll(".sort-card").forEach(card => {
+        const cardType = (card.querySelector(".sort-type-badge")?.textContent?.trim() ?? "").split(" / ")[0];
+        const show     = activeTypes.size === 0 || activeTypes.has(cardType);
+        card.style.display = show ? "" : "none";
+        if (show) anyVisible = true;
+      });
+      group.style.display = (activeTypes.size === 0 || anyVisible) ? "" : "none";
+    });
   }
 
   // ==============================
@@ -1064,16 +1107,16 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   // ==============================
   // Réordonnancement des sorts
   // ==============================
-  _getTargetSortRow(event, tbody) {
-    for (const row of tbody.querySelectorAll("tr.sort-main-row")) {
-      const rect = row.getBoundingClientRect();
-      if (event.clientY >= rect.top && event.clientY <= rect.bottom) return row;
+  _getTargetSortCard(event, container) {
+    for (const card of container.querySelectorAll(".sort-card")) {
+      const rect = card.getBoundingClientRect();
+      if (event.clientY >= rect.top && event.clientY <= rect.bottom) return card;
     }
     return null;
   }
 
-  _clearSortDropIndicators(tbody) {
-    tbody.querySelectorAll(".sort-drop-above, .sort-drop-below").forEach(el => {
+  _clearSortDropIndicators(container) {
+    container.querySelectorAll(".sort-drop-above, .sort-drop-below").forEach(el => {
       el.classList.remove("sort-drop-above", "sort-drop-below");
     });
   }
@@ -1084,13 +1127,13 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     if (data?.type !== "sort-assign" && !event.dataTransfer.types.includes("text/plain")) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
-    const tbody    = event.currentTarget;
-    const targetRow = this._getTargetSortRow(event, tbody);
-    this._clearSortDropIndicators(tbody);
-    if (!targetRow) return;
-    const rect    = targetRow.getBoundingClientRect();
-    const before  = event.clientY < rect.top + rect.height / 2;
-    targetRow.classList.add(before ? "sort-drop-above" : "sort-drop-below");
+    const container  = event.currentTarget;
+    const targetCard = this._getTargetSortCard(event, container);
+    this._clearSortDropIndicators(container);
+    if (!targetCard) return;
+    const rect   = targetCard.getBoundingClientRect();
+    const before = event.clientY < rect.top + rect.height / 2;
+    targetCard.classList.add(before ? "sort-drop-above" : "sort-drop-below");
   }
 
   _onDragLeaveSortReorder(event) {
@@ -1100,8 +1143,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   async _onDropSortReorder(event) {
-    const tbody = event.currentTarget;
-    this._clearSortDropIndicators(tbody);
+    const container = event.currentTarget;
+    this._clearSortDropIndicators(container);
     // Le drop→danseur est prioritaire ; ne pas intercepter si la target est une zone danseur
     if (event.target.closest(".danseur-slots")) return;
     event.preventDefault();
@@ -1112,13 +1155,13 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const draggedSort = this.actor.items.get(data.itemId);
     if (!draggedSort || draggedSort.type !== "sort") return;
 
-    const targetRow = this._getTargetSortRow(event, tbody);
-    if (!targetRow || targetRow.dataset.itemId === data.itemId) return;
+    const targetCard = this._getTargetSortCard(event, container);
+    if (!targetCard || targetCard.dataset.itemId === data.itemId) return;
 
-    const targetSort = this.actor.items.get(targetRow.dataset.itemId);
+    const targetSort = this.actor.items.get(targetCard.dataset.itemId);
     if (!targetSort) return;
 
-    const rect       = targetRow.getBoundingClientRect();
+    const rect       = targetCard.getBoundingClientRect();
     const sortBefore = event.clientY < rect.top + rect.height / 2;
     const siblings   = this.actor.items.filter(i => i.type === "sort" && i.id !== draggedSort.id);
 

@@ -377,3 +377,193 @@
 .agone .na-roll-btn:hover { color: var(--agone-gold) !important; }
 .agone .na-score { font-size: 11px; color: var(--agone-brown); }
 .agone .na-malus { color: var(--agone-red); font-size: 10px; font-style: normal; }
+.agone .na-apprendre-btn {
+  border-color: var(--agone-gold);
+  color: var(--agone-gold);
+  opacity: 0.6;
+}
+.agone .na-apprendre-btn:hover { opacity: 1; background: var(--agone-gold); color: #fff; }
+
+/* ── Compétences — grille par domaine ───────────────────── */
+.agone .comp-groups-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.agone .comp-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--agone-border);
+  margin-bottom: 5px;
+}
+.agone .comp-group-count {
+  font-size: 10px;
+  color: var(--agone-brown);
+  opacity: 0.5;
+}
+/* Badge de score / niveau */
+.agone .comp-score-badge {
+  display: inline-block;
+  border-radius: 10px;
+  font-size: 9px;
+  padding: 1px 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0.4px;
+  border: 1px solid rgba(92,58,30,0.3);
+  background: rgba(92,58,30,0.10);
+  color: var(--agone-brown);
+}
+.agone .comp-score-badge.score-0 { background: rgba(92,58,30,0.07); color: #9a8070; border-color: rgba(92,58,30,0.18); }
+.agone .comp-score-badge.score-1 { background: rgba(92,58,30,0.10); color: #7a5c3a; }
+.agone .comp-score-badge.score-2 { background: rgba(120,90,30,0.14); color: #6a5020; }
+.agone .comp-score-badge.score-3 { background: rgba(160,120,20,0.16); color: #5a4010; border-color: rgba(160,120,20,0.4); }
+.agone .comp-score-badge.score-4 { background: rgba(180,140,10,0.20); color: #4a3000; border-color: rgba(180,140,10,0.5); }
+.agone .comp-score-badge.score-5 { background: rgba(201,162,39,0.25); color: #3a2200; border-color: rgba(201,162,39,0.55); }
+.agone .comp-score-badge.score-6,
+.agone .comp-score-badge.score-7,
+.agone .comp-score-badge.score-8,
+.agone .comp-score-badge.score-9,
+.agone .comp-score-badge.score-10 { background: rgba(201,162,39,0.35); color: #2a1800; border-color: var(--agone-gold); }
+/* Badge de domaine (partagé avec le browser) */
+.agone .comp-dom-badge {
+  display: inline-block;
+  border-radius: 10px;
+  font-size: 9px;
+  padding: 1px 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: rgba(92,58,30,0.12);
+  color: var(--agone-brown);
+  border: 1px solid rgba(92,58,30,0.3);
+  letter-spacing: 0.4px;
+}
+/* Grille de cartes */
+.agone .comp-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 5px;
+}
+/* Carte individuelle */
+.agone .comp-card {
+  background: rgba(92,58,30,0.03);
+  border: 1px solid var(--agone-border);
+  border-radius: 5px;
+  padding: 5px 7px 5px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-width: 0;
+}
+.agone .comp-card:hover {
+  border-color: var(--agone-gold);
+  box-shadow: 0 1px 5px rgba(201,162,39,0.15);
+}
+/* En-tête de carte : nom + spécialité */
+.agone .comp-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.agone .comp-card-name {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: var(--agone-dark-text);
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+  width: 100%;
+}
+.agone .comp-card-name:hover { color: var(--agone-gold); }
+.agone .comp-card-spe {
+  font-size: 10px;
+  color: var(--agone-brown);
+  opacity: 0.75;
+  font-style: italic;
+  line-height: 1.2;
+}
+/* Corps de carte : stats + level */
+.agone .comp-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 2px;
+}
+.agone .comp-card-stats {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.agone .comp-card-stat-lbl {
+  font-size: 9px;
+  color: var(--agone-brown);
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.agone .comp-card-attr-badge {
+  margin-left: auto;
+  font-size: 9px;
+  background: rgba(92,58,30,0.1);
+  color: var(--agone-brown);
+  border-radius: 3px;
+  padding: 1px 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.agone .comp-card-dom {
+  font-size: 9px;
+  color: var(--agone-brown);
+  opacity: 0.55;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+  margin-top: 1px;
+}
+.agone .comp-card-levelbtns {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+/* Actions : cachées par défaut, visibles au survol */
+.agone .comp-card-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: none;
+  gap: 2px;
+  align-items: center;
+  background: rgba(244,232,193,0.92);
+  border-radius: 3px;
+  padding: 1px 3px;
+  z-index: 2;
+}
+.agone .comp-card:hover .comp-card-actions { display: flex; }
+/* Carte NA (non acquise) */
+.agone .comp-card--na {
+  background: rgba(92,58,30,0.02);
+  border-color: rgba(92,58,30,0.18);
+}
+.agone .comp-card--na .comp-card-name {
+  color: #a08878;
+  font-weight: 500;
+}
+.agone .comp-card--na .comp-card-name:hover { color: var(--agone-gold); }
+.agone .comp-card--na .comp-card-actions { display: none; }
+.agone .comp-card--na:hover .comp-card-actions { display: flex; }

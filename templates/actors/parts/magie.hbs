@@ -121,6 +121,26 @@
       </button>
     </div>
 
+    <!-- Références de portée -->
+    <div class="portees-ref">
+      <div class="portee-ref-row">
+        <span class="portee-ref-label">👁️ <em>Portée du regard</em></span>
+        <span class="portee-ref-desc">Contact visuel requis — max <strong>3 m</strong></span>
+      </div>
+      <div class="portee-ref-row">
+        <span class="portee-ref-label">🎯 <em>À vue</em></span>
+        <span class="portee-ref-desc">Ligne de vue directe — max <strong>50 m</strong></span>
+      </div>
+      <div class="portee-ref-row">
+        <span class="portee-ref-label">🤝 <em>Contact</em></span>
+        <span class="portee-ref-desc">Toucher physique direct</span>
+      </div>
+      <div class="portee-ref-row">
+        <span class="portee-ref-label">🌍 <em>Illimitée</em></span>
+        <span class="portee-ref-desc">Connaissance du lieu ou de la cible requise</span>
+      </div>
+    </div>
+
     <!-- Mini-filtre sorts -->
     <div class="sorts-mini-filter">
       <div class="smf-search-wrap">
@@ -139,56 +159,48 @@
     </div>
 
     {{#if sorts.length}}
-    <table class="sorts-table">
-      <thead>
-        <tr>
-          <th>{{localize "AGONE.Nom"}}</th>
-          <th>{{localize "AGONE.TypeMagie"}}</th>
-          <th>{{localize "AGONE.Seuil"}}</th>
-          <th>{{localize "AGONE.Portee"}}</th>
-          <th>{{localize "AGONE.Duree"}}</th>
-          <th>{{localize "AGONE.Danse"}}</th>
-          <th></th>
-          <th class="col-drag"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each sorts as |sort|}}
-        {{#unless sort.system.danseurNom}}
-        <tr class="item-row sort-main-row" data-item-id="{{sort.id}}" draggable="true">
-          <td class="sort-name-cell">
-            {{#if sort.system.description}}
-            <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDesc" data-item-id="{{sort.id}}" title="Afficher la description">
-              <i class="fas fa-chevron-right"></i>
-            </button>
+    <div class="sorts-groups-container">
+      {{#each sortsBySeuil as |group|}}
+      <div class="sort-group" data-seuil="{{group.seuil}}">
+        <div class="sort-group-header">
+          <span class="sort-seuil-badge">Seuil {{group.seuil}}</span>
+          <span class="sort-group-count">{{group.sorts.length}}</span>
+        </div>
+        <div class="sorts-cards-container">
+          {{#each group.sorts as |sort|}}
+          <div class="sort-card item-row" data-item-id="{{sort.id}}" draggable="true">
+            <div class="sort-card-top">
+              {{#if sort.system.description}}
+              <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDesc"
+                      data-item-id="{{sort.id}}" title="Description">
+                <i class="fas fa-chevron-right sort-toggle-icon"></i>
+              </button>
+              {{/if}}
+              <button type="button" class="roll-btn sort-card-name item-name" data-action="rollSort"
+                      data-item-id="{{sort.id}}">{{sort.name}}</button>
+            </div>
+            {{#if sort.system.typeMagie}}
+            <span class="sort-type-badge">{{sort.system.typeMagie}}{{#if sort.system.instrument}} / {{sort.system.instrument}}{{/if}}</span>
             {{/if}}
-            <button type="button" class="roll-btn item-name" data-action="rollSort" data-item-id="{{sort.id}}">
-              {{sort.name}}
-            </button>
-          </td>
-          <td>{{sort.system.typeMagie}}{{#if sort.system.instrument}} / {{sort.system.instrument}}{{/if}}</td>
-          <td>{{sort.system.seuil}}</td>
-          <td>{{sort.system.portee}}</td>
-          <td>{{sort.system.duree}}</td>
-          <td>{{sort.system.danse}}</td>
-          <td>
-            {{#if sort.system.danseurNom}}<span class="sort-danseur-badge">{{sort.system.danseurNom}}</span>{{/if}}
-          </td>
-          <td class="sort-actions-cell">
-            <a class="item-edit" data-item-id="{{sort.id}}"><i class="fas fa-edit"></i></a>
-            <a class="item-delete" data-item-id="{{sort.id}}"><i class="fas fa-trash"></i></a>
-          </td>
-          <td class="sort-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></td>
-        </tr>
-        {{#if sort.system.description}}
-        <tr class="sort-desc-row" data-item-id="{{sort.id}}" style="display:none">
-          <td colspan="9" class="sort-description-cell">{{sort.system.description}}</td>
-        </tr>
-        {{/if}}
-        {{/unless}}
-        {{/each}}
-      </tbody>
-    </table>
+            <div class="sort-card-stats">
+              {{#if sort.system.portee}}<span class="sort-stat"><em>Portée</em> {{sort.system.portee}}</span>{{/if}}
+              {{#if sort.system.duree}}<span class="sort-stat"><em>Durée</em> {{sort.system.duree}}</span>{{/if}}
+              {{#if sort.system.danse}}<span class="sort-stat"><em>Lancer</em> {{sort.system.danse}}</span>{{/if}}
+            </div>
+            {{#if sort.system.description}}
+            <div class="sort-desc-panel" style="display:none">{{{sort.system.description}}}</div>
+            {{/if}}
+            <div class="sort-card-actions">
+              <a class="item-edit" data-item-id="{{sort.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
+              <a class="item-delete" data-item-id="{{sort.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+              <span class="sort-card-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      {{/each}}
+    </div>
     {{else}}
     <p class="empty-list">{{localize "AGONE.AucunSort"}}</p>
     {{/if}}

@@ -27,57 +27,67 @@
   </div>
 
   {{#if competences.length}}
-  <table class="competences-table">
-    <thead>
-      <tr>
-        <th class="col-nom">{{localize "AGONE.Nom"}}</th>
-        <th class="col-domaine">{{localize "AGONE.Domaine"}}</th>
-        <th class="col-specialite">{{localize "AGONE.Specialite"}}</th>
-        <th class="col-attr">{{localize "AGONE.AttributLie"}}</th>
-        <th class="col-score">{{localize "AGONE.Score"}}</th>
-        <th class="col-exp">{{localize "AGONE.Exp"}}</th>
-        <th class="col-actions"></th>
-        <th class="col-drag"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each competences as |comp|}}
-      <tr class="item-row" data-item-id="{{comp.id}}">
-        <td class="col-nom">
-          <button type="button" class="roll-btn item-name" data-action="rollCompetence" data-item-id="{{comp.id}}"
-                  title='{{localize "AGONE.JeterCompetence"}}'>
-            {{comp.name}}
-          </button>
-        </td>
-        <td class="col-domaine">{{comp.system.domaine}}</td>
-        <td class="col-specialite">{{comp.system.specialite}}</td>
-        <td class="col-attr">{{comp.system.attributLie}}</td>
-        <td class="col-score">
-          <input type="number" name="items.{{comp.id}}.system.score" value="{{comp.system.score}}" class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.score" />
-          {{#if ../showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
-                  data-type="competence" data-item-id="{{comp.id}}" data-cout="{{comp.xpCout}}" data-crea-cout="{{comp.creaCout}}"
-                  title='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
-            <i class="fas fa-arrow-up"></i> {{comp.coutAffiche}}
-          </button>
-          <button type="button" class="leveldown-btn" data-action="levelDown"
-                  data-type="competence" data-item-id="{{comp.id}}"
-                  title='{{localize "AGONE.RetrograderNiveau"}}'
-                  {{#unless comp.system.score}}disabled{{/unless}}>
-            <i class="fas fa-arrow-down"></i> {{comp.coutAfficheDown}}
-          </button>{{/if}}
-        </td>
-        <td class="col-exp">
-          <input type="number" name="items.{{comp.id}}.system.exp" value="{{comp.system.exp}}" class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />
-        </td>
-        <td class="col-actions">
-          <a class="item-edit" data-item-id="{{comp.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
-          <a class="item-delete" data-item-id="{{comp.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
-        </td>
-        <td class="col-drag"><span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span></td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
+  <div class="comp-groups-container">
+    {{#each competencesByDomaine as |group|}}
+    <div class="comp-group" data-score="{{group.score}}">
+      <div class="comp-group-header">
+        <span class="comp-score-badge score-{{group.score}}">Niveau {{group.score}}</span>
+        <span class="comp-group-count">{{group.comps.length}}</span>
+      </div>
+      <div class="comp-cards-grid">
+        {{#each group.comps as |comp|}}
+        <div class="comp-card item-row" data-item-id="{{comp.id}}">
+          <div class="comp-card-header">
+            <button type="button" class="roll-btn comp-card-name item-name"
+                    data-action="rollCompetence" data-item-id="{{comp.id}}"
+                    title='{{localize "AGONE.JeterCompetence"}}'>
+              {{comp.name}}
+            </button>
+            {{#if comp.system.specialite}}
+            <span class="comp-card-spe" title='{{localize "AGONE.Specialite"}}'>&#9733; {{comp.system.specialite}}</span>
+            {{/if}}
+          </div>
+          <div class="comp-card-body">
+            <div class="comp-card-stats">
+              <label class="comp-card-stat-lbl">score</label>
+              <input type="number" name="items.{{comp.id}}.system.score" value="{{comp.system.score}}"
+                     class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.score" />
+              <label class="comp-card-stat-lbl">exp.</label>
+              <input type="number" name="items.{{comp.id}}.system.exp" value="{{comp.system.exp}}"
+                     class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />
+              <span class="comp-card-attr-badge">{{comp.system.attributLie}}</span>
+            </div>
+            {{#if comp.system.domaine}}
+            <div class="comp-card-dom">{{comp.system.domaine}}</div>
+            {{/if}}
+            {{#if @root.showLevelUp}}
+            <div class="comp-card-levelbtns">
+              <button type="button" class="levelup-btn" data-action="levelUp"
+                      data-type="competence" data-item-id="{{comp.id}}"
+                      data-cout="{{comp.xpCout}}" data-crea-cout="{{comp.creaCout}}"
+                      title='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
+                <i class="fas fa-arrow-up"></i> {{comp.coutAffiche}}
+              </button>
+              <button type="button" class="leveldown-btn" data-action="levelDown"
+                      data-type="competence" data-item-id="{{comp.id}}"
+                      title='{{localize "AGONE.RetrograderNiveau"}}'
+                      {{#unless comp.system.score}}disabled{{/unless}}>
+                <i class="fas fa-arrow-down"></i> {{comp.coutAfficheDown}}
+              </button>
+            </div>
+            {{/if}}
+          </div>
+          <div class="comp-card-actions">
+            <a class="item-edit" data-item-id="{{comp.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
+            <a class="item-delete" data-item-id="{{comp.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+            <span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
   {{else}}
   <p class="empty-list">{{localize "AGONE.AucuneCompetence"}}</p>
   {{/if}}
@@ -85,28 +95,32 @@
   <!-- Compétences non acquises (visible uniquement lors d'une recherche) -->
   <div class="comps-na-section" style="display:none">
     <p class="na-section-title"><i class="fas fa-dice"></i> {{localize "AGONE.CompetencesNonAcquises"}}</p>
-    <table class="competences-table comps-na-table">
-      <tbody>
-        {{#each competencesNonAcquises as |c|}}
-        <tr class="item-row na-row" data-nom="{{c.name}}" data-domaine="{{c.domaine}}">
-          <td class="col-nom">
-            <button type="button" class="roll-btn item-name na-roll-btn" data-action="rollCompetenceNA"
-                    data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.domaine}}"
-                    title='{{localize "AGONE.JeterCompetenceNonAcquise"}}'>
-              {{c.name}}
-            </button>
-          </td>
-          <td class="col-domaine">{{c.domaine}}</td>
-          <td class="col-specialite">—</td>
-          <td class="col-attr">{{c.attributLie}}</td>
-          <td class="col-score"><span class="na-score">0 <em class="na-malus">(−3)</em></span></td>
-          <td class="col-exp">—</td>
-          <td class="col-actions"></td>
-          <td class="col-drag"></td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
+    <div class="comp-cards-grid comp-na-cards">
+      {{#each competencesNonAcquises as |c|}}
+      <div class="comp-card comp-card--na na-row" data-nom="{{c.name}}" data-domaine="{{c.domaine}}">
+        <div class="comp-card-header">
+          <button type="button" class="roll-btn comp-card-name na-roll-btn" data-action="rollCompetenceNA"
+                  data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.domaine}}"
+                  title='{{localize "AGONE.JeterCompetenceNonAcquise"}}'>
+            {{c.name}}
+          </button>
+        </div>
+        <div class="comp-card-body">
+          <div class="comp-card-stats">
+            <span class="na-score">0 <em class="na-malus">(−3)</em></span>
+            <span class="comp-card-attr-badge">{{c.attributLie}}</span>
+          </div>
+        </div>
+        <div class="comp-card-actions">
+          <button type="button" class="na-apprendre-btn btn-icon" data-action="apprendreCompetenceNA"
+                  data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.domaine}}"
+                  title='{{localize "AGONE.ApprendreCompetence"}}'>
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      {{/each}}
+    </div>
   </div>
 
   <!-- Manœuvres & Bottes -->

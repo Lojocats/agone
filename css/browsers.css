@@ -852,6 +852,17 @@
   padding: 2px 8px;
 }
 .competences-browser .cb-search-wrap i { font-size: 11px; opacity: 0.5; }
+.competences-browser .cb-search-clear {
+  background: transparent;
+  border: none;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 2px;
+  line-height: 1;
+}
+.competences-browser .cb-search-clear:hover { opacity: 1; color: var(--agone-red, #9a2a2a); }
 .competences-browser .cb-search {
   border: none !important;
   background: transparent !important;

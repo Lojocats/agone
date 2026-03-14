@@ -2,7 +2,11 @@
 
   <!-- Filtres -->
   <div class="cb-filters">
-    <input type="text" class="cb-search" placeholder="Rechercher une compétence…" value="{{search}}" />
+    <div class="cb-search-wrap">
+      <i class="fas fa-search cb-search-icon"></i>
+      <input type="text" class="cb-search" placeholder="Rechercher une compétence…" value="{{search}}" />
+      {{#if search}}<button type="button" class="cb-search-clear" title="Effacer">✕</button>{{/if}}
+    </div>
 
     <div class="cb-filter-row">
       <!-- Domaines -->

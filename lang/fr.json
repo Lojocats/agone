@@ -125,6 +125,7 @@
     "EffacerRecherche":    "Effacer la recherche",
     "CompetencesNonAcquises": "Compétences non acquises",
     "JeterCompetenceNonAcquise": "Lancer cette compétence (non apprise, malus −3)",
+    "ApprendreCompetence": "Apprendre cette compétence (ajouter à la fiche)",
     "PtsCreationComp":    "Points de création (compétences)",
     "PtsCreationCarac":   "Points de création (caractéristiques)",
     "MonterNiveau":           "Montée de niveau",
