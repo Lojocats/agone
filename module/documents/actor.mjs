@@ -849,6 +849,98 @@ export class AgoneActor extends Actor {
     return roll;
   }
 
+  /**
+   * Jet de sort d'emprise improvis\u00e9 via un danseur (depuis le browser de sorts).
+   * Reprend la logique de _onRollSortDanseur avec s\u00e9uil \u00d7 2.
+   */
+  async rollSortImproDanseur(danseurId, sortData) {
+    const danseur = this.items.get(danseurId);
+    if (!danseur) return;
+
+    if ((danseur.system.enduranceActuelle ?? 0) <= 0) {
+      ui.notifications.warn(`${danseur.name} n'a plus d'endurance et ne peut pas lancer de sort.`);
+      return;
+    }
+
+    const sd          = this.system;
+    const seuilBase   = sortData.seuil ?? 0;
+    const seuil       = seuilBase * 2;
+    const label       = `${sortData.name} (improvis\u00e9 via ${danseur.name})`;
+
+    const compDanseurs      = this.items.find(i =>
+      i.type === "competence" && i.name.toLowerCase().includes("danseur")
+    );
+    const scoreConnDanseurs = compDanseurs?.system.score ?? 0;
+    const aptitude          = (sd.emprise ?? 0) + scoreConnDanseurs + (sd.bonusEsprit ?? 0);
+    const bonusDanseur      = danseur.system.bonusEmprise ?? 0;
+    const bonusEsprit       = sd.bonusEsprit ?? 0;
+    const endBefore         = danseur.system.enduranceActuelle ?? 0;
+    const newEnd            = Math.max(0, endBefore - 1);
+
+    const empSourceLabel = sd.typeMage === "jorniste"      ? `INT (${sd.intelligence?.score ?? 0}) \u2014 Jorniste`
+                         : sd.typeMage === "obscurantiste" ? `VOL (${sd.volonte?.score ?? 0}) \u2014 Obscurantiste`
+                         : `(INT ${sd.intelligence?.score ?? 0} + VOL ${sd.volonte?.score ?? 0}) / 2 \u2014 \u00c9clipsiste`;
+
+    const modif = await this._dialogModificateur(label);
+    if (modif === null) return;
+
+    const roll = new Roll("1d10x10 + @apt + @bd + @modif", {
+      apt: aptitude, bd: bonusDanseur, modif,
+    });
+    await roll.evaluate();
+
+    const succes = roll.total >= seuil;
+    await this._sendRollToChat(roll, label, {
+      sort:      { label: "Sort",         value: sortData.name },
+      seuil:     { label: "Seuil",        value: `${seuil} (${seuilBase} \u00d7 2, improvis\u00e9)` },
+      resultat:  { label: "R\u00e9sultat", value: succes ? "\u2714 Succ\u00e8s" : "\u2718 \u00c9chec" },
+      danseur:   { label: "Danseur",      value: danseur.name },
+      endurance: { label: "Endurance",    value: `${endBefore} \u2192 ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
+      empBase:   { label: "Emprise (base)", value: sd.emprise ?? 0, tooltip: empSourceLabel },
+      connDans:  { label: compDanseurs?.name ?? "Conn. Danseurs", value: `+${scoreConnDanseurs}` },
+      esprit:    { label: "Bonus Esprit",   value: `+${bonusEsprit}`,
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} \u2212 Esprit Noir ${sd.esprit?.noir ?? 0}` },
+      aptTotal:  { label: "Total Emprise",  value: aptitude },
+      bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
+      modif:     { label: "Bonus / Malus",  value: modif >= 0 ? `+${modif}` : modif },
+    });
+
+    await danseur.update({ "system.enduranceActuelle": newEnd });
+    return roll;
+  }
+
+  async rollImprovisationDanseur(danseurId) {
+    const danseur = this.items.get(danseurId);
+    if (!danseur) return;
+
+    const sd    = this.system;
+    const label = game.i18n.format("AGONE.ImprovisationEmpriseLabel", { nom: danseur.name });
+
+    const cre         = sd.creativite?.score ?? 0;
+    const empathie    = danseur.system.empathie ?? 0;
+    const bonusEsprit = sd.bonusEsprit ?? 0;
+    const aptitude    = cre + empathie + bonusEsprit;
+    const endAct      = danseur.system.enduranceActuelle ?? 0;
+    const endMax      = danseur.system.enduranceMax     ?? 0;
+
+    const modif = await this._dialogModificateur(label);
+    if (modif === null) return;
+
+    const roll = new Roll("1d10x10 + @apt + @modif", { apt: aptitude, modif });
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      danseur:   { label: "Danseur",                      value: danseur.name },
+      endurance: { label: "Endurance danseur",            value: `${endAct} / ${endMax}` },
+      cre:       { label: "Cr\u00e9ativit\u00e9 (CR\u00c9)",              value: cre },
+      empathie:  { label: `Empathie (${danseur.name})`,  value: `+${empathie}` },
+      esprit:    { label: "Bonus Esprit",                 value: `+${bonusEsprit}`,
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} \u2212 Esprit Noir ${sd.esprit?.noir ?? 0}` },
+      aptTotal:  { label: "Total Improvisation",          value: aptitude },
+      modif:     { label: "Bonus / Malus",                value: modif >= 0 ? `+${modif}` : modif },
+    });
+    return roll;
+  }
+
   // ==============================
   // Private helpers
   // ==============================

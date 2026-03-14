@@ -1041,36 +1041,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
   async _onRollImprovisation(event) {
     event.preventDefault();
-    const itemId  = event.currentTarget.dataset.itemId;
-    const danseur = this.actor.items.get(itemId);
-    if (!danseur) return;
-
-    const sd    = this.actor.system;
-    const label = game.i18n.format("AGONE.ImprovisationEmpriseLabel", { nom: danseur.name });
-
-    // Impro : CRÉ + Empathie(danseur) + bonusEsprit
-    const cre         = sd.creativite?.score ?? 0;
-    const empathie    = danseur.system.empathie ?? 0;
-    const bonusEsprit = sd.bonusEsprit ?? 0;
-    const aptitude    = cre + empathie + bonusEsprit;
-    const endAct      = danseur.system.enduranceActuelle ?? 0;
-    const endMax      = danseur.system.enduranceMax     ?? 0;
-
-    const modif = await this.actor._dialogModificateur(label);
-    if (modif === null) return;
-
-    const roll = new Roll("1d10x10 + @apt + @modif", { apt: aptitude, modif });
-    await roll.evaluate();
-    await this.actor._sendRollToChat(roll, label, {
-      danseur:   { label: "Danseur",          value: danseur.name },
-      endurance: { label: "Endurance danseur", value: `${endAct} / ${endMax}` },
-      cre:       { label: "Créativité (CRÉ)",  value: cre },
-      empathie:  { label: `Empathie (${danseur.name})`, value: `+${empathie}` },
-      esprit:    { label: "Bonus Esprit",       value: `+${bonusEsprit}`,
-                   tooltip: `Esprit ${sd.esprit?.score ?? 0} − Esprit Noir ${sd.esprit?.noir ?? 0}` },
-      aptTotal:  { label: "Total Improvisation", value: aptitude },
-      modif:     { label: "Bonus / Malus",       value: modif >= 0 ? `+${modif}` : modif },
-    });
+    const itemId = event.currentTarget.dataset.itemId;
+    await this.actor.rollImprovisationDanseur(itemId);
   }
 
   // ==============================

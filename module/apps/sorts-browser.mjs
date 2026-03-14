@@ -170,7 +170,35 @@ export class SortsBrowser extends Application {
       if (isNaN(idx)) return;
       const d = SORTS_DATA[idx];
       if (!d) return;
-      // Priorité à l'item acteur (pour les compAlt et bonus éventuels)
+
+      // Sorts d'emprise (danseurs) : demander quel danseur utiliser
+      const EMPRISE_TYPES = new Set(["jorniste", "obscurantiste", "eclipsiste"]);
+      if (EMPRISE_TYPES.has(d.typeMagie)) {
+        const danseurs = this.actor.items.filter(i => i.type === "danseur" && !i.system.modeCreation);
+        if (!danseurs.length) {
+          ui.notifications.warn(`${this.actor.name} n'a aucun danseur disponible pour lancer ce sort d'emprise.`);
+          return;
+        }
+        let danseurId;
+        if (danseurs.length === 1) {
+          danseurId = danseurs[0].id;
+        } else {
+          const options = danseurs.map(dan => `<option value="${dan.id}">${dan.name}</option>`).join("");
+          danseurId = await foundry.applications.api.DialogV2.prompt({
+            window:  { title: `Sort d'emprise improvis\u00e9 \u2014 ${d.name}` },
+            content: `<div class="form-group" style="margin:8px 0">
+                        <label style="font-weight:600">Danseur \u00e0 utiliser&nbsp;:</label>
+                        <select name="danseurId" style="width:100%;margin-top:4px">${options}</select>
+                      </div>`,
+            ok: { label: "Lancer", callback: (_ev, btn) => btn.form.elements.danseurId.value },
+          });
+          if (!danseurId) return;
+        }
+        await this.actor.rollSortImproDanseur(danseurId, { name: d.name, seuil: d.seuil });
+        return;
+      }
+
+      // Sort normal (Arts Magiques)
       const actorItem = this.actor.items.find(i => i.type === "sort" && i.name === d.name);
       if (actorItem) {
         await this.actor.rollSort(actorItem.id, { impro: true });
