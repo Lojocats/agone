@@ -144,7 +144,6 @@ AGONE.peuplesData = {
     charismaBonus: 1,  charismaMin: 7,  charismaMax: null,
     creativiteBonus: 1, creativiteMin: null, creativiteMax: null,
   },
-  // ── Peuples hors tableau (valeurs estimées) ──────────────────
   drakonien: {
     taiBase: 0, pointsCreationComp: 100, corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,   agiliteMin: null, agiliteMax: null,

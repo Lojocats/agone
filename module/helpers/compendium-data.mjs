@@ -614,7 +614,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Farfadet",
-    taiBase: -2, mvBase: 5,
+    taiBase: -1, mvBase: 5,
     pointsCreationComp: 15,
     competencesRaciales: ["Acrobaties", "Esquive"],
     corpsBonus: 0, espritBonus: 0, ameBonus: 2,
@@ -622,7 +622,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Lutin",
-    taiBase: -3, mvBase: 6,
+    taiBase: -1, mvBase: 6,
     pointsCreationComp: 15,
     competencesRaciales: ["Acrobaties", "Vol"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 1,
@@ -638,7 +638,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Minotaure",
-    taiBase: 2, mvBase: 4,
+    taiBase: 1, mvBase: 4,
     pointsCreationComp: 12,
     competencesRaciales: ["Corps-à-corps", "Intimidation"],
     corpsBonus: 3, espritBonus: 0, ameBonus: 0,
@@ -646,7 +646,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Ogre",
-    taiBase: 2, mvBase: 4,
+    taiBase: 0, mvBase: 4,
     pointsCreationComp: 10,
     competencesRaciales: ["Intimidation", "Résistance à la douleur"],
     corpsBonus: 4, espritBonus: -1, ameBonus: 0,
@@ -654,7 +654,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Drakonien",
-    taiBase: 1, mvBase: 4,
+    taiBase: 0, mvBase: 4,
     pointsCreationComp: 12,
     competencesRaciales: ["Magie drakonienne", "Résistance au feu"],
     corpsBonus: 1, espritBonus: 1, ameBonus: 1,
@@ -670,7 +670,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Pixie",
-    taiBase: -4, mvBase: 1, volBase: 18,
+    taiBase: -2, mvBase: 1, volBase: 18,
     pointsCreationComp: 18,
     competencesRaciales: ["Magie des fées", "Furtivité"],
     corpsBonus: 0, espritBonus: 2, ameBonus: 2,
@@ -678,7 +678,7 @@ export const PEUPLES_DATA = [
   },
   {
     name: "Fée Noire",
-    taiBase: -1, mvBase: 5, volBase: 9,
+    taiBase: -2, mvBase: 5, volBase: 9,
     pointsCreationComp: 14,
     competencesRaciales: ["Manipulation", "Magie sombre"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 2,
