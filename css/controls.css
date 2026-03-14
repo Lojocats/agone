@@ -220,6 +220,18 @@
 .agone .btn-icon:hover,
 .agone .item-create:hover { background: var(--agone-gold); color: var(--agone-brown-dark); }
 
+/* Bouton toggle tri (compétences, sorts) — plus grand que btn-icon standard */
+.agone .tri-toggle-btn {
+  width: auto;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+  gap: 5px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 .agone .item-edit, .agone .item-delete {
   cursor: pointer;
   font-size: 11px;
@@ -429,6 +441,7 @@
 .agone .comp-score-badge.score-8,
 .agone .comp-score-badge.score-9,
 .agone .comp-score-badge.score-10 { background: rgba(201,162,39,0.35); color: #2a1800; border-color: var(--agone-gold); }
+.agone .comp-score-badge.fam-badge { background: rgba(40,80,120,0.12); color: #1a3a5c; border-color: rgba(40,80,120,0.3); }
 /* Badge de domaine (partagé avec le browser) */
 .agone .comp-dom-badge {
   display: inline-block;

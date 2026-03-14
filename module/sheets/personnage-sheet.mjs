@@ -151,6 +151,31 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       .sort(([a], [b]) => Number(a) - Number(b))
       .map(([seuil, sorts]) => ({ seuil: Number(seuil), sorts }));
 
+    // Grouper les sorts — adaptatif selon le flag de tri
+    const _triSorts = actor.getFlag("agone", "triSorts") ?? "type";
+    context.triSortsEstType = _triSorts === "type";
+
+    if (context.triSortsEstType) {
+      const TYPE_ORDER = ["jorniste", "obscurantiste", "eclipsiste", "accord", "cyse", "decorum", "geste"];
+      const _byType = {};
+      for (const s of context.sorts) {
+        if (s.system.danseurNom) continue;
+        const type = s.system.typeMagie || "Autre";
+        if (!_byType[type]) _byType[type] = [];
+        _byType[type].push(s);
+      }
+      context.sortsGroups = [
+        ...TYPE_ORDER.filter(t => _byType[t]).map(t => ({
+          label: TYPE_LABELS_MAGIE[t] ?? t, sorts: _byType[t],
+        })),
+        ...Object.keys(_byType).filter(t => !TYPE_ORDER.includes(t)).map(t => ({
+          label: t, sorts: _byType[t],
+        })),
+      ];
+    } else {
+      context.sortsGroups = context.sortsBySeuil.map(g => ({ label: `Seuil ${g.seuil}`, sorts: g.sorts }));
+    }
+
     // Enrichissement de la description HTML
     context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       system.description ?? "", { async: true, secrets: actor.isOwner }
@@ -171,18 +196,55 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     // Compétences non encore acquises par le personnage (pour jet avec malus -3)
     const _acquisNoms = new Set(actor.items.filter(i => i.type === "competence").map(i => i.name));
     context.competencesNonAcquises = (CONFIG.AGONE.competences ?? [])
-      .filter(c => !_acquisNoms.has(c.name));
+      .filter(c => !_acquisNoms.has(c.name))
+      .map(c => ({ ...c, displayName: c.name.replace(/\s*\([^)]*\)$/, '').trim() }));
 
-    // Grouper les compétences acquises par score (pour affichage en cartes)
-    const _compsByScore = {};
-    for (const c of context.competences) {
-      const s = c.system.score ?? 0;
-      if (!_compsByScore[s]) _compsByScore[s] = [];
-      _compsByScore[s].push(c);
+    // Grouper les compétences acquises — adaptatif selon le flag de tri
+    const _compFamilleMap = new Map((CONFIG.AGONE.competences ?? []).map(c => [c.name, c.famille ?? ""]));
+    // Index supplémentaire par nom de base (sans la famille entre parenthèses) pour matcher les items raciaux
+    const _compBaseMap = new Map((CONFIG.AGONE.competences ?? []).map(c => [
+      c.name.replace(/\s*\([^)]*\)$/, '').trim(), c.famille ?? "",
+    ]));
+    const _getFamille = (name) => _compFamilleMap.get(name)
+      || _compFamilleMap.get(name.replace(/\s*\([^)]*\)$/, '').trim())
+      || _compBaseMap.get(name)
+      || _compBaseMap.get(name.replace(/\s*\([^)]*\)$/, '').trim())
+      || "Autre";
+    const _triComps = actor.getFlag("agone", "triComps") ?? "famille";
+    context.triCompsEstFamille = _triComps === "famille";
+
+    if (!context.triCompsEstFamille) {
+      // Par score décroissant
+      const _byScore = {};
+      for (const c of context.competences) {
+        const s = c.system.score ?? 0;
+        if (!_byScore[s]) _byScore[s] = [];
+        _byScore[s].push(c);
+      }
+      context.competencesGroups = Object.entries(_byScore)
+        .sort(([a], [b]) => Number(b) - Number(a))
+        .map(([score, comps]) => ({ label: `Niveau ${score}`, className: `score-${score}`, comps }));
+    } else {
+      // Par famille
+      const ORDRE_FAMILLES = ["Épreuve", "Maraude", "Savoir", "Société", "Occulte"];
+      const _byFam = {};
+      for (const c of context.competences) {
+        const fam = _getFamille(c.name);
+        if (!_byFam[fam]) _byFam[fam] = [];
+        _byFam[fam].push(c);
+      }
+      context.competencesGroups = [
+        ...ORDRE_FAMILLES.filter(f => _byFam[f]).map(f => ({
+          label: f, className: "fam-badge",
+          comps: _byFam[f].sort((a, b) => (b.system.score ?? 0) - (a.system.score ?? 0)),
+        })),
+        ...Object.keys(_byFam).filter(f => !ORDRE_FAMILLES.includes(f)).map(f => ({
+          label: f, className: "fam-badge",
+          comps: _byFam[f].sort((a, b) => (b.system.score ?? 0) - (a.system.score ?? 0)),
+        })),
+      ];
     }
-    context.competencesByDomaine = Object.entries(_compsByScore)
-      .sort(([a], [b]) => Number(b) - Number(a))   // scores décroissants
-      .map(([score, comps]) => ({ score: Number(score), comps }));
+    context.competencesByDomaine = context.competencesGroups; // alias backward compat
 
     // Coûts XP pour la montée de niveau (multiplicateurs, après création)
     const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
@@ -288,14 +350,14 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     // Accord → Musique | Cyse → Sculpture | Décorum → Peinture | Geste → Poésie
     const DOMAINES_ARTS = ["Accord", "Décorum", "Geste", "Cyse"];
     const ARTS_COMP_LIEE = {
-      "Accord":  "Musique (Société)",
-      "Cyse":    "Sculpture (Société)",
-      "Décorum": "Peinture (Société)",
-      "Geste":   "Poésie (Société)",
+      "Accord":  "Musique",
+      "Cyse":    "Sculpture",
+      "Décorum": "Peinture",
+      "Geste":   "Poésie",
     };
     context.artsMagiquesByDomaine = DOMAINES_ARTS.map(domaine => {
       const comp = context.competences.find(c =>
-        c.name === "Arts Magiques (Occulte)" && c.system.domaine === domaine
+        c.name === "Arts Magiques" && c.system.domaine === domaine
       );
       const score        = comp ? (comp.system.score ?? 0) : 0;
       const specialite   = comp?.system.specialite ?? "";
@@ -627,6 +689,10 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     html.find("[data-action='resetComps']").click(this._onResetComps.bind(this));
     html.find("[data-action='validerCreation']").click(this._onValiderCreation.bind(this));
 
+    // Toggle tri compétences & sorts
+    html.find("[data-action='triCompsToggle']").click(this._onTriCompsToggle.bind(this));
+    html.find("[data-action='triSortsToggle']").click(this._onTriSortsToggle.bind(this));
+
     // Drag & drop inline items
     html.find(".item-drag").each((i, li) => {
       li.setAttribute("draggable", true);
@@ -824,7 +890,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     await Item.create({
       name  : btn.dataset.nom,
       type  : "competence",
-      system: { domaine: btn.dataset.domaine ?? "", attributLie: btn.dataset.attributLie ?? "agilite", score: 0, exp: 0 },
+      system: { domaine: "", attributLie: btn.dataset.attributLie ?? "agilite", score: 0, exp: 0 },
     }, { parent: this.actor });
   }
 
@@ -1747,7 +1813,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         type:   "competence",
         system: {
           nom:         c.nom,
-          domaine:     c.domaine     ?? "",
+          domaine:     c.famille     ?? "",
           specialite:  c.specialite  ?? "",
           attributLie: VALID_ATTRS.includes(c.attributLie) ? c.attributLie : "agilite",
           score:       c.score       ?? 5,
@@ -1798,19 +1864,19 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       "system.peupleMalusEnAttente.volonteBonus":      negB('volonte'),
       "system.peupleMalusEnAttente.charismaBonus":     negB('charisma'),
       "system.peupleMalusEnAttente.creativiteBonus":   negB('creativite'),
-      // Aspects — bonus positifs uniquement
-      "system.corps.score":  Math.max(0, (sd.corps?.score  ?? 0) - (old.corpsBonus  ?? 0) + Math.max(0, nw.corpsBonus  ?? 0)),
-      "system.esprit.score": Math.max(0, (sd.esprit?.score ?? 0) - (old.espritBonus ?? 0) + Math.max(0, nw.espritBonus ?? 0)),
-      "system.ame.score":    Math.max(0, (sd.ame?.score    ?? 0) - (old.ameBonus    ?? 0) + Math.max(0, nw.ameBonus    ?? 0)),
-      // Attributs : bonus positif appliqué, clamp au max racial uniquement
-      "system.agilite.score":      calcScoreCrea(sd.agilite?.score,      old.agiliteBonus,      posB('agilite'),      nw.agiliteMax),
-      "system.force.score":        calcScoreCrea(sd.force?.score,        old.forceBonus,        posB('force'),        nw.forceMax),
-      "system.perception.score":   calcScoreCrea(sd.perception?.score,   old.perceptionBonus,   posB('perception'),   nw.perceptionMax),
-      "system.resistance.score":   calcScoreCrea(sd.resistance?.score,   old.resistanceBonus,   posB('resistance'),   nw.resistanceMax),
-      "system.intelligence.score": calcScoreCrea(sd.intelligence?.score, old.intelligenceBonus, posB('intelligence'), nw.intelligenceMax),
-      "system.volonte.score":      calcScoreCrea(sd.volonte?.score,      old.volonteBonus,      posB('volonte'),      nw.volonteMax),
-      "system.charisma.score":     calcScoreCrea(sd.charisma?.score,     old.charismaBonus,     posB('charisma'),     nw.charismaMax),
-      "system.creativite.score":   calcScoreCrea(sd.creativite?.score,   old.creativiteBonus,   posB('creativite'),   nw.creativiteMax),
+      // Reset total : aspects remis à 0 + bonus racial positif
+      "system.corps.score":  posB('corps'),
+      "system.esprit.score": posB('esprit'),
+      "system.ame.score":    posB('ame'),
+      // Reset total : attributs remis à 0 + bonus racial positif
+      "system.agilite.score":      posB('agilite'),
+      "system.force.score":        posB('force'),
+      "system.perception.score":   posB('perception'),
+      "system.resistance.score":   posB('resistance'),
+      "system.intelligence.score": posB('intelligence'),
+      "system.volonte.score":      posB('volonte'),
+      "system.charisma.score":     posB('charisma'),
+      "system.creativite.score":   posB('creativite'),
       // Contraintes raciales persistantes
       "system.agilite.raceMin":      nw.agiliteMin      ?? null,
       "system.agilite.raceMax":      nw.agiliteMax      ?? null,
@@ -1828,10 +1894,34 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       "system.charisma.raceMax":     nw.charismaMax     ?? null,
       "system.creativite.raceMin":   nw.creativiteMin   ?? null,
       "system.creativite.raceMax":   nw.creativiteMax   ?? null,
+      // Réinitialisation des points de création
+      "system.ptsCreationCarac.depense": 0,
+      "system.ptsCreationComp.depense":  0,
       "system.saisonPerso":          nw.saisonDefaut || (CONFIG.AGONE.peuplesData[peupleKey]?.saisonDefaut ?? ""),
     };
     await this.actor.update(update);
+    // Reset des scores de toutes les compétences non-raciales
+    const compsToReset = this.actor.items.filter(i => i.type === "competence" && !newCompIds.includes(i.id));
+    if (compsToReset.length) {
+      await this.actor.updateEmbeddedDocuments("Item", compsToReset.map(i => ({
+        _id: i.id, "system.score": 0, "system.exp": 0,
+      })));
+    }
     ui.notifications?.info(game.i18n.format("AGONE.PeupleApplique", { name: peupleItem.name }));
+  }
+
+  // Toggle tri des compétences
+  async _onTriCompsToggle(event) {
+    event.preventDefault();
+    const cur = this.actor.getFlag("agone", "triComps") ?? "famille";
+    await this.actor.setFlag("agone", "triComps", cur === "famille" ? "score" : "famille");
+  }
+
+  // Toggle tri des sorts
+  async _onTriSortsToggle(event) {
+    event.preventDefault();
+    const cur = this.actor.getFlag("agone", "triSorts") ?? "type";
+    await this.actor.setFlag("agone", "triSorts", cur === "type" ? "seuil" : "type");
   }
 
   // Montée de niveau (dépense XP)
@@ -1857,6 +1947,14 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
     }
 
+    // Vérification du plafond de score compétence (max 10)
+    if (type === "competence") {
+      const item0 = this.actor.items.get(itemId);
+      if (item0 && (item0.system.score ?? 0) >= 10) {
+        return ui.notifications.warn(game.i18n.localize("AGONE.MaxCompetenceAtteint"));
+      }
+    }
+
     const isCarac  = (type === "aspect" || type === "carac");
     const pool     = isCarac ? sd.ptsCreationCarac : sd.ptsCreationComp;
     const restePts = (pool?.max ?? 0) - (pool?.depense ?? 0);
@@ -1878,12 +1976,6 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
           game.i18n.format("AGONE.PasAssezPtsCrea", { cout: creaCout, actuel: restePts })
         );
       }
-      const confirmed = await foundry.applications.api.DialogV2.confirm({
-        title:   game.i18n.localize("AGONE.MonterNiveau"),
-        content: `<p>${game.i18n.format("AGONE.ConfirmerMonteeNiveau", { cout: `${creaCout} ${game.i18n.localize("AGONE.PointsCreation")}` })}</p>`
-      });
-      if (!confirmed) return;
-
       if (isCarac) {
         await this.actor.update({
           [`system.${key}.score`]:          (sd[key].score ?? 0) + 1,
@@ -1936,12 +2028,6 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
       return;
     }
-
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
-      title:   game.i18n.localize("AGONE.MonterNiveau"),
-      content: `<p>${game.i18n.format("AGONE.ConfirmerMonteeNiveau", { cout: xpCout })}</p>`
-    });
-    if (!confirmed) return;
 
     if (isCarac) {
       await this.actor.update({
@@ -2002,12 +2088,6 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
       const remboursement = creaDelta(rawScore - 1);
 
-      const confirmed = await foundry.applications.api.DialogV2.confirm({
-        title:   game.i18n.localize("AGONE.RetrograderNiveau"),
-        content: `<p>${game.i18n.format("AGONE.ConfirmerRetrogradeNiveau", { remboursement: `${remboursement} ${game.i18n.localize("AGONE.PointsCreation")}` })}</p>`,
-      });
-      if (!confirmed) return;
-
       if (type === "carac") {
         await this.actor.update({
           [`system.${key}.score`]:           currentScore - 1,
@@ -2026,12 +2106,6 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const mult            = type === "aspect" ? m.aspect : type === "carac" ? m.carac : m.competence;
     const xpRemboursement = currentScore * mult;
     const isCaracOrAspect = (type === "carac" || type === "aspect");
-
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
-      title:   game.i18n.localize("AGONE.RetrograderNiveau"),
-      content: `<p>${game.i18n.format("AGONE.ConfirmerRetrogradeNiveau", { remboursement: `${xpRemboursement} XP` })}</p>`,
-    });
-    if (!confirmed) return;
 
     if (isCaracOrAspect) {
       await this.actor.update({

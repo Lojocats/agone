@@ -154,6 +154,7 @@
     "NiveauMaxCrea":           "Ce niveau dépasse la limite autorisée par la table d'achat (max 10).",
     "PasAssezPtsCrea":         "Points de création insuffisants : il faut {cout} (disponibles : {actuel}).",
     "MaxRacialAtteint":        "Maximum racial atteint — cette caractéristique ne peut pas être augmentée davantage.",
+    "MaxCompetenceAtteint":    "Score maximum atteint — une compétence ne peut pas dépasser 10.",
     "MinRacialRequis":         "Minimum racial non atteint — cette caractéristique doit encore être augmentée.",
     "RetrograderNiveau":             "Rétrograder",
     "ConfirmerRetrogradeNiveau":     "Rétrograder au niveau inférieur et récupérer {remboursement} ?",

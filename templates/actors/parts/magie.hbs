@@ -119,6 +119,10 @@
       <button type="button" class="item-create" data-type="sort" title='{{localize "AGONE.AjouterSort"}}'>
         <i class="fas fa-plus"></i>
       </button>
+      <button type="button" class="btn-icon tri-toggle-btn" data-action="triSortsToggle"
+              title='{{#if triSortsEstType}}Trier par seuil{{else}}Trier par type{{/if}}'>
+        <i class="fas fa-sort"></i> {{#if triSortsEstType}}Type{{else}}Séuil{{/if}}
+      </button>
     </div>
 
     <!-- Références de portée & MQ -->
@@ -196,10 +200,10 @@
 
     {{#if sorts.length}}
     <div class="sorts-groups-container">
-      {{#each sortsBySeuil as |group|}}
-      <div class="sort-group" data-seuil="{{group.seuil}}">
+      {{#each sortsGroups as |group|}}
+      <div class="sort-group" data-key="{{group.label}}">
         <div class="sort-group-header">
-          <span class="sort-seuil-badge">Seuil {{group.seuil}}</span>
+          <span class="sort-seuil-badge">{{group.label}}</span>
           <span class="sort-group-count">{{group.sorts.length}}</span>
         </div>
         <div class="sorts-cards-container">

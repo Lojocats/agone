@@ -10,7 +10,7 @@ const fields = foundry.data.fields;
 export class CompetenceData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
-      nom:        new fields.StringField({ initial: "Armes (Épreuve)" }),
+      nom:        new fields.StringField({ initial: "Armes" }),
       domaine:    new fields.StringField({ initial: "" }),
       specialite: new fields.StringField({ initial: "" }),
       score:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),

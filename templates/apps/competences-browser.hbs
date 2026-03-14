@@ -12,13 +12,13 @@
       <!-- Domaines -->
       <div class="cb-dom-filters">
         <label>
-          <input type="checkbox" class="cb-all-check" {{#if allDomainesSelected}}checked{{/if}} />
+          <input type="checkbox" class="cb-all-check" {{#if allFamillesSelected}}checked{{/if}} />
           Tous
         </label>
-        {{#each allDomaines as |d|}}
+        {{#each allFamilles as |f|}}
         <label>
-          <input type="checkbox" class="cb-dom-check" value="{{d.value}}" {{#if d.active}}checked{{/if}} />
-          <span class="cb-dom-badge dom-{{d.value}}">{{d.label}}</span>
+          <input type="checkbox" class="cb-fam-check" value="{{f.value}}" {{#if f.active}}checked{{/if}} />
+          <span class="cb-fam-badge fam-{{f.value}}">{{f.label}}</span>
         </label>
         {{/each}}
       </div>
@@ -38,7 +38,7 @@
       <thead>
         <tr>
           <th>Compétence</th>
-          <th>Domaine</th>
+          <th>Famille</th>
           <th>Attribut lié</th>
           <th></th>
         </tr>
@@ -47,10 +47,10 @@
         {{#each competences as |c|}}
         <tr class="cb-row {{#if c.count}}cb-row-owned{{/if}}">
           <td class="cb-name">
-            {{c.name}}
+            {{c.displayName}}
             {{#if c.count}}<span class="cb-count-badge" title="Possédée {{c.count}} fois">×{{c.count}}</span>{{/if}}
           </td>
-          <td><span class="cb-dom-badge dom-{{c.domaine}}">{{c.domaine}}</span></td>
+          <td><span class="cb-fam-badge fam-{{c.famille}}">{{c.famille}}</span></td>
           <td class="cb-attr">{{c.attributLie}}</td>
           <td>
             <button type="button" class="cb-add-btn" data-action="addCompetence"

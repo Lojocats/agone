@@ -461,47 +461,73 @@ Hooks.on("preCreateScene", (scene, data) => {
 });
 
 // ── Tooltip santé (hover token non-possédé) ──────────────────────────────────
-Hooks.on("hoverToken", (token, hovered) => {
-  const old = document.getElementById("agone-sante-tip");
-  if (old) {
-    old.remove();
-    if (token._agoneTipMove) {
-      document.removeEventListener("mousemove", token._agoneTipMove);
-      delete token._agoneTipMove;
-    }
+{
+  // Token canvas actuellement survolé (référence pour mises à jour et nettoyage)
+  let _agoneSanteToken = null;
+
+  function _buildTipLabel(token) {
+    const pdv = token.actor?.system?.pdv;
+    if (!pdv?.max) return null;
+    const pct = pdv.valeur / pdv.max;
+    const get = (k) => game.settings.get("agone", k);
+    return pct >= 1.0  ? get("santeLabel100") :
+           pct >= 0.75 ? get("santeLabel75")  :
+           pct >= 0.5  ? get("santeLabel50")  :
+           pct >= 0.25 ? get("santeLabel25")  :
+           pct >  0    ? get("santeLabel10")  :
+                         get("santeLabel0");
   }
-  if (!hovered) return;
-  if (!token.actor) return;
-  // Les propriétaires voient la barre HP directement ; le GM voit quand même le tooltip
-  if (!game.user?.isGM && token.isOwner) return;
 
-  const pdv = token.actor.system?.pdv;
-  if (!pdv || !pdv.max) return;
-
-  const pct = pdv.valeur / pdv.max;
-  const get = (k) => game.settings.get("agone", k);
-  const label =
-    pct >= 1.0  ? get("santeLabel100") :
-    pct >= 0.75 ? get("santeLabel75")  :
-    pct >= 0.5  ? get("santeLabel50")  :
-    pct >= 0.25 ? get("santeLabel25")  :
-    pct >  0    ? get("santeLabel10")  :
-                  get("santeLabel0");
-
-  const tip = document.createElement("div");
-  tip.id = "agone-sante-tip";
-  tip.className = "agone-sante-tip";
-  tip.innerHTML = `<strong>${token.name}</strong> <em>${label}</em>`;
-  document.body.appendChild(tip);
-
-  const move = (e) => {
-    const el = document.getElementById("agone-sante-tip");
-    if (el) {
-      el.style.left = `${e.clientX + 16}px`;
-      el.style.top  = `${e.clientY - 10}px`;
+  function _removeTip() {
+    document.getElementById("agone-sante-tip")?.remove();
+    if (_agoneSanteToken?._agoneTipMove) {
+      document.removeEventListener("mousemove", _agoneSanteToken._agoneTipMove);
+      delete _agoneSanteToken._agoneTipMove;
     }
-  };
-  document.addEventListener("mousemove", move);
-  token._agoneTipMove = move;
-});
+    _agoneSanteToken = null;
+  }
+
+  Hooks.on("hoverToken", (token, hovered) => {
+    _removeTip();
+    if (!hovered || !token.actor) return;
+    // Les propriétaires voient la barre HP directement ; le GM voit quand même le tooltip
+    if (!game.user?.isGM && token.isOwner) return;
+    const label = _buildTipLabel(token);
+    if (!label) return;
+
+    _agoneSanteToken = token;
+    const tip = document.createElement("div");
+    tip.id = "agone-sante-tip";
+    tip.className = "agone-sante-tip";
+    tip.innerHTML = `<strong>${token.name}</strong> <em>${label}</em>`;
+    document.body.appendChild(tip);
+
+    const move = (e) => {
+      const el = document.getElementById("agone-sante-tip");
+      if (el) {
+        el.style.left = `${e.clientX + 16}px`;
+        el.style.top  = `${e.clientY - 10}px`;
+      }
+    };
+    document.addEventListener("mousemove", move);
+    token._agoneTipMove = move;
+  });
+
+  // Supprime le tooltip immédiatement si le token survolé est supprimé
+  Hooks.on("deleteToken", (tokenDoc) => {
+    if (_agoneSanteToken && _agoneSanteToken.document?.id === tokenDoc.id) {
+      _removeTip();
+    }
+  });
+
+  // Met à jour le texte du tooltip si les PdV changent pendant le survol
+  Hooks.on("updateActor", (actor) => {
+    if (!_agoneSanteToken) return;
+    const tip = document.getElementById("agone-sante-tip");
+    if (!tip) return;
+    if (_agoneSanteToken.actor?.id !== actor.id) return;
+    const label = _buildTipLabel(_agoneSanteToken);
+    if (label) tip.innerHTML = `<strong>${_agoneSanteToken.name}</strong> <em>${label}</em>`;
+  });
+}
 

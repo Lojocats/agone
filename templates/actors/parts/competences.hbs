@@ -17,6 +17,10 @@
     <button type="button" class="item-create" data-type="competence" title='{{localize "AGONE.AjouterCompetence"}}'>
       <i class="fas fa-plus"></i>
     </button>
+    <button type="button" class="btn-icon tri-toggle-btn" data-action="triCompsToggle"
+            title='{{#if triCompsEstFamille}}Trier par niveau{{else}}Trier par famille{{/if}}'>
+      <i class="fas fa-sort"></i> {{#if triCompsEstFamille}}Famille{{else}}Niveau{{/if}}
+    </button>
   </div>
 
   <!-- Barre de recherche compétences -->
@@ -28,10 +32,10 @@
 
   {{#if competences.length}}
   <div class="comp-groups-container">
-    {{#each competencesByDomaine as |group|}}
-    <div class="comp-group" data-score="{{group.score}}">
+    {{#each competencesGroups as |group|}}
+    <div class="comp-group" data-key="{{group.label}}">
       <div class="comp-group-header">
-        <span class="comp-score-badge score-{{group.score}}">Niveau {{group.score}}</span>
+        <span class="comp-score-badge {{group.className}}">{{group.label}}</span>
         <span class="comp-group-count">{{group.comps.length}}</span>
       </div>
       <div class="comp-cards-grid">
@@ -97,12 +101,12 @@
     <p class="na-section-title"><i class="fas fa-dice"></i> {{localize "AGONE.CompetencesNonAcquises"}}</p>
     <div class="comp-cards-grid comp-na-cards">
       {{#each competencesNonAcquises as |c|}}
-      <div class="comp-card comp-card--na na-row" data-nom="{{c.name}}" data-domaine="{{c.domaine}}">
+      <div class="comp-card comp-card--na na-row" data-nom="{{c.name}}" data-domaine="{{c.famille}}">
         <div class="comp-card-header">
           <button type="button" class="roll-btn comp-card-name na-roll-btn" data-action="rollCompetenceNA"
-                  data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.domaine}}"
+                  data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.famille}}"
                   title='{{localize "AGONE.JeterCompetenceNonAcquise"}}'>
-            {{c.name}}
+            {{c.displayName}}
           </button>
         </div>
         <div class="comp-card-body">
@@ -113,7 +117,7 @@
         </div>
         <div class="comp-card-actions">
           <button type="button" class="na-apprendre-btn btn-icon" data-action="apprendreCompetenceNA"
-                  data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.domaine}}"
+                  data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.famille}}"
                   title='{{localize "AGONE.ApprendreCompetence"}}'>
             <i class="fas fa-plus"></i>
           </button>

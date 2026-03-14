@@ -133,7 +133,7 @@ export class AgoneActor extends Actor {
 
         // Esquive totale (AGI + compétence Esquive + Bonus Corps)
         const compEsquive = this.items.find(i =>
-          i.type === "competence" && i.name === "Esquive (Épreuve)"
+          i.type === "competence" && i.name === "Esquive"
         );
         const scoreEsquive = compEsquive ? compEsquive.system.score : 0;
         systemData.esquiveTotal = systemData.agilite.score + scoreEsquive + systemData.bonusCorps;
@@ -143,14 +143,14 @@ export class AgoneActor extends Actor {
 
         // Potentiel de conjuration (Noirceur + Démonologie + Bonus Âme)
         const compDemono = this.items.find(i =>
-          i.type === "competence" && i.name === "Démonologie (Occulte)"
+          i.type === "competence" && i.name === "Démonologie"
         );
         const scoreDemono = compDemono ? compDemono.system.score : 0;
         systemData.aptitudeConjuration = systemData.noirceur + scoreDemono + systemData.bonusAme;
 
         // Potentiel Arts Magiques (ART + Arts Magiques + Bonus Âme)
         const compArts = this.items.find(i =>
-          i.type === "competence" && i.name === "Arts Magiques (Occulte)"
+          i.type === "competence" && i.name === "Arts Magiques"
         );
         const scoreArts = compArts ? compArts.system.score : 0;
         systemData.aptitudeArtsMagiques = systemData.art + scoreArts + systemData.bonusAme;
@@ -314,16 +314,16 @@ export class AgoneActor extends Actor {
     }
 
     // --- 7. Re-dérivation des stats basées sur les items ---
-    const compEsquive  = this.items.find(i => i.type === "competence" && i.name === "Esquive (Épreuve)");
+    const compEsquive  = this.items.find(i => i.type === "competence" && i.name === "Esquive");
     const scoreEsquive = compEsquive?.system.score ?? 0;
     sd.esquiveTotal    = sd.agilite.score + scoreEsquive + sd.bonusCorps;
     sd.esquiveDistance = Math.round((sd.agilite.score + scoreEsquive) / 2);
 
-    const compDemono       = this.items.find(i => i.type === "competence" && i.name === "Démonologie (Occulte)");
+    const compDemono       = this.items.find(i => i.type === "competence" && i.name === "Démonologie");
     const scoreDemono      = compDemono?.system.score ?? 0;
     sd.aptitudeConjuration = sd.noirceur + scoreDemono + sd.bonusAme;
 
-    const compArts          = this.items.find(i => i.type === "competence" && i.name === "Arts Magiques (Occulte)");
+    const compArts          = this.items.find(i => i.type === "competence" && i.name === "Arts Magiques");
     const scoreArts         = compArts?.system.score ?? 0;
     sd.aptitudeArtsMagiques = sd.art + scoreArts + sd.bonusAme;
 
@@ -792,7 +792,7 @@ export class AgoneActor extends Actor {
       const domaineCible = TYPES_TO_DOMAINE[typeMagie] ?? null;
       const hasArts = this.items.some(i =>
         i.type === "competence" &&
-        i.name === "Arts Magiques (Occulte)" &&
+        i.name === "Arts Magiques" &&
         (domaineCible === null ? true : i.system.domaine === domaineCible)
       );
       if (!hasArts) {

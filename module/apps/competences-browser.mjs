@@ -9,7 +9,7 @@ export class CompetencesBrowser extends Application {
     super(options);
     this.actor         = actor;
     this._search       = "";
-    this._filterDoms   = new Set();   // sous-ensemble de Épreuve/Maraude/Savoir/Société/Occulte
+    this._filterFams   = new Set();   // sous-ensemble de Épreuve/Maraude/Savoir/Société/Occulte
     this._filterPossede = "all";      // "all" | "oui" | "non"
   }
 
@@ -31,7 +31,7 @@ export class CompetencesBrowser extends Application {
 
   /** @override */
   async getData() {
-    const DOMAINES = ["Épreuve", "Maraude", "Savoir", "Société", "Occulte"];
+    const FAMILLES = ["Épreuve", "Maraude", "Savoir", "Société", "Occulte"];
 
     // Compter combien de fois chaque compétence est possédée
     const compCount = {};
@@ -41,10 +41,11 @@ export class CompetencesBrowser extends Application {
     }
 
     let competences = (CONFIG.AGONE?.competences ?? []).map(d => ({
-      name       : d.name,
-      domaine    : d.domaine,
-      attributLie: d.attributLie,
-      count      : compCount[d.name] ?? 0,
+      name        : d.name,
+      displayName : d.name.replace(/\s*\([^)]*\)$/, '').trim(),
+      famille     : d.famille,
+      attributLie : d.attributLie,
+      count       : compCount[d.name] ?? 0,
     }));
 
     // Filtres
@@ -52,8 +53,8 @@ export class CompetencesBrowser extends Application {
       const s = this._search.toLowerCase();
       competences = competences.filter(c => c.name.toLowerCase().includes(s));
     }
-    if (this._filterDoms.size > 0) {
-      competences = competences.filter(c => this._filterDoms.has(c.domaine));
+    if (this._filterFams.size > 0) {
+      competences = competences.filter(c => this._filterFams.has(c.famille));
     }
     if (this._filterPossede === "oui") {
       competences = competences.filter(c => c.count > 0);
@@ -63,18 +64,18 @@ export class CompetencesBrowser extends Application {
 
     competences.sort((a, b) => a.name.localeCompare(b.name, "fr"));
 
-    const allDomaines = DOMAINES.map(d => ({
-      value : d,
-      label : d,
-      active: this._filterDoms.has(d),
+    const allFamilles = FAMILLES.map(f => ({
+      value : f,
+      label : f,
+      active: this._filterFams.has(f),
     }));
 
     return {
       competences,
-      allDomaines,
-      search           : this._search,
-      filterPossede    : this._filterPossede,
-      allDomainesSelected: this._filterDoms.size === 0,
+      allFamilles,
+      search              : this._search,
+      filterPossede       : this._filterPossede,
+      allFamillesSelected : this._filterFams.size === 0,
     };
   }
 
@@ -96,17 +97,17 @@ export class CompetencesBrowser extends Application {
       this.render();
     });
 
-    // Checkbox "Tous" — efface le filtre de domaine
+    // Checkbox "Tous" — efface le filtre de famille
     html.find(".cb-all-check").on("change", () => {
-      this._filterDoms.clear();
+      this._filterFams.clear();
       this.render();
     });
 
-    // Checkboxes de domaine
-    html.find(".cb-dom-check").on("change", e => {
-      const d = e.currentTarget.value;
-      if (e.currentTarget.checked) this._filterDoms.add(d);
-      else                         this._filterDoms.delete(d);
+    // Checkboxes de famille
+    html.find(".cb-fam-check").on("change", e => {
+      const f = e.currentTarget.value;
+      if (e.currentTarget.checked) this._filterFams.add(f);
+      else                         this._filterFams.delete(f);
       this.render();
     });
 

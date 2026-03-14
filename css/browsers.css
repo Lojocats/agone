@@ -927,7 +927,7 @@
   transition: color 0.15s;
 }
 .competences-browser .cb-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
-.competences-browser .cb-dom-badge {
+.competences-browser .cb-fam-badge {
   display: inline-block;
   border-radius: 10px;
   font-size: 9px;
