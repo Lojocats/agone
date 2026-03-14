@@ -69,4 +69,9 @@ export function registerHandlebarsHelpers() {
   Handlebars.registerHelper("multiply", function(a, b) {
     return Number(a) * Number(b);
   });
+
+  Handlebars.registerHelper("or", function(...args) {
+    args.pop(); // options object
+    return args.some(Boolean);
+  });
 }

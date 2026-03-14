@@ -60,6 +60,26 @@ Hooks.once("init", () => {
     },
   });
 
+  // ── Labels de santé (textes affichés au hover d'un token non-possédé) ──
+  const _santeLabels = [
+    { key: "santeLabel100", def: "se porte à merveille",      hint: "AGONE.SanteLabel100Hint" },
+    { key: "santeLabel75",  def: "se porte bien",             hint: "AGONE.SanteLabel75Hint"  },
+    { key: "santeLabel50",  def: "a vu de meilleurs jours",   hint: "AGONE.SanteLabel50Hint"  },
+    { key: "santeLabel25",  def: "est blessé",                hint: "AGONE.SanteLabel25Hint"  },
+    { key: "santeLabel10",  def: "est aux portes de la mort", hint: "AGONE.SanteLabel10Hint"  },
+    { key: "santeLabel0",   def: "semble mourant",            hint: "AGONE.SanteLabel0Hint"   },
+  ];
+  for (const { key, def, hint } of _santeLabels) {
+    game.settings.register("agone", key, {
+      name: `AGONE.${key.charAt(0).toUpperCase() + key.slice(1)}`,
+      hint,
+      scope: "world",
+      config: true,
+      type: String,
+      default: def,
+    });
+  }
+
   // ── Calendrier d'Harmonde ────────────────────────────────────────────
   game.settings.register("agone", "calendrierDate", {
     scope: "world", config: false,
@@ -175,6 +195,8 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/peines-browser.hbs",
     // Partials Perfidie
     "systems/agone/templates/actors/parts/perfidie.hbs",
+    "systems/agone/templates/actors/parts/companions.hbs",
+    "systems/agone/templates/actors/parts/parametres.hbs",
     "systems/agone/templates/apps/manoeuvres-browser.hbs",
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",
@@ -447,3 +469,84 @@ Hooks.on("hotbarDrop", (_bar, data, _slot) => {
     return false; // laisser FVTT gérer
   }
 });
+// ── Tokens : défauts pour les nouveaux acteurs ──────────────────────────────
+Hooks.on("preCreateActor", (actor, _data, _options) => {
+  actor.updateSource({
+    "prototypeToken.bar1.attribute": "system.pdv",
+    "prototypeToken.displayBars": CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40,
+    "prototypeToken.actorLink": true,
+  });
+});
+
+// ── Tokens existants : migration bar PdV au premier chargement (GM) ─────────
+Hooks.once("ready", () => {
+  if (!game.user?.isGM) return;
+  const toUpdate = [];
+  for (const actor of game.actors ?? []) {
+    const bar = actor.prototypeToken?.bar1?.attribute;
+    if (!bar || bar === "pdv" || bar === "") {
+      toUpdate.push(actor.update({
+        "prototypeToken.bar1.attribute": "system.pdv",
+        "prototypeToken.displayBars":   CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40,
+        "prototypeToken.actorLink":      true,
+      }));
+    }
+  }
+  if (toUpdate.length) Promise.all(toUpdate).then(() => console.log("Agone | bar PdV configurée sur", toUpdate.length, "acteur(s)"));
+});
+
+// ── Scènes : grille en mètres (1 m / case) par défaut ───────────────────────
+Hooks.on("preCreateScene", (scene, data) => {
+  if (!data.grid?.units) {
+    scene.updateSource({
+      "grid.distance": 1,
+      "grid.units":    "m",
+    });
+  }
+});
+
+// ── Tooltip santé (hover token non-possédé) ──────────────────────────────────
+Hooks.on("hoverToken", (token, hovered) => {
+  const old = document.getElementById("agone-sante-tip");
+  if (old) {
+    old.remove();
+    if (token._agoneTipMove) {
+      document.removeEventListener("mousemove", token._agoneTipMove);
+      delete token._agoneTipMove;
+    }
+  }
+  if (!hovered) return;
+  if (!token.actor) return;
+  // Les propriétaires voient la barre HP directement ; le GM voit quand même le tooltip
+  if (!game.user?.isGM && token.isOwner) return;
+
+  const pdv = token.actor.system?.pdv;
+  if (!pdv || !pdv.max) return;
+
+  const pct = pdv.valeur / pdv.max;
+  const get = (k) => game.settings.get("agone", k);
+  const label =
+    pct >= 1.0  ? get("santeLabel100") :
+    pct >= 0.75 ? get("santeLabel75")  :
+    pct >= 0.5  ? get("santeLabel50")  :
+    pct >= 0.25 ? get("santeLabel25")  :
+    pct >  0    ? get("santeLabel10")  :
+                  get("santeLabel0");
+
+  const tip = document.createElement("div");
+  tip.id = "agone-sante-tip";
+  tip.className = "agone-sante-tip";
+  tip.innerHTML = `<strong>${token.name}</strong> <em>${label}</em>`;
+  document.body.appendChild(tip);
+
+  const move = (e) => {
+    const el = document.getElementById("agone-sante-tip");
+    if (el) {
+      el.style.left = `${e.clientX + 16}px`;
+      el.style.top  = `${e.clientY - 10}px`;
+    }
+  };
+  document.addEventListener("mousemove", move);
+  token._agoneTipMove = move;
+});
+

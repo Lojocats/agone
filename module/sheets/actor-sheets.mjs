@@ -7,17 +7,24 @@ export class CompagnonSheet extends foundry.appv1.sheets.ActorSheet {
       classes: ["agone", "sheet", "actor", "compagnon"],
       template: "systems/agone/templates/actors/compagnon-sheet.hbs",
       width: 720,
-      height: 600,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "infos" }]
+      height: 650,
+      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributs" }]
     });
   }
 
   async getData(options = {}) {
     const context = await super.getData(options);
-    context.system = this.actor.system;
-    context.armes  = this.actor.items.filter(i => i.type === "arme");
+    const system  = this.actor.system;
+    context.system  = system;
+    context.actor   = this.actor;
+    context.isOwner = this.actor.isOwner;
+    context.isGM    = game.user.isGM;
+    context.armes   = this.actor.items.filter(i => i.type === "arme");
+    context.pdvPercent = system.pdv?.max > 0
+      ? Math.round(Math.min(100, (system.pdv.valeur / system.pdv.max) * 100))
+      : 0;
     context.descriptionHTML = await TextEditor.enrichHTML(
-      this.actor.system.description ?? "", { async: true, secrets: this.actor.isOwner }
+      system.description ?? "", { async: true, secrets: this.actor.isOwner }
     );
     return context;
   }
@@ -140,18 +147,28 @@ export class PnjSheet extends foundry.appv1.sheets.ActorSheet {
       classes: ["agone", "sheet", "actor", "pnj"],
       template: "systems/agone/templates/actors/pnj-sheet.hbs",
       width: 750,
-      height: 680,
+      height: 700,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributs" }]
     });
   }
 
   async getData(options = {}) {
     const context = await super.getData(options);
-    context.system = this.actor.system;
-    context.armes  = this.actor.items.filter(i => i.type === "arme");
+    const system  = this.actor.system;
+    context.system  = system;
+    context.actor   = this.actor;
+    context.isOwner = this.actor.isOwner;
+    context.isGM    = game.user.isGM;
+    context.armes   = this.actor.items.filter(i => i.type === "arme");
     context.armures = this.actor.items.filter(i => i.type === "armure");
+    context.pdvPercent = system.pdv?.max > 0
+      ? Math.round(Math.min(100, (system.pdv.valeur / system.pdv.max) * 100))
+      : 0;
     context.descriptionHTML = await TextEditor.enrichHTML(
-      this.actor.system.description ?? "", { async: true, secrets: this.actor.isOwner }
+      system.description ?? "", { async: true, secrets: this.actor.isOwner }
+    );
+    context.competencesHTML = await TextEditor.enrichHTML(
+      system.competences ?? "", { async: true, secrets: this.actor.isOwner }
     );
     return context;
   }

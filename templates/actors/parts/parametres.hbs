@@ -1,0 +1,97 @@
+<div class="parametres-tab">
+
+  {{#if isOwner}}
+  <!-- ── Mode personnage ──────────────────────────── -->
+  <div class="param-section">
+    <h3 class="param-section-title">
+      <i class="fas fa-user-cog"></i> {{localize "AGONE.ModePersonnage"}}
+    </h3>
+    <div class="creation-mode-bar {{#if modeCreation}}en-creation{{/if}}">
+      {{#if modeCreation}}
+        <span class="creation-badge">{{localize "AGONE.EnModeCreation"}}</span>
+        <button type="button" class="btn-valider-creation" data-action="validerCreation">
+          {{localize "AGONE.ValiderCreation"}}
+        </button>
+      {{else}}
+        <button type="button" class="btn-toggle-creation" data-action="toggleCreation">
+          {{localize "AGONE.ReactiverCreation"}}
+        </button>
+        <button type="button" class="btn-toggle-levelup {{#if modeLevelUp}}active{{/if}}"
+                data-action="toggleLevelUp" title='{{localize "AGONE.ModeLevelUp"}}'>
+          <i class="fas fa-arrow-up"></i> {{localize "AGONE.ModeLevelUp"}}
+        </button>
+      {{/if}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- ── Visibilité des onglets ───────────────────── -->
+  <div class="param-section">
+    <h3 class="param-section-title">
+      <i class="fas fa-eye"></i> {{localize "AGONE.VisibiliteOnglets"}}
+    </h3>
+    <div class="tabs-visibility">
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="competences"
+               {{#if tabsVisible.competences}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Competences"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="combat"
+               {{#if tabsVisible.combat}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Combat"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="magie"
+               {{#if tabsVisible.magie}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Magie"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="avantages"
+               {{#if tabsVisible.avantages}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Avantages"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="tenebres"
+               {{#if tabsVisible.tenebres}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Tenebres"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="perfidie"
+               {{#if tabsVisible.perfidie}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Perfidie"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="equipement"
+               {{#if tabsVisible.equipement}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Equipement"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="identite"
+               {{#if tabsVisible.identite}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Identite"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="notes"
+               {{#if tabsVisible.notes}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Notes"}}
+      </label>
+      <label class="tab-toggle">
+        <input type="checkbox" data-tab="companions"
+               {{#if tabsVisible.companions}}checked{{/if}}
+               data-action="toggleTabVisibility" />
+        {{localize "AGONE.Companions"}}
+      </label>
+    </div>
+  </div>
+
+</div>

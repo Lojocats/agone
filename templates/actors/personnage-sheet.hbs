@@ -43,17 +43,9 @@
           <input type="number" name="system.experience.totale" value="{{system.experience.totale}}" class="stat-num" />
         </div>
       </div>
-      {{#if isOwner}}
-      <div class="creation-mode-bar {{#if modeCreation}}en-creation{{/if}}">
-        {{#if modeCreation}}
-          <span class="creation-badge">{{localize "AGONE.EnModeCreation"}}</span>
-          <button type="button" class="btn-valider-creation" data-action="validerCreation">{{localize "AGONE.ValiderCreation"}}</button>
-        {{else}}
-          <button type="button" class="btn-toggle-creation" data-action="toggleCreation">{{localize "AGONE.ReactiverCreation"}}</button>
-          <button type="button" class="btn-toggle-levelup {{#if modeLevelUp}}active{{/if}}" data-action="toggleLevelUp" title='{{localize "AGONE.ModeLevelUp"}}'>
-            <i class="fas fa-arrow-up"></i> {{localize "AGONE.ModeLevelUp"}}
-          </button>
-        {{/if}}
+      {{#if modeCreation}}
+      <div class="creation-mode-indicator">
+        <span class="creation-badge"><i class="fas fa-pen-nib"></i> {{localize "AGONE.EnModeCreation"}}</span>
       </div>
       {{/if}}
     </div>
@@ -61,15 +53,17 @@
 
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="attributs">{{localize "AGONE.Attributs"}}</a>
-    <a class="item" data-tab="competences">{{localize "AGONE.Competences"}}</a>
-    <a class="item" data-tab="combat">{{localize "AGONE.Combat"}}</a>
-    <a class="item" data-tab="magie">{{localize "AGONE.Magie"}}</a>
-    <a class="item" data-tab="avantages">{{localize "AGONE.Avantages"}}</a>
-    <a class="item" data-tab="tenebres">{{localize "AGONE.Tenebres"}}</a>
-    <a class="item" data-tab="perfidie">{{localize "AGONE.Perfidie"}}</a>
-    <a class="item" data-tab="equipement">{{localize "AGONE.Equipement"}}</a>
-    <a class="item" data-tab="identite">{{localize "AGONE.Identite"}}</a>
-    <a class="item" data-tab="notes">{{localize "AGONE.Notes"}}</a>
+    <a class="item{{#unless tabsVisible.competences}} tab-hidden{{/unless}}" data-tab="competences">{{localize "AGONE.Competences"}}</a>
+    <a class="item{{#unless tabsVisible.combat}} tab-hidden{{/unless}}" data-tab="combat">{{localize "AGONE.Combat"}}</a>
+    <a class="item{{#unless tabsVisible.magie}} tab-hidden{{/unless}}" data-tab="magie">{{localize "AGONE.Magie"}}</a>
+    <a class="item{{#unless tabsVisible.avantages}} tab-hidden{{/unless}}" data-tab="avantages">{{localize "AGONE.Avantages"}}</a>
+    <a class="item{{#unless tabsVisible.tenebres}} tab-hidden{{/unless}}" data-tab="tenebres">{{localize "AGONE.Tenebres"}}</a>
+    <a class="item{{#unless tabsVisible.perfidie}} tab-hidden{{/unless}}" data-tab="perfidie">{{localize "AGONE.Perfidie"}}</a>
+    <a class="item{{#unless tabsVisible.equipement}} tab-hidden{{/unless}}" data-tab="equipement">{{localize "AGONE.Equipement"}}</a>
+    <a class="item{{#unless tabsVisible.identite}} tab-hidden{{/unless}}" data-tab="identite">{{localize "AGONE.Identite"}}</a>
+    <a class="item{{#unless tabsVisible.notes}} tab-hidden{{/unless}}" data-tab="notes">{{localize "AGONE.Notes"}}</a>
+    <a class="item{{#unless tabsVisible.companions}} tab-hidden{{/unless}}" data-tab="companions">{{localize "AGONE.Companions"}}</a>
+    <a class="item" data-tab="parametres">⚙</a>
   </nav>
 
   <section class="sheet-body">
@@ -123,6 +117,16 @@
     <!-- ONGLET : IDENTITÉ -->
     <div class="tab" data-group="primary" data-tab="identite">
       {{> systems/agone/templates/actors/parts/identite.hbs}}
+    </div>
+
+    <!-- ONGLET : COMPAGNONS -->
+    <div class="tab" data-group="primary" data-tab="companions">
+      {{> systems/agone/templates/actors/parts/companions.hbs}}
+    </div>
+
+    <!-- ONGLET : PARAMÈTRES -->
+    <div class="tab" data-group="primary" data-tab="parametres">
+      {{> systems/agone/templates/actors/parts/parametres.hbs}}
     </div>
   </section>
 </form>

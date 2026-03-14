@@ -285,6 +285,9 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     // PdV max = BPdV(race) + RES × 3 + bonusDe (résultat du 1d10 de création)
     const bpdv = pData?.bpdv ?? taiTables.lookupTai(taiTables.taiToBpdv, this.tai);
     this.pdv.max = bpdv + (this.resistance.score * 3) + this.pdv.bonusDe;
+    // Alias FVTT : la barre token cherche .value et .min, le schéma utilise .valeur
+    this.pdv.value = this.pdv.valeur;
+    this.pdv.min   = 0;
     this.bd  = taiTables.lookupBd(this.force.score, this.tai);
     this.modPoids = taiTables.lookupTai(taiTables.taiToModPoids, this.tai);
     this.chargeMax = (this.force.score + this.resistance.score) * this.modPoids;
@@ -451,6 +454,7 @@ export class PnjData extends foundry.abstract.TypeDataModel {
       charisma:    new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       creativite:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       bd:          new fields.NumberField({ initial: 0, integer: true }),
+      flamme:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       blessureGrave1: new fields.BooleanField({ initial: false }),
       blessureGrave2: new fields.BooleanField({ initial: false }),
       blessureGrave3: new fields.BooleanField({ initial: false }),

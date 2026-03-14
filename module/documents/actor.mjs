@@ -10,6 +10,21 @@ export class AgoneActor extends Actor {
   prepareData() {
     super.prepareData();
   }
+  /**
+   * Redirige les mises à jour de la barre PdV token vers system.pdv.valeur
+   * (FVTT appelle modifyTokenAttribute avec le champ "value" interne, on remplace par "valeur").
+   * @override
+   */
+  async modifyTokenAttribute(attribute, value, isDelta = false, isBar = true) {
+    if (isBar && attribute === "system.pdv") {
+      const current = this.system.pdv.valeur;
+      const max     = this.system.pdv.max;
+      const newVal  = Math.min(max, Math.max(0, isDelta ? current + value : value));
+      return this.update({ "system.pdv.valeur": newVal });
+    }
+    return super.modifyTokenAttribute(attribute, value, isDelta, isBar);
+  }
+
 
   /**
    * Coerce les valeurs non-finies (NaN, Infinity) en 0 avant validation.

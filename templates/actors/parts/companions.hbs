@@ -1,0 +1,87 @@
+<div class="companions-tab">
+
+  {{#if isOwner}}
+  <div class="companions-drop-zone{{#if companions.length}} has-items{{/if}}"
+       title="{{localize 'AGONE.CompagnonDropHint'}}">
+    <i class="fas fa-user-plus"></i> {{localize "AGONE.CompagnonDropHint"}}
+  </div>
+  {{/if}}
+
+  {{#if companions.length}}
+  <div class="companions-cards">
+    {{#each companions}}
+    <div class="cmp-card" data-uuid="{{uuid}}">
+
+      <!-- Portrait + type badge -->
+      <div class="cmp-portrait-wrap">
+        <img class="cmp-portrait" src="{{img}}" title="{{localize 'AGONE.Ouvrir'}} {{name}}" />
+        <span class="cmp-type-badge cmp-type-{{type}}">{{type}}</span>
+      </div>
+
+      <!-- Corps de la carte -->
+      <div class="cmp-body">
+
+        <!-- En-tête : nom + sous-titre + actions -->
+        <div class="cmp-header">
+          <div class="cmp-name-block">
+            <span class="cmp-name">{{name}}</span>
+            {{#if subtitle}}<span class="cmp-subtitle">{{subtitle}}</span>{{/if}}
+          </div>
+          {{#if ../isOwner}}
+          <div class="cmp-actions">
+            <button type="button" class="companion-open cmp-btn" data-uuid="{{uuid}}"
+                    title="{{localize 'AGONE.Ouvrir'}}">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
+            <button type="button" class="companion-remove cmp-btn cmp-btn-remove" data-uuid="{{uuid}}"
+                    title="{{localize 'AGONE.Retirer'}}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          {{/if}}
+        </div>
+
+        <!-- Barre PdV -->
+        <div class="cmp-pdv-block">
+          <div class="cmp-pdv-line">
+            <span class="cmp-pdv-label">PdV</span>
+            <span class="cmp-pdv-nums">{{pdvVal}} / {{pdvMax}}</span>
+            {{#if bgMalus}}<span class="cmp-bg-malus">{{bgMalus}}</span>{{/if}}
+            {{#if bcActive}}<span class="cmp-bc-badge"><i class="fas fa-skull"></i></span>{{/if}}
+          </div>
+          <div class="cmp-pdv-track">
+            <div class="cmp-pdv-fill" style="width:{{pdvPct}}%; background:{{pdvColor}};"></div>
+          </div>
+        </div>
+
+        <!-- Blessures graves -->
+        {{#if (or bg1 bg2 bg3)}}
+        <div class="cmp-bg-row">
+          <span class="cmp-bg-dot {{#if bg1}}bg-active{{/if}}" title="BG 1 (−2)">1</span>
+          <span class="cmp-bg-dot {{#if bg2}}bg-active{{/if}}" title="BG 2 (−6)">2</span>
+          <span class="cmp-bg-dot {{#if bg3}}bg-active{{/if}}" title="BG 3 (−12)">3</span>
+        </div>
+        {{/if}}
+
+        <!-- Stats row -->
+        {{#if stats.length}}
+        <div class="cmp-stats-row">
+          {{#each stats}}
+          <div class="cmp-stat {{cls}}">
+            {{#if icon}}<i class="{{icon}}"></i>{{/if}}
+            <span class="cmp-stat-val">{{val}}</span>
+            <span class="cmp-stat-lbl">{{label}}</span>
+          </div>
+          {{/each}}
+        </div>
+        {{/if}}
+
+      </div><!-- /.cmp-body -->
+    </div><!-- /.cmp-card -->
+    {{/each}}
+  </div>
+  {{else}}
+  <p class="companions-empty">{{localize "AGONE.CompagnonAucun"}}</p>
+  {{/if}}
+
+</div>

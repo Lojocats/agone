@@ -249,6 +249,80 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     context.ptsCreationCompRestant  = system.ptsCreationComp.max  - system.ptsCreationComp.depense;
     context.modeCreation   = system.modeCreation;
     context.modeLevelUp    = !!system.modeLevelUp;
+
+    // ── Compagnons (acteurs liés par UUID) ──────────────────────────────────
+    const companionUUIDs = this.actor.getFlag("agone", "companions") ?? [];
+    context.companions = [];
+    for (const uuid of companionUUIDs) {
+      const cActor = await fromUuid(uuid).catch(() => null);
+      if (!cActor) continue;
+      const cs = cActor.system;
+      const type = cActor.type; // personnage | compagnon | pnj
+
+      // PdV commun
+      const pdvVal = cs.pdv?.valeur ?? 0;
+      const pdvMax = cs.pdv?.max   ?? 0;
+      const pdvPct = pdvMax > 0 ? Math.round(Math.min(100, (pdvVal / pdvMax) * 100)) : 0;
+      const pdvColor = pdvPct >= 75 ? '#4a9a4a' : pdvPct >= 50 ? '#8a8a00' : pdvPct >= 25 ? '#c06000' : '#9a1a1a';
+
+      // Blessures graves
+      const bg1 = !!cs.blessureGrave1;
+      const bg2 = !!cs.blessureGrave2;
+      const bg3 = !!cs.blessureGrave3;
+      const bgMalus = cs.malusBlessureGrave ?? 0;
+      const bcActive = !!cs.blessuresCritique;
+
+      // Stats spécifiques par type
+      const stats = [];
+      if (type === 'personnage') {
+        if ((cs.flamme ?? 0) > 0 || cs.flamme === 0)
+          stats.push({ icon: 'fas fa-fire',        label: 'Flamme',  val: cs.flamme ?? 0, cls: 'csp-flamme' });
+        stats.push({ icon: 'fas fa-bolt',           label: 'Init.',   val: cs.initiative ?? (cs.agilite?.score ?? 0) + (cs.perception?.score ?? 0), cls: '' });
+        stats.push({ icon: 'fas fa-shoe-prints',    label: 'MV',      val: cs.mv ?? 0, cls: '' });
+        if ((cs.bonusCorps  ?? null) !== null) stats.push({ icon: null, label: 'C/E/Â', val: `${cs.bonusCorps}/${cs.bonusEsprit}/${cs.bonusAme}`, cls: 'csp-aspects' });
+      } else if (type === 'compagnon') {
+        stats.push({ icon: 'fas fa-bolt',           label: 'Init.',   val: cs.initiative ?? 0, cls: '' });
+        stats.push({ icon: 'fas fa-sword',          label: 'Mêlée',  val: cs.melee ?? 0, cls: '' });
+        stats.push({ icon: 'fas fa-shoe-prints',    label: 'MV',      val: cs.mv ?? 0, cls: '' });
+        if ((cs.mvVol ?? 0) > 0)
+          stats.push({ icon: 'fas fa-dove',         label: 'Vol',     val: cs.mvVol, cls: '' });
+      } else if (type === 'pnj') {
+        stats.push({ icon: 'fas fa-bolt',           label: 'Init.',   val: cs.initiative ?? 0, cls: '' });
+        stats.push({ icon: 'fas fa-sword',          label: 'Mêlée',  val: cs.melee ?? 0, cls: '' });
+        stats.push({ icon: 'fas fa-bullseye',       label: 'Tir',     val: cs.tir ?? 0, cls: '' });
+        if ((cs.armure?.protection ?? 0) > 0)
+          stats.push({ icon: 'fas fa-shield-alt',   label: 'PRO',     val: cs.armure.protection, cls: '' });
+        if ((cs.flamme ?? 0) > 0)
+          stats.push({ icon: 'fas fa-fire',         label: 'Flamme',  val: cs.flamme, cls: 'csp-flamme' });
+      }
+
+      // Sous-titre (espèce / race / peuple)
+      const subtitle = type === 'compagnon' ? (cs.espece ?? '') :
+                       type === 'pnj'       ? (cs.race   ?? '') :
+                       type === 'personnage'? (cs.peuple ?? '') : '';
+
+      context.companions.push({
+        uuid, name: cActor.name, img: cActor.img ?? 'icons/svg/mystery-man.svg',
+        type, subtitle,
+        pdvVal, pdvMax, pdvPct, pdvColor,
+        bg1, bg2, bg3, bgMalus, bcActive,
+        stats,
+        // rétrocompat
+        pdv: cs.pdv ?? null,
+        flamme: type === 'personnage' ? (cs.flamme ?? null) : null,
+      });
+    }
+
+    // ── Visibilité des onglets ──────────────────────────────────────────────
+    const defaultTabsVisible = {
+      competences: true, combat: true, magie: true,  avantages: true,
+      tenebres: true,    perfidie: true, equipement: true, identite: true,
+      notes: true,       companions: true,
+    };
+    context.tabsVisible = foundry.utils.mergeObject(
+      defaultTabsVisible,
+      this.actor.getFlag("agone", "tabsVisible") ?? {}
+    );
     // Visibilité des boutons de montée de niveau :
     //   - mode carac/comp : toujours visible en création, sinon si modeLevelUp toggleé
     //   - mode aspect      : seulement en XP normal avec modeLevelUp
@@ -504,6 +578,24 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       await this.actor.update({ "system.perfidie": (this.actor.system.perfidie ?? 0) + 1 });
       ui.notifications?.info(`Bienfait « ${peine.system.bienfait} » acquis.`);
     });
+
+    // ── Compagnons ────────────────────────────────────────────────────────
+    html.find(".companion-open").click(this._onOpenCompanion.bind(this));
+    html.find(".companion-remove").click(this._onRemoveCompanion.bind(this));
+    // Feedback visuel drag-over sur la zone compagnons
+    html.find(".companions-drop-zone").each((_, el) => {
+      el.addEventListener("dragover", (ev) => {
+        ev.preventDefault();
+        el.classList.add("drag-over");
+      });
+      el.addEventListener("dragleave", (ev) => {
+        if (!el.contains(ev.relatedTarget)) el.classList.remove("drag-over");
+      });
+      el.addEventListener("drop", () => el.classList.remove("drag-over"));
+    });
+
+    // ── Visibilité des onglets (paramètres) ───────────────────────────────
+    html.find("[data-action='toggleTabVisibility']").change(this._onToggleTabVisibility.bind(this));
 
   }
 
@@ -1968,5 +2060,52 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const value  = el.type === "checkbox" ? el.checked : (isNaN(el.value) ? el.value : Number(el.value));
     const item   = this.actor.items.get(itemId);
     if (item && field) await item.update({ [field]: value });
+  }
+
+  // ==============================
+  // Drop d'acteur (companions)
+  // ==============================
+  /** @override */
+  async _onDropActor(event, data) {
+    if (event.target?.closest(".companions-drop-zone")) {
+      const uuid = data.uuid;
+      if (!uuid || uuid === this.actor.uuid) return;
+      const current = this.actor.getFlag("agone", "companions") ?? [];
+      if (current.includes(uuid)) return;
+      await this.actor.setFlag("agone", "companions", [...current, uuid]);
+      return;
+    }
+    // Pas d'autre comportement de drop d'acteur par défaut
+  }
+
+  // ==============================
+  // Compagnons — ouvrir / retirer
+  // ==============================
+  async _onOpenCompanion(event) {
+    event.preventDefault();
+    const uuid  = event.currentTarget.dataset.uuid;
+    const actor = await fromUuid(uuid).catch(() => null);
+    if (actor) actor.sheet.render(true);
+  }
+
+  async _onRemoveCompanion(event) {
+    event.preventDefault();
+    const uuid    = event.currentTarget.dataset.uuid;
+    const current = this.actor.getFlag("agone", "companions") ?? [];
+    await this.actor.setFlag("agone", "companions", current.filter(u => u !== uuid));
+  }
+
+  // ==============================
+  // Paramètres — visibilité onglets
+  // ==============================
+  async _onToggleTabVisibility(event) {
+    const tab     = event.currentTarget.dataset.tab;
+    const checked = event.currentTarget.checked;
+    // Si l'onglet actif est masqué, repasser sur Attributs
+    if (!checked && this._tabs?.[0]?.active === tab) {
+      this._tabs[0].activate("attributs");
+    }
+    const current = this.actor.getFlag("agone", "tabsVisible") ?? {};
+    await this.actor.setFlag("agone", "tabsVisible", { ...current, [tab]: checked });
   }
 }

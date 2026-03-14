@@ -4,12 +4,13 @@
   "description": "Système Agone — Jeu de rôle fantasy médiéval pour Foundry VTT",
   "version": "1.0.0",
   "compatibility": {
-    "minimum": "12",
-    "verified": "13"
+    "minimum": "13",
+    "verified": "13",
+    "maximum": "13"
   },
   "authors": [
     {
-      "name": "Agone System Community"
+      "name": "Lojocats"
     }
   ],
   "esmodules": [

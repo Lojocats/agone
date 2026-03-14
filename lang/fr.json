@@ -499,6 +499,20 @@
     "Aveugle":     "Aveugle",
     "Sourd":       "Sourd",
 
+    "SanteLabelSection": "Textes de santé (survol token)",
+    "SanteLabel100":     "Palier 100 % (pleine santé)",
+    "SanteLabel100Hint": "Texte au survol quand le personnage est à pleine santé (PdV = max).",
+    "SanteLabel75":      "Palier 75 %",
+    "SanteLabel75Hint":  "Texte au survol entre 75 % et 100 % de PdV.",
+    "SanteLabel50":      "Palier 50 %",
+    "SanteLabel50Hint":  "Texte au survol entre 50 % et 75 % de PdV.",
+    "SanteLabel25":      "Palier 25 %",
+    "SanteLabel25Hint":  "Texte au survol entre 25 % et 50 % de PdV.",
+    "SanteLabel10":      "Palier critique (> 0 %)",
+    "SanteLabel10Hint":  "Texte au survol entre 1 % et 25 % de PdV.",
+    "SanteLabel0":       "Palier mort (0 PdV)",
+    "SanteLabel0Hint":   "Texte au survol quand le personnage est à 0 PdV.",
+
     "SaisonMonde":      "Saison du Monde",
     "SaisonMondeHint":  "La saison actuelle d'Harmonde. Les personnages dont la saison correspond gagnent +1 à tous leurs jets.",
     "SaisonPerso":      "Saison personnelle",
@@ -506,6 +520,18 @@
     "SaisonDefaut":     "Saison par défaut",
     "ConfigSaison":     "Configurer la Saison",
     "BonusSaisonin":    "Bonus Saisonin",
-    "CalendrierHarmonde": "Calendrier d'Harmonde"
+    "CalendrierHarmonde": "Calendrier d'Harmonde",
+
+    "Companions":             "Compagnons",
+    "Parametres":             "Paramètres",
+    "CompagnonDropHint":      "Glisser un acteur ici pour l'ajouter comme compagnon",
+    "CompagnonAucun":         "Aucun compagnon. Glissez un acteur depuis le panneau Acteurs.",
+    "ModePersonnage":         "Mode du personnage",
+    "VisibiliteOnglets":      "Onglets visibles",
+    "Ouvrir":                 "Ouvrir",
+    "Retirer":                "Retirer",
+    "Espece":                 "Espèce",
+    "Race":                   "Race",
+    "Armures":                "Armures"
   }
 }
