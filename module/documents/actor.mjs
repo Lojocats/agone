@@ -233,7 +233,9 @@ export class AgoneActor extends Actor {
     sd.corpsNoirTotal  = (sd.corpsNoirTotal  ?? sd.corps.noir)  + b.corps_noir;
     sd.espritNoirTotal = (sd.espritNoirTotal ?? sd.esprit.noir) + b.esprit_noir;
     sd.ameNoirTotal    = (sd.ameNoirTotal    ?? sd.ame.noir)    + b.ame_noir;
-    sd.tai                += b.tai;
+    // taiEffectif = valeur TAI avec les bonus d'avantages, uniquement pour les dérivations.
+    // sd.tai n'est PAS modifié pour éviter l'accumulation en BDD lors des sauvegardes.
+    const taiEffectif = sd.tai + b.tai;
 
     // --- 1b. Points de création compétences (ex: Orphelin -10) ---
     if (b.ptsCreationComp_bonus !== 0) {
@@ -249,16 +251,16 @@ export class AgoneActor extends Actor {
 
     // --- 3. Re-dérivation TAI (si TAI modifié) ---
     if (b.tai !== 0) {
-      if (!sd.mvOverride) sd.mv = T.lookupTai(T.taiToMv, sd.tai);
-      sd.modPoids = T.lookupTai(T.taiToModPoids, sd.tai);
+      if (!sd.mvOverride) sd.mv = T.lookupTai(T.taiToMv, taiEffectif);
+      sd.modPoids = T.lookupTai(T.taiToModPoids, taiEffectif);
     }
 
     // --- 4. Re-dérivation dépendant de force / résistance ---
     const peupleKey = T.peupleNomVersKey?.[sd.peuple] ?? "humain";
     const pData     = T.peuplesData?.[peupleKey] ?? T.peuplesData?.humain;
-    const bpdv      = pData?.bpdv ?? T.lookupTai(T.taiToBpdv, sd.tai);
+    const bpdv      = pData?.bpdv ?? T.lookupTai(T.taiToBpdv, taiEffectif);
     sd.pdv.max   = bpdv + sd.resistance.score * 3 + sd.pdv.bonusDe;
-    sd.bd        = T.lookupBd(sd.force.score, sd.tai);
+    sd.bd        = T.lookupBd(sd.force.score, taiEffectif);
     sd.chargeMax = (sd.force.score + sd.resistance.score) * sd.modPoids;
     sd.demiCharge = Math.floor(sd.chargeMax / 2);
     sd.chargeJour = Math.floor(sd.chargeMax / 4);

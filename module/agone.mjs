@@ -5,7 +5,7 @@
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 import { AGONE }                from "./helpers/config.mjs";
-import { ARMES_DATA, ARMURES_DATA, BOUCLIERS_DATA, SORTS_DATA } from "./helpers/compendium-data.mjs";
+import { ARMES_DATA, ARMURES_DATA, BOUCLIERS_DATA, SORTS_DATA, PEUPLES_DATA } from "./helpers/compendium-data.mjs";
 import { registerHandlebarsHelpers as registerHandlebars } from "./helpers/handlebars.mjs";
 
 // ── DataModels ────────────────────────────────────────────────────────────────
@@ -87,6 +87,12 @@ Hooks.once("init", () => {
     default: { jour: 1, mois: 1, an: 1 },
   });
   game.settings.register("agone", "calendrierNotes", {
+    scope: "world", config: false,
+    type: Object,
+    default: {},
+  });
+  // Hachages des données des compendiums pour détection de changement
+  game.settings.register("agone", "compendiumHashes", {
     scope: "world", config: false,
     type: Object,
     default: {},
@@ -238,182 +244,131 @@ Hooks.once("ready", async () => {
 
   if (!game.user.isGM) return;
 
-  // ── Compendium compétences ─────────────────────────────────────────────
-  const packComp = game.packs.get("agone.competences");
-  if (packComp && (await packComp.getIndex()).size === 0) {
-    const domainAttr = {
-      "Épreuve":     "agilite",
-      "Maraude":     "agilite",
-      "Société":     "charisma",
-      "Savoir":      "intelligence",
-      "Occulte":     "volonte",
-    };
-    const itemsComp = CONFIG.AGONE.competences.map(name => {
-      const match   = name.match(/\(([^)]+)\)$/);
-      const domaine = match ? match[1] : "";
-      return { name, type: "competence", system: { domaine, attributLie: domainAttr[domaine] ?? "agilite", score: 0, exp: 0, specialite: "", description: "" } };
-    });
-    await packComp.configure({ locked: false });
-    await Item.createDocuments(itemsComp, { pack: "agone.competences" });
-    await packComp.configure({ locked: true });
-    console.log(`Agone | Compendium compétences initialisé (${itemsComp.length} entrées)`);
+  // ── Utilitaires de synchronisation de compendium ───────────────────────
+  // Calcule un hash SHA-256 tronqué (16 hex) des données passées
+  async function _dataHash(data) {
+    const str = JSON.stringify(data);
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
   }
+
+  // Reseede un compendium si vide ou si les données ont changé
+  async function _syncPack(packId, newHash, seedFn) {
+    const pack = game.packs.get(packId);
+    if (!pack) return;
+    const hashes = game.settings.get("agone", "compendiumHashes") ?? {};
+    const index  = await pack.getIndex();
+    const isEmpty     = index.size === 0;
+    const hashChanged = hashes[packId] !== newHash;
+    if (!isEmpty && !hashChanged) return;
+    console.log(`Agone | Reseed ${packId} (isEmpty=${isEmpty}, hashChanged=${hashChanged})`);
+    await pack.configure({ locked: false });
+    if (!isEmpty) {
+      await Item.deleteDocuments(index.map(e => e._id), { pack: packId });
+      if (pack.folders.size > 0)
+        await Folder.deleteDocuments([...pack.folders].map(f => f.id), { pack: packId });
+    }
+    await seedFn(pack);
+    await pack.configure({ locked: true });
+    await game.settings.set("agone", "compendiumHashes", { ...game.settings.get("agone", "compendiumHashes"), [packId]: newHash });
+  }
+
+  // ── Compendium compétences ─────────────────────────────────────────────
+  await _syncPack("agone.competences", await _dataHash(CONFIG.AGONE.competences), async () => {
+    const itemsComp = CONFIG.AGONE.competences.map(c => ({
+      name: c.name, type: "competence",
+      system: { domaine: c.domaine, attributLie: c.attributLie ?? "agilite", score: 0, exp: 0, specialite: "", description: "" },
+    }));
+    await Item.createDocuments(itemsComp, { pack: "agone.competences" });
+    console.log(`Agone | Compendium compétences initialisé (${itemsComp.length} entrées)`);
+  });
 
   // ── Compendium peuples ─────────────────────────────────────────────────
-  const packPeuples = game.packs.get("agone.peuples");
-  if (packPeuples && (await packPeuples.getIndex()).size === 0) {
-    const peupleLabels = {
-      humain: "Humain", nain: "Nain", geant: "Géant", farfadet: "Farfadet",
-      lutin: "Lutin", satyre: "Satyre", minotaure: "Minotaure", ogre: "Ogre",
-      drakonien: "Drakonien", morgane: "Morgane", pixie: "Pixie",
-      feeNoire: "Fée Noire", meduse: "Méduse",
-    };
-    const itemsPeuples = Object.entries(CONFIG.AGONE.peuplesData).map(([key, data]) => ({
-      name: peupleLabels[key] ?? key,
-      type: "peuple",
-      system: { ...data, description: "" },
+  await _syncPack("agone.peuples", await _dataHash(PEUPLES_DATA), async () => {
+    const itemsPeuples = PEUPLES_DATA.map(p => ({
+      name: p.name, type: "peuple", system: { ...p },
     }));
-    await packPeuples.configure({ locked: false });
     await Item.createDocuments(itemsPeuples, { pack: "agone.peuples" });
-    await packPeuples.configure({ locked: true });
     console.log(`Agone | Compendium peuples initialisé (${itemsPeuples.length} entrées)`);
-  }
+  });
 
   // ── Compendium armes ───────────────────────────────────────────────────
-  const packArmes = game.packs.get("agone.armes");
-  if (packArmes) {
-    const indexArmes = await packArmes.getIndex();
-    const armesHasFolders = packArmes.folders.size > 0;
-    if (indexArmes.size !== ARMES_DATA.length || !armesHasFolders) {
-      await packArmes.configure({ locked: false });
-      // Nettoyer les entrées et dossiers existants
-      if (indexArmes.size > 0)
-        await Item.deleteDocuments(indexArmes.map(e => e._id), { pack: "agone.armes" });
-      if (packArmes.folders.size > 0)
-        await Folder.deleteDocuments([...packArmes.folders].map(f => f.id), { pack: "agone.armes" });
-      // Créer les dossiers par style
-      const [fMelee, fTrait, fJet] = await Folder.createDocuments([
-        { name: "Mêlée",  type: "Item", color: "#8B0000" },
-        { name: "Trait",  type: "Item", color: "#8B4500" },
-        { name: "Lancer", type: "Item", color: "#4B5320" },
-      ], { pack: "agone.armes" });
-      const styleFolder = { melee: fMelee.id, trait: fTrait.id, jet: fJet.id };
-      const itemsArmes = ARMES_DATA.map(d => ({
-        name: d.name, type: "arme", system: d, folder: styleFolder[d.style] ?? null
-      }));
-      await Item.createDocuments(itemsArmes, { pack: "agone.armes" });
-      await packArmes.configure({ locked: true });
-      console.log(`Agone | Compendium armes initialisé (${itemsArmes.length} entrées, 3 dossiers)`);
-    }
-  }
+  await _syncPack("agone.armes", await _dataHash(ARMES_DATA), async (pack) => {
+    const [fMelee, fTrait, fJet] = await Folder.createDocuments([
+      { name: "Mêlée",  type: "Item", color: "#8B0000" },
+      { name: "Trait",  type: "Item", color: "#8B4500" },
+      { name: "Lancer", type: "Item", color: "#4B5320" },
+    ], { pack: "agone.armes" });
+    const styleFolder = { melee: fMelee.id, trait: fTrait.id, jet: fJet.id };
+    const itemsArmes  = ARMES_DATA.map(d => ({
+      name: d.name, type: "arme", system: d, folder: styleFolder[d.style] ?? null
+    }));
+    await Item.createDocuments(itemsArmes, { pack: "agone.armes" });
+    console.log(`Agone | Compendium armes initialisé (${itemsArmes.length} entrées, 3 dossiers)`);
+  });
 
   // ── Compendium armures / boucliers ─────────────────────────────────────
-  const packArmures = game.packs.get("agone.armures");
-  if (packArmures) {
-    const itemsArmures   = ARMURES_DATA.map(d => ({ name: d.name, type: "armure", system: d }));
-    const itemsBoucliers = BOUCLIERS_DATA.map(d => ({ name: d.name, type: "armure", system: d }));
-    const allArmures = [...itemsArmures, ...itemsBoucliers];
-    const indexArmures = await packArmures.getIndex();
-    const armuresHasFolders = packArmures.folders.size > 0;
-    if (indexArmures.size !== allArmures.length || !armuresHasFolders) {
-      await packArmures.configure({ locked: false });
-      // Nettoyer les entrées et dossiers existants
-      if (indexArmures.size > 0)
-        await Item.deleteDocuments(indexArmures.map(e => e._id), { pack: "agone.armures" });
-      if (packArmures.folders.size > 0)
-        await Folder.deleteDocuments([...packArmures.folders].map(f => f.id), { pack: "agone.armures" });
-      // Créer les dossiers
-      const [folderArmures, folderBoucliers] = await Folder.createDocuments([
-        { name: "Armures",   type: "Item", color: "#8B4513" },
-        { name: "Boucliers", type: "Item", color: "#696969" },
-      ], { pack: "agone.armures" });
-      // Créer les items
-      await Item.createDocuments(
-        itemsArmures.map(i => ({ ...i, folder: folderArmures.id })),
-        { pack: "agone.armures" }
-      );
-      await Item.createDocuments(
-        itemsBoucliers.map(i => ({ ...i, folder: folderBoucliers.id })),
-        { pack: "agone.armures" }
-      );
-      await packArmures.configure({ locked: true });
-      console.log(`Agone | Compendium armures initialisé (${allArmures.length} entrées, 2 dossiers)`);
-    }
-  }
+  const _armuresAll = [...ARMURES_DATA, ...BOUCLIERS_DATA];
+  await _syncPack("agone.armures", await _dataHash(_armuresAll), async () => {
+    const [folderArmures, folderBoucliers] = await Folder.createDocuments([
+      { name: "Armures",   type: "Item", color: "#8B4513" },
+      { name: "Boucliers", type: "Item", color: "#696969" },
+    ], { pack: "agone.armures" });
+    await Item.createDocuments(
+      ARMURES_DATA.map(d => ({ name: d.name, type: "armure", system: d, folder: folderArmures.id })),
+      { pack: "agone.armures" }
+    );
+    await Item.createDocuments(
+      BOUCLIERS_DATA.map(d => ({ name: d.name, type: "armure", system: d, folder: folderBoucliers.id })),
+      { pack: "agone.armures" }
+    );
+    console.log(`Agone | Compendium armures initialisé (${_armuresAll.length} entrées, 2 dossiers)`);
+  });
 
   // ── Compendium sorts & œuvres ──────────────────────────────────────────
-  const packSorts = game.packs.get("agone.sorts");
-  if (packSorts) {
-    const itemsSorts = SORTS_DATA.map(d => ({
-      name: d.name,
-      type: "sort",
-      system: {
-        typeMagie:   d.typeMagie   ?? "",
-        seuil:       d.seuil       ?? 0,
-        portee:      d.portee      ?? "",
-        duree:       d.duree       ?? "",
-        danse:       d.danse       ?? "",
-        instrument:  d.instrument  ?? "",
-        special:     d.special     ?? "",
-        description: d.description ?? "",
-      }
-    }));
-    const indexSorts = await packSorts.getIndex();
-    const sortsHasFolders = packSorts.folders.size > 0;
-    const firstSort = indexSorts.size > 0 ? await packSorts.getDocument(indexSorts.contents[0]._id) : null;
-    const needsReseedSorts = indexSorts.size !== itemsSorts.length || !sortsHasFolders || !firstSort?.system?.description;
-    if (needsReseedSorts) {
-      await packSorts.configure({ locked: false });
-      // Nettoyer les entrées et dossiers existants
-      if (indexSorts.size > 0)
-        await Item.deleteDocuments(indexSorts.map(e => e._id), { pack: "agone.sorts" });
-      if (packSorts.folders.size > 0)
-        await Folder.deleteDocuments([...packSorts.folders].map(f => f.id), { pack: "agone.sorts" });
-      // Créer les dossiers top-level par type de magie
-      const [fJorniste, fObsc, fEcl, fAccord, fCyse, fDecorum, fGeste] = await Folder.createDocuments([
-        { name: "Jorniste",      type: "Item", color: "#FFD700" },
-        { name: "Obscurantiste", type: "Item", color: "#4B0082" },
-        { name: "Éclipsiste",    type: "Item", color: "#1E90FF" },
-        { name: "Accord",        type: "Item", color: "#228B22" },
-        { name: "Cyse",          type: "Item", color: "#8B4513" },
-        { name: "Décorum",       type: "Item", color: "#2E8B57" },
-        { name: "Geste",         type: "Item", color: "#A0522D" },
-      ], { pack: "agone.sorts" });
-      // Sous-dossiers Accord (par instrument)
-      const [fHarpe, fFlute, fViole, fTambour, fCistre] = await Folder.createDocuments([
-        { name: "Harpe",   type: "Item", color: "#32CD32", folder: fAccord.id },
-        { name: "Flûte",   type: "Item", color: "#90EE90", folder: fAccord.id },
-        { name: "Viole",   type: "Item", color: "#006400", folder: fAccord.id },
-        { name: "Tambour", type: "Item", color: "#3CB371", folder: fAccord.id },
-        { name: "Cistre",  type: "Item", color: "#66CDAA", folder: fAccord.id },
-      ], { pack: "agone.sorts" });
-      // Sous-dossiers Décorum (par saison)
-      const [fPrintemps, fEte, fAutomne, fHiver] = await Folder.createDocuments([
-        { name: "Printemps", type: "Item", color: "#ADFF2F", folder: fDecorum.id },
-        { name: "Été",       type: "Item", color: "#FFA500", folder: fDecorum.id },
-        { name: "Automne",   type: "Item", color: "#D2691E", folder: fDecorum.id },
-        { name: "Hiver",     type: "Item", color: "#B0C4DE", folder: fDecorum.id },
-      ], { pack: "agone.sorts" });
-      // Table de correspondance type+instrument → dossier
-      const folderMap = {
-        jorniste:      { "": fJorniste.id },
-        obscurantiste: { "": fObsc.id },
-        eclipsiste:    { "": fEcl.id },
-        accord:        { harpe: fHarpe.id, flute: fFlute.id, viole: fViole.id, tambour: fTambour.id, cistre: fCistre.id },
-        cyse:          { "": fCyse.id },
-        decorum:       { printemps: fPrintemps.id, ete: fEte.id, automne: fAutomne.id, hiver: fHiver.id },
-        geste:         { "": fGeste.id },
+  await _syncPack("agone.sorts", await _dataHash(SORTS_DATA), async () => {
+    const [fJorniste, fObsc, fEcl, fAccord, fCyse, fDecorum, fGeste] = await Folder.createDocuments([
+      { name: "Jorniste",      type: "Item", color: "#FFD700" },
+      { name: "Obscurantiste", type: "Item", color: "#4B0082" },
+      { name: "Éclipsiste",    type: "Item", color: "#1E90FF" },
+      { name: "Accord",        type: "Item", color: "#228B22" },
+      { name: "Cyse",          type: "Item", color: "#8B4513" },
+      { name: "Décorum",       type: "Item", color: "#2E8B57" },
+      { name: "Geste",         type: "Item", color: "#A0522D" },
+    ], { pack: "agone.sorts" });
+    const [fHarpe, fFlute, fViole, fTambour, fCistre] = await Folder.createDocuments([
+      { name: "Harpe",   type: "Item", color: "#32CD32", folder: fAccord.id },
+      { name: "Flûte",   type: "Item", color: "#90EE90", folder: fAccord.id },
+      { name: "Viole",   type: "Item", color: "#006400", folder: fAccord.id },
+      { name: "Tambour", type: "Item", color: "#3CB371", folder: fAccord.id },
+      { name: "Cistre",  type: "Item", color: "#66CDAA", folder: fAccord.id },
+    ], { pack: "agone.sorts" });
+    const [fPrintemps, fEte, fAutomne, fHiver] = await Folder.createDocuments([
+      { name: "Printemps", type: "Item", color: "#ADFF2F", folder: fDecorum.id },
+      { name: "Été",       type: "Item", color: "#FFA500", folder: fDecorum.id },
+      { name: "Automne",   type: "Item", color: "#D2691E", folder: fDecorum.id },
+      { name: "Hiver",     type: "Item", color: "#B0C4DE", folder: fDecorum.id },
+    ], { pack: "agone.sorts" });
+    const folderMap = {
+      jorniste:      { "": fJorniste.id },
+      obscurantiste: { "": fObsc.id },
+      eclipsiste:    { "": fEcl.id },
+      accord:        { harpe: fHarpe.id, flute: fFlute.id, viole: fViole.id, tambour: fTambour.id, cistre: fCistre.id },
+      cyse:          { "": fCyse.id },
+      decorum:       { printemps: fPrintemps.id, ete: fEte.id, automne: fAutomne.id, hiver: fHiver.id },
+      geste:         { "": fGeste.id },
+    };
+    const itemsSorts = SORTS_DATA.map(d => {
+      const typeMap = folderMap[d.typeMagie] ?? {};
+      return {
+        name: d.name, type: "sort",
+        system: { typeMagie: d.typeMagie ?? "", seuil: d.seuil ?? 0, portee: d.portee ?? "", duree: d.duree ?? "", danse: d.danse ?? "", instrument: d.instrument ?? "", special: d.special ?? "", description: d.description ?? "" },
+        folder: typeMap[d.instrument] ?? typeMap[""] ?? null,
       };
-      const mappedSorts = itemsSorts.map((item, idx) => {
-        const d = SORTS_DATA[idx];
-        const typeMap = folderMap[d.typeMagie] ?? {};
-        return { ...item, folder: typeMap[d.instrument] ?? typeMap[""] ?? null };
-      });
-      await Item.createDocuments(mappedSorts, { pack: "agone.sorts" });
-      await packSorts.configure({ locked: true });
-      console.log(`Agone | Compendium sorts initialisé (${itemsSorts.length} entrées, dossiers par type)`);
-    }
-  }
+    });
+    await Item.createDocuments(itemsSorts, { pack: "agone.sorts" });
+    console.log(`Agone | Compendium sorts initialisé (${itemsSorts.length} entrées, dossiers par type)`);
+  });
 });
 
 /* ============================================================================
