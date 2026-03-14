@@ -426,6 +426,48 @@ export class AgoneActor extends Actor {
     return roll;
   }
 
+  // Jet d'une compétence non acquise (score 0, malus -3 automatique)
+  async rollCompetenceSansItem(nom, attributLie, domaine) {
+    const sd        = this.system;
+    const attrKey   = attributLie ?? "agilite";
+    const attrScore = sd[attrKey]?.score ?? sd[attrKey] ?? 0;
+
+    const attrConfig = CONFIG.AGONE.attributs[attrKey] ?? {};
+    let bonusAspect = 0;
+    if (attrConfig.aspect === "corps")  bonusAspect = sd.bonusCorps  ?? 0;
+    if (attrConfig.aspect === "esprit") bonusAspect = sd.bonusEsprit ?? 0;
+    if (attrConfig.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
+
+    const label = nom + (domaine ? ` [${domaine}]` : "");
+    const modif = await this._dialogModificateur(label, { specialite: "" });
+    if (modif === null) return;
+
+    const bonusSaisonin = this._getBonusSaisonin();
+    const bonusSpe    = this._lastBonusSpe ?? 0;
+    const malusArmure = (attrKey === "agilite" || attrKey === "perception")
+      ? (sd.armure?._malusAgiActif ?? 0) : 0;
+    const malusBlessure = sd.malusBlessureGrave ?? 0;
+
+    const roll = new Roll(
+      "1d10x10 + @comp + @attr + @bonus + @modif",
+      {
+        comp: 0,
+        attr: attrScore,
+        bonus: bonusAspect + bonusSpe,
+        modif: modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin
+      }
+    );
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      competence: `${label} : 0 (${game.i18n.localize("AGONE.MalusCompNonApprise")})`,
+      attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
+      aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
+      modif:     `Bonus/Malus : ${modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
+    });
+    return roll;
+  }
+
   /**
    * Expose les statistiques dérivées pour les formules de jet FoundryVTT
    * (p. ex. CONFIG.Combat.initiative.formula = "1d10 + @initiative")

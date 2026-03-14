@@ -79,6 +79,32 @@
   background: rgba(201, 162, 39, 0.15);
 }
 
+/* ── Bouton level-down (rétrogradation) ─────────────────── */
+.agone .leveldown-btn[disabled],
+.agone .leveldown-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+.agone .leveldown-btn {
+  background: transparent;
+  border: 1px solid var(--agone-red, #9a2a2a);
+  color: var(--agone-red, #9a2a2a);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.agone .leveldown-btn:hover:not(:disabled) {
+  opacity: 1;
+  background: rgba(154, 42, 42, 0.12);
+}
+
 /* ── Bouton toggle mode level-up ─────────────────────────── */
 .agone .btn-toggle-levelup {
   background: transparent;
@@ -285,3 +311,69 @@
   line-height: 1.3;
 }
 .agone .slot-meta span { white-space: nowrap; }
+
+/* ── Barre de recherche compétences ─────────────────────── */
+.agone .comp-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 0 6px 0;
+  padding: 3px 6px;
+  background: rgba(92,58,30,0.05);
+  border: 1px solid var(--agone-border);
+  border-radius: 4px;
+}
+.agone .comp-search-icon {
+  color: var(--agone-brown);
+  opacity: 0.5;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.agone .comp-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--agone-dark-text);
+  box-shadow: none;
+  padding: 2px 0;
+  min-width: 0;
+}
+.agone .comp-search-input:focus {
+  border: none;
+  box-shadow: none;
+}
+.agone .comp-search-clear {
+  border: none;
+  background: transparent;
+  color: var(--agone-brown);
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 12px;
+  width: auto;
+  height: auto;
+  padding: 0 2px;
+}
+.agone .comp-search-clear:hover { opacity: 1; color: var(--agone-red); background: transparent; }
+
+/* ── Compétences non acquises ────────────────────────────── */
+.agone .comps-na-section {
+  margin: 2px 0 8px 0;
+}
+.agone .na-section-title {
+  font-size: 11px;
+  color: var(--agone-brown);
+  font-style: italic;
+  opacity: 0.75;
+  margin: 3px 0 2px 2px;
+}
+.agone .comps-na-table tbody tr td {
+  color: #a08878;
+  font-style: italic;
+}
+.agone .comps-na-table tbody tr:hover td { color: var(--agone-dark-text); font-style: normal; }
+.agone .na-roll-btn { color: #a08878 !important; }
+.agone .na-roll-btn:hover { color: var(--agone-gold) !important; }
+.agone .na-score { font-size: 11px; color: var(--agone-brown); }
+.agone .na-malus { color: var(--agone-red); font-size: 10px; font-style: normal; }

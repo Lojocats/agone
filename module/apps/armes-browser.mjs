@@ -105,6 +105,7 @@ export class ArmesBrowser extends Application {
 
     html.find(".ab-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
+      this._refocusSelector = ".ab-search";
       this.render();
     }, 250));
 
@@ -133,6 +134,7 @@ export class ArmesBrowser extends Application {
     html.find(".ab-req-for").on("input", foundry.utils.debounce(e => {
       const v = parseInt(e.currentTarget.value);
       this._filterReqFor = isNaN(v) ? null : v;
+      this._refocusSelector = ".ab-req-for";
       this.render();
     }, 300));
 
@@ -177,5 +179,23 @@ export class ArmesBrowser extends Application {
       ui.notifications?.info(`${d.name} ajoutée à ${this.actor.name}.`);
       this.render();
     });
+  }
+
+  /** @override */
+  async _render(force, options) {
+    await super._render(force, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.find(sel)[0];
+        if (el) {
+          el.focus();
+          if (typeof el.setSelectionRange === "function") {
+            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
+          }
+        }
+      });
+    }
   }
 }

@@ -43,11 +43,23 @@
                       title='{{localize "AGONE.MonterNiveau"}} Arts Magiques ({{d.comp.coutAffiche}})'>
                 <i class="fas fa-arrow-up"></i> Arts ({{d.comp.coutAffiche}})
               </button>
+              <button type="button" class="leveldown-btn" data-action="levelDown"
+                      data-type="competence" data-item-id="{{d.comp.id}}"
+                      title='{{localize "AGONE.RetrograderNiveau"}}'
+                      {{#unless d.comp.system.score}}disabled{{/unless}}>
+                <i class="fas fa-arrow-down"></i> {{d.comp.coutAfficheDown}}
+              </button>
               {{#if d.compLiee}}
               <button type="button" class="levelup-btn levelup-btn-liee" data-action="levelUp"
                       data-type="competence" data-item-id="{{d.compLiee.id}}" data-cout="{{d.compLiee.xpCout}}" data-crea-cout="{{d.compLiee.creaCout}}"
                       title='{{localize "AGONE.MonterNiveau"}} {{d.nomCompLiee}} ({{d.compLiee.coutAffiche}})'>
                 <i class="fas fa-arrow-up"></i> {{d.nomCompLiee}} ({{d.compLiee.coutAffiche}})
+              </button>
+              <button type="button" class="leveldown-btn" data-action="levelDown"
+                      data-type="competence" data-item-id="{{d.compLiee.id}}"
+                      title='{{localize "AGONE.RetrograderNiveau"}}'
+                      {{#unless d.compLiee.system.score}}disabled{{/unless}}>
+                <i class="fas fa-arrow-down"></i> {{d.compLiee.coutAfficheDown}}
               </button>
               {{else}}
               <span class="arts-comp-liee-manquante arts-levelup-absent" title="{{d.nomCompLiee}} non possédée">

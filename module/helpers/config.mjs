@@ -200,64 +200,64 @@ AGONE.peupleNomVersKey = {
 // Compétences raciales de départ (score 5, offertes aux saïsonins à la création)
 AGONE.peuplesData.humain.competencesRaciales    = [];
 AGONE.peuplesData.nain.competencesRaciales      = [
-  { nom: "Harmonie",           domaine: "Occulte",  specialite: "architecture ésotérique", attributLie: "creativite",   score: 5 },
-  { nom: "Démonologie",        domaine: "Occulte",  specialite: "",                      attributLie: "intelligence", score: 5 },
-  { nom: "Savoir-faire",       domaine: "Société", specialite: "forge",                 attributLie: "intelligence", score: 5 },
+  { nom: "Harmonie",           domaine: "",  specialite: "architecture ésotérique", attributLie: "creativite",   score: 5 },
+  { nom: "Démonologie",        domaine: "",  specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Savoir-faire",       domaine: "", specialite: "forge",                 attributLie: "intelligence", score: 5 },
 ];
 AGONE.peuplesData.geant.competencesRaciales     = [
-  { nom: "Armes",              domaine: "Épreuve",  specialite: "lancer de rocher",      attributLie: "melee",        score: 5 },
-  { nom: "Chasse",             domaine: "Maraude",  specialite: "",                      attributLie: "perception",   score: 5 },
-  { nom: "Géographie",         domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Armes",              domaine: "",  specialite: "lancer de rocher",      attributLie: "melee",        score: 5 },
+  { nom: "Chasse",             domaine: "",  specialite: "",                      attributLie: "perception",   score: 5 },
+  { nom: "Géographie",         domaine: "",   specialite: "",                      attributLie: "intelligence", score: 5 },
 ];
 AGONE.peuplesData.farfadet.competencesRaciales  = [
-  { nom: "Serrurerie",         domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
-  { nom: "Passe-passe",        domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
-  { nom: "Chasse",             domaine: "Maraude",  specialite: "Danseurs",              attributLie: "perception",   score: 5 },
+  { nom: "Serrurerie",         domaine: "",  specialite: "",                      attributLie: "agilite",      score: 5 },
+  { nom: "Passe-passe",        domaine: "",  specialite: "",                      attributLie: "agilite",      score: 5 },
+  { nom: "Chasse",             domaine: "",  specialite: "Danseurs",              attributLie: "perception",   score: 5 },
 ];
 AGONE.peuplesData.lutin.competencesRaciales     = [
-  { nom: "Discrétion",         domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
-  { nom: "Herboristerie",      domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
-  { nom: "Astronomie",         domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Discrétion",         domaine: "",  specialite: "",                      attributLie: "agilite",      score: 5 },
+  { nom: "Herboristerie",      domaine: "",   specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Astronomie",         domaine: "",   specialite: "",                      attributLie: "intelligence", score: 5 },
 ];
 AGONE.peuplesData.satyre.competencesRaciales    = [
-  { nom: "Musique",            domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
-  { nom: "Éloquence",          domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
-  { nom: "Armes",              domaine: "Épreuve",  specialite: "sabots",                attributLie: "melee",        score: 5 },
+  { nom: "Musique",            domaine: "", specialite: "",                      attributLie: "charisma",     score: 5 },
+  { nom: "Éloquence",          domaine: "", specialite: "",                      attributLie: "charisma",     score: 5 },
+  { nom: "Armes",              domaine: "",  specialite: "sabots",                attributLie: "melee",        score: 5 },
 ];
 AGONE.peuplesData.minotaure.competencesRaciales = [
-  { nom: "Vigilance",          domaine: "Épreuve",  specialite: "",                      attributLie: "perception",   score: 5 },
-  { nom: "Démonologie",        domaine: "Occulte",  specialite: "",                      attributLie: "intelligence", score: 5 },
-  { nom: "Armes",              domaine: "Épreuve",  specialite: "cornes",                attributLie: "melee",        score: 5 },
+  { nom: "Vigilance",          domaine: "",  specialite: "",                      attributLie: "perception",   score: 5 },
+  { nom: "Démonologie",        domaine: "",  specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Armes",              domaine: "",  specialite: "cornes",                attributLie: "melee",        score: 5 },
 ];
 AGONE.peuplesData.ogre.competencesRaciales      = [
-  { nom: "Chirurgie",          domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
-  { nom: "Premiers soins",     domaine: "Épreuve",  specialite: "",                      attributLie: "intelligence", score: 5 },
-  { nom: "Jeu",                domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
+  { nom: "Chirurgie",          domaine: "",   specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Premiers soins",     domaine: "",  specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Jeu",                domaine: "",  specialite: "",                      attributLie: "agilite",      score: 5 },
 ];
 AGONE.peuplesData.feeNoire.competencesRaciales  = [
-  { nom: "Harmonie",           domaine: "Occulte",  specialite: "",                      attributLie: "creativite",   score: 5 },
-  { nom: "Sculpture",          domaine: "Société", specialite: "",                      attributLie: "creativite",   score: 5 },
-  { nom: "Histoire & Légendes", domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Harmonie",           domaine: "",  specialite: "",                      attributLie: "creativite",   score: 5 },
+  { nom: "Sculpture",          domaine: "", specialite: "",                      attributLie: "creativite",   score: 5 },
+  { nom: "Histoire & Légendes", domaine: "",   specialite: "",                      attributLie: "intelligence", score: 5 },
 ];
 AGONE.peuplesData.meduse.competencesRaciales    = [
-  { nom: "Éloquence",          domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
-  { nom: "Intendance",         domaine: "Société", specialite: "",                      attributLie: "intelligence", score: 5 },
-  { nom: "Armes",              domaine: "Épreuve",  specialite: "serpents",              attributLie: "melee",        score: 5 },
+  { nom: "Éloquence",          domaine: "", specialite: "",                      attributLie: "charisma",     score: 5 },
+  { nom: "Intendance",         domaine: "", specialite: "",                      attributLie: "intelligence", score: 5 },
+  { nom: "Armes",              domaine: "",  specialite: "serpents",              attributLie: "melee",        score: 5 },
 ];
 AGONE.peuplesData.drakonien.competencesRaciales = [
-    { nom: "Harmonie",           domaine: "Occulte",  specialite: "dragons",                      attributLie: "creativite",   score: 5 },
-    { nom: "Géographie",         domaine: "Savoir",   specialite: "réseau de sous-sols local",          attributLie: "intelligence", score: 5 },
-    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "protéiforme",                      attributLie: "agilite",     score: 5 },
+    { nom: "Harmonie",           domaine: "",  specialite: "dragons",                      attributLie: "creativite",   score: 5 },
+    { nom: "Géographie",         domaine: "",   specialite: "réseau de sous-sols local",          attributLie: "intelligence", score: 5 },
+    { nom: "Athélétisme",          domaine: "",  specialite: "protéiforme",                      attributLie: "agilite",     score: 5 },
 ];
 AGONE.peuplesData.morgane.competencesRaciales   = [
-    { nom: "Poisons",             domaine: "Savoir",   specialite: "",                      attributLie: "intelligence", score: 5 },
-    { nom: "Baratin",              domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
-    { nom: "Éloquence",          domaine: "Société", specialite: "",                      attributLie: "charisma",     score: 5 },
+    { nom: "Poisons",             domaine: "",   specialite: "",                      attributLie: "intelligence", score: 5 },
+    { nom: "Baratin",              domaine: "", specialite: "",                      attributLie: "charisma",     score: 5 },
+    { nom: "Éloquence",          domaine: "", specialite: "",                      attributLie: "charisma",     score: 5 },
 ];
 AGONE.peuplesData.pixie.competencesRaciales     = [
-    { nom: "Discrétion",         domaine: "Maraude",  specialite: "",                      attributLie: "agilite",      score: 5 },
-    { nom: "Athélétisme",          domaine: "Épreuve",  specialite: "vol",                    attributLie: "agilite",     score: 5 },
-    { nom: "Géographie",         domaine: "Savoir",   specialite: "Harmonde",                      attributLie: "intelligence", score: 5 },
+    { nom: "Discrétion",         domaine: "",  specialite: "",                      attributLie: "agilite",      score: 5 },
+    { nom: "Athélétisme",          domaine: "",  specialite: "vol",                    attributLie: "agilite",     score: 5 },
+    { nom: "Géographie",         domaine: "",   specialite: "Harmonde",                      attributLie: "intelligence", score: 5 },
 ];
 
 // Points de création de caractéristiques : humain = 80, saisonins = 70

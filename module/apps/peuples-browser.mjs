@@ -71,6 +71,7 @@ export class PeuplesBrowser extends Application {
 
     html.find(".pb-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
+      this._refocusSelector = ".pb-search";
       this.render();
     }, 250));
 
@@ -133,5 +134,23 @@ export class PeuplesBrowser extends Application {
       ui.notifications?.info(`${d.name} appliqué à ${this.actor.name}.`);
       this.render();
     });
+  }
+
+  /** @override */
+  async _render(force, options) {
+    await super._render(force, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.find(sel)[0];
+        if (el) {
+          el.focus();
+          if (typeof el.setSelectionRange === "function") {
+            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
+          }
+        }
+      });
+    }
   }
 }

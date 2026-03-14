@@ -8,7 +8,7 @@ import { ManoeuvresBrowser } from "../apps/manoeuvres-browser.mjs";
 import { PeuplesBrowser } from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser } from "../apps/pouvoirs-browser.mjs";
 import { PeinesBrowser }  from "../apps/peines-browser.mjs";
-import { BIENFAITS_PERFIDIE_DATA } from "../helpers/compendium-data.mjs";
+import { BIENFAITS_PERFIDIE_DATA, AVANTAGES_DATA } from "../helpers/compendium-data.mjs";
 
 /**
  * Feuille de personnage Agone (Personnage Joueur)
@@ -49,6 +49,18 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     context.dons         = actor.items.filter(i => i.type === "don" && i.system.categorie === "avantage").sort(bySort);
     context.avantages    = context.dons;  // alias pour avantages.hbs
     context.defauts      = actor.items.filter(i => i.type === "don" && i.system.categorie === "defaut").sort(bySort);
+
+    // Enrichit chaque avantage/défaut avec sa catégorie thématique (Âme, Corps, etc.)
+    const AV_SECT_LABELS = {
+      charge: "Charges", ame: "Âme", corps: "Corps", esprit: "Esprit",
+      societe: "Société", emprise: "Emprise", arts: "Arts", saisons: "Saisons", flamme: "Flamme",
+    };
+    const avDataByName = new Map(AVANTAGES_DATA.map(d => [d.name, d]));
+    for (const don of [...context.avantages, ...context.defauts]) {
+      const sd = avDataByName.get(don.name);
+      don._avSection      = sd?.categorie ?? "";
+      don._avSectionLabel = AV_SECT_LABELS[don._avSection] ?? "";
+    }
     context.sorts        = actor.items.filter(i => i.type === "sort").sort(bySort);
     context.equipements  = actor.items.filter(i => i.type === "equipement").sort(bySort);
     context.pouvoirs     = actor.items.filter(i => i.type === "pouvoir");
@@ -144,6 +156,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     context.typsArme  = CONFIG.AGONE.typesArme;
     context.competencesListe = CONFIG.AGONE.competences;
 
+    // Compétences non encore acquises par le personnage (pour jet avec malus -3)
+    const _acquisNoms = new Set(actor.items.filter(i => i.type === "competence").map(i => i.name));
+    context.competencesNonAcquises = (CONFIG.AGONE.competences ?? [])
+      .filter(c => !_acquisNoms.has(c.name));
+
     // Coûts XP pour la montée de niveau (multiplicateurs, après création)
     const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
     const tbl = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
@@ -206,6 +223,42 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     };
     for (const c of context.competences)
       c.coutAffiche = system.modeCreation ? c.creaCout : c.xpCout;
+
+    // ── Coûts de rétrogradation (remboursement) ──────────────
+    context.creaCoutDown = {
+      corps:        system.corps.score        > 0 ? creaDelta(system.corps.score        - 1) : 0,
+      esprit:       system.esprit.score       > 0 ? creaDelta(system.esprit.score       - 1) : 0,
+      ame:          system.ame.score          > 0 ? creaDelta(system.ame.score          - 1) : 0,
+      agilite:      rawCarac('agilite')       > 0 ? creaDelta(rawCarac('agilite')       - 1) : 0,
+      force:        rawCarac('force')         > 0 ? creaDelta(rawCarac('force')         - 1) : 0,
+      perception:   rawCarac('perception')    > 0 ? creaDelta(rawCarac('perception')    - 1) : 0,
+      resistance:   rawCarac('resistance')    > 0 ? creaDelta(rawCarac('resistance')    - 1) : 0,
+      intelligence: rawCarac('intelligence')  > 0 ? creaDelta(rawCarac('intelligence')  - 1) : 0,
+      volonte:      rawCarac('volonte')       > 0 ? creaDelta(rawCarac('volonte')       - 1) : 0,
+      charisma:     rawCarac('charisma')      > 0 ? creaDelta(rawCarac('charisma')      - 1) : 0,
+      creativite:   rawCarac('creativite')    > 0 ? creaDelta(rawCarac('creativite')    - 1) : 0,
+    };
+    context.xpCoutDown = {
+      corps:        system.corps.score        * m.aspect,
+      esprit:       system.esprit.score       * m.aspect,
+      ame:          system.ame.score          * m.aspect,
+      agilite:      system.agilite.score      * m.carac,
+      force:        system.force.score        * m.carac,
+      perception:   system.perception.score   * m.carac,
+      resistance:   system.resistance.score   * m.carac,
+      intelligence: system.intelligence.score * m.carac,
+      volonte:      system.volonte.score      * m.carac,
+      charisma:     system.charisma.score     * m.carac,
+      creativite:   system.creativite.score   * m.carac,
+    };
+    context.coutAfficheDown = {};
+    for (const k of Object.keys(context.creaCoutDown))
+      context.coutAfficheDown[k] = system.modeCreation ? context.creaCoutDown[k] : context.xpCoutDown[k];
+    for (const c of context.competences) {
+      c.creaCoutDown    = c.system.score > 0 ? creaDelta(c.system.score - 1) : 0;
+      c.xpCoutDown      = c.system.score * m.competence;
+      c.coutAfficheDown = system.modeCreation ? c.creaCoutDown : c.xpCoutDown;
+    }
 
     // Compétences Arts Magiques par domaine (Accord, Décorum, Geste, Cyse)
     // POT = Art + min(score_artsMag, score_compLiée) + bonusÂme
@@ -358,6 +411,29 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     return context;
   }
 
+  /**
+   * @override
+   * Conserve le focus sur le champ actif après re-render (évite que l'éditeur
+   * ProseMirror de l'onglet Identité ne vole le focus lors de la sauvegarde).
+   */
+  async _render(force, options) {
+    // Mémoriser le champ focalisé AVANT le re-render
+    const focused = document.activeElement;
+    const isOurInput = this.element?.[0]?.contains(focused) &&
+      ["INPUT", "SELECT", "TEXTAREA"].includes(focused?.tagName ?? "");
+    const focusedName = isOurInput ? (focused.name || null) : null;
+
+    await super._render(force, options);
+
+    // Restaurer le focus si un champ nommé de la fiche l'avait
+    if (focusedName) {
+      requestAnimationFrame(() => {
+        const el = this.form?.querySelector(`[name="${CSS.escape(focusedName)}"]`);
+        if (el) el.focus();
+      });
+    }
+  }
+
   /** @override */
   async _onSubmit(event, options = {}) {
     // Convertir les inputs type="number" vides en "0" avant que FormDataExtended
@@ -390,6 +466,13 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Jets de dés — Compétences
     html.find("[data-action='rollCompetence']").click(this._onRollCompetence.bind(this));
+    html.find("[data-action='rollCompetenceNA']").click(this._onRollCompetenceNA.bind(this));
+
+    // Barre de recherche compétences
+    html.find(".comp-search-input").on("input", (ev) => this._onFilterCompetences(ev, html));
+    html.find(".comp-search-clear").click((ev) => {
+      html.find(".comp-search-input").val("").trigger("input");
+    });
 
     // Jets de dés — Combat
     html.find("[data-action='rollInitiative']").click(this._onRollInitiative.bind(this));
@@ -480,6 +563,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Montée de niveau (dépense XP)
     html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
+
+    // Rétrogradation (remboursement XP / pts création)
+    html.find("[data-action='levelDown']").click(this._onLevelDown.bind(this));
 
     // Montée de niveau danseur
     html.find("[data-action='levelUpDanseur']").click(this._onLevelUpDanseur.bind(this));
@@ -649,6 +735,10 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
     }
     const itemData = { name, type, system: {} };
+    // data-categorie permet de pré-remplir la catégorie pour les "don" (avantage|défaut)
+    if (type === "don" && btn.dataset.categorie) {
+      itemData.system.categorie = btn.dataset.categorie;
+    }
     return await Item.create(itemData, { parent: this.actor });
   }
 
@@ -692,6 +782,44 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const li     = event.currentTarget.closest("[data-item-id]");
     const itemId = li?.dataset.itemId ?? event.currentTarget.dataset.itemId;
     await this.actor.rollCompetence(itemId);
+  }
+
+  async _onRollCompetenceNA(event) {
+    event.preventDefault();
+    const btn = event.currentTarget;
+    await this.actor.rollCompetenceSansItem(
+      btn.dataset.nom,
+      btn.dataset.attributLie,
+      btn.dataset.domaine
+    );
+  }
+
+  _onFilterCompetences(event, html) {
+    const query = event.currentTarget.value.trim().toLowerCase();
+    const clearBtn = html.find(".comp-search-clear")[0];
+    if (clearBtn) clearBtn.style.display = query ? "" : "none";
+
+    // Filtrer les lignes acquises
+    html.find(".competences-table:not(.comps-na-table) tbody .item-row").each((_, row) => {
+      const name = (row.querySelector(".item-name")?.textContent ?? "").trim().toLowerCase();
+      row.style.display = (!query || name.includes(query)) ? "" : "none";
+    });
+
+    // Section non acquises : visible seulement si recherche active
+    const naSection = html.find(".comps-na-section")[0];
+    if (!naSection) return;
+    if (!query) { naSection.style.display = "none"; return; }
+    naSection.style.display = "";
+
+    let anyVisible = false;
+    html.find(".comps-na-table .na-row").each((_, row) => {
+      const nom     = (row.dataset.nom     ?? "").toLowerCase();
+      const domaine = (row.dataset.domaine ?? "").toLowerCase();
+      const visible = nom.includes(query) || domaine.includes(query);
+      row.style.display = visible ? "" : "none";
+      if (visible) anyVisible = true;
+    });
+    naSection.style.display = anyVisible ? "" : "none";
   }
 
   async _onRollInitiative(event) {
@@ -1791,6 +1919,91 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         "system.experience.totale": (sd.experience.totale ?? 0) + xpCout,
       }));
       await Promise.all(updates);
+    }
+  }
+
+  // ==============================
+  // Rétrogradation (remboursement pts création ou XP)
+  // ==============================
+  async _onLevelDown(event) {
+    event.preventDefault();
+    const btn    = event.currentTarget;
+    const type   = btn.dataset.type;
+    const key    = btn.dataset.key;
+    const itemId = btn.dataset.itemId;
+    const sd     = this.actor.system;
+
+    const item         = (type === "competence") ? this.actor.items.get(itemId) : null;
+    const currentScore = (type === "competence") ? (item?.system.score ?? 0) : (sd[key]?.score ?? 0);
+
+    if (currentScore <= 0) {
+      return ui.notifications.warn(game.i18n.localize("AGONE.ScoreDejaZero"));
+    }
+
+    const tbl       = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
+    const lastDelta = tbl.length >= 2 ? tbl[tbl.length - 1] - tbl[tbl.length - 2] : 1;
+    const creaDelta = (s) => s + 1 < tbl.length ? tbl[s + 1] - tbl[s] : lastDelta + (s - (tbl.length - 2));
+    const m         = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
+
+    // ── MODE CRÉATION ────────────────────────────────────────
+    if (sd.modeCreation) {
+      if (type === "aspect") {
+        return ui.notifications.warn(game.i18n.localize("AGONE.AspectsBloquesCrea"));
+      }
+      const pool   = (type === "carac") ? sd.ptsCreationCarac : sd.ptsCreationComp;
+      const bonus  = (type === "carac") ? (sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0) : 0;
+      const rawScore = Math.max(0, currentScore - bonus);
+
+      if (rawScore <= 0) {
+        return ui.notifications.warn(game.i18n.localize("AGONE.RemboursementImpossible"));
+      }
+      const remboursement = creaDelta(rawScore - 1);
+
+      const confirmed = await foundry.applications.api.DialogV2.confirm({
+        title:   game.i18n.localize("AGONE.RetrograderNiveau"),
+        content: `<p>${game.i18n.format("AGONE.ConfirmerRetrogradeNiveau", { remboursement: `${remboursement} ${game.i18n.localize("AGONE.PointsCreation")}` })}</p>`,
+      });
+      if (!confirmed) return;
+
+      if (type === "carac") {
+        await this.actor.update({
+          [`system.${key}.score`]:           currentScore - 1,
+          "system.ptsCreationCarac.depense": Math.max(0, (pool.depense ?? 0) - remboursement),
+        });
+      } else if (type === "competence" && item) {
+        await Promise.all([
+          item.update({ "system.score": currentScore - 1 }),
+          this.actor.update({ "system.ptsCreationComp.depense": Math.max(0, (pool.depense ?? 0) - remboursement) }),
+        ]);
+      }
+      return;
+    }
+
+    // ── MODE XP NORMAL ───────────────────────────────────────
+    const mult            = type === "aspect" ? m.aspect : type === "carac" ? m.carac : m.competence;
+    const xpRemboursement = currentScore * mult;
+    const isCaracOrAspect = (type === "carac" || type === "aspect");
+
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
+      title:   game.i18n.localize("AGONE.RetrograderNiveau"),
+      content: `<p>${game.i18n.format("AGONE.ConfirmerRetrogradeNiveau", { remboursement: `${xpRemboursement} XP` })}</p>`,
+    });
+    if (!confirmed) return;
+
+    if (isCaracOrAspect) {
+      await this.actor.update({
+        [`system.${key}.score`]:       currentScore - 1,
+        "system.experience.courante":  (sd.experience.courante ?? 0) + xpRemboursement,
+        "system.experience.totale":    Math.max(0, (sd.experience.totale ?? 0) - xpRemboursement),
+      });
+    } else if (type === "competence" && item) {
+      await Promise.all([
+        item.update({ "system.score": currentScore - 1 }),
+        this.actor.update({
+          "system.experience.courante": (sd.experience.courante ?? 0) + xpRemboursement,
+          "system.experience.totale":   Math.max(0, (sd.experience.totale ?? 0) - xpRemboursement),
+        }),
+      ]);
     }
   }
 

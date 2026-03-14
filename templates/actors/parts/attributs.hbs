@@ -32,6 +32,12 @@
                     title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.corps}} XP)'>
               <i class="fas fa-arrow-up"></i> {{xpCout.corps}}
             </button>
+            <button type="button" class="leveldown-btn" data-action="levelDown"
+                    data-type="aspect" data-key="corps"
+                    title='{{localize "AGONE.RetrograderNiveau"}}'
+                    {{#unless system.corps.score}}disabled{{/unless}}>
+              <i class="fas fa-arrow-down"></i> {{coutAfficheDown.corps}}
+            </button>
           </div>
           {{/if}}
         </div>
@@ -63,6 +69,12 @@
                     title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.esprit}} XP)'>
               <i class="fas fa-arrow-up"></i> {{xpCout.esprit}}
             </button>
+            <button type="button" class="leveldown-btn" data-action="levelDown"
+                    data-type="aspect" data-key="esprit"
+                    title='{{localize "AGONE.RetrograderNiveau"}}'
+                    {{#unless system.esprit.score}}disabled{{/unless}}>
+              <i class="fas fa-arrow-down"></i> {{coutAfficheDown.esprit}}
+            </button>
           </div>
           {{/if}}
         </div>
@@ -93,6 +105,12 @@
                     data-type="aspect" data-key="ame" data-cout="{{xpCout.ame}}" data-crea-cout="{{creaCout.ame}}"
                     title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.ame}} XP)'>
               <i class="fas fa-arrow-up"></i> {{xpCout.ame}}
+            </button>
+            <button type="button" class="leveldown-btn" data-action="levelDown"
+                    data-type="aspect" data-key="ame"
+                    title='{{localize "AGONE.RetrograderNiveau"}}'
+                    {{#unless system.ame.score}}disabled{{/unless}}>
+              <i class="fas fa-arrow-down"></i> {{coutAfficheDown.ame}}
             </button>
           </div>
           {{/if}}
@@ -201,6 +219,12 @@
                 title='{{#if caracAtMax.agilite}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.agilite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.agilite}}){{/if}}'
                 {{#if caracAtMax.agilite}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.agilite}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="agilite"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.agilite.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.agilite}}
         </button>{{/if}}
       </div>
       {{!-- Force (Corps) --}}
@@ -215,6 +239,12 @@
                 title='{{#if caracAtMax.force}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.force}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.force}}){{/if}}'
                 {{#if caracAtMax.force}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.force}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="force"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.force.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.force}}
         </button>{{/if}}
       </div>
       {{!-- Perception (Corps) --}}
@@ -229,6 +259,12 @@
                 title='{{#if caracAtMax.perception}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.perception}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.perception}}){{/if}}'
                 {{#if caracAtMax.perception}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.perception}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="perception"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.perception.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.perception}}
         </button>{{/if}}
       </div>
       {{!-- Résistance (Corps) --}}
@@ -243,6 +279,12 @@
                 title='{{#if caracAtMax.resistance}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.resistance}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.resistance}}){{/if}}'
                 {{#if caracAtMax.resistance}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.resistance}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="resistance"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.resistance.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.resistance}}
         </button>{{/if}}
       </div>
       </div>{{!-- /carac-aspect-group Corps --}}
@@ -261,6 +303,12 @@
                 title='{{#if caracAtMax.intelligence}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.intelligence}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.intelligence}}){{/if}}'
                 {{#if caracAtMax.intelligence}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.intelligence}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="intelligence"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.intelligence.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.intelligence}}
         </button>{{/if}}
       </div>
       {{!-- Volonté (Esprit) --}}
@@ -275,6 +323,12 @@
                 title='{{#if caracAtMax.volonte}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.volonte}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.volonte}}){{/if}}'
                 {{#if caracAtMax.volonte}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.volonte}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="volonte"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.volonte.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.volonte}}
         </button>{{/if}}
       </div>
       </div>{{!-- /carac-aspect-group Esprit --}}
@@ -293,6 +347,12 @@
                 title='{{#if caracAtMax.charisma}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.charisma}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.charisma}}){{/if}}'
                 {{#if caracAtMax.charisma}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.charisma}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="charisma"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.charisma.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.charisma}}
         </button>{{/if}}
       </div>
       {{!-- Créativité (Âme) --}}
@@ -307,6 +367,12 @@
                 title='{{#if caracAtMax.creativite}}{{localize "AGONE.MaxRacialAtteint"}} (max : {{caracEffectiveMax.creativite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.creativite}}){{/if}}'
                 {{#if caracAtMax.creativite}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.creativite}}
+        </button>
+        <button type="button" class="leveldown-btn" data-action="levelDown"
+                data-type="carac" data-key="creativite"
+                title='{{localize "AGONE.RetrograderNiveau"}}'
+                {{#unless system.creativite.score}}disabled{{/unless}}>
+          <i class="fas fa-arrow-down"></i> {{coutAfficheDown.creativite}}
         </button>{{/if}}
       </div>
       </div>{{!-- /carac-aspect-group Âme --}}

@@ -802,3 +802,210 @@
   background: rgba(0,0,0,0.06);
   border-top: 0;
 }
+
+/* ============================================================
+   ONGLET AVANTAGES & DÉFAUTS — Compteur de charges + layout
+   ============================================================ */
+
+/* ── Carte Charges ───────────────────────────────────────── */
+.agone .charges-card {
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(92,58,30,0.25);
+  border-radius: var(--radius, 4px);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.agone .charges-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: rgba(92,58,30,0.08);
+  border-bottom: 1px solid rgba(92,58,30,0.15);
+}
+.agone .charges-card-header i { color: var(--agone-gold, #c9a227); font-size: 13px; }
+.agone .charges-card-title {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .charges-card-subtitle {
+  font-size: 11px;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.65;
+  font-style: italic;
+  margin-left: 4px;
+}
+.agone .charges-card-body { padding: 8px 12px; }
+
+/* Ligne principale de stats */
+.agone .charges-stats-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.agone .charges-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+  padding: 4px 8px;
+  background: rgba(92,58,30,0.05);
+  border: 1px solid rgba(92,58,30,0.12);
+  border-radius: 4px;
+}
+.agone .charges-stat--main {
+  background: rgba(201,162,39,0.1);
+  border-color: rgba(201,162,39,0.3);
+}
+.agone .charges-stat--solde { min-width: 56px; }
+.agone .charges-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.7;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.agone .charges-stat-val {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--agone-dark-text, #2a1a08);
+  line-height: 1.1;
+}
+.agone .charges-stat-input {
+  width: 46px;
+  text-align: center;
+  border: 1px solid rgba(92,58,30,0.3);
+  border-radius: 3px;
+  padding: 1px 3px;
+  background: rgba(255,255,255,0.55);
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--agone-dark-text, #2a1a08);
+  font-family: 'Crimson Text', Georgia, serif;
+}
+.agone .charges-stat-input:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 0 2px rgba(201,162,39,0.15);
+}
+
+/* Séparateur opérateur (+, −, =) */
+.agone .charges-stat-sep {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.5;
+  padding: 0 2px;
+  align-self: center;
+}
+.agone .charges-stat-sep--eq {
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+/* Couleurs des valeurs */
+.agone .charges-plus  { color: #2a7a35; }
+.agone .charges-moins { color: #8a2020; }
+.agone .charges-disponibles { color: var(--agone-brown, #5c3a1e); }
+.agone .charges-ok     { color: #2a7a35; }
+.agone .charges-deficit{ color: #8a1a1a; }
+
+.agone .charges-note {
+  font-size: 11px;
+  color: #7a4500;
+  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Grille avantages / défauts (côte à côte) ────────────── */
+.agone .av-def-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+  align-items: start;
+}
+@media (max-width: 580px) {
+  .agone .av-def-grid { grid-template-columns: 1fr; }
+}
+
+/* En-tête de chaque colonne */
+.agone .av-col-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  border-bottom: 2px solid rgba(92,58,30,0.15);
+}
+.agone .av-col-title {
+  flex: 1;
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  margin: 0;
+}
+.agone .av-title { color: #1a6a35; }
+.agone .av-title i { color: #c9a227; }
+.agone .def-title { color: #7a1a1a; }
+.agone .def-title i { color: #c04040; }
+
+/* Don-row dans l'onglet avantages (surcharge magic.css) */
+.agone .av-col .don-row,
+.agone .def-col .don-row {
+  gap: 5px;
+  background: transparent;
+  border-bottom: 1px dotted rgba(92,58,30,0.15);
+  padding: 3px 4px;
+}
+.agone .av-col .don-row:hover,
+.agone .def-col .don-row:hover { background: rgba(201,162,39,0.06); }
+
+/* Badge de section thématique */
+.agone .av-section-badge {
+  display: inline-block;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+/* Couleurs par section */
+.agone .av-sect-ame      { background: rgba(140,60,160,0.13); color: #5a106a; border: 1px solid rgba(140,60,160,0.3); }
+.agone .av-sect-corps    { background: rgba(180,70,20,0.12);  color: #7a2a00; border: 1px solid rgba(180,70,20,0.3);  }
+.agone .av-sect-esprit   { background: rgba(30,100,180,0.12); color: #103070; border: 1px solid rgba(30,100,180,0.3); }
+.agone .av-sect-societe  { background: rgba(40,130,60,0.12);  color: #0a4a1a; border: 1px solid rgba(40,130,60,0.3);  }
+.agone .av-sect-emprise  { background: rgba(200,130,0,0.13);  color: #6a4000; border: 1px solid rgba(200,130,0,0.3);  }
+.agone .av-sect-arts     { background: rgba(60,120,180,0.12); color: #1a3870; border: 1px solid rgba(60,120,180,0.3); }
+.agone .av-sect-saisons  { background: rgba(30,160,140,0.12); color: #0a5040; border: 1px solid rgba(30,160,140,0.3); }
+.agone .av-sect-flamme   { background: rgba(200,60,20,0.13);  color: #6a1800; border: 1px solid rgba(200,60,20,0.3);  }
+.agone .av-sect-charge    { background: rgba(92,58,30,0.1);   color: #4a2800; border: 1px solid rgba(92,58,30,0.25); }
+
+/* Badge sur défaut : version plus atténuée */
+.agone .av-defaut-sect { opacity: 0.75; }
+
+/* Valeur du coût (+N ou −N) */
+.agone .av-cout-pos {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a6a35;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.agone .av-cout-neg {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a1a1a;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Placeholder pour aligner les lignes sans bouton description */
+.agone .don-desc-placeholder { width: 22px; flex-shrink: 0; }

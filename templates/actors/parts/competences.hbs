@@ -19,6 +19,13 @@
     </button>
   </div>
 
+  <!-- Barre de recherche compétences -->
+  <div class="comp-search-wrap">
+    <i class="fas fa-search comp-search-icon"></i>
+    <input type="text" class="comp-search-input" placeholder='{{localize "AGONE.FiltrerCompetences"}}' autocomplete="off" />
+    <button type="button" class="comp-search-clear btn-icon" title='{{localize "AGONE.EffacerRecherche"}}' style="display:none">✕</button>
+  </div>
+
   {{#if competences.length}}
   <table class="competences-table">
     <thead>
@@ -51,6 +58,12 @@
                   data-type="competence" data-item-id="{{comp.id}}" data-cout="{{comp.xpCout}}" data-crea-cout="{{comp.creaCout}}"
                   title='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
             <i class="fas fa-arrow-up"></i> {{comp.coutAffiche}}
+          </button>
+          <button type="button" class="leveldown-btn" data-action="levelDown"
+                  data-type="competence" data-item-id="{{comp.id}}"
+                  title='{{localize "AGONE.RetrograderNiveau"}}'
+                  {{#unless comp.system.score}}disabled{{/unless}}>
+            <i class="fas fa-arrow-down"></i> {{comp.coutAfficheDown}}
           </button>{{/if}}
         </td>
         <td class="col-exp">
@@ -68,6 +81,33 @@
   {{else}}
   <p class="empty-list">{{localize "AGONE.AucuneCompetence"}}</p>
   {{/if}}
+
+  <!-- Compétences non acquises (visible uniquement lors d'une recherche) -->
+  <div class="comps-na-section" style="display:none">
+    <p class="na-section-title"><i class="fas fa-dice"></i> {{localize "AGONE.CompetencesNonAcquises"}}</p>
+    <table class="competences-table comps-na-table">
+      <tbody>
+        {{#each competencesNonAcquises as |c|}}
+        <tr class="item-row na-row" data-nom="{{c.name}}" data-domaine="{{c.domaine}}">
+          <td class="col-nom">
+            <button type="button" class="roll-btn item-name na-roll-btn" data-action="rollCompetenceNA"
+                    data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.domaine}}"
+                    title='{{localize "AGONE.JeterCompetenceNonAcquise"}}'>
+              {{c.name}}
+            </button>
+          </td>
+          <td class="col-domaine">{{c.domaine}}</td>
+          <td class="col-specialite">—</td>
+          <td class="col-attr">{{c.attributLie}}</td>
+          <td class="col-score"><span class="na-score">0 <em class="na-malus">(−3)</em></span></td>
+          <td class="col-exp">—</td>
+          <td class="col-actions"></td>
+          <td class="col-drag"></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
 
   <!-- Manœuvres & Bottes -->
   <div class="section-header">
