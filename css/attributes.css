@@ -1,0 +1,221 @@
+/* ============================================================
+   AGONE – Aspects, Caractéristiques, Dérivées, Emprise
+   ============================================================ */
+
+/* ── Aspects & Attributs ─────────────────────────────────── */
+.agone .attributs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 750px) {
+  .agone .attributs-grid { grid-template-columns: 1fr; }
+}
+
+.agone .aspects-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.agone .aspect-block {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(92,58,30,0.08);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+}
+.agone .aspect-header {
+  font-family: 'MedievalSharp', sans-serif;
+  font-size: 13px;
+  color: var(--agone-brown-dark);
+  margin: 0 0 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--agone-gold);
+  padding-bottom: 3px;
+}
+.agone .aspect-values {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .aspect-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.agone .aspect-stat label {
+  font-size: 11px;
+  color: var(--agone-brown);
+  flex: 1;
+}
+.agone .aspect-num {
+  width: 44px;
+  text-align: center;
+  background: var(--agone-input-bg);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+}
+.agone .exp-label {
+  font-size: 10px;
+  color: var(--agone-brown);
+  opacity: 0.75;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+.agone .aspect-num.exp { width: 42px; }
+.agone .aspect-stat.noir .aspect-num { border-color: var(--agone-noir); }
+.agone .aspect-stat.noir .noir-base {
+  width: 36px;
+  font-size: 10px;
+  opacity: 0.75;
+  border-style: dashed;
+  margin-top: 2px;
+}
+.agone .aspect-stat.derived .derived-val {
+  font-weight: bold;
+  color: var(--agone-brown-dark);
+}
+
+.agone .flamme-totaux {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  padding: 6px;
+  background: rgba(92,58,30,0.1);
+  border-radius: var(--radius);
+  border: 1px solid var(--agone-gold);
+}
+.agone .flamme-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .flamme-box label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--agone-dark-text);
+  font-weight: 600;
+}
+.agone .flamme-box .derived-val,
+.agone .flamme-box .derived-big {
+  color: var(--agone-dark-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ── Caractéristiques ────────────────────────────────────── */
+.agone .carac-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.agone .carac-aspect-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.agone .carac-aspect-label {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--agone-gold);
+  border-bottom: 1px solid var(--agone-gold);
+  margin: 0 0 2px 0;
+  padding-bottom: 2px;
+}
+.agone .carac-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px dotted rgba(92,58,30,0.3);
+}
+
+/* ── Caractéristiques dérivées ───────────────────────────── */
+.agone .derived-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+  margin-top: 8px;
+}
+/* Compatibilité pnj-sheet et anciens contextes */
+.agone .derived-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .derived-row label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--agone-brown);
+}
+.agone .derived-val {
+  font-weight: bold;
+  font-size: 15px;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ── Emprise avec select intégré ─────────────────────────── */
+.agone .cstat-emprise { grid-column: span 1; }
+.agone .cstat-emprise-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.agone .cstat-emprise-wrap .cstat-label { display: block; }
+.agone .cstat-emprise-wrap .emprise-type-select {
+  font-size: 9px;
+  padding: 1px 2px;
+  border: 1px solid rgba(92,58,30,0.25);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.5);
+  width: 100%;
+  max-width: 100%;
+  color: var(--agone-brown);
+}
+
+/* Sélecteur d'obédience (Emprise) */
+.agone .emprise-type-select {
+  font-size: 0.75em;
+  padding: 1px 3px;
+  margin-left: 4px;
+  height: auto;
+  border: 1px solid #8a6a3a;
+  background: #f5ede0;
+  color: #4b3a24;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* ── Résumé Flamme ───────────────────────────────────────── */
+.agone .flamme-resume {
+  display: flex;
+  gap: 20px;
+  padding: 8px;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+.agone .flamme-stat-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .flamme-stat-box label {
+  font-size: 12px;
+  color: var(--agone-brown-dark);
+  font-weight: 600;
+}
+.agone .flamme-stat-box .derived-big,
+.agone .flamme-stat-box .derived-val,
+.agone .flamme-stat-box .stat-num {
+  color: var(--agone-dark-text);
+  font-weight: 700;
+}

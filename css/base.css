@@ -1,0 +1,42 @@
+/* ============================================================
+   AGONE – Base : variables, polices, reset global
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+  --agone-brown:      #5c3a1e;
+  --agone-brown-dark: #3b210e;
+  --agone-gold:       #c9a227;
+  --agone-gold-light: #e8c964;
+  --agone-red:        #8b1a1a;
+  --agone-parchment:  #f4e8c1;
+  --agone-parchment2: #ede0b0;
+  --agone-dark-text:  #2a1a08;
+  --agone-shadow:     rgba(0,0,0,0.45);
+  --agone-input-bg:   rgba(255,255,255,0.55);
+  --agone-border:     #7d5a2a;
+  --agone-noir:       #1a1a2e;
+  --agone-noir-text:  #c0c0d0;
+  --radius:           4px;
+}
+
+/* ── Base feuille ────────────────────────────────────────── */
+.agone.sheet {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 14px;
+  color: var(--agone-dark-text);
+  background: var(--agone-parchment);
+}
+
+.agone.sheet *,
+.agone.sheet *::before,
+.agone.sheet *::after {
+  box-sizing: border-box;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+.agone ::-webkit-scrollbar { width: 6px; }
+.agone ::-webkit-scrollbar-track { background: rgba(92,58,30,0.1); }
+.agone ::-webkit-scrollbar-thumb { background: var(--agone-brown); border-radius: 3px; }
+.agone ::-webkit-scrollbar-thumb:hover { background: var(--agone-gold); }

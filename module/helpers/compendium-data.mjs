@@ -576,7 +576,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 20,
     competencesRaciales: [],
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
-    description: "Peuple le plus répandu, les Humains s'adaptent à tous les environnements. Ils ne bénéficient d'aucun bonus racial particulier mais commencent avec 20 points de compétences supplémentaires."
+    description: "Peuple le plus répandu d'Harmonde, les Humains ne sont liés à aucune saison et s'adaptent à tous les milieux. Contrairement aux Saisonins, ils ne portent aucune marque raciale particulière, mais compensent cette absence de dons innés par une polyvalence et une résilience remarquables."
   },
   {
     name: "Nain",
@@ -584,7 +584,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Artisanat", "Apprécier les métaux"],
     corpsBonus: 2, espritBonus: 0, ameBonus: 0,
-    description: ""
+    description: "Décans de l'Hiver, les Nains sont connus de tous sur Harmonde et semblent n'avoir guère changé d'une ère à l'autre : petits — mais plus grands que les Lutins —, trapus, généralement barbus, et d'une humeur perpétuellement grise. Maîtres artisans et mineurs hors pair, ils entretiennent avec la pierre et le métal une relation qui frise le sacré."
   },
   {
     name: "Géant",
@@ -592,7 +592,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Résistance à la douleur"],
     corpsBonus: 4, espritBonus: 0, ameBonus: 0,
-    description: ""
+    description: "Décans de l'Été, les Géants sont en tout point identiques aux humains dans leurs traits et leur allure — sauf en un détail que personne ne peut ignorer : leur taille prodigieuse. Calmes et posés pour la plupart, ils n'ont guère besoin de se montrer menaçants ; leur simple présence impose naturellement le respect."
   },
   {
     name: "Farfadet",
@@ -600,7 +600,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Acrobaties", "Esquive"],
     corpsBonus: 0, espritBonus: 0, ameBonus: 2,
-    description: ""
+    description: "Décans du Printemps comme leurs cousins les Lutins, les Farfadets leur sont semblables en taille et en apparence générale, si ce n'est des traits souvent plus fins et plus racés. Là où le Lutin est forestier, le Farfadet est citadin : à l'aise dans les ruelles et les marchés des cités humaines, il s'y est taillé une réputation d'intermédiaire espiègle entre les mondes."
   },
   {
     name: "Lutin",
@@ -608,7 +608,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Acrobaties", "Vol"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 1,
-    description: ""
+    description: "Décans du Printemps, les Lutins ont la stature de jeunes enfants : oreilles pointues, traits ronds et expressifs, corps menu et vif. Amoureux des forêts profondes où ils vivent en petites communautés discrètes, ils sont espiègles et agiles. Leur petite taille ne doit pas tromper — prompts à disparaître dans la végétation, ils compensent leur manque de force brute par une vivacité et une connexion instinctive avec la nature."
   },
   {
     name: "Satyre",
@@ -616,7 +616,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 15,
     competencesRaciales: ["Chant", "Instruments de musique"],
     corpsBonus: 0, espritBonus: 0, ameBonus: 3,
-    description: ""
+    description: "Décans du Printemps, les Satyres allient un buste humain à de puissantes pattes de bouc. Séduisants et sensuels, ils ont perdu depuis longtemps les cornes qu'ils portaient jadis au front. Épicuriens dans l'âme, ils vivent au rythme de la musique, du vin et du désir, et leur seule présence transforme n'importe quelle réunion en fête mémorable."
   },
   {
     name: "Minotaure",
@@ -624,7 +624,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Corps-à-corps", "Intimidation"],
     corpsBonus: 3, espritBonus: 0, ameBonus: 0,
-    description: ""
+    description: "Décans de l'Été, les Minotaures portent un corps d'homme puissant surmonté d'une tête de taureau. Plus grands que les Ogres mais moins massifs que les Géants, ils occupent une place singulière parmi les Saisonins de l'Été : guerriers nés, ils associent la force brute à une fierté qui peut facilement virer à l'entêtement."
   },
   {
     name: "Ogre",
@@ -632,7 +632,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 10,
     competencesRaciales: ["Intimidation", "Résistance à la douleur"],
     corpsBonus: 4, espritBonus: -1, ameBonus: 0,
-    description: ""
+    description: "Décans de l'Été, les Ogres sont des colosses robustes et mal dégrossis, dépassant souvent d'une tête les humains les plus grands. Leur carrure massive les rend redoutables au combat, et leur tempérament impulsif et querelleur les y précipite régulièrement. Derrière une apparence fruste se cachent cependant une force de caractère et une loyauté farouche envers ceux qu'ils reconnaissent comme les leurs."
   },
   {
     name: "Drakonien",
@@ -640,7 +640,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Magie drakonienne", "Résistance au feu"],
     corpsBonus: 1, espritBonus: 1, ameBonus: 1,
-    description: ""
+    description: "Décans de l'Automne, les Drakoniens arborent un corps humanoïde recouvert de fines écailles et une tête rappelant celle d'un dragon ou d'un grand lézard. Ils sont en outre dotés d'un don rare : la capacité de changer brièvement de forme, prenant l'apparence d'autres créatures. Secrets et fiers de leur héritage reptilien, ils cultivent la maîtrise de soi comme une vertu suprême."
   },
   {
     name: "Morgane",
@@ -648,7 +648,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 16,
     competencesRaciales: ["Magie lunaire", "Navigation"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 2,
-    description: ""
+    description: "Décans de l'Automne, les Morganes sont en tous points semblables aux femmes humaines, si ce n'est une beauté si parfaite qu'elle en paraît surnaturelle. Certaines arborent également une peau d'un blanc immaculé aux légers reflets bleutés, comme illuminée par un clair de lune. Liées à l'eau et à la lune, elles allient une profonde sagesse ésotérique à un charme presque irrésistible."
   },
   {
     name: "Pixie",
@@ -656,7 +656,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 18,
     competencesRaciales: ["Magie des fées", "Furtivité"],
     corpsBonus: 0, espritBonus: 2, ameBonus: 2,
-    description: ""
+    description: "Décans de l'Automne, les Pixies sont les plus petits de tous les Saisonins. Leur peau noueuse et leur sourire un peu trop large trahissent leur nature : il y a chez eux quelque chose de légèrement inquiétant, que ne viennent qu'à moitié compenser leurs ailes de libellule aux reflets irisés. Capricieux et imprévisibles, ils ne sont jamais aussi dangereux que lorsqu'ils s'ennuient."
   },
   {
     name: "Fée Noire",
@@ -664,7 +664,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 14,
     competencesRaciales: ["Manipulation", "Magie sombre"],
     corpsBonus: 0, espritBonus: 1, ameBonus: 2,
-    description: ""
+    description: "Décans de l'Hiver, les Fées Noires sont les plus petites des races humanoïdes — encore plus menues que les Lutins. Elles se présentent sous l'apparence de petites vieilles ridées et voûtées, dans le dos desquelles poussent deux ailes membraneuses de chauve-souris. Leur allure apparemment inoffensive est trompeuse : ce sont des êtres anciens, rancuniers, et redoutablement rusés."
   },
   {
     name: "Méduse",
@@ -672,7 +672,7 @@ export const PEUPLES_DATA = [
     pointsCreationComp: 12,
     competencesRaciales: ["Pétrification", "Regard fascinant"],
     corpsBonus: 1, espritBonus: 0, ameBonus: 2,
-    description: ""
+    description: "Décans de l'Hiver, les Méduses sont de somptueuses femmes à la peau d'ivoire et aux yeux dorés aux pupilles fendues comme celles d'un chat. Leur chevelure est entièrement remplacée par une couronne de serpents vivants, discrets au repos mais toujours présents. D'une beauté envoûtante qui dissimule un tempérament calculateur, les Méduses sont aussi fascinantes que dangereuses."
   },
 ];
 

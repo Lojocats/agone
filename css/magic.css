@@ -1,0 +1,804 @@
+/* ============================================================
+   AGONE – Onglet Magie : Équipement, Sorts, Danseurs,
+           Démons, Arts Magiques, Manœuvres & Dons (fiche)
+   ============================================================ */
+
+/* ── Équipement ──────────────────────────────────────────── */
+.agone .charge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 16px;
+  padding: 6px;
+  background: rgba(92,58,30,0.06);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+.agone .charge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.agone .charge-row label { flex: 1; }
+.agone .surcharge { color: var(--agone-red) !important; }
+.agone .surcharge-malus {
+  font-size: 11px;
+  color: var(--agone-red);
+  font-weight: bold;
+}
+
+.agone .monnaie-taux {
+  font-size: 11px;
+  color: var(--agone-brown);
+  text-align: center;
+  margin: 4px 0 6px;
+  font-style: italic;
+}
+.agone .monnaie-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.agone .monnaie-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px;
+  background: rgba(201,162,39,0.1);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+}
+.agone .monnaie-row label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--agone-brown);
+  font-weight: 600;
+}
+.agone .monnaie-row input { width: 60px; text-align: center; }
+
+/* ── Sorts & Magie ───────────────────────────────────────── */
+.agone .aptitudes-grid {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.agone .aptitude-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(92,58,30,0.08);
+  border-radius: var(--radius);
+  border: 1px solid var(--agone-border);
+}
+.agone .aptitude-row label { font-size: 12px; }
+
+/* ── Sorts ────────────────────────────────────────────────── */
+.agone .sorts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.agone .sorts-table thead th {
+  background: rgba(92,58,30,0.08);
+  color: var(--agone-brown);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid var(--agone-border);
+}
+.agone .sorts-table tbody td {
+  padding: 3px 8px;
+  border-bottom: 1px solid rgba(93,58,30,0.12);
+  vertical-align: middle;
+  font-size: 12px;
+}
+.agone .sort-main-row:hover td { background: rgba(201,162,39,0.07); }
+.agone .sort-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone .sort-desc-row td.sort-description-cell {
+  padding: 4px 12px 8px 28px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-text-dark-secondary, #555);
+  background: rgba(92,58,30,0.04);
+  border-top: none;
+  line-height: 1.5;
+}
+
+.agone .sort-impro-btn {
+  background: transparent;
+  border: 1px solid rgba(80,45,10,0.30);
+  border-radius: 3px;
+  padding: 1px 5px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3310);
+  font-size: 11px;
+  opacity: 0.75;
+  margin-right: 2px;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+.agone .sort-impro-btn:hover {
+  background: rgba(201,162,39,0.15);
+  border-color: var(--agone-brown, #5c3310);
+  opacity: 1;
+}
+
+/* ── Mini-filtre sorts dans feuille personnage ───────────── */
+.agone .sorts-mini-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 5px 8px;
+  background: rgba(92,58,30,0.06);
+  border-radius: var(--radius);
+  border: 1px solid rgba(93,58,30,0.2);
+}
+.agone .smf-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(92,58,30,0.08);
+  border: 1px solid rgba(93,58,30,0.2);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+}
+.agone .smf-search-wrap i { opacity: 0.5; font-size: 11px; }
+.agone .smf-search {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none;
+  font-size: 12px;
+  padding: 2px 0;
+  width: 120px;
+}
+.agone .smf-checks { display: flex; flex-wrap: wrap; gap: 2px 10px; }
+.agone .smf-lbl {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+.agone .smf-lbl input[type="checkbox"] {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  accent-color: var(--agone-brown);
+}
+
+/* ── Avantages / Défauts (dans la fiche) ─────────────────── */
+.agone .dons-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.agone .dons-list li.don-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone .don-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  background: rgba(92,58,30,0.05);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+.agone .don-name { flex: 1; }
+.agone .don-cout { font-size: 11px; color: var(--agone-brown); }
+.agone .don-desc-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  color: rgba(255,240,200,0.45);
+  font-size: 0.72em;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.agone .don-desc-toggle:hover { color: var(--agone-gold); }
+.agone li.don-desc-expand {
+  padding: 3px 10px 5px 28px;
+  background: rgba(0,0,0,0.15);
+  border-top: 0;
+}
+.agone .don-desc-text {
+  font-size: 10.5px;
+  color: rgba(255,240,200,0.7);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ── Pouvoirs (dans la fiche) ────────────────────────────── */
+.agone .pouvoirs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.agone .pouvoir-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-bottom: 1px dotted rgba(92,58,30,0.25);
+  font-size: 13px;
+}
+.agone .pouvoir-desc-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: rgba(80,50,20,0.4);
+  font-size: 0.75em;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.agone .pouvoir-desc-toggle:hover { color: var(--agone-brown); }
+.agone .pouvoir-desc-expand {
+  display: none;
+  padding: 2px 6px 6px 28px;
+  font-size: 11px;
+  color: rgba(60,35,15,0.78);
+  font-style: italic;
+  border-bottom: 1px dotted rgba(92,58,30,0.20);
+  background: rgba(0,0,0,0.04);
+  list-style: none;
+}
+.agone .pouvoir-categorie {
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--agone-brown);
+  color: var(--agone-parchment);
+}
+.agone .pouvoir-name { flex: 1; }
+
+/* Bouton nom-pouvoir cliquable */
+.agone .pouvoir-name-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  color: var(--agone-dark-text, #2a1a08);
+  text-align: left;
+  flex: 1;
+}
+.agone .pouvoir-name-btn:hover {
+  text-decoration: underline;
+  color: var(--agone-brown);
+}
+
+/* ── Danseurs ─────────────────────────────────────────────── */
+.agone .magie-main {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .agone .magie-main { grid-template-columns: 1fr; }
+}
+.agone .danseurs-block { margin-top: 0; }
+.agone .danseur-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(92,58,30,0.06);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.agone .danseur-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .danseur-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.agone .danseur-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.agone .danseur-nom { font-weight: 600; font-size: 13px; }
+.agone .danseur-stat {
+  font-size: 11px;
+  color: var(--agone-brown);
+  white-space: nowrap;
+}
+.agone .danseur-roll-btn {
+  background: var(--agone-brown);
+  border: 1px solid var(--agone-gold);
+  color: var(--agone-parchment);
+  border-radius: var(--radius, 4px);
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.agone .danseur-roll-btn:hover {
+  background: var(--agone-gold);
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone .danseur-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 30px;
+  border: 1px dashed rgba(93,58,30,0.3);
+  border-radius: var(--radius);
+  padding: 4px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.agone .danseur-slots.drag-over {
+  background: rgba(201,162,39,0.1);
+  border-color: var(--agone-gold);
+  border-style: solid;
+}
+.agone .danseur-slot-sort {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px 6px;
+  background: rgba(92,58,30,0.1);
+  border-radius: 3px;
+  font-size: 12px;
+}
+.agone .slot-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone .slot-name {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--agone-brown);
+  text-align: left;
+  cursor: pointer;
+  line-height: inherit;
+}
+.agone .slot-name:hover { color: var(--agone-gold); text-decoration: underline; }
+.agone .slot-desc-toggle {
+  background: transparent;
+  border: none;
+  color: var(--agone-brown);
+  opacity: 0.55;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 10px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.agone .slot-desc-toggle:hover { opacity: 1; }
+.agone .slot-description {
+  font-size: 11px;
+  color: var(--agone-brown);
+  line-height: 1.4;
+  padding: 2px 4px;
+  background: rgba(92,58,30,0.06);
+  border-radius: 2px;
+}
+.agone .slot-description p { margin: 0 0 2px; }
+.agone .slot-type {
+  font-size: 10px;
+  color: var(--agone-brown);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+.agone .slot-remove {
+  background: transparent;
+  border: 1px solid rgba(92,58,30,0.3);
+  color: var(--agone-brown);
+  border-radius: 3px;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.1s;
+  flex-shrink: 0;
+}
+.agone .slot-remove:hover { background: rgba(180,40,40,0.15); border-color: #c04040; color: #c04040; }
+.agone .danseur-drop-hint {
+  font-size: 11px;
+  color: var(--agone-brown);
+  opacity: 0.5;
+  text-align: center;
+  padding: 4px;
+  font-style: italic;
+}
+
+/* Drag & drop dans les slots danseurs */
+.agone .danseur-slot-sort.dragging { opacity: 0.4; }
+.agone .danseur-slot-sort.slot-drop-above { box-shadow: inset 0 2px 0 0 var(--agone-gold); }
+.agone .danseur-slot-sort.slot-drop-below { box-shadow: inset 0 -2px 0 0 var(--agone-gold); }
+
+/* Barre de montée de niveau des Danseurs */
+.agone .danseur-levelup-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  background: rgba(201,162,39,0.07);
+  border-top: 1px solid rgba(80,45,10,0.2);
+  border-radius: 0 0 4px 4px;
+  font-size: 11px;
+}
+.agone .danseur-xp-pool {
+  color: var(--agone-brown);
+  font-weight: 600;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.agone .danseur-levelup-btn {
+  background: rgba(80,45,10,0.10);
+  border: 1px solid rgba(80,45,10,0.35);
+  color: var(--agone-dark-text, #2a1a08);
+  border-radius: 3px;
+  padding: 2px 7px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.agone .danseur-levelup-btn:hover {
+  background: var(--agone-gold);
+  border-color: var(--agone-brown);
+}
+.agone .danseur-levelup-btn .lu-cout {
+  opacity: 0.7;
+  font-size: 10px;
+}
+
+/* Mode Création Danseur */
+.agone .danseur-crea-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  background: rgba(201,162,39,0.06);
+  border-top: 1px solid rgba(80,45,10,0.15);
+}
+.agone .danseur-crea-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+.agone .danseur-crea-label {
+  min-width: 72px;
+  color: var(--agone-dark-text, #2a1a08);
+  font-weight: 500;
+}
+.agone .danseur-niv-btn {
+  background: rgba(80,45,10,0.12);
+  border: 1px solid rgba(80,45,10,0.4);
+  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--agone-brown, #5c3310);
+}
+.agone .danseur-niv-btn:hover:not([disabled]) {
+  background: var(--agone-gold, #c9a227);
+  border-color: var(--agone-brown, #5c3310);
+}
+.agone .danseur-niv-btn[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.agone .danseur-niv-num {
+  min-width: 22px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3310);
+}
+.agone .danseur-crea-arrow {
+  color: var(--agone-brown, #5c3310);
+  opacity: 0.55;
+  font-size: 13px;
+}
+.agone .danseur-crea-val {
+  font-weight: 600;
+  color: var(--agone-dark-text, #2a1a08);
+  min-width: 24px;
+  font-size: 13px;
+}
+.agone .danseur-next-val {
+  font-size: 10px;
+  color: var(--agone-brown, #5c3310);
+  opacity: 0.6;
+  margin-left: 2px;
+}
+.agone .danseur-pts-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(80,45,10,0.10);
+  color: var(--agone-brown, #5c3310);
+  white-space: nowrap;
+}
+.agone .danseur-pts-badge.pts-deficit {
+  background: rgba(180,30,30,0.12);
+  color: #8b1a1a;
+}
+.agone .danseur-inline-num {
+  width: 40px;
+  text-align: center;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(80,45,10,0.35);
+  border-radius: 3px;
+  color: var(--agone-dark-text, #2a1a08);
+  font-size: 12px;
+  padding: 1px 2px;
+  -moz-appearance: textfield;
+}
+.agone .danseur-inline-num::-webkit-outer-spin-button,
+.agone .danseur-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+.agone .danseur-valider-btn {
+  background: rgba(26,107,48,0.13);
+  border: 1px solid rgba(26,107,48,0.45);
+  color: #1a6b30;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.agone .danseur-valider-btn:hover { background: rgba(26,107,48,0.28); }
+.agone .danseur-recrea-btn {
+  background: transparent;
+  border: 1px solid rgba(80,45,10,0.30);
+  border-radius: 3px;
+  padding: 2px 5px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3310);
+  font-size: 12px;
+  opacity: 0.7;
+}
+.agone .danseur-recrea-btn:hover { opacity: 1; background: rgba(80,45,10,0.08); }
+
+/* ── Démons intérieurs ────────────────────────────────────── */
+.agone .demons-block { margin-top: 10px; }
+.agone .demon-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(60,15,30,0.06);
+  border: 1px solid rgba(120,30,60,0.25);
+  border-radius: var(--radius, 4px);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.agone .demon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.agone .demon-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.agone .demon-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone .demon-nom { font-weight: 600; font-size: 13px; color: #5a1530; }
+.agone .demon-stat {
+  font-size: 11px;
+  color: rgba(90,21,48,0.85);
+  white-space: nowrap;
+}
+.agone .demon-creation-badge {
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(90,21,48,0.75);
+}
+.agone .demon-stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.agone .demon-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.agone .demon-stat-row label {
+  color: rgba(90,21,48,0.8);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.agone .demon-inline-num {
+  width: 40px;
+  text-align: center;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid rgba(120,30,60,0.30);
+  border-radius: 3px;
+  color: var(--agone-dark-text, #2a1a08);
+  font-size: 12px;
+  padding: 1px 2px;
+  -moz-appearance: textfield;
+}
+.agone .demon-inline-num::-webkit-outer-spin-button,
+.agone .demon-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+.agone .demon-valider-btn {
+  background: rgba(26,107,48,0.13);
+  border: 1px solid rgba(26,107,48,0.45);
+  color: #1a6b30;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.agone .demon-valider-btn:hover { background: rgba(26,107,48,0.28); }
+.agone .demon-recrea-btn {
+  background: transparent;
+  border: 1px solid rgba(120,30,60,0.30);
+  border-radius: 3px;
+  padding: 2px 5px;
+  cursor: pointer;
+  color: rgba(90,21,48,0.8);
+  font-size: 12px;
+  opacity: 0.7;
+}
+.agone .demon-recrea-btn:hover { opacity: 1; background: rgba(120,30,60,0.08); }
+
+/* ── Arts Magiques ───────────────────────────────────────── */
+.agone .arts-domaines-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12px; }
+.agone .arts-domaines-table th { text-align: left; padding: 2px 4px; color: var(--agone-gold); border-bottom: 1px solid var(--agone-gold); font-size: 11px; }
+.agone .arts-domaines-table td { padding: 3px 4px; vertical-align: middle; }
+.agone .arts-domaines-table .arts-absent td { opacity: 0.45; font-style: italic; }
+.agone .arts-domaine-absent { color: var(--agone-brown); opacity: 0.6; }
+
+.agone .arts-spe-hint {
+  display: block;
+  font-size: 10px;
+  color: #8a5a00;
+  font-style: italic;
+  line-height: 1.2;
+  margin-bottom: 1px;
+}
+.agone .arts-scores-pair {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+.agone .arts-comp-liee-score {
+  font-size: 10px;
+  color: var(--agone-brown, #8a6a30);
+  white-space: nowrap;
+}
+.agone .arts-comp-liee-nom {
+  font-style: italic;
+  font-size: 9px;
+  opacity: 0.75;
+}
+.agone .arts-comp-liee-manquante {
+  color: #a05050;
+  opacity: 0.7;
+}
+.agone .arts-levelup-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 3px;
+}
+.agone .arts-levelup-pair .levelup-btn {
+  font-size: 0.72em;
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+.agone .arts-levelup-pair .levelup-btn-liee {
+  background: #e8d8b8;
+  border-color: #8a6a3a;
+}
+.agone .arts-levelup-absent {
+  font-size: 0.72em;
+  font-style: italic;
+  opacity: 0.6;
+}
+
+/* ── Manœuvres : badge & toggle description (fiche acteur) ── */
+.agone .man-col-toggle { width: 22px; text-align: center; }
+.agone .man-col-badge  { width: 76px; text-align: center; }
+
+.agone .man-desc-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: rgba(60,35,15,0.55);
+  font-size: 0.75em;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.agone .man-desc-toggle:hover { color: var(--agone-gold); }
+
+.agone .man-badge {
+  display: inline-block;
+  border-radius: 10px;
+  font-size: 9px;
+  padding: 1px 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.agone .man-badge-manoeuvre {
+  background: rgba(80,110,200,0.14);
+  color: #2a50a0;
+  border: 1px solid rgba(80,110,200,0.4);
+}
+.agone .man-badge-botte {
+  background: rgba(200,120,40,0.16);
+  color: #7a3a00;
+  border: 1px solid rgba(200,120,40,0.4);
+}
+
+.agone tr.man-desc-expand td.man-desc-cell {
+  font-size: 11px;
+  padding: 4px 12px 6px 36px;
+  color: rgba(60,35,15,0.82);
+  font-style: italic;
+  background: rgba(0,0,0,0.06);
+  border-top: 0;
+}

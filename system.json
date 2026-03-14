@@ -80,6 +80,8 @@
     }
   ],
   "socket": false,
-  "manifest": "",
-  "url": ""
+  "url": "https://github.com/Lojocats/agone",
+  "manifest": "https://raw.githubusercontent.com/Lojocats/agone/main/system.json",
+  "download": "https://github.com/Lojocats/agone/releases/latest/download/agone.zip",
+  "changelog": "https://github.com/Lojocats/agone/blob/main/CHANGELOG.md"
 }

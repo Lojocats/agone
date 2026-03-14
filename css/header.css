@@ -1,0 +1,215 @@
+/* ============================================================
+   AGONE – En-tête, onglets, corps de feuille, titres
+   ============================================================ */
+
+/* ── En-tête ─────────────────────────────────────────────── */
+.agone .sheet-header {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, var(--agone-brown-dark), var(--agone-brown));
+  border-bottom: 3px solid var(--agone-gold);
+  color: var(--agone-parchment);
+}
+
+/* ── Barre mode création ─────────────────────────────────── */
+.agone .creation-mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px;
+  background: rgba(0,0,0,0.25);
+  border-top: 1px solid var(--agone-gold);
+  font-size: 12px;
+}
+.agone .creation-mode-bar.en-creation {
+  background: rgba(120, 60, 0, 0.45);
+  border-top-color: #e8a030;
+}
+.agone .creation-badge {
+  font-weight: bold;
+  color: #f0c060;
+  letter-spacing: 0.04em;
+}
+.agone .btn-valider-creation {
+  margin-left: auto;
+  padding: 2px 10px;
+  background: #5a8a30;
+  color: #fff;
+  border: 1px solid #3a6010;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.agone .btn-valider-creation:hover { background: #3a6a10; }
+.agone .btn-toggle-creation {
+  padding: 2px 10px;
+  background: rgba(80,50,20,0.6);
+  color: var(--agone-parchment);
+  border: 1px solid var(--agone-gold);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.agone .btn-toggle-creation:hover { background: rgba(120,80,30,0.8); }
+
+.agone .header-portrait {
+  flex: 0 0 90px;
+}
+.agone .profile-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border: 2px solid var(--agone-gold);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.agone .header-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agone .charname input {
+  width: 100%;
+  font-family: 'MedievalSharp', 'Crimson Text', serif;
+  font-size: 22px;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--agone-gold-light);
+  color: var(--agone-parchment);
+  outline: none;
+  padding: 2px 4px;
+}
+
+.agone .header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.agone .header-row label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--agone-gold-light);
+  white-space: nowrap;
+}
+.agone .header-row input,
+.agone .header-row select {
+  background: var(--agone-input-bg);
+  border: 1px solid var(--agone-gold);
+  border-radius: var(--radius);
+  color: var(--agone-dark-text);
+  font-size: 13px;
+  padding: 2px 5px;
+}
+
+.agone .secondary-stats {
+  gap: 12px;
+}
+.agone .stat-box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone .stat-box label {
+  font-size: 11px;
+  color: var(--agone-gold-light);
+  text-transform: uppercase;
+}
+.agone .stat-num {
+  width: 52px;
+  text-align: center;
+}
+.agone .derived {
+  font-weight: bold;
+  color: var(--agone-gold-light);
+}
+.agone .derived.big,
+.agone .derived-big {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--agone-gold-light);
+}
+.agone .derived.big.flamme-noire,
+.agone .derived-big.flamme-noire {
+  color: var(--agone-noir, #2a2a2a);
+  text-shadow: 0 0 4px rgba(80,0,0,0.6);
+}
+.agone .derived.sombre {
+  color: var(--agone-noir, #2a2a2a);
+}
+
+/* ── Onglets ─────────────────────────────────────────────── */
+.agone .sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--agone-brown);
+  border-bottom: 2px solid var(--agone-gold);
+  padding: 0 6px;
+}
+.agone .sheet-tabs .item {
+  padding: 6px 12px;
+  color: var(--agone-parchment2);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.agone .sheet-tabs .item:hover { color: var(--agone-gold-light); }
+.agone .sheet-tabs .item.active {
+  color: var(--agone-gold);
+  border-bottom-color: var(--agone-gold);
+  font-weight: 600;
+}
+
+/* ── Corps de feuille ────────────────────────────────────── */
+.agone .sheet-body {
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+/* ── Titres de sections ──────────────────────────────────── */
+.agone .section-title,
+.agone .section-header h3,
+.agone h3.section-title {
+  font-family: 'MedievalSharp', 'Crimson Text', serif;
+  font-size: 14px;
+  color: var(--agone-brown-dark);
+  border-bottom: 1px solid var(--agone-gold);
+  padding-bottom: 3px;
+  margin: 10px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.agone .section-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.agone .section-header h3 {
+  flex: 1;
+  margin: 0;
+}
+
+/* ── Onglets masqués ─────────────────────────────────────── */
+.agone .sheet-tabs .item.tab-hidden,
+.agone .sheet-body .tab.tab-hidden {
+  display: none !important;
+}
+
+/* ── Indicateur mode création (header) ──────────────────── */
+.agone .creation-mode-indicator {
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: rgba(120, 60, 0, 0.35);
+  border-top: 1px solid #e8a030;
+}

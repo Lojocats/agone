@@ -1,0 +1,292 @@
+/* ============================================================
+   AGONE – Onglet Identité · Fiche Peuple · Fiche Item
+   ============================================================ */
+
+/* ── Flamme (résumé dans la fiche) ──────────────────────── */
+.agone .flamme-resume {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 10px;
+  background: rgba(201,162,39,0.08);
+  border: 1px solid rgba(201,162,39,0.3);
+  border-radius: var(--radius, 4px);
+  margin-bottom: 8px;
+}
+.agone .flamme-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+  padding: 4px 8px;
+  background: rgba(201,162,39,0.12);
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 3px;
+}
+.agone .flamme-stat-box .fsb-val {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--agone-brown, #5c3a1e);
+  line-height: 1.1;
+}
+.agone .flamme-stat-box .fsb-lbl {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--agone-dark-text, #2a1a08);
+  opacity: 0.7;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ── Onglet Identité ─────────────────────────────────────── */
+.agone .identite-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+}
+.agone .identite-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 550px) {
+  .agone .identite-main-grid { grid-template-columns: 1fr; }
+}
+.agone .identite-card {
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: var(--radius, 4px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.agone .identite-card-header {
+  background: rgba(92,58,30,0.08);
+  padding: 5px 10px;
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 12px;
+  color: var(--agone-brown, #5c3a1e);
+  border-bottom: 1px solid rgba(92,58,30,0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone .identite-card-body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.agone .identite-card-body-culture {
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 10px;
+}
+.agone .identite-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.agone .identite-row label {
+  min-width: 90px;
+  font-size: 12px;
+  color: var(--agone-brown, #5c3a1e);
+  font-weight: 600;
+}
+.agone .identite-row input,
+.agone .identite-row select {
+  flex: 1;
+  border: 1px solid rgba(92,58,30,0.25);
+  border-radius: 3px;
+  padding: 2px 5px;
+  background: rgba(255,255,255,0.5);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone .identite-row input:focus,
+.agone .identite-row select:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 0 2px rgba(201,162,39,0.15);
+}
+.agone .identite-peuple-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone .peuple-drop-zone {
+  flex: 1;
+  border: 1px dashed rgba(92,58,30,0.35);
+  border-radius: 3px;
+  padding: 4px 8px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  background: rgba(255,255,255,0.35);
+  transition: background 0.15s, border-color 0.15s;
+}
+.agone .peuple-drop-zone.drag-over {
+  background: rgba(201,162,39,0.12);
+  border-color: var(--agone-gold, #c9a227);
+  border-style: solid;
+}
+.agone .identite-notes-zone {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.agone .identite-editor {
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: var(--radius, 4px);
+  min-height: 80px;
+  background: rgba(255,255,255,0.35);
+}
+
+/* ── Fiche Item (sheet) ──────────────────────────────────── */
+.agone.item {
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 14px;
+  color: var(--agone-dark-text, #2a1a08);
+  background: var(--agone-parchment, #f4e8c1);
+}
+.agone.item *,
+.agone.item *::before,
+.agone.item *::after { box-sizing: border-box; }
+
+.agone.item .item-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+  padding: 8px;
+}
+@media (max-width: 480px) {
+  .agone.item .item-form-grid { grid-template-columns: 1fr; }
+}
+.agone.item .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.agone.item .form-group.full-width { grid-column: 1 / -1; }
+.agone.item .form-group > label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--agone-brown, #5c3a1e);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.agone.item .form-group input,
+.agone.item .form-group select,
+.agone.item .form-group textarea {
+  border: 1px solid rgba(92,58,30,0.25);
+  border-radius: 3px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.55);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone.item .form-group input:focus,
+.agone.item .form-group select:focus,
+.agone.item .form-group textarea:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 0 2px rgba(201,162,39,0.15);
+}
+
+.agone.item .form-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.agone.item .form-check input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--agone-brown, #5c3a1e);
+}
+
+.agone.item .description-group {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px 8px;
+}
+.agone.item .totaux-bloc {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  background: rgba(92,58,30,0.06);
+  border: 1px solid rgba(92,58,30,0.15);
+  border-radius: var(--radius, 4px);
+}
+.agone.item .totaux-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.agone.item .totaux-row label { font-weight: 600; color: var(--agone-brown, #5c3a1e); }
+.agone.item .arme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 0 8px;
+}
+
+/* ── Fiche Peuple (item type peuple) ─────────────────────── */
+.agone.peuple .peuple-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 16px;
+  padding: 8px;
+}
+.agone.peuple .peuple-stat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone.peuple .peuple-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 2px 0;
+  border-bottom: 1px dotted rgba(92,58,30,0.2);
+}
+.agone.peuple .peuple-row-label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone.peuple .bonus-input {
+  width: 48px;
+  text-align: center;
+  border: 1px solid rgba(92,58,30,0.3);
+  border-radius: 3px;
+  padding: 2px 4px;
+  background: rgba(255,255,255,0.5);
+  font-size: 12px;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone.peuple .col-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--agone-brown, #5c3a1e);
+  font-weight: 600;
+  text-align: center;
+  opacity: 0.7;
+}

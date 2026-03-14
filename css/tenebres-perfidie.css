@@ -1,0 +1,440 @@
+/* ============================================================
+   AGONE – Ténèbres, Perfidie, Navigateur Peines
+   ============================================================ */
+
+/* ── Ténèbres ────────────────────────────────────────────── */
+.agone .tenebres-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Barre de stats */
+.agone .tene-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: rgba(26,26,46,0.08);
+  border: 1px solid var(--agone-noir);
+  border-radius: var(--radius);
+}
+.agone .tene-stat-item { display: flex; align-items: center; gap: 6px; }
+.agone .tene-stat-item label { font-size: 12px; font-weight: 600; white-space: nowrap; margin: 0; }
+.agone .tene-noirceur { font-size: 16px; font-weight: bold; color: var(--agone-noir); min-width: 24px; text-align: center; }
+.agone .tene-stat-separator { width: 1px; height: 28px; background: var(--agone-noir); opacity: 0.2; flex-shrink: 0; }
+.agone .tene-progress-track {
+  width: 90px; height: 6px;
+  background: rgba(0,0,0,0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.agone .tene-progress-bar {
+  height: 100%;
+  background: var(--agone-noir);
+  transition: width 0.3s;
+  max-width: 100%;
+}
+/* Masquer les spinners */
+.agone .tene-stats-bar input.stat-num {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+  font-size: 11px;
+  padding: 2px 3px;
+  box-sizing: content-box;
+  -moz-appearance: textfield;
+}
+.agone .tene-stats-bar input.stat-num::-webkit-outer-spin-button,
+.agone .tene-stats-bar input.stat-num::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Corps principal */
+.agone .tene-content {
+  display: grid;
+  grid-template-columns: 1fr 270px;
+  gap: 16px;
+  align-items: start;
+}
+.agone .tene-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Tableau des Paliers ─────────────────────────────────── */
+.agone .paliers-section .paliers-title { margin-bottom: 6px; }
+.agone .paliers-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.agone .paliers-table thead th {
+  background: rgba(26,26,46,0.10);
+  color: var(--agone-noir);
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--agone-noir);
+  text-align: left;
+}
+.agone .paliers-table thead .col-palier { text-align: center; }
+.agone .paliers-table .col-palier { width: 48px; text-align: center; }
+.agone .paliers-table .col-bienfait { width: 150px; }
+.agone .paliers-table .palier-row td {
+  padding: 3px 8px;
+  border-bottom: 1px solid rgba(26,26,46,0.07);
+  vertical-align: middle;
+}
+.agone .paliers-table .palier-row:not(.palier-reached) { opacity: 0.40; }
+.agone .paliers-table .palier-reached { background: rgba(26,26,46,0.05); }
+.agone .paliers-table .palier-reached .col-palier {
+  color: var(--agone-noir);
+  font-weight: 700;
+  font-size: 13px;
+}
+.agone .paliers-table .col-peine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone .paliers-table .peine-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(26,26,46,0.25);
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.agone .paliers-table .palier-reached .peine-dot {
+  background: var(--agone-noir);
+  border-color: var(--agone-noir);
+}
+.agone .paliers-table .bienfait-yes {
+  color: var(--agone-brown);
+  font-style: italic;
+  font-size: 11px;
+}
+.agone .peines-hint {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown);
+  margin-top: 4px;
+}
+
+/* ── Perfidie ────────────────────────────────────────────── */
+.agone .perfidie-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Barre de stats */
+.agone .perf-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  background: rgba(26,26,46,0.08);
+  border: 1px solid var(--agone-noir);
+  border-radius: var(--radius);
+}
+.agone .perf-stat-item { display: flex; align-items: center; gap: 6px; }
+.agone .perf-stat-item label { font-size: 12px; font-weight: 600; white-space: nowrap; margin: 0; }
+.agone .perf-dif-val { font-size: 16px; font-weight: bold; color: var(--agone-noir); min-width: 24px; text-align: center; }
+.agone .perf-stat-separator { width: 1px; height: 28px; background: var(--agone-noir); opacity: 0.2; flex-shrink: 0; }
+.agone .perf-stats-bar input.stat-num {
+  width: 60px !important; min-width: 60px !important; max-width: 60px !important;
+  font-size: 11px; padding: 2px 3px; box-sizing: content-box; -moz-appearance: textfield;
+}
+.agone .perf-stats-bar input.stat-num::-webkit-outer-spin-button,
+.agone .perf-stats-bar input.stat-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Légende des paliers DIF */
+.agone .perf-dif-legend {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.agone .perf-dif-range {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(26,26,46,0.2);
+  color: rgba(26,26,46,0.45);
+  background: transparent;
+  white-space: nowrap;
+}
+.agone .perf-dif-range.perf-range-active {
+  color: var(--agone-noir);
+  background: rgba(26,26,46,0.12);
+  border-color: var(--agone-noir);
+  font-weight: 600;
+}
+
+/* Bouton parcourir */
+.agone .perf-browser-btn {
+  margin-left: auto;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: rgba(26,26,46,0.08);
+  border: 1px solid var(--agone-noir);
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.agone .perf-browser-btn:hover { background: rgba(26,26,46,0.16); }
+
+/* Corps principal Perfidie */
+.agone .perf-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Tableau des Peines acquises */
+.agone .peines-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.agone .peines-table thead th {
+  background: rgba(26,26,46,0.10);
+  color: var(--agone-noir);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--agone-noir);
+  text-align: left;
+}
+.agone .peines-table tbody td {
+  padding: 3px 8px;
+  border-bottom: 1px solid rgba(26,26,46,0.07);
+  vertical-align: middle;
+}
+
+/* Badges Corps / Âme noire */
+.agone .pn-noir-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.agone .pn-noir-corps { background: rgba(160,40,40,0.15); color: #9b2525; border: 1px solid rgba(160,40,40,0.35); }
+.agone .pn-noir-ame   { background: rgba(60,30,120,0.15); color: #3d1f8a; border: 1px solid rgba(60,30,120,0.35); }
+.agone .pn-noir-none  { color: rgba(26,26,46,0.35); font-size: 11px; }
+
+/* Bienfait sur les peines */
+.agone .pn-bienfait-acquis {
+  color: var(--agone-brown);
+  font-weight: 600;
+  font-size: 11px;
+}
+.agone .pn-bienfait-acquis .fa-star { color: var(--agone-gold); }
+.agone .pn-acquerir-btn {
+  background: rgba(92,58,30,0.08);
+  border: 1px solid var(--agone-brown);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--agone-brown);
+  white-space: nowrap;
+}
+.agone .pn-acquerir-btn:hover { background: rgba(92,58,30,0.18); }
+.agone .pn-bienfait-dispo { font-size: 11px; color: rgba(26,26,46,0.45); font-style: italic; }
+.agone .pn-bienfait-none  { font-size: 11px; color: rgba(26,26,46,0.30); }
+.agone .peine-desc-cell {
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(26,26,46,0.65);
+  padding: 4px 8px 6px 8px !important;
+  background: rgba(26,26,46,0.03);
+  border-bottom: 1px dashed rgba(26,26,46,0.12) !important;
+}
+
+/* Bienfaits acquis */
+.agone .bienfaits-perfidie-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .bienfait-perfidie-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px 8px;
+  background: rgba(201,162,39,0.08);
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: var(--radius);
+}
+.agone .bienfait-perfidie-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.agone .bienfait-perfidie-desc {
+  margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(26,26,46,0.65);
+  padding-left: 20px;
+}
+.agone .pn-star-icon { color: var(--agone-gold); }
+.agone .bienfait-peines-src { font-size: 11px; color: rgba(26,26,46,0.5); font-style: italic; }
+.agone .perf-empty { font-style: italic; font-size: 12px; color: rgba(26,26,46,0.45); padding: 8px 0; }
+
+/* ── Navigateur Peines de Perfidie ──────────────────────── */
+.agone.peines-browser .window-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.peines-browser-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: var(--font-primary);
+  font-size: 13px;
+}
+.peines-browser-app .pnb-filters {
+  flex-shrink: 0;
+  padding: 10px 14px 6px;
+  background: rgba(26,26,46,0.05);
+  border-bottom: 1px solid rgba(26,26,46,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.peines-browser-app .pnb-filter-row,
+.peines-browser-app .pnb-filter-row2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.peines-browser-app .pnb-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+.peines-browser-app .pnb-search {
+  flex: 1;
+  height: 26px;
+  border: 1px solid rgba(26,26,46,0.2);
+  border-radius: var(--radius);
+  padding: 0 8px;
+}
+.peines-browser-app .pnb-clear {
+  background: transparent;
+  border: 1px solid rgba(26,26,46,0.25);
+  border-radius: var(--radius);
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.peines-browser-app .pnb-count {
+  font-size: 11px;
+  color: rgba(26,26,46,0.5);
+  white-space: nowrap;
+  margin-left: auto;
+}
+.peines-browser-app .pnb-list-wrapper {
+  flex: 1;
+  overflow-y: auto;
+}
+.peines-browser-app .pnb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.peines-browser-app .pnb-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(26,26,46,0.10);
+  color: var(--agone-noir);
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--agone-noir);
+  text-align: left;
+  white-space: nowrap;
+}
+.peines-browser-app .pnb-col-toggle { width: 28px; }
+.peines-browser-app .pnb-col-cat    { width: 170px; }
+.peines-browser-app .pnb-col-noir   { width: 72px; }
+.peines-browser-app .pnb-col-bienfait { width: 130px; }
+.peines-browser-app .pnb-col-action { width: 36px; text-align: center; }
+
+.peines-browser-app .pnb-row td {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(26,26,46,0.07);
+  vertical-align: middle;
+}
+.peines-browser-app .pnb-row:hover td { background: rgba(26,26,46,0.04); }
+.peines-browser-app .pnb-has-item  { background: rgba(26,26,46,0.05); }
+.peines-browser-app .pnb-has-item:hover td { background: rgba(26,26,46,0.07); }
+.peines-browser-app .pnb-check     { color: #3a8a3a; }
+.peines-browser-app .pnb-add-btn   { background: transparent; border: none; cursor: pointer; color: var(--agone-brown); padding: 2px 4px; }
+.peines-browser-app .pnb-add-btn:hover { color: var(--agone-noir); }
+.peines-browser-app .pnb-empty     { text-align: center; font-style: italic; color: rgba(26,26,46,0.45); padding: 20px; }
+
+/* Catégorie badges */
+.peines-browser-app .pnb-cat-badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.peines-browser-app .pnb-cat-creature_masque { background: rgba(160,40,40,0.12); color: #9b2525; border: 1px solid rgba(160,40,40,0.30); }
+.peines-browser-app .pnb-cat-lieu_perfidie   { background: rgba(60,30,120,0.12); color: #3d1f8a; border: 1px solid rgba(60,30,120,0.30); }
+.peines-browser-app .pnb-cat-autre           { background: rgba(92,58,30,0.12); color: var(--agone-brown); border: 1px solid rgba(92,58,30,0.30); }
+
+/* Badges Corps / Âme dans le browser */
+.peines-browser-app .pnb-noir-badge { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.peines-browser-app .pnb-noir-corps { background: rgba(160,40,40,0.15); color: #9b2525; border: 1px solid rgba(160,40,40,0.35); }
+.peines-browser-app .pnb-noir-ame   { background: rgba(60,30,120,0.15); color: #3d1f8a; border: 1px solid rgba(60,30,120,0.35); }
+.peines-browser-app .pnb-noir-none  { color: rgba(26,26,46,0.35); font-size: 11px; }
+.peines-browser-app .pnb-bienfait-name { font-size: 11px; font-style: italic; color: var(--agone-brown); }
+.peines-browser-app .pnb-bienfait-none { font-size: 11px; color: rgba(26,26,46,0.30); }
+
+/* Description dans le browser */
+.peines-browser-app .pnb-description-cell {
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(26,26,46,0.65);
+  padding: 5px 10px 7px !important;
+  background: rgba(26,26,46,0.03);
+  border-bottom: 1px dashed rgba(26,26,46,0.12) !important;
+}

@@ -1,0 +1,616 @@
+/* ============================================================
+   AGONE – Applications & Utilitaires
+   Chat · Fumble · Calendrier · Saison · Tooltip
+   Fiche PNJ · Compagnons · Parametres · Drag-drop
+   ============================================================ */
+
+/* ── Bouton Fumble ───────────────────────────────────────── */
+.agone .fumble-btn {
+  background: linear-gradient(135deg, #6a1010 0%, #3a0800 100%);
+  border: 1px solid #c04040;
+  color: #f8d8d8;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background 0.15s;
+}
+.agone .fumble-btn:hover {
+  background: linear-gradient(135deg, #8a1a1a 0%, #5a1008 100%);
+}
+
+/* ── Chat : résultats de jet ─────────────────────────────── */
+.agone-roll-card {
+  background: var(--agone-parchment, #f4e8c1);
+  border: 1px solid var(--agone-border, #7d5a2a);
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: var(--agone-dark-text, #2a1a08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  max-width: 320px;
+}
+.agone-roll-card .roll-header {
+  background: var(--agone-brown, #5c3a1e);
+  color: var(--agone-parchment, #f4e8c1);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.agone-roll-card .roll-label {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  font-weight: normal;
+}
+.agone-roll-card .roll-actor-name {
+  font-size: 11px;
+  opacity: 0.8;
+}
+.agone-roll-card .roll-body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone-roll-card .roll-total {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: var(--agone-brown, #5c3a1e);
+  line-height: 1.1;
+}
+.agone-roll-card .roll-total.critique { color: #1a6b30; }
+.agone-roll-card .roll-total.echec { color: #7a2010; }
+.agone-roll-card .roll-breakdown {
+  font-size: 11px;
+  color: var(--agone-dark-text, #2a1a08);
+  opacity: 0.75;
+  text-align: center;
+  font-style: italic;
+}
+.agone-roll-card .roll-result-label {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 0;
+}
+.agone-roll-card .roll-result-label.critique { color: #1a6b30; }
+.agone-roll-card .roll-result-label.echec { color: var(--agone-red, #8b1a1a); }
+.agone-roll-card .roll-result-label.fumble {
+  color: var(--agone-red, #8b1a1a);
+  font-style: italic;
+}
+.agone-roll-card .fumble-alert {
+  background: rgba(130,20,20,0.1);
+  border: 1px solid rgba(130,20,20,0.3);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: #7a1010;
+  text-align: center;
+}
+.agone-roll-card .critique-alert {
+  background: rgba(20,100,40,0.1);
+  border: 1px solid rgba(20,100,40,0.3);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: #1a5a28;
+  text-align: center;
+}
+.agone-roll-card .mega-fumble-pulse {
+  animation: mega-fumble-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mega-fumble-pulse {
+  0%  { opacity: 1; }
+  50% { opacity: 0.5; }
+  100%{ opacity: 1; }
+}
+
+/* Bouton fumble sur carte chat */
+.agone-fumble-btn {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 4px 8px 8px;
+  background: linear-gradient(135deg, #6a1010 0%, #3a0800 100%);
+  border: 1px solid #c04040;
+  color: #f8d8d8;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background 0.15s;
+  font-family: 'Crimson Text', Georgia, serif;
+}
+.agone-fumble-btn:hover {
+  background: linear-gradient(135deg, #8a2020 0%, #5a1008 100%);
+}
+
+/* ── Saison Configuration ────────────────────────────────── */
+.agone-saison-config .window-content {
+  background: var(--agone-parchment, #f4e8c1);
+  padding: 12px;
+  font-family: 'Crimson Text', Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.agone-saison-config .sc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.agone-saison-config .sc-section h3 {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3a1e);
+  border-bottom: 1px solid rgba(92,58,30,0.2);
+  padding-bottom: 4px;
+  margin: 0;
+}
+.agone-saison-config .sc-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.agone-saison-config .sc-row label {
+  min-width: 100px;
+  font-size: 12px;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-saison-config .sc-row select,
+.agone-saison-config .sc-row input[type="number"] {
+  border: 1px solid rgba(92,58,30,0.3);
+  border-radius: 3px;
+  padding: 3px 6px;
+  background: rgba(255,255,255,0.55);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-saison-config .sc-row select:focus,
+.agone-saison-config .sc-row input:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 0 2px rgba(201,162,39,0.15);
+}
+.agone-saison-config .sc-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(92,58,30,0.2);
+}
+.agone-saison-config .sc-btn {
+  background: rgba(92,58,30,0.1);
+  border: 1px solid rgba(92,58,30,0.3);
+  color: var(--agone-brown, #5c3a1e);
+  border-radius: 3px;
+  padding: 4px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Crimson Text', Georgia, serif;
+  transition: background 0.15s;
+}
+.agone-saison-config .sc-btn:hover {
+  background: var(--agone-gold, #c9a227);
+  color: var(--agone-dark-text, #2a1a08);
+  border-color: var(--agone-brown, #5c3a1e);
+}
+
+/* ── Calendrier ──────────────────────────────────────────── */
+.agone-calendrier-wrap {
+  background: var(--agone-parchment, #f4e8c1);
+  padding: 10px;
+  font-family: 'Crimson Text', Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+.agone-calendrier-wrap .cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+}
+.agone-calendrier-wrap .cal-header h2 {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 16px;
+  color: var(--agone-brown, #5c3a1e);
+  margin: 0;
+}
+.agone-calendrier-wrap .cal-nav-btn {
+  background: rgba(92,58,30,0.08);
+  border: 1px solid rgba(92,58,30,0.3);
+  color: var(--agone-brown, #5c3a1e);
+  border-radius: 3px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.agone-calendrier-wrap .cal-nav-btn:hover {
+  background: rgba(201,162,39,0.2);
+  border-color: var(--agone-gold, #c9a227);
+}
+.agone-calendrier-wrap .cal-saison-label {
+  font-size: 12px;
+  color: var(--agone-brown, #5c3a1e);
+  font-style: italic;
+}
+.agone-calendrier-wrap .cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.agone-calendrier-wrap .cal-day-header {
+  text-align: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--agone-brown, #5c3a1e);
+  font-weight: 600;
+  padding: 2px;
+  opacity: 0.7;
+}
+.agone-calendrier-wrap .cal-day {
+  min-height: 40px;
+  padding: 3px;
+  border: 1px solid rgba(92,58,30,0.1);
+  border-radius: 2px;
+  background: rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: background 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.agone-calendrier-wrap .cal-day:hover { background: rgba(201,162,39,0.1); }
+.agone-calendrier-wrap .cal-day.cal-today {
+  background: rgba(201,162,39,0.15);
+  border-color: var(--agone-gold, #c9a227);
+}
+.agone-calendrier-wrap .cal-day.cal-other-month { opacity: 0.4; }
+.agone-calendrier-wrap .cal-day-num {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-calendrier-wrap .cal-day-note {
+  font-size: 9px;
+  color: var(--agone-brown, #5c3a1e);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agone-calendrier-wrap .cal-note-area {
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: var(--radius, 4px);
+  padding: 8px;
+  background: rgba(255,255,255,0.35);
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone-calendrier-wrap .cal-note-area textarea {
+  resize: vertical;
+  border: none;
+  background: transparent;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  width: 100%;
+  min-height: 50px;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-calendrier-wrap .cal-note-area textarea:focus { outline: none; }
+
+/* ── Tooltip santé ───────────────────────────────────────── */
+#agone-sante-tip {
+  position: fixed;
+  z-index: 9999;
+  background: var(--agone-brown, #5c3a1e);
+  color: var(--agone-parchment, #f4e8c1);
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 12px;
+  max-width: 220px;
+  line-height: 1.4;
+  pointer-events: none;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+  border: 1px solid var(--agone-gold, #c9a227);
+}
+#agone-sante-tip .tip-title {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 11px;
+  color: var(--agone-gold, #c9a227);
+  border-bottom: 1px solid rgba(201,162,39,0.3);
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+
+/* ── Fiche PNJ / Créature ────────────────────────────────── */
+.agone.npc-sheet .stat-text {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .npc-sheet-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.agone .npc-carac-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 8px;
+  padding: 6px 8px;
+}
+.agone .npc-carac-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 2px 4px;
+  background: rgba(92,58,30,0.04);
+  border-radius: 3px;
+}
+.agone .npc-carac-label {
+  flex: 1;
+  font-size: 11px;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .npc-armure-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 3px 6px;
+  background: rgba(92,58,30,0.06);
+  border-radius: 3px;
+}
+.agone .npc-notes-block {
+  padding: 6px 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .npc-equip-textarea {
+  resize: vertical;
+  min-height: 60px;
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: 3px;
+  padding: 5px 8px;
+  background: rgba(255,255,255,0.35);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 12px;
+  color: var(--agone-dark-text, #2a1a08);
+  width: 100%;
+}
+.agone .npc-equip-textarea:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 0 2px rgba(201,162,39,0.15);
+}
+
+/* ── Onglet Compagnons ───────────────────────────────────── */
+.agone .companions-tab {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.agone .companions-drop-zone {
+  border: 2px dashed rgba(92,58,30,0.3);
+  border-radius: var(--radius, 4px);
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  transition: background 0.15s, border-color 0.15s;
+}
+.agone .companions-drop-zone.drag-over {
+  background: rgba(201,162,39,0.1);
+  border-color: var(--agone-gold, #c9a227);
+  border-style: solid;
+}
+.agone .companions-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.agone .cmp-card {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: var(--radius, 4px);
+  align-items: flex-start;
+  transition: box-shadow 0.15s;
+}
+.agone .cmp-card:hover { box-shadow: 0 2px 6px rgba(92,58,30,0.15); }
+.agone .cmp-portrait {
+  width: 52px;
+  height: 52px;
+  border-radius: 3px;
+  border: 1px solid rgba(92,58,30,0.3);
+  object-fit: cover;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.agone .cmp-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.agone .cmp-name {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3a1e);
+  cursor: pointer;
+}
+.agone .cmp-name:hover { color: var(--agone-gold, #c9a227); text-decoration: underline; }
+.agone .cmp-pdv-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+.agone .cmp-pdv-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(92,58,30,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.agone .cmp-pdv-fill {
+  height: 100%;
+  background: #2a8040;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.agone .cmp-pdv-fill.cmp-pdv-low { background: #c07020; }
+.agone .cmp-pdv-fill.cmp-pdv-critical { background: var(--agone-red, #8b1a1a); }
+.agone .cmp-pdv-label {
+  font-size: 11px;
+  color: var(--agone-brown, #5c3a1e);
+  white-space: nowrap;
+}
+.agone .cmp-bg-row {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.agone .cmp-bg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(92,58,30,0.4);
+  background: rgba(255,255,255,0.5);
+}
+.agone .cmp-bg-dot.cmp-bg-active { background: var(--agone-red, #8b1a1a); border-color: var(--agone-red, #8b1a1a); }
+.agone .cmp-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 8px;
+  font-size: 11px;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .cmp-stat-item {
+  white-space: nowrap;
+}
+
+/* ── Onglet Paramètres ───────────────────────────────────── */
+.agone .parametres-tab {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.agone .param-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agone .param-section h3 {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3a1e);
+  border-bottom: 1px solid rgba(92,58,30,0.2);
+  padding-bottom: 4px;
+  margin: 0;
+}
+.agone .tabs-visibility {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .tab-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.agone .tab-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--agone-brown, #5c3a1e);
+}
+
+/* ── Drag-drop utilitaires ───────────────────────────────── */
+.agone .col-drag { width: 18px; cursor: grab; text-align: center; opacity: 0.4; }
+.agone .col-drag:active { cursor: grabbing; }
+.agone .item-drag-handle { cursor: grab; opacity: 0.45; font-size: 12px; }
+.agone .item-drag-handle:active { cursor: grabbing; }
+.agone tr.drop-above td { box-shadow: inset 0 2px 0 0 var(--agone-gold, #c9a227); }
+.agone tr.drop-below td { box-shadow: inset 0 -2px 0 0 var(--agone-gold, #c9a227); }
+.agone .dragging { opacity: 0.35; }
+
+/* ── Slot meta (tag peuple dans slot) ────────────────────── */
+.agone .slot-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+.agone .slot-meta-tag {
+  font-size: 9px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: rgba(92,58,30,0.12);
+  color: var(--agone-brown, #5c3a1e);
+  border: 1px solid rgba(92,58,30,0.2);
+  white-space: nowrap;
+}
+
+/* ── Envoyer au chat ─────────────────────────────────────── */
+.agone .send-to-chat {
+  background: rgba(92,58,30,0.08);
+  border: 1px solid rgba(92,58,30,0.25);
+  color: var(--agone-brown, #5c3a1e);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.agone .send-to-chat:hover {
+  background: rgba(201,162,39,0.15);
+  border-color: var(--agone-gold, #c9a227);
+}
+
+/* ── Conteneur éditeur (notes) ───────────────────────────── */
+.agone .editor-container {
+  border: 1px solid rgba(92,58,30,0.2);
+  border-radius: var(--radius, 4px);
+  background: rgba(255,255,255,0.35);
+  min-height: 80px;
+  padding: 4px;
+}
+.agone .editor-container .ProseMirror {
+  min-height: 80px;
+  outline: none;
+  font-size: 13px;
+  line-height: 1.5;
+}
