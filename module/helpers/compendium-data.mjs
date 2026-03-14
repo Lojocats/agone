@@ -596,7 +596,7 @@ export const POUVOIRS_DATA = [
 export const PEUPLES_DATA = [
   {
     key: "humain", name: "Humain", saisonDefaut: "",
-    taiBase: 0, mvBase: 4, mvVolBase: 0,
+    taiBase: 0, mvBase: 3, mvVolBase: 0,
     bpdv: 25, pointsCreationComp: 120, pointsCreationCarac: 80,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,      agiliteMin: null, agiliteMax: null,
@@ -612,7 +612,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "nain", name: "Nain", saisonDefaut: "hiver",
-    taiBase: -1, mvBase: 3, mvVolBase: 0,
+    taiBase: -1, mvBase: 2, mvVolBase: 0,
     bpdv: 20, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,      agiliteMin: null, agiliteMax: null,
@@ -632,7 +632,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "geant", name: "Géant", saisonDefaut: "ete",
-    taiBase: 3, mvBase: 6, mvVolBase: 0,
+    taiBase: 3, mvBase: 8, mvVolBase: 0,
     bpdv: 100, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,       agiliteMin: null, agiliteMax: 3,
@@ -652,7 +652,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "farfadet", name: "Farfadet", saisonDefaut: "printemps",
-    taiBase: -1, mvBase: 5, mvVolBase: 0,
+    taiBase: -1, mvBase: 2, mvVolBase: 0,
     bpdv: 20, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 2,      agiliteMin: null, agiliteMax: null,
@@ -672,7 +672,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "lutin", name: "Lutin", saisonDefaut: "printemps",
-    taiBase: -1, mvBase: 6, mvVolBase: 0,
+    taiBase: -1, mvBase: 2, mvVolBase: 0,
     bpdv: 20, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 1,      agiliteMin: null, agiliteMax: null,
@@ -692,7 +692,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "satyre", name: "Satyre", saisonDefaut: "printemps",
-    taiBase: 0, mvBase: 5, mvVolBase: 0,
+    taiBase: 0, mvBase: 3, mvVolBase: 0,
     bpdv: 25, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,      agiliteMin: null, agiliteMax: null,
@@ -732,7 +732,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "ogre", name: "Ogre", saisonDefaut: "ete",
-    taiBase: 0, mvBase: 4, mvVolBase: 0,
+    taiBase: 0, mvBase: 3, mvVolBase: 0,
     bpdv: 25, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,      agiliteMin: null, agiliteMax: null,
@@ -752,7 +752,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "drakonien", name: "Drakonien", saisonDefaut: "automne",
-    taiBase: 0, mvBase: 4, mvVolBase: 0,
+    taiBase: 0, mvBase: 3, mvVolBase: 0,
     bpdv: 25, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 0,      agiliteMin: null, agiliteMax: null,
@@ -772,7 +772,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "morgane", name: "Morgane", saisonDefaut: "automne",
-    taiBase: 0, mvBase: 4, mvVolBase: 0,
+    taiBase: 0, mvBase: 3, mvVolBase: 0,
     bpdv: 25, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 1,      agiliteMin: null, agiliteMax: null,
@@ -792,7 +792,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "pixie", name: "Pixie", saisonDefaut: "automne",
-    taiBase: -2, mvBase: 1, mvVolBase: 4,
+    taiBase: -2, mvBase: 1, mvVolBase: 18,
     bpdv: 10, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 4,      agiliteMin: 7,    agiliteMax: null,
@@ -832,7 +832,7 @@ export const PEUPLES_DATA = [
   },
   {
     key: "meduse", name: "Méduse", saisonDefaut: "hiver",
-    taiBase: 0, mvBase: 4, mvVolBase: 0,
+    taiBase: 0, mvBase: 3, mvVolBase: 0,
     bpdv: 25, pointsCreationComp: 100, pointsCreationCarac: 70,
     corpsBonus: 0, espritBonus: 0, ameBonus: 0,
     agiliteBonus: 1,      agiliteMin: null, agiliteMax: null,
