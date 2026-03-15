@@ -257,7 +257,7 @@
   border: none;
   cursor: pointer;
   padding: 0 2px;
-  color: rgba(255,240,200,0.45);
+  color: rgba(0,0,0,0.75);
   font-size: 0.72em;
   flex-shrink: 0;
   transition: color 0.15s;
@@ -265,12 +265,12 @@
 .agone .don-desc-toggle:hover { color: var(--agone-gold); }
 .agone li.don-desc-expand {
   padding: 3px 10px 5px 28px;
-  background: rgba(0,0,0,0.15);
+  background: rgba(255,240,200,0.7);
   border-top: 0;
 }
 .agone .don-desc-text {
   font-size: 10.5px;
-  color: rgba(255,240,200,0.7);
+  color: rgba(0,0,0,0.75);
   font-style: italic;
   line-height: 1.4;
 }
