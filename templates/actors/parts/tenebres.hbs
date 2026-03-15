@@ -145,86 +145,100 @@
     <!-- Colonne latérale : Flamme + Démons -->
     <div class="tene-sidebar">
 
-      <!-- Démons intérieurs -->
+      <!-- Démons intérieurs (acteurs liés) -->
       <div class="demons-block">
-    <div class="section-header">
-      <h3 class="section-title">{{localize "AGONE.Demons"}}</h3>
-      <button type="button" class="item-create" data-type="demon" title='{{localize "AGONE.NouveauDemon"}}'>
-        <i class="fas fa-plus"></i>
-      </button>
-    </div>
-    {{#if demons.length}}
-    {{#each demons as |d|}}
-    <div class="demon-card item-row" data-item-id="{{d.id}}">
-      <div class="demon-header">
-        <div class="demon-info">
-          <span class="demon-nom">{{d.name}}</span>
-          {{#if d.system.modeCreation}}
-          <span class="demon-creation-badge">{{localize "AGONE.EnModeCreation"}}</span>
-          {{else}}
-          <span class="demon-stat" title="{{localize "AGONE.DIF"}}">{{localize "AGONE.DIF"}} {{d.system.dif}}</span>
-          <span class="demon-stat" title="{{localize "AGONE.AptitudeConjuration"}}">{{localize "AGONE.TenebresConjLabel"}} {{d.system.aptitudeConjuration}}</span>
-          <span class="demon-stat" title="{{localize "AGONE.Empathie"}}">{{localize "AGONE.TenebresEmpLabel"}} {{d.system.empathie}}</span>
-          <span class="demon-stat" title="{{localize "AGONE.Endurance"}}">{{localize "AGONE.TenebresEndLabel"}} {{d.system.endurance.valeur}}/{{d.system.endurance.max}}</span>
-          {{/if}}
-        </div>
-        <div class="demon-actions">
-          {{#if d.system.modeCreation}}
-          <button type="button" class="demon-valider-btn" data-action="validerCreationDemon"
-                  data-item-id="{{d.id}}" title='{{localize "AGONE.DemonValiderCrea"}}'>
-            <i class="fas fa-check"></i> {{localize "AGONE.Valider"}}
-          </button>
-          {{else}}
-          <button type="button" class="btn-icon demon-recrea-btn" data-action="reactiverCreationDemon"
-                  data-item-id="{{d.id}}" title='{{localize "AGONE.DemonReactiverCrea"}}'>
-            <i class="fas fa-table"></i>
+        <div class="section-header">
+          <h3 class="section-title">{{localize "AGONE.Demons"}}</h3>
+          {{#if isOwner}}
+          <button type="button" data-action="createDemonActor" title='{{localize "AGONE.NouveauDemon"}}'>
+            <i class="fas fa-plus"></i>
           </button>
           {{/if}}
-          <a class="item-edit" data-item-id="{{d.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
-          <a class="item-delete" data-item-id="{{d.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </div>
-      </div>
-      <div class="demon-stats-grid">
-        <div class="demon-stat-row">
-          <label>DIF</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="dif" value="{{d.system.dif}}">
+
+        {{#if isOwner}}
+        <div class="demons-drop-zone" title="{{localize 'AGONE.DemonDropHint'}}">
+          <i class="fas fa-skull"></i> {{localize "AGONE.DemonDropHint"}}
         </div>
-        <div class="demon-stat-row">
-          <label>{{localize "AGONE.AptitudeConjuration"}}</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="aptitudeConjuration" value="{{d.system.aptitudeConjuration}}" min="0">
+        {{/if}}
+
+        {{#if demonActors.length}}
+        <div class="demons-cards">
+          {{#each demonActors}}
+          <div class="cmp-card demon-actor-card" data-uuid="{{uuid}}">
+
+            <!-- Portrait -->
+            <div class="cmp-portrait-wrap">
+              <img class="cmp-portrait" src="{{img}}" title="{{localize 'AGONE.Ouvrir'}} {{name}}" />
+              <span class="cmp-type-badge cmp-type-demon">{{localize "AGONE.Demon"}}</span>
+            </div>
+
+            <!-- Corps -->
+            <div class="cmp-body">
+
+              <!-- En-tête : nom + actions -->
+              <div class="cmp-header">
+                <div class="cmp-name-block">
+                  <span class="cmp-name">{{name}}</span>
+                  {{#if origine}}
+                  <span class="cmp-subtitle">{{localize (concat "AGONE.Peine." origine)}}</span>
+                  {{/if}}
+                  {{#if modeCreation}}
+                  <span class="demon-creation-badge">{{localize "AGONE.EnModeCreation"}}</span>
+                  {{/if}}
+                </div>
+                {{#if ../isOwner}}
+                <div class="cmp-actions">
+                  <button type="button" class="demon-actor-open cmp-btn" data-uuid="{{uuid}}"
+                          title="{{localize 'AGONE.Ouvrir'}}">
+                    <i class="fas fa-external-link-alt"></i>
+                  </button>
+                  <button type="button" class="demon-actor-remove cmp-btn cmp-btn-remove" data-uuid="{{uuid}}"
+                          title="{{localize 'AGONE.Retirer'}}">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                {{/if}}
+              </div>
+
+              <!-- Barre Densité -->
+              <div class="cmp-pdv-block">
+                <div class="cmp-pdv-line">
+                  <span class="cmp-pdv-label">{{localize "AGONE.Densite"}}</span>
+                  <span class="cmp-pdv-nums">{{densiteVal}} / {{densiteMax}}</span>
+                </div>
+                <div class="cmp-pdv-track">
+                  <div class="cmp-pdv-fill" style="width:{{densitePct}}%; background:{{densiteColor}};"></div>
+                </div>
+              </div>
+
+              <!-- Stats démon -->
+              <div class="cmp-stats-row">
+                <div class="cmp-stat">
+                  <span class="cmp-stat-lbl">{{localize "AGONE.Initiative"}}</span>
+                  <span class="cmp-stat-val">{{initiative}}</span>
+                </div>
+                <div class="cmp-stat">
+                  <span class="cmp-stat-lbl">{{localize "AGONE.Melee"}}</span>
+                  <span class="cmp-stat-val">{{melee}}</span>
+                </div>
+                <div class="cmp-stat">
+                  <span class="cmp-stat-lbl">DIF</span>
+                  <span class="cmp-stat-val">{{dif}}</span>
+                </div>
+                <div class="cmp-stat">
+                  <span class="cmp-stat-lbl">{{localize "AGONE.Opacite"}}</span>
+                  <span class="cmp-stat-val">{{opacite}}</span>
+                </div>
+              </div>
+
+            </div><!-- /.cmp-body -->
+          </div><!-- /.cmp-card -->
+          {{/each}}
         </div>
-        <div class="demon-stat-row">
-          <label>{{localize "AGONE.Empathie"}}</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="empathie" value="{{d.system.empathie}}" min="0">
-        </div>
-        <div class="demon-stat-row">
-          <label>{{localize "AGONE.Opacite"}}</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="opacite" value="{{d.system.opacite}}" min="0">
-        </div>
-        <div class="demon-stat-row">
-          <label>{{localize "AGONE.Densite"}}</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="densite.valeur" value="{{d.system.densite.valeur}}" min="0">
-          <span>/</span>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="densite.max" value="{{d.system.densite.max}}" min="0">
-        </div>
-        <div class="demon-stat-row">
-          <label>{{localize "AGONE.Endurance"}}</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="endurance.valeur" value="{{d.system.endurance.valeur}}" min="0">
-          <span>/</span>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="endurance.max" value="{{d.system.endurance.max}}" min="0">
-        </div>
-        <div class="demon-stat-row">
-          <label>{{localize "AGONE.Memoire"}}</label>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="memoire.valeur" value="{{d.system.memoire.valeur}}" min="0">
-          <span>/</span>
-          <input class="demon-inline-num" type="number" data-item-id="{{d.id}}" data-field="memoire.max" value="{{d.system.memoire.max}}" min="0">
-        </div>
-      </div>
-    </div>
-    {{/each}}
-    {{else}}
-    <p class="empty-list">{{localize "AGONE.AucunDemon"}}</p>
-    {{/if}}
+        {{else}}
+        <p class="companions-empty">{{localize "AGONE.AucunDemon"}}</p>
+        {{/if}}
       </div>
     </div><!-- .tene-sidebar -->
 

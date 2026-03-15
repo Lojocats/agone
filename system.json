@@ -31,7 +31,8 @@
     "Actor": {
       "personnage": {},
       "compagnon": {},
-      "pnj": {}
+      "pnj": {},
+      "demon": {}
     },
     "Item": {
       "competence": {},

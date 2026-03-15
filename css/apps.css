@@ -43,11 +43,11 @@
 }
 .agone-roll-card .roll-label {
   font-family: 'MedievalSharp', Georgia, serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: normal;
 }
 .agone-roll-card .roll-actor-name {
-  font-size: 11px;
+  font-size: 13px;
   opacity: 0.8;
 }
 .agone-roll-card .roll-body {
@@ -57,7 +57,7 @@
   gap: 4px;
 }
 .agone-roll-card .roll-total {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
   text-align: center;
   color: var(--agone-brown, #5c3a1e);
@@ -66,7 +66,7 @@
 .agone-roll-card .roll-total.critique { color: #1a6b30; }
 .agone-roll-card .roll-total.echec { color: #7a2010; }
 .agone-roll-card .roll-breakdown {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--agone-dark-text, #2a1a08);
   opacity: 0.75;
   text-align: center;
@@ -74,7 +74,7 @@
 }
 .agone-roll-card .roll-result-label {
   text-align: center;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   padding: 2px 0;
 }
@@ -89,7 +89,7 @@
   border: 1px solid rgba(130,20,20,0.3);
   border-radius: 3px;
   padding: 5px 8px;
-  font-size: 12px;
+  font-size: 13px;
   color: #7a1010;
   text-align: center;
 }
@@ -98,7 +98,7 @@
   border: 1px solid rgba(20,100,40,0.3);
   border-radius: 3px;
   padding: 5px 8px;
-  font-size: 12px;
+  font-size: 13px;
   color: #1a5a28;
   text-align: center;
 }
@@ -650,4 +650,158 @@
   outline: none;
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* ── Companion / Demon card — classes partagées ──────────── */
+.agone .cmp-portrait-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.agone .cmp-type-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 9px;
+  text-align: center;
+  padding: 1px 3px;
+  background: rgba(92,58,30,0.8);
+  color: #f5e9d0;
+  border-radius: 0 0 3px 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agone .cmp-type-demon   { background: rgba(80,0,30,0.85); }
+.agone .cmp-type-personnage { background: rgba(20,60,20,0.8); }
+.agone .cmp-type-compagnon  { background: rgba(30,50,80,0.8); }
+.agone .cmp-type-pnj        { background: rgba(60,40,10,0.8); }
+.agone .cmp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+}
+.agone .cmp-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.agone .cmp-subtitle {
+  font-size: 10px;
+  color: rgba(92,58,30,0.6);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agone .cmp-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.agone .cmp-btn {
+  background: none;
+  border: 1px solid rgba(92,58,30,0.3);
+  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3a1e);
+  font-size: 11px;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.agone .cmp-btn:hover { background: rgba(201,162,39,0.15); border-color: var(--agone-gold, #c9a227); }
+.agone .cmp-btn-remove:hover { background: rgba(139,26,26,0.15); border-color: var(--agone-red, #8b1a1a); color: var(--agone-red, #8b1a1a); }
+.agone .cmp-pdv-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.agone .cmp-pdv-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+.agone .cmp-pdv-nums {
+  color: var(--agone-brown, #5c3a1e);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+.agone .cmp-pdv-track {
+  height: 6px;
+  background: rgba(92,58,30,0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.agone .cmp-bg-malus {
+  font-size: 10px;
+  color: var(--agone-red, #8b1a1a);
+  font-weight: bold;
+}
+.agone .cmp-bc-badge { color: var(--agone-red, #8b1a1a); font-size: 11px; }
+.agone .cmp-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.agone .cmp-stat-val {
+  font-weight: bold;
+  font-size: 12px;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .cmp-stat-lbl {
+  font-size: 9px;
+  color: rgba(92,58,30,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.agone .csp-flamme { color: #c06000; }
+.agone .companions-empty {
+  font-size: 12px;
+  font-style: italic;
+  color: rgba(92,58,30,0.5);
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* ── Zone drop & cartes Démons ───────────────────────────── */
+.agone .demons-drop-zone {
+  border: 2px dashed rgba(80,0,30,0.35);
+  border-radius: var(--radius, 4px);
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: #500020;
+  transition: background 0.15s, border-color 0.15s;
+  margin-bottom: 6px;
+}
+.agone .demons-drop-zone.drag-over {
+  background: rgba(139,26,26,0.1);
+  border-color: var(--agone-red, #8b1a1a);
+  border-style: solid;
+}
+.agone .demons-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.agone .demon-actor-card {
+  border-color: rgba(80,0,30,0.3);
+}
+.agone .demon-actor-card:hover {
+  box-shadow: 0 2px 6px rgba(80,0,30,0.22);
+}
+.agone .demon-creation-badge {
+  font-size: 9px;
+  color: var(--agone-gold, #c9a227);
+  font-style: italic;
 }

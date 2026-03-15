@@ -93,13 +93,37 @@ export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
 
   async getData(options = {}) {
     const context = await super.getData(options);
-    context.system = this.actor.system;
-    context.pouvoirs = this.actor.items.filter(i => i.type === "pouvoir");
+    context.system   = this.actor.system;
+    context.isOwner  = this.actor.isOwner;
+    context.armes    = this.actor.items.filter(i => i.type === "arme");
+    context.pdvPercent = this.actor.system.densite?.max > 0
+      ? Math.round(Math.min(100, (this.actor.system.densite.valeur / this.actor.system.densite.max) * 100))
+      : 0;
+    // Sélecteur d'origine : types chromatiques + types de palier démoniaques
+    const origineChoices = [
+      { value: "",                label: "—" },
+      { value: "opalin",          label: "Opalin" },
+      { value: "azurin",          label: "Azurin" },
+      { value: "saphirin",        label: "Saphirin" },
+      { value: "ambre",           label: "Ambré" },
+      { value: "safran",          label: "Safran" },
+      { value: "carmin",          label: "Carmin" },
+      { value: "vermillon",       label: "Vermillon" },
+      { value: "obsidien",        label: "Obsidien" },
+      { value: "diablotin",       label: game.i18n.localize("AGONE.Peine.diablotin") },
+      { value: "demonFacetieux",  label: game.i18n.localize("AGONE.Peine.demonFacetieux") },
+      { value: "jumeauDemoniaque",label: game.i18n.localize("AGONE.Peine.jumeauDemoniaque") },
+      { value: "siamoisTenebres", label: game.i18n.localize("AGONE.Peine.siamoisTenebres") },
+    ];
+    context.origineOptions = origineChoices.map(o => ({ ...o, selected: this.actor.system.origine === o.value }));
     context.descriptionHTML = await TextEditor.enrichHTML(
       this.actor.system.description ?? "", { async: true, secrets: this.actor.isOwner }
     );
     context.connivancesHTML = await TextEditor.enrichHTML(
       this.actor.system.connivances ?? "", { async: true, secrets: this.actor.isOwner }
+    );
+    context.notesHTML = await TextEditor.enrichHTML(
+      this.actor.system.notes ?? "", { async: true, secrets: this.actor.isOwner }
     );
     return context;
   }
@@ -120,7 +144,8 @@ export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
     html.find(".item-create").click(async (e) => {
       e.preventDefault();
       const type = e.currentTarget.dataset.type;
-      await Item.create({ name: game.i18n.localize("AGONE.NouvelPouvoir"), type }, { parent: this.actor });
+      const nameKey = type === "arme" ? "AGONE.NouvelleArme" : "AGONE.NouvelPouvoir";
+      await Item.create({ name: game.i18n.localize(nameKey), type }, { parent: this.actor });
     });
     html.find(".item-edit").click((e) => {
       e.preventDefault();

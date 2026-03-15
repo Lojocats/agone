@@ -64,12 +64,17 @@ export class AgoneActor extends Actor {
           { palier: 92, origine: "siamoisTenebres"  },
         ];
         options._demonCreations = [];
+        const _linkedDemonUuids = this.getFlag("agone", "demons") ?? [];
         for (const { palier, origine } of PALIERS_DEMON) {
           if (oldTene < palier && newTene >= palier) {
-            const alreadyExists = this.items.some(
+            const alreadyExistsItem = this.items.some(
               i => i.type === "demon" && i.system.origine === origine
             );
-            if (!alreadyExists) options._demonCreations.push(origine);
+            const alreadyExistsActor = _linkedDemonUuids.some(uuid => {
+              const doc = fromUuidSync?.(uuid);
+              return doc?.system?.origine === origine;
+            });
+            if (!alreadyExistsItem && !alreadyExistsActor) options._demonCreations.push(origine);
           }
         }
       }
@@ -90,14 +95,23 @@ export class AgoneActor extends Actor {
       jumeauDemoniaque: "AGONE.Peine.jumeauDemoniaque",
       siamoisTenebres:  "AGONE.Peine.siamoisTenebres",
     };
-    const toCreate = options._demonCreations.map(origine => ({
-      type:   "demon",
-      name:   game.i18n.localize(NOM_DEMON[origine]) || origine,
-      system: { modeCreation: true, origine },
-    }));
-    await this.createEmbeddedDocuments("Item", toCreate);
-    const nomListe = toCreate.map(d => d.name).join(", ");
-    ui.notifications.info(game.i18n.format("AGONE.DemonAutoApparu", { name: nomListe }));
+    const currentUuids = this.getFlag("agone", "demons") ?? [];
+    const newUuids = [...currentUuids];
+    for (const origine of options._demonCreations) {
+      const name = game.i18n.localize(NOM_DEMON[origine]) || origine;
+      const newActor = await Actor.create({
+        name,
+        type:   "demon",
+        system: { origine },
+      });
+      if (newActor) {
+        newUuids.push(newActor.uuid);
+        ui.notifications.info(game.i18n.format("AGONE.DemonAutoApparu", { name }));
+      }
+    }
+    if (newUuids.length > currentUuids.length) {
+      await this.setFlag("agone", "demons", newUuids);
+    }
   }
 
   /** @override */
@@ -280,15 +294,20 @@ export class AgoneActor extends Actor {
     sd.seuilBlessureCritique = Math.max(1, Math.floor(sd.pdv.max / 2));
 
     // --- 5. Re-dérivation des caractéristiques secondaires ---
-    sd.melee = Math.round((sd.force.score + sd.agilite.score * 2) / 3);
-    sd.tir   = Math.round((sd.agilite.score + sd.perception.score) / 2);
+    sd.melee = Math.floor((sd.force.score + sd.agilite.score * 2) / 3);
+    sd.tir   = Math.floor((sd.agilite.score + sd.perception.score) / 2);
 
     if (sd.typeMage === "jorniste")           sd.emprise = sd.intelligence.score;
     else if (sd.typeMage === "obscurantiste") sd.emprise = sd.volonte.score;
-    else sd.emprise = Math.round((sd.intelligence.score + sd.volonte.score) / 2);
+    else sd.emprise = Math.floor((sd.intelligence.score + sd.volonte.score) / 2);
     sd.emprise += b.emprise_bonus;
 
-    sd.art              = Math.round((sd.charisma.score + sd.creativite.score) / 2) + b.art_bonus;
+    // Art : Fée Noire = CHA seul ; autres = ⌊(CHA + CRÉ) / 2⌋
+    if (peupleKey === "feeNoire") {
+      sd.art = sd.charisma.score + b.art_bonus;
+    } else {
+      sd.art = Math.floor((sd.charisma.score + sd.creativite.score) / 2) + b.art_bonus;
+    }
     sd.initiative       = sd.agilite.score + sd.perception.score + sd.bonusCorps + b.initiative_bonus;
     sd.initMagique      = sd.initiative + 10;
     sd.defenseNaturelle = sd.agilite.score + sd.bonusCorps;
@@ -440,7 +459,8 @@ export class AgoneActor extends Actor {
       attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
       aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
       modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
+      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {}),
+      ...(compData.notes    ? { notes:    compData.notes } : {})
     });
     return roll;
   }
@@ -821,7 +841,25 @@ export class AgoneActor extends Actor {
 
     const seuilBase = sort.system.seuil ?? 0;
     const seuil = impro ? seuilBase * 2 : seuilBase;
-    let aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
+
+    // Aptitude : utilise le score de la compétence "Arts Magiques" du domaine exact du sort
+    const domaineCibleApt = TYPES_TO_DOMAINE[typeMagie] ?? null;
+    let aptitude;
+    let aptitudeDomainLabel;
+    if (domaineCibleApt) {
+      const compArtsExact = this.items.find(i =>
+        i.type === "competence" &&
+        i.name === "Arts Magiques" &&
+        i.system.domaine === domaineCibleApt
+      );
+      const scoreExact = compArtsExact?.system.score ?? 0;
+      aptitude = (sd.art ?? 0) + scoreExact + (sd.bonusAme ?? 0);
+      aptitudeDomainLabel = `Arts Magiques (${domaineCibleApt}) : ${aptitude}`;
+    } else {
+      // Pas de domaine précis (jorniste / obscurantiste / eclipsiste)
+      aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
+      aptitudeDomainLabel = `Arts Magiques : ${aptitude}`;
+    }
 
     // Compétence alternative : min(artsMagiques, compAlt + attrAlt + bonusAspect)
     const compAltNom = sort.system.compAlt?.trim() ?? "";
@@ -853,8 +891,8 @@ export class AgoneActor extends Actor {
 
     const succes = roll.total >= seuil;
     const aptitudeLabel = compAltNom
-      ? `Arts Magiques (min avec ${compAltNom}) : ${aptitude}`
-      : `Arts Magiques : ${aptitude}`;
+      ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compAltNom}) : ${aptitude}`
+      : aptitudeDomainLabel;
     const seuilLabel = impro ? `Seuil : ${seuil} (${seuilBase} x 2, improvisé)` : `Seuil : ${seuil}`;
     await this._sendRollToChat(roll, label, {
       aptitude: aptitudeLabel,

@@ -35,7 +35,7 @@
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
-            <span class="derived-val">{{system.bonusCorps}}</span>
+            <span class="derived-val {{#if (gt system.bonusCorps 0)}}racial-pos{{else}}{{#unless (eq system.bonusCorps 0)}}racial-neg{{/unless}}{{/if}}">{{system.bonusCorps}}</span>
           </div>
           {{#if showLevelUpAspect}}
           <div class="aspect-stat levelup">
@@ -84,7 +84,7 @@
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
-            <span class="derived-val">{{system.bonusEsprit}}</span>
+            <span class="derived-val {{#if (gt system.bonusEsprit 0)}}racial-pos{{else}}{{#unless (eq system.bonusEsprit 0)}}racial-neg{{/unless}}{{/if}}">{{system.bonusEsprit}}</span>
           </div>
           {{#if showLevelUpAspect}}
           <div class="aspect-stat levelup">
@@ -133,7 +133,7 @@
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
-            <span class="derived-val">{{system.bonusAme}}</span>
+            <span class="derived-val {{#if (gt system.bonusAme 0)}}racial-pos{{else}}{{#unless (eq system.bonusAme 0)}}racial-neg{{/unless}}{{/if}}">{{system.bonusAme}}</span>
           </div>
           {{#if showLevelUpAspect}}
           <div class="aspect-stat levelup">

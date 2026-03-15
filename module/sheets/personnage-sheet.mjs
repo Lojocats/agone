@@ -494,6 +494,30 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       });
     }
 
+    // ── Démons intérieurs (acteurs liés par UUID) ──────────────────────────
+    const demonUUIDs = this.actor.getFlag("agone", "demons") ?? [];
+    context.demonActors = [];
+    for (const dUuid of demonUUIDs) {
+      const dActor = await fromUuid(dUuid).catch(() => null);
+      if (!dActor) continue;
+      const ds = dActor.system;
+      const densiteVal = ds.densite?.valeur ?? 0;
+      const densiteMax = ds.densite?.max   ?? 0;
+      const densitePct = densiteMax > 0 ? Math.round(Math.min(100, (densiteVal / densiteMax) * 100)) : 0;
+      const densiteColor = densitePct >= 75 ? '#4a9a4a' : densitePct >= 50 ? '#8a8a00' : densitePct >= 25 ? '#c06000' : '#9a1a1a';
+      context.demonActors.push({
+        uuid:      dActor.uuid,
+        name:      dActor.name,
+        img:       dActor.img ?? 'icons/svg/mystery-man.svg',
+        origine:   ds.origine ?? '',
+        dif:       ds.dif      ?? 0,
+        opacite:   ds.opacite  ?? 0,
+        melee:     ds.melee    ?? 0,
+        initiative:ds.initiative ?? 0,
+        densiteVal, densiteMax, densitePct, densiteColor,
+      });
+    }
+
     // ── Visibilité des onglets ──────────────────────────────────────────────
     const defaultTabsVisible = {
       competences: true, combat: true, magie: true,  avantages: true,
@@ -579,7 +603,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       context.tooltipsDerives = {
         melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}x2) ÷ 3 = ${system.melee}${srcStr("force","agilite")}`,
         tir:    `(AGI ${system.agilite.score} + PER ${system.perception.score}) ÷ 2 = ${system.tir}${srcStr("agilite","perception")}`,
-        art:    `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2${bsign(avArt)} = ${system.art}${srcStr("charisma","creativite","art_bonus")}`,
+        art:    peupleKey === "feeNoire"
+          ? `CHA ${system.charisma.score}${bsign(avArt)} = ${system.art}${srcStr("charisma","art_bonus")}`
+          : `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2↓${bsign(avArt)} = ${system.art}${srcStr("charisma","creativite","art_bonus")}`,
         initiative: `AGI ${system.agilite.score} + PER ${system.perception.score} + Bonus Corps ${bC}${bsign(avInit)} = ${system.initiative}\n${bonusCorpsDetail}${srcStr("agilite","perception","initiative_bonus")}`,
         initMagique: `Initiative ${system.initiative} + 10 = ${system.initMagique}`,
         defenseNaturelle: `AGI ${system.agilite.score} + Bonus Corps ${bC} = ${system.defenseNaturelle}\n${bonusCorpsDetail}${srcStr("agilite")}`,
@@ -863,6 +889,22 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     html.find(".companion-remove").click(this._onRemoveCompanion.bind(this));
     // Feedback visuel drag-over sur la zone compagnons
     html.find(".companions-drop-zone").each((_, el) => {
+      el.addEventListener("dragover", (ev) => {
+        ev.preventDefault();
+        el.classList.add("drag-over");
+      });
+      el.addEventListener("dragleave", (ev) => {
+        if (!el.contains(ev.relatedTarget)) el.classList.remove("drag-over");
+      });
+      el.addEventListener("drop", () => el.classList.remove("drag-over"));
+    });
+
+    // ── Démons (acteurs liés) ──────────────────────────────────────────────
+    html.find(".demon-actor-open").click(this._onOpenDemonActor.bind(this));
+    html.find(".demon-actor-remove").click(this._onRemoveDemonActor.bind(this));
+    html.find("[data-action='createDemonActor']").click(this._onCreateDemonActor.bind(this));
+    // Feedback visuel drag-over sur la zone démons
+    html.find(".demons-drop-zone").each((_, el) => {
       el.addEventListener("dragover", (ev) => {
         ev.preventDefault();
         el.classList.add("drag-over");
@@ -1979,10 +2021,10 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       "system.peupleMalusEnAttente.volonteBonus":      negB('volonte'),
       "system.peupleMalusEnAttente.charismaBonus":     negB('charisma'),
       "system.peupleMalusEnAttente.creativiteBonus":   negB('creativite'),
-      // Reset total : aspects remis à 0 + bonus racial positif
-      "system.corps.score":  posB('corps'),
-      "system.esprit.score": posB('esprit'),
-      "system.ame.score":    posB('ame'),
+      // Aspects : conserve les valeurs, retire l'ancien bonus racial, ajoute le nouveau
+      "system.corps.score":  Math.max(1, (sd.corps?.score  ?? 1) - (old.corpsBonus  ?? 0)) + posB('corps'),
+      "system.esprit.score": Math.max(1, (sd.esprit?.score ?? 1) - (old.espritBonus ?? 0)) + posB('esprit'),
+      "system.ame.score":    Math.max(1, (sd.ame?.score    ?? 1) - (old.ameBonus    ?? 0)) + posB('ame'),
       // Reset total : attributs remis à 0 + bonus racial positif
       "system.agilite.score":      posB('agilite'),
       "system.force.score":        posB('force'),
@@ -2534,6 +2576,23 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       await this.actor.setFlag("agone", "companions", [...current, uuid]);
       return;
     }
+    if (event.target?.closest(".demons-drop-zone")) {
+      const uuid = data.uuid;
+      if (!uuid || uuid === this.actor.uuid) return;
+      const dropped = await fromUuid(uuid).catch(() => null);
+      if (!dropped) return;
+      // Normaliser : Actor sidebar OU token canvas
+      const droppedActor = (dropped.documentName === "Actor") ? dropped : (dropped.actor ?? null);
+      if (!droppedActor || droppedActor.type !== "demon") {
+        ui.notifications.warn(game.i18n.localize("AGONE.DemonDropWrongType"));
+        return;
+      }
+      const actorUuid = droppedActor.uuid;
+      const current = this.actor.getFlag("agone", "demons") ?? [];
+      if (current.includes(actorUuid)) return;
+      await this.actor.setFlag("agone", "demons", [...current, actorUuid]);
+      return;
+    }
     // Pas d'autre comportement de drop d'acteur par défaut
   }
 
@@ -2552,6 +2611,35 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const uuid    = event.currentTarget.dataset.uuid;
     const current = this.actor.getFlag("agone", "companions") ?? [];
     await this.actor.setFlag("agone", "companions", current.filter(u => u !== uuid));
+  }
+
+  // ==============================
+  // Démons acteurs — créer / ouvrir / retirer
+  // ==============================
+  async _onCreateDemonActor(event) {
+    event.preventDefault();
+    const newActor = await Actor.create({
+      name: game.i18n.localize("AGONE.NouveauDemon"),
+      type: "demon",
+    });
+    if (!newActor) return;
+    const current = this.actor.getFlag("agone", "demons") ?? [];
+    await this.actor.setFlag("agone", "demons", [...current, newActor.uuid]);
+    newActor.sheet.render(true);
+  }
+
+  async _onOpenDemonActor(event) {
+    event.preventDefault();
+    const uuid  = event.currentTarget.dataset.uuid;
+    const actor = await fromUuid(uuid).catch(() => null);
+    if (actor) actor.sheet.render(true);
+  }
+
+  async _onRemoveDemonActor(event) {
+    event.preventDefault();
+    const uuid    = event.currentTarget.dataset.uuid;
+    const current = this.actor.getFlag("agone", "demons") ?? [];
+    await this.actor.setFlag("agone", "demons", current.filter(u => u !== uuid));
   }
 
   // ==============================

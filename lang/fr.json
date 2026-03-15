@@ -305,6 +305,8 @@
     "Demons":             "Démons intérieurs",
     "NouveauDemon":       "Nouveau démon",
     "AucunDemon":         "Aucun démon",
+    "DemonDropHint":      "Glissez un acteur Démon ici",
+    "DemonDropWrongType": "Seuls les acteurs de type Démon peuvent être liés ici",
     "DemonValiderCrea":   "Valider la création du démon",
     "DemonReactiverCrea": "Retour en mode création",
     "Valider":            "Valider",

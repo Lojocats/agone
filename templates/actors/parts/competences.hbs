@@ -59,7 +59,19 @@
               <label class="comp-card-stat-lbl">{{localize "AGONE.Exp"}}</label>
               <input type="number" name="items.{{comp.id}}.system.exp" value="{{comp.system.exp}}"
                      class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />
-              <span class="comp-card-attr-badge">{{comp.system.attributLie}}</span>
+              <select class="comp-card-attr-badge inline-edit" data-item-id="{{comp.id}}" data-field="system.attributLie"
+                      title='{{localize "AGONE.AttributLie"}}'>
+                <option value="agilite"      {{#if (eq comp.system.attributLie "agilite")}}selected{{/if}}>AGI</option>
+                <option value="force"        {{#if (eq comp.system.attributLie "force")}}selected{{/if}}>FOR</option>
+                <option value="perception"   {{#if (eq comp.system.attributLie "perception")}}selected{{/if}}>PER</option>
+                <option value="resistance"   {{#if (eq comp.system.attributLie "resistance")}}selected{{/if}}>RÉS</option>
+                <option value="intelligence" {{#if (eq comp.system.attributLie "intelligence")}}selected{{/if}}>INT</option>
+                <option value="volonte"      {{#if (eq comp.system.attributLie "volonte")}}selected{{/if}}>VOL</option>
+                <option value="charisma"     {{#if (eq comp.system.attributLie "charisma")}}selected{{/if}}>CHA</option>
+                <option value="creativite"   {{#if (eq comp.system.attributLie "creativite")}}selected{{/if}}>CRÉ</option>
+                <option value="melee"        {{#if (eq comp.system.attributLie "melee")}}selected{{/if}}>MÊL</option>
+                <option value="tir"          {{#if (eq comp.system.attributLie "tir")}}selected{{/if}}>TIR</option>
+              </select>
             </div>
             {{#if comp.system.domaine}}
             <div class="comp-card-dom">{{comp.system.domaine}}</div>

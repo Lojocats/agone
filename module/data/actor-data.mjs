@@ -91,17 +91,17 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
 
       // Aspects
       corps: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
         exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         noir:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
       esprit: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
         exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         noir:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
       ame: new fields.SchemaField({
-        score: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        score: new fields.NumberField({ initial: 1, integer: true, min: 0 }),
         exp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         noir:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
@@ -302,8 +302,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     this.chargeMax = (this.force.score + this.resistance.score) * this.modPoids;
 
     // Caractéristiques secondaires
-    this.melee    = Math.round((this.force.score + this.agilite.score * 2) / 3);
-    this.tir      = Math.round((this.agilite.score + this.perception.score) / 2);
+    this.melee    = Math.floor((this.force.score + this.agilite.score * 2) / 3);
+    this.tir      = Math.floor((this.agilite.score + this.perception.score) / 2);
     // Emprise selon obédience magique
     if (this.typeMage === "jorniste") {
       this.emprise = this.intelligence.score;
@@ -311,9 +311,14 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       this.emprise = this.volonte.score;
     } else {
       // eclipsiste (défaut)
-      this.emprise = Math.round((this.intelligence.score + this.volonte.score) / 2);
+      this.emprise = Math.floor((this.intelligence.score + this.volonte.score) / 2);
     }
-    this.art      = Math.round((this.charisma.score + this.creativite.score) / 2);
+    // Art : Fée Noire = CHA seul ; autres = ⌊(CHA + CRÉ) / 2⌋
+    if (peupleKey === "feeNoire") {
+      this.art = this.charisma.score;
+    } else {
+      this.art = Math.floor((this.charisma.score + this.creativite.score) / 2);
+    }
 
     // Initiative de base (sans arme)
     this.initiative     = this.agilite.score + this.perception.score + this.bonusCorps;
@@ -406,7 +411,7 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
 
   prepareDerivedData() {
     this.initiative = this.agilite + this.perception;
-    this.melee = Math.round((this.force + this.agilite * 2) / 3);
+    this.melee = Math.floor((this.force + this.agilite * 2) / 3);
     this.demiCharge = Math.floor(this.chargeMax / 2);
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
@@ -415,32 +420,77 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
 }
 
 // ================================
-// Démon
+// Démon (acteur complet)
 // ================================
 export class DemonData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
+      // Identité
       description:  new fields.HTMLField({ initial: "" }),
-      origine:      new fields.StringField({ initial: "" }),
-      opacite:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      origine:      new fields.StringField({ initial: "" }),  // valeur libre : opalin/azurin/… ou nom du palier auto-créé
+      sexe:         new fields.StringField({ initial: "" }),
+      taille:       new fields.StringField({ initial: "" }),
+      masse:        new fields.StringField({ initial: "" }),
+      age:          new fields.StringField({ initial: "" }),
+
+      // Caractéristiques primaires
+      agilite:     new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+      force:       new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+      perception:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+      intelligence:new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+      volonte:     new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+      charisma:    new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+      creativite:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
+
+      // Stats physiques
+      tai:         new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      mv:          new fields.NumberField({ initial: 3, integer: true, min: 0 }),
+      mvVol:       new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      bd:          new fields.NumberField({ initial: 0, integer: true }),
+      dif:         new fields.NumberField({ initial: 0, integer: true }),
+      opacite:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+
+      // Densité (équivalent PdV pour le démon)
       densite: new fields.SchemaField({
         valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 })
+        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       }),
-      dif:          new fields.NumberField({ initial: 0, integer: true }),
-      aptitudeConjuration: new fields.NumberField({ initial: 0, integer: true }),
-      empathie:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-      endurance: new fields.SchemaField({
-        valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 })
-      }),
-      memoire: new fields.SchemaField({
-        valeur: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-        max:    new fields.NumberField({ initial: 0, integer: true, min: 0 })
-      }),
-      connivances:  new fields.HTMLField({ initial: "" }),
-      notes:        new fields.HTMLField({ initial: "" })
+
+      // Charge
+      chargeMax:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+
+      // Blessures
+      blessureGrave1: new fields.BooleanField({ initial: false }),
+      blessureGrave2: new fields.BooleanField({ initial: false }),
+      blessureGrave3: new fields.BooleanField({ initial: false }),
+
+      // Notes
+      connivances: new fields.HTMLField({ initial: "" }),
+      notes:       new fields.HTMLField({ initial: "" }),
     };
+  }
+
+  prepareDerivedData() {
+    // RÉS = Densité max / 5
+    this.resistance = Math.floor(this.densite.max / 5);
+    // Stats de combat
+    this.melee    = Math.floor((this.force + this.agilite * 2) / 3);
+    this.tir      = Math.floor((this.agilite + this.perception) / 2);
+    this.initiative = this.agilite + this.perception;
+    this.art      = Math.floor((this.charisma + this.creativite) / 2);
+    // Seuils basés sur densité max
+    this.seuilBlessureGrave    = Math.max(1, Math.floor(this.densite.max / 3));
+    this.seuilBlessureCritique = Math.max(1, Math.floor(this.densite.max / 2));
+    // Charge
+    this.demiCharge  = Math.floor(this.chargeMax / 2);
+    this.chargeJour  = Math.floor(this.chargeMax / 4);
+    // Blessures graves
+    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
+    const malusTable = [0, -2, -6, -12];
+    this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    // Alias token bar
+    this.densite.value = this.densite.valeur;
+    this.densite.min   = 0;
   }
 }
 
@@ -482,8 +532,8 @@ export class PnjData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
-    this.melee      = Math.round((this.force + this.agilite * 2) / 3);
-    this.tir        = Math.round((this.perception + this.agilite) / 2);
+    this.melee      = Math.floor((this.force + this.agilite * 2) / 3);
+    this.tir        = Math.floor((this.perception + this.agilite) / 2);
     this.initiative = this.agilite + this.perception;
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
