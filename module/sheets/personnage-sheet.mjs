@@ -8,7 +8,7 @@ import { ManoeuvresBrowser } from "../apps/manoeuvres-browser.mjs";
 import { PeuplesBrowser } from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser } from "../apps/pouvoirs-browser.mjs";
 import { PeinesBrowser }  from "../apps/peines-browser.mjs";
-import { BIENFAITS_PERFIDIE_DATA, AVANTAGES_DATA } from "../helpers/compendium-data.mjs";
+import { BIENFAITS_PERFIDIE_DATA, AVANTAGES_DATA, AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
 
 /**
  * Feuille de personnage Agone (Personnage Joueur)
@@ -258,7 +258,38 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       return lastDelta + (rawScore - (tbl.length - 2));
     };
     const posBonus  = (k) => system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
-    const rawCarac  = (k) => Math.max(0, system[k].score - posBonus(k));
+    const avBonus   = (k) => system[k]?.avantageBonus ?? 0;
+    const rawCarac  = (k) => Math.max(0, system[k].score - posBonus(k) - avBonus(k));
+    // Modificateur racial net = appliqué (peupleBonusApplique) + en attente (peupleMalusEnAttente)
+    // Utilisé uniquement pour l'affichage des badges — jamais pour rawCarac ni le stockage.
+    const racialNet = (k) => posBonus(k) + (system.peupleMalusEnAttente?.[`${k}Bonus`] ?? 0);
+
+    // Bonus raciaux exposés pour affichage (séparation valeur de base / bonus racial)
+    context.bonusRacialAspect = {
+      corps:  racialNet('corps'),
+      esprit: racialNet('esprit'),
+      ame:    racialNet('ame'),
+    };
+    // Bonus avantages/défauts exposés pour affichage (transient)
+    context.bonusAvantageAspect = {
+      corps:  avBonus('corps'),
+      esprit: avBonus('esprit'),
+      ame:    avBonus('ame'),
+    };
+    // Valeur de base des aspects (hors bonus racial et avantages) — affichée dans l'input
+    context.rawAspect = {
+      corps:  rawCarac('corps'),
+      esprit: rawCarac('esprit'),
+      ame:    rawCarac('ame'),
+    };
+    context.bonusRacialCarac = {};
+    context.bonusAvantageCarac = {};
+    context.rawCaracVal = {};
+    for (const k of ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite']) {
+      context.bonusRacialCarac[k]   = racialNet(k);
+      context.bonusAvantageCarac[k] = avBonus(k);
+      context.rawCaracVal[k]        = rawCarac(k);
+    }
 
     context.xpCout = {
       corps:        (system.corps.score        + 1) * m.aspect,
@@ -274,9 +305,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       creativite:   (system.creativite.score   + 1) * m.carac,
     };
     context.creaCout = {
-      corps:        creaDelta(system.corps.score),
-      esprit:       creaDelta(system.esprit.score),
-      ame:          creaDelta(system.ame.score),
+      corps:        creaDelta(rawCarac('corps')),
+      esprit:       creaDelta(rawCarac('esprit')),
+      ame:          creaDelta(rawCarac('ame')),
       agilite:      creaDelta(rawCarac('agilite')),
       force:        creaDelta(rawCarac('force')),
       perception:   creaDelta(rawCarac('perception')),
@@ -311,9 +342,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // ── Coûts de rétrogradation (remboursement) ──────────────
     context.creaCoutDown = {
-      corps:        system.corps.score        > 0 ? creaDelta(system.corps.score        - 1) : 0,
-      esprit:       system.esprit.score       > 0 ? creaDelta(system.esprit.score       - 1) : 0,
-      ame:          system.ame.score          > 0 ? creaDelta(system.ame.score          - 1) : 0,
+      corps:        rawCarac('corps')  > 0 ? creaDelta(rawCarac('corps')  - 1) : 0,
+      esprit:       rawCarac('esprit') > 0 ? creaDelta(rawCarac('esprit') - 1) : 0,
+      ame:          rawCarac('ame')    > 0 ? creaDelta(rawCarac('ame')    - 1) : 0,
       agilite:      rawCarac('agilite')       > 0 ? creaDelta(rawCarac('agilite')       - 1) : 0,
       force:        rawCarac('force')         > 0 ? creaDelta(rawCarac('force')         - 1) : 0,
       perception:   rawCarac('perception')    > 0 ? creaDelta(rawCarac('perception')    - 1) : 0,
@@ -481,6 +512,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const caracAtMax      = {};
     const caracBelowMin   = {};
     const caracEffectiveMax = {}; // max final affiché = raceMax + bonusAppliqué
+    const caracAtMaxCreation = {};
     for (const k of caracsKeys) {
       const bonus    = system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
       const rawScore = system[k].score - bonus;
@@ -488,10 +520,62 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       caracAtMax[k]         = raceMax !== null && rawScore >= raceMax;
       caracBelowMin[k]      = system.modeCreation && (peupleData?.[`${k}Min`] ?? null) !== null && rawScore < peupleData[`${k}Min`];
       caracEffectiveMax[k]  = raceMax !== null ? raceMax + bonus : null;
+      caracAtMaxCreation[k] = system.modeCreation && caracAtMax[k];
     }
-    context.caracAtMax        = caracAtMax;
-    context.caracBelowMin     = caracBelowMin;
-    context.caracEffectiveMax = caracEffectiveMax;
+    context.caracAtMax         = caracAtMax;
+    context.caracBelowMin      = caracBelowMin;
+    context.caracEffectiveMax  = caracEffectiveMax;
+    context.caracAtMaxCreation = caracAtMaxCreation;
+
+    // ── Tooltips détaillés pour les stats dérivées ──────────────────────────────────────────────
+    {
+      // Sources avantages/défauts par stat
+      const donsAll = actor.items.filter(i => i.type === "don");
+      const statSrc = {};
+      for (const don of donsAll) {
+        for (const e of (AVANTAGES_EFFETS[don.name] ?? [])) {
+          if (e.delta !== undefined && e.delta !== 0) {
+            if (!statSrc[e.stat]) statSrc[e.stat] = [];
+            statSrc[e.stat].push(`${e.delta > 0 ? "+" : ""}${e.delta} (${don.name})`);
+          }
+        }
+      }
+      const srcStr = (...stats) => {
+        const all = stats.flatMap(s => statSrc[s] ?? []);
+        return all.length ? "\n  dont avantages : " + all.join(", ") : "";
+      };
+      const bsign = v => v === 0 ? "" : (v > 0 ? ` + ${v}` : ` − ${Math.abs(v)}`);
+
+      const bC  = system.bonusCorps  ?? 0;
+      const bE  = system.bonusEsprit ?? 0;
+      const bA  = system.bonusAme    ?? 0;
+      const nC  = system.corpsNoirTotal  ?? 0;
+      const nE  = system.espritNoirTotal ?? 0;
+      const nAm = system.ameNoirTotal    ?? 0;
+      const bonusCorpsDetail = `Bonus Corps : Corps ${system.corps.score} − Noir ${nC} = ${bC}`;
+
+      const avInit    = system.avantageInitiativeBonus ?? 0;
+      const avArt     = system.avantageArtBonus        ?? 0;
+      const avEmp     = system.avantageEmpriseBonus    ?? 0;
+      const escComp   = system.esquiveCompScore        ?? 0;
+
+      let empriseFormule;
+      if (system.typeMage === "jorniste")           empriseFormule = `INT ${system.intelligence.score}`;
+      else if (system.typeMage === "obscurantiste") empriseFormule = `VOL ${system.volonte.score}`;
+      else empriseFormule = `(INT ${system.intelligence.score} + VOL ${system.volonte.score}) ÷ 2`;
+
+      context.tooltipsDerives = {
+        melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}×2) ÷ 3 = ${system.melee}${srcStr("force","agilite")}`,
+        tir:    `(AGI ${system.agilite.score} + PER ${system.perception.score}) ÷ 2 = ${system.tir}${srcStr("agilite","perception")}`,
+        art:    `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2${bsign(avArt)} = ${system.art}${srcStr("charisma","creativite","art_bonus")}`,
+        initiative: `AGI ${system.agilite.score} + PER ${system.perception.score} + Bonus Corps ${bC}${bsign(avInit)} = ${system.initiative}\n${bonusCorpsDetail}${srcStr("agilite","perception","initiative_bonus")}`,
+        initMagique: `Initiative ${system.initiative} + 10 = ${system.initMagique}`,
+        defenseNaturelle: `AGI ${system.agilite.score} + Bonus Corps ${bC} = ${system.defenseNaturelle}\n${bonusCorpsDetail}${srcStr("agilite")}`,
+        bd:     `Tableau FOR ${system.force.score} + TAI ${system.tai} = ${system.bd}${srcStr("force","tai")}`,
+        esquive: `AGI ${system.agilite.score} + Esquive ${escComp} + Bonus Corps ${bC} = ${system.esquiveTotal}\n${bonusCorpsDetail}${srcStr("agilite")}`,
+        emprise: `${empriseFormule}${bsign(avEmp)} = ${system.emprise}${srcStr("intelligence","volonte","emprise_bonus")}`,
+      };
+    }
 
     return context;
   }
@@ -631,6 +715,10 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Édition inline (quantité équipement, etc.)
     html.find(".inline-edit").change(this._onInlineEdit.bind(this));
+
+    // Inputs "base" de scores (aspects + caracs) : pas de name= pour éviter le double-comptage
+    // du bonus racial par le mécanisme de submit de FoundryVTT
+    html.find("[data-raw-input]").change(this._onRawInputChange.bind(this));
 
     // Armure portée — clic sur checkbox d'item
     html.find(".armure-portee").change(this._onArmureItemPorteeChange.bind(this));
@@ -2405,6 +2493,20 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const value  = el.type === "checkbox" ? el.checked : (isNaN(el.value) ? el.value : Number(el.value));
     const item   = this.actor.items.get(itemId);
     if (item && field) await item.update({ [field]: value });
+  }
+
+  // ==============================
+  // Inputs "base" (aspects + caracs) : sans name= pour éviter le double-comptage
+  // du bonus racial par le mécanisme de submit FoundryVTT
+  // ==============================
+  async _onRawInputChange(event) {
+    event.preventDefault();
+    const input    = event.currentTarget;
+    const field    = input.dataset.field;           // ex. "system.corps.score"
+    const key      = input.dataset.rawInput;        // ex. "corps"
+    const rawValue = Math.max(0, Number(input.value) || 0);
+    const posB     = this.actor.system.peupleBonusApplique?.[`${key}Bonus`] ?? 0;
+    await this.actor.update({ [field]: rawValue + posB });
   }
 
   // ==============================

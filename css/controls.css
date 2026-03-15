@@ -52,6 +52,44 @@
   color: #c84040;
 }
 
+/* Maximum racial atteint en mode création */
+.agone .carac-row.carac-at-max .stat-num:not(.exp) {
+  border-color: #b87820;
+  background: rgba(185, 130, 30, 0.1);
+  color: #a06010;
+}
+.agone .carac-max-label {
+  font-size: 10px;
+  color: #a06010;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+/* Badges de bonus racial sur les caractéristiques */
+.agone .racial-bonus-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.agone .racial-pos {
+  color: #2e7d32;
+  background: rgba(74, 154, 74, 0.12);
+  border: 1px solid rgba(74, 154, 74, 0.3);
+}
+.agone .racial-neg {
+  color: #800000;
+  background: rgba(160, 0, 0, 0.08);
+  border: 1px solid rgba(160, 0, 0, 0.2);
+}
+
+/* Ligne racial dans les aspects */
+.agone .aspect-stat.racial .derived-val.racial-pos { color: #2e7d32; font-weight: 700; }
+.agone .aspect-stat.racial .derived-val.racial-neg { color: #800000; font-weight: 700; }
+
 /* ── Bouton level-up ─────────────────────────────────────── */
 /* Désactivé (max racial atteint) */
 .agone .levelup-btn[disabled],

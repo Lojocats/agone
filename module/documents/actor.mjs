@@ -229,6 +229,18 @@ export class AgoneActor extends Actor {
     sd.corps.score        += b.corps;
     sd.esprit.score       += b.esprit;
     sd.ame.score          += b.ame;
+    // Mémoriser les bonus avantages pour la séparation UI base / final (transient — jamais stocké)
+    sd.agilite.avantageBonus      = b.agilite;
+    sd.force.avantageBonus        = b.force;
+    sd.resistance.avantageBonus   = b.resistance;
+    sd.intelligence.avantageBonus = b.intelligence;
+    sd.volonte.avantageBonus      = b.volonte;
+    sd.charisma.avantageBonus     = b.charisma;
+    sd.creativite.avantageBonus   = b.creativite;
+    sd.perception.avantageBonus   = b.perception;
+    sd.corps.avantageBonus        = b.corps;
+    sd.esprit.avantageBonus       = b.esprit;
+    sd.ame.avantageBonus          = b.ame;
     // Ajouter les noirs des dons aux totaux dérivés (pas aux champs stockés)
     sd.corpsNoirTotal  = (sd.corpsNoirTotal  ?? sd.corps.noir)  + b.corps_noir;
     sd.espritNoirTotal = (sd.espritNoirTotal ?? sd.esprit.noir) + b.esprit_noir;
@@ -281,6 +293,10 @@ export class AgoneActor extends Actor {
     sd.initMagique      = sd.initiative + 10;
     sd.defenseNaturelle = sd.agilite.score + sd.bonusCorps;
     sd.noirceur         = Math.floor(sd.tenebres / 10);
+    // Stockage des bonus d'avantages sur les stats dérivées (transient, pour affichage dans les tooltips)
+    sd.avantageInitiativeBonus = b.initiative_bonus;
+    sd.avantageArtBonus        = b.art_bonus;
+    sd.avantageEmpriseBonus    = b.emprise_bonus;
 
     // MV diviseur (Boiteux ÷2, Un membre en moins ÷3)
     if (b.mv_divisor > 1) {
@@ -316,6 +332,7 @@ export class AgoneActor extends Actor {
     // --- 7. Re-dérivation des stats basées sur les items ---
     const compEsquive  = this.items.find(i => i.type === "competence" && i.name === "Esquive");
     const scoreEsquive = compEsquive?.system.score ?? 0;
+    sd.esquiveCompScore = scoreEsquive; // transient — pour les tooltips
     sd.esquiveTotal    = sd.agilite.score + scoreEsquive + sd.bonusCorps;
     sd.esquiveDistance = Math.round((sd.agilite.score + scoreEsquive) / 2);
 
