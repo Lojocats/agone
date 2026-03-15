@@ -640,6 +640,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     html.find("[name='system.armure.malusAgi']").change(this._onArmureMalusChange.bind(this));
     html.find("[name='system.armure.type']").change(this._onArmureMalusChange.bind(this));
 
+    // Arme équipée (tenue en main) — boucliers : sync actor.bouclier
+    html.find(".arme-equipe").change(this._onArmeEquipeChange.bind(this));
+
     // 3e blessure grave → jet de VOL Difficulté 10
     html.find("[name='system.blessureGrave3']").change(async (e) => {
       if (e.currentTarget.checked) {
@@ -1526,6 +1529,46 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
       modif: `Bonus/Malus : ${modif}`
     });
+  }
+
+  // ==============================
+  // Arme équipée (tenue en main)
+  // ==============================
+  async _onArmeEquipeChange(event) {
+    event.preventDefault();
+    const el     = event.currentTarget;
+    const itemId = el.dataset.itemId;
+    const equipe = el.checked;
+    const item   = this.actor.items.get(itemId);
+    if (!item) return;
+
+    await item.update({ "system.equipe": equipe });
+
+    // Pour les boucliers : déséquiper les autres et synchroniser actor.bouclier
+    if (item.system.style === "bouclier") {
+      const updateBatch = this.actor.items
+        .filter(i => i.type === "arme" && i.system.style === "bouclier" && i.id !== itemId)
+        .map(i => ({ _id: i.id, "system.equipe": false }));
+      if (updateBatch.length) await this.actor.updateEmbeddedDocuments("Item", updateBatch);
+
+      if (equipe) {
+        await this.actor.update({
+          "system.bouclier.portee":       true,
+          "system.bouclier.nom":          item.name,
+          "system.bouclier.defenseBonus": item.system.defenseBonus ?? 0,
+          "system.bouclier.protection":   item.system.protection   ?? 0,
+          "system.bouclier.malusAgi":     item.system.malusAgi     ?? 0,
+        });
+      } else {
+        await this.actor.update({
+          "system.bouclier.portee":       false,
+          "system.bouclier.nom":          "",
+          "system.bouclier.defenseBonus": 0,
+          "system.bouclier.protection":   0,
+          "system.bouclier.malusAgi":     0,
+        });
+      }
+    }
   }
 
   // ==============================

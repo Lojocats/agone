@@ -192,6 +192,15 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
         malusPer:  new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
 
+      // Bouclier équipé
+      bouclier: new fields.SchemaField({
+        nom:          new fields.StringField({ initial: "" }),
+        portee:       new fields.BooleanField({ initial: false }),
+        defenseBonus: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        protection:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+        malusAgi:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      }),
+
       // État de combat
       blessureGrave1:    new fields.BooleanField({ initial: false }),
       blessureGrave2:    new fields.BooleanField({ initial: false }),
@@ -361,6 +370,10 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     }
     this.armure._malusAgiActif = this.armure.portee ? -this.armure.malusAgi : 0;
     this.armure._malusPerActif  = this.armure.portee ? -this.armure.malusPer : 0;
+
+    // Malus bouclier équipé
+    this.bouclier._defenseBonusActif = this.bouclier.portee ? this.bouclier.defenseBonus : 0;
+    this.bouclier._malusAgiActif     = this.bouclier.portee ? -this.bouclier.malusAgi    : 0;
   }
 }
 

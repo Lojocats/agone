@@ -151,6 +151,7 @@
     <table class="armes-table">
       <thead>
         <tr>
+          <th class="col-equipe" title="{{localize 'AGONE.Equipe'}}"><i class="fas fa-hand-paper"></i></th>
           <th class="col-arme-name">{{localize "AGONE.Nom"}}</th>
           <th class="col-tai">TAI</th>
           <th class="col-type">Type</th>
@@ -163,23 +164,41 @@
       </thead>
       <tbody>
         {{#each armes as |arme|}}
-        <tr class="item-row" data-item-id="{{arme.id}}">
+        <tr class="item-row {{#if arme.system.equipe}}arme-equipee{{/if}}" data-item-id="{{arme.id}}">
+          <td class="col-equipe">
+            <label class="arme-equipe-toggle" title="{{#if arme.system.equipe}}Équipée{{else}}Rangée{{/if}}">
+              <input type="checkbox" class="arme-equipe" data-item-id="{{arme.id}}" {{#if arme.system.equipe}}checked{{/if}} />
+              <i class="fas {{#if (eq arme.system.style 'bouclier')}}fa-shield{{else}}fa-hand-paper{{/if}} arme-equipe-icon"></i>
+            </label>
+          </td>
           <td class="col-arme-name">
             <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{arme.id}}">{{arme.name}}</span>
+            {{#if (eq arme.system.style "bouclier")}}
+            <span class="armure-badge pro-badge">PRO {{arme.system.protection}}</span>
+            {{#if arme.system.malusAgi}}<span class="armure-badge malus-badge">-AGI {{arme.system.malusAgi}}</span>{{/if}}
+            {{/if}}
           </td>
           <td class="col-tai">{{arme.system.tai}}</td>
-          <td class="col-type">{{arme.system.type}}</td>
+          <td class="col-type">{{#if (eq arme.system.style "bouclier")}}<i class="fas fa-shield-alt" title="Bouclier"></i>{{else}}{{arme.system.type}}{{/if}}</td>
           <td class="col-init">
+            {{#if (eq arme.system.style "bouclier")}}
+            <span class="arme-score arme-score-inactive">—</span>
+            {{else}}
             <div class="arme-cell">
               <span class="arme-score">{{arme.system.initTotal}}</span>
               <button type="button" class="roll-btn-small roll-init-btn" data-action="rollInitiative" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
             </div>
+            {{/if}}
           </td>
           <td class="col-atk">
+            {{#if (eq arme.system.style "bouclier")}}
+            <span class="arme-score arme-score-inactive">—</span>
+            {{else}}
             <div class="arme-cell">
               <span class="arme-score">{{arme.system.attackTotal}}</span>
               <button type="button" class="roll-btn-small roll-atk-btn" data-action="rollAttaque" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterAttaque"}}'><i class="fas fa-dice-d10"></i></button>
             </div>
+            {{/if}}
           </td>
           <td class="col-def">
             <div class="arme-cell">
@@ -188,8 +207,12 @@
             </div>
           </td>
           <td class="col-dom">
+            {{#if (eq arme.system.style "bouclier")}}
+            <span class="arme-score arme-score-inactive">—</span>
+            {{else}}
             <span class="dom-base">{{arme.system.dommages}}</span>
             <span class="dom-bd">+{{system.bd}}</span>
+            {{/if}}
           </td>
           <td class="col-row-actions">
             <a class="item-edit" data-item-id="{{arme.id}}" title="Éditer"><i class="fas fa-pen"></i></a>

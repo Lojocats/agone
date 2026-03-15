@@ -5,33 +5,20 @@
     <div class="arb-filter-row">
       <div class="arb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="arb-search" placeholder="Rechercher une armure ou un bouclier..." value="{{search}}">
+        <input type="text" class="arb-search" placeholder="Rechercher une armure..." value="{{search}}">
       </div>
       <button type="button" class="arb-clear" title="Effacer les filtres">
         <i class="fas fa-eraser"></i>
       </button>
     </div>
 
-    <div class="arb-type-checks">
-      <span class="arb-filter-label">Catégorie :</span>
-      <label class="arb-type-lbl">
-        <input type="checkbox" class="arb-all-genre" {{#if allGenresSelected}}checked{{/if}}> Tous
-      </label>
-      <label class="arb-type-lbl">
-        <input type="checkbox" class="arb-genre-check" value="armure" {{#if filterArmure}}checked{{/if}}> Armure
-      </label>
-      <label class="arb-type-lbl">
-        <input type="checkbox" class="arb-genre-check" value="bouclier" {{#if filterBouclier}}checked{{/if}}> Bouclier
-      </label>
-    </div>
-
     <div class="arb-filter-row2">
       <select class="arb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Toutes</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédées</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédées</option>
       </select>
-      <span class="arb-count">{{items.length}} article(s)</span>
+      <span class="arb-count">{{items.length}} armure(s)</span>
     </div>
   </div>
 
@@ -41,7 +28,6 @@
       <thead>
         <tr>
           <th class="arb-col-name">Nom</th>
-          <th class="arb-col-genre">Catégorie</th>
           <th class="arb-col-type">Couverture</th>
           <th class="arb-col-prot" title="Protection">PRO</th>
           <th class="arb-col-malus" title="Malus d'Agilité">-AGI</th>
@@ -52,7 +38,6 @@
         {{#each items as |item|}}
         <tr class="arb-row {{#if item.hasInActor}}arb-has-item{{/if}}" data-armure-idx="{{item.idx}}">
           <td class="arb-name">{{item.name}}</td>
-          <td class="arb-genre">{{#if (eq item.genre "bouclier")}}<i class="fas fa-shield-alt"></i> Bouclier{{else}}<i class="fas fa-user-shield"></i> Armure{{/if}}</td>
           <td class="arb-type">{{item.typeLabel}}</td>
           <td class="arb-prot"><strong>{{item.protection}}</strong></td>
           <td class="arb-malus">{{#if item.malusAgi}}-{{item.malusAgi}}{{else}}0{{/if}}</td>
@@ -68,7 +53,7 @@
         </tr>
         {{/each}}
         {{#unless items.length}}
-        <tr><td colspan="6" class="arb-empty">Aucun article trouvé.</td></tr>
+        <tr><td colspan="5" class="arb-empty">Aucune armure trouvée.</td></tr>
         {{/unless}}
       </tbody>
     </table>

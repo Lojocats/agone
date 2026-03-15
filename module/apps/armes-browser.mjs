@@ -1,4 +1,6 @@
-import { ARMES_DATA } from "../helpers/compendium-data.mjs";
+import { ARMES_DATA, BOUCLIERS_DATA } from "../helpers/compendium-data.mjs";
+
+const _ALL_ARMES_DATA = [...ARMES_DATA, ...BOUCLIERS_DATA];
 
 /**
  * Navigateur d'armes Agone — fenêtre de sélection avec filtres.
@@ -37,11 +39,11 @@ export class ArmesBrowser extends Application {
       this.actor.items.filter(i => i.type === "arme").map(i => i.name)
     );
 
-    const STYLE_LABELS = { melee:"Mêlée", trait:"Trait", jet:"Lancer" };
+    const STYLE_LABELS = { melee:"Mêlée", trait:"Trait", jet:"Lancer", bouclier:"Bouclier" };
     const TYPE_LABELS  = { P:"P (Perforant)", T:"T (Tranchant)", C:"C (Contondant)",
                            TC:"TC", PC:"PC", PT:"PT" };
 
-    let armes = ARMES_DATA.map((d, idx) => ({
+    let armes = _ALL_ARMES_DATA.map((d, idx) => ({
       idx        : String(idx),
       name       : d.name,
       style      : d.style,
@@ -55,6 +57,8 @@ export class ArmesBrowser extends Application {
       portee     : d.portee ?? "—",
       reqFor     : d.reqFor ?? 0,
       reqAgi     : d.reqAgi ?? 0,
+      protection : d.protection ?? 0,
+      malusAgi   : d.malusAgi ?? 0,
       description: d.description ?? "",
       hasInActor : actorArmeNames.has(d.name),
     }));
@@ -81,10 +85,10 @@ export class ArmesBrowser extends Application {
 
     armes.sort((a, b) => a.name.localeCompare(b.name, "fr"));
 
-    const allStyles = ["melee","trait","jet"].map(s => ({
+    const allStyles = ["melee","trait","jet","bouclier"].map(s => ({
       value: s, label: STYLE_LABELS[s] ?? s, active: this._filterStyles.has(s)
     }));
-    const allTypes = [...new Set(ARMES_DATA.map(d => d.type).filter(Boolean))].sort()
+    const allTypes = [...new Set(_ALL_ARMES_DATA.map(d => d.type).filter(Boolean))].sort()
       .map(t => ({ value: t, label: TYPE_LABELS[t] ?? t, active: this._filterTypes.has(t) }));
 
     return {
@@ -155,7 +159,7 @@ export class ArmesBrowser extends Application {
     html.find("[data-action='addArme']").on("click", async e => {
       const idx = parseInt(e.currentTarget.closest("[data-arme-idx]")?.dataset?.armeIdx ?? "");
       if (isNaN(idx)) return;
-      const d = ARMES_DATA[idx];
+      const d = _ALL_ARMES_DATA[idx];
       if (!d) return;
 
       await Item.create({
@@ -172,6 +176,8 @@ export class ArmesBrowser extends Application {
           portee      : d.portee       ?? "",
           reqFor      : d.reqFor       ?? 0,
           reqAgi      : d.reqAgi       ?? 0,
+          protection  : d.protection   ?? 0,
+          malusAgi    : d.malusAgi     ?? 0,
           description : d.description  ?? "",
         },
       }, { parent: this.actor });

@@ -1,4 +1,4 @@
-import { ARMURES_DATA, BOUCLIERS_DATA } from "../helpers/compendium-data.mjs";
+import { ARMURES_DATA } from "../helpers/compendium-data.mjs";
 
 /**
  * Navigateur d'armures & boucliers Agone — fenêtre de sélection avec filtres.
@@ -9,7 +9,6 @@ export class ArmuresBrowser extends Application {
     super(options);
     this.actor          = actor;
     this._search        = "";
-    this._filterGenre   = new Set();  // "armure" | "bouclier"
     this._filterPossede = "all";      // "all" | "oui" | "non"
   }
 
@@ -26,7 +25,7 @@ export class ArmuresBrowser extends Application {
   }
 
   get title() {
-    return `Armures & Boucliers — ${this.actor.name}`;
+    return `Armures — ${this.actor.name}`;
   }
 
   /** @override */
@@ -37,39 +36,20 @@ export class ArmuresBrowser extends Application {
 
     const TYPE_LABELS = { "0":"Veste seule", "1":"Partielle", "2":"Complète" };
 
-    // Combiner armures + boucliers dans une liste unifiée
-    let items = [
-      ...ARMURES_DATA.map((d, idx) => ({
-        idx       : `a${idx}`,
-        genre     : "armure",
-        source    : "armure",
-        name      : d.name,
-        typeLabel : TYPE_LABELS[d.type] ?? d.type,
-        protection: d.protection,
-        malusAgi  : d.malusAgi ?? 0,
-        hasInActor: actorArmureNames.has(d.name),
-        raw        : d,
-      })),
-      ...BOUCLIERS_DATA.map((d, idx) => ({
-        idx       : `b${idx}`,
-        genre     : "bouclier",
-        source    : "bouclier",
-        name      : d.name,
-        typeLabel : "Bouclier",
-        protection: d.protection,
-        malusAgi  : d.malusAgi ?? 0,
-        hasInActor: actorArmureNames.has(d.name),
-        raw        : d,
-      })),
-    ];
+    let items = ARMURES_DATA.map((d, idx) => ({
+      idx       : `a${idx}`,
+      name      : d.name,
+      typeLabel : TYPE_LABELS[d.type] ?? d.type,
+      protection: d.protection,
+      malusAgi  : d.malusAgi ?? 0,
+      hasInActor: actorArmureNames.has(d.name),
+      raw        : d,
+    }));
 
     // Filtres
     if (this._search) {
       const s = this._search.toLowerCase();
       items = items.filter(e => e.name.toLowerCase().includes(s));
-    }
-    if (this._filterGenre.size > 0) {
-      items = items.filter(e => this._filterGenre.has(e.genre));
     }
     if (this._filterPossede === "oui") {
       items = items.filter(e => e.hasInActor);
@@ -83,9 +63,6 @@ export class ArmuresBrowser extends Application {
       items,
       search          : this._search,
       filterPossede   : this._filterPossede,
-      filterArmure    : this._filterGenre.has("armure"),
-      filterBouclier  : this._filterGenre.has("bouclier"),
-      allGenresSelected: this._filterGenre.size === 0,
     };
   }
 
@@ -99,17 +76,6 @@ export class ArmuresBrowser extends Application {
       this.render();
     }, 250));
 
-    html.find(".arb-all-genre").on("change", () => {
-      this._filterGenre.clear();
-      this.render();
-    });
-    html.find(".arb-genre-check").on("change", e => {
-      const v = e.currentTarget.value;
-      if (e.currentTarget.checked) this._filterGenre.add(v);
-      else this._filterGenre.delete(v);
-      this.render();
-    });
-
     html.find(".arb-possede-filter").on("change", e => {
       this._filterPossede = e.currentTarget.value;
       this.render();
@@ -117,26 +83,20 @@ export class ArmuresBrowser extends Application {
 
     html.find(".arb-clear").on("click", () => {
       this._search        = "";
-      this._filterGenre.clear();
       this._filterPossede = "all";
       this.render();
     });
 
     html.find("[data-action='addArmure']").on("click", async e => {
       const idxRaw = e.currentTarget.closest("[data-armure-idx]")?.dataset?.armureIdx ?? "";
-      let d;
-      if (idxRaw.startsWith("a")) {
-        d = ARMURES_DATA[parseInt(idxRaw.slice(1))];
-      } else if (idxRaw.startsWith("b")) {
-        d = BOUCLIERS_DATA[parseInt(idxRaw.slice(1))];
-      }
+      const d = idxRaw.startsWith("a") ? ARMURES_DATA[parseInt(idxRaw.slice(1))] : null;
       if (!d) return;
 
       await Item.create({
         name  : d.name,
         type  : "armure",
         system: {
-          type       : d.type   ?? "0",
+          type       : d.type        ?? "0",
           protection : d.protection  ?? 0,
           malusAgi   : d.malusAgi    ?? 0,
           malusPer   : d.malusPer    ?? 0,

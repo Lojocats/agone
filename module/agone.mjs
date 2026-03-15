@@ -293,36 +293,32 @@ Hooks.once("ready", async () => {
   });
 
   // ── Compendium armes ───────────────────────────────────────────────────
-  await _syncPack("agone.armes", await _dataHash(ARMES_DATA), async (pack) => {
-    const [fMelee, fTrait, fJet] = await Folder.createDocuments([
-      { name: "Mêlée",  type: "Item", color: "#8B0000" },
-      { name: "Trait",  type: "Item", color: "#8B4500" },
-      { name: "Lancer", type: "Item", color: "#4B5320" },
+  const _armesAll = [...ARMES_DATA, ...BOUCLIERS_DATA];
+  await _syncPack("agone.armes", await _dataHash(_armesAll), async (pack) => {
+    const [fMelee, fTrait, fJet, fBoucliers] = await Folder.createDocuments([
+      { name: "Mêlée",     type: "Item", color: "#8B0000" },
+      { name: "Trait",     type: "Item", color: "#8B4500" },
+      { name: "Lancer",    type: "Item", color: "#4B5320" },
+      { name: "Boucliers", type: "Item", color: "#696969" },
     ], { pack: "agone.armes" });
-    const styleFolder = { melee: fMelee.id, trait: fTrait.id, jet: fJet.id };
-    const itemsArmes  = ARMES_DATA.map(d => ({
+    const styleFolder = { melee: fMelee.id, trait: fTrait.id, jet: fJet.id, bouclier: fBoucliers.id };
+    const itemsArmes  = _armesAll.map(d => ({
       name: d.name, type: "arme", system: d, folder: styleFolder[d.style] ?? null
     }));
     await Item.createDocuments(itemsArmes, { pack: "agone.armes" });
-    console.log(`Agone | Compendium armes initialisé (${itemsArmes.length} entrées, 3 dossiers)`);
+    console.log(`Agone | Compendium armes initialisé (${itemsArmes.length} entrées, 4 dossiers)`);
   });
 
-  // ── Compendium armures / boucliers ─────────────────────────────────────
-  const _armuresAll = [...ARMURES_DATA, ...BOUCLIERS_DATA];
-  await _syncPack("agone.armures", await _dataHash(_armuresAll), async () => {
-    const [folderArmures, folderBoucliers] = await Folder.createDocuments([
-      { name: "Armures",   type: "Item", color: "#8B4513" },
-      { name: "Boucliers", type: "Item", color: "#696969" },
+  // ── Compendium armures ─────────────────────────────────────────────────
+  await _syncPack("agone.armures", await _dataHash(ARMURES_DATA), async () => {
+    const [folderArmures] = await Folder.createDocuments([
+      { name: "Armures", type: "Item", color: "#8B4513" },
     ], { pack: "agone.armures" });
     await Item.createDocuments(
       ARMURES_DATA.map(d => ({ name: d.name, type: "armure", system: d, folder: folderArmures.id })),
       { pack: "agone.armures" }
     );
-    await Item.createDocuments(
-      BOUCLIERS_DATA.map(d => ({ name: d.name, type: "armure", system: d, folder: folderBoucliers.id })),
-      { pack: "agone.armures" }
-    );
-    console.log(`Agone | Compendium armures initialisé (${_armuresAll.length} entrées, 2 dossiers)`);
+    console.log(`Agone | Compendium armures initialisé (${ARMURES_DATA.length} entrées)`);
   });
 
   // ── Compendium sorts & œuvres ──────────────────────────────────────────

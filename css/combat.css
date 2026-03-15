@@ -278,6 +278,23 @@
   border-bottom: 1px solid rgba(92,58,30,0.08);
 }
 .agone .armes-table .col-arme-name { text-align: left; }
+.agone .armes-table .col-equipe { width: 24px; text-align: center; }
+.agone .arme-equipee { background: rgba(74, 154, 74, 0.06) !important; }
+.agone .arme-equipee:hover { background: rgba(74, 154, 74, 0.12) !important; }
+.agone .arme-equipe-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--agone-brown);
+  opacity: 0.4;
+}
+.agone .arme-equipee .arme-equipe-toggle { opacity: 1; color: #4a9a4a; }
+.agone .arme-equipe-toggle input { display: none; }
+.agone .arme-score-inactive { color: rgba(92,58,30,0.3); font-size: 12px; font-weight: 600; }
+.agone .ab-bouclier-pro { font-size: 10px; font-weight: 700; color: #2e7d32; padding: 1px 4px; background: rgba(74,154,74,0.12); border-radius: 3px; border: 1px solid rgba(74,154,74,0.3); margin-left: 3px; }
+.agone .ab-bouclier-malus { font-size: 10px; font-weight: 700; color: #800000; padding: 1px 4px; background: rgba(160,0,0,0.08); border-radius: 3px; border: 1px solid rgba(160,0,0,0.2); margin-left: 2px; }
 .agone .arme-cell {
   display: flex;
   align-items: center;
