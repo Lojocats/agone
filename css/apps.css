@@ -60,6 +60,8 @@
   font-size: 32px;
   font-weight: bold;
   text-align: center;
+  display: block;
+  margin: 8px auto;
   color: var(--agone-brown, #5c3a1e);
   line-height: 1.1;
 }
