@@ -33,7 +33,7 @@
   {{#if isFumble}}
   <div class="fumble-alert{{#if isMegaFumble}} mega-fumble-alert{{/if}}">
     <i class="fas fa-skull"></i> <strong>{{#if isMegaFumble}}{{localize "AGONE.MegaFumble"}}{{else}}{{localize "AGONE.Fumble"}}{{/if}}</strong>
-    — {{localize "AGONE.PenaliteFumble"}} : −{{fumblePenalty}}
+    — {{localize "AGONE.PenaliteFumble"}} : -{{fumblePenalty}}
     {{#if fumbleTotal}}<span class="fumble-total-adj">({{localize "AGONE.TotalAjuste"}} : {{fumbleTotal}})</span>{{/if}}
   </div>
   {{/if}}

@@ -814,6 +814,48 @@
   border-color: var(--agone-gold, #c9a227);
 }
 
+/* Largeurs des colonnes */
+.manoeuvres-browser .mb-col-toggle   { width: 24px; }
+.manoeuvres-browser .mb-col-name     { min-width: 140px; }
+.manoeuvres-browser .mb-col-cat      { width: 90px; }
+.manoeuvres-browser .mb-col-ini,
+.manoeuvres-browser .mb-col-att,
+.manoeuvres-browser .mb-col-def      { width: 42px; text-align: center; }
+.manoeuvres-browser .mb-col-dom      { width: 80px; }
+.manoeuvres-browser .mb-col-condition{ min-width: 140px; }
+.manoeuvres-browser .mb-col-action   { width: 30px; }
+
+/* Cellules de valeurs numériques */
+.manoeuvres-browser .mb-ini,
+.manoeuvres-browser .mb-att,
+.manoeuvres-browser .mb-def {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+.manoeuvres-browser .mb-dom {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7a3a00;
+}
+.manoeuvres-browser .mb-condition {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-text-dark-secondary, #666);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* manoeuvre-sheet : grille de stats */
+.agone.item.manoeuvre .manoeuvre-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px 10px;
+  margin-bottom: 6px;
+}
+
 /* ══════════════════════════════════════════════════════════
    COMPÉTENCES BROWSER
    ══════════════════════════════════════════════════════════ */

@@ -111,7 +111,7 @@
         </div>
         <div class="comp-card-body">
           <div class="comp-card-stats">
-            <span class="na-score">0 <em class="na-malus">(−3)</em></span>
+            <span class="na-score">0 <em class="na-malus">(-3)</em></span>
             <span class="comp-card-attr-badge">{{c.attributLie}}</span>
           </div>
         </div>
@@ -127,66 +127,4 @@
     </div>
   </div>
 
-  <!-- Manœuvres & Bottes -->
-  <div class="section-header">
-    <h3>{{localize "AGONE.Manoeuvres"}}</h3>
-    <button type="button" class="compendium-browse btn-icon" data-pack="agone.manoeuvres" title='{{localize "AGONE.ParcourirManoeuvres"}}'>
-      <i class="fas fa-search"></i>
-    </button>
-    <button type="button" class="item-create" data-type="manoeuvre" title='{{localize "AGONE.AjouterManoeuvre"}}'>
-      <i class="fas fa-plus"></i>
-    </button>
-  </div>
-
-  {{#if manoeuvres.length}}
-  <table class="manoeuvres-table">
-    <thead>
-      <tr>
-        <th class="man-col-toggle"></th>
-        <th class="man-col-badge"></th>
-        <th>{{localize "AGONE.Nom"}}</th>
-        <th class="col-score">{{localize "AGONE.Score"}}</th>
-        <th class="col-mod">{{localize "AGONE.Malus"}}</th>
-        <th></th>
-        <th class="col-drag"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each manoeuvres as |man|}}
-      <tr class="item-row" data-item-id="{{man.id}}">
-        <td class="man-col-toggle">
-          {{#if man.system.description}}
-          <button type="button" class="man-desc-toggle btn-icon" data-item-id="{{man.id}}" title="Description">
-            <i class="fas fa-chevron-right man-toggle-icon"></i>
-          </button>
-          {{/if}}
-        </td>
-        <td class="man-col-badge">
-          <span class="man-badge man-badge-{{man.system.categorie}}">
-            {{#if (eq man.system.categorie "botte")}}Botte{{else}}Manœuvre{{/if}}
-          </span>
-        </td>
-        <td>
-          <button type="button" class="roll-btn item-name" data-action="rollManoeuvre" data-item-id="{{man.id}}">
-            {{man.name}}
-          </button>
-        </td>
-        <td><span>{{man.system.score}}</span></td>
-        <td><span>{{man.system.malus}}</span></td>
-        <td>
-          <a class="item-edit" data-item-id="{{man.id}}"><i class="fas fa-edit"></i></a>
-          <a class="item-delete" data-item-id="{{man.id}}"><i class="fas fa-trash"></i></a>
-        </td>
-        <td class="col-drag"><span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span></td>
-      </tr>
-      <tr class="man-desc-expand" data-item-id="{{man.id}}" style="display:none">
-        <td></td>
-        <td colspan="6" class="man-desc-cell">{{man.system.description}}</td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
-  {{else}}
-  <p class="empty-list">{{localize "AGONE.AucuneManoeuvre"}}</p>
-  {{/if}}
 </div>

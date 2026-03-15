@@ -106,7 +106,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       };
       const niv = (n, mn) => Math.max(0, Math.min(6, (n ?? 1) - 1));
 
-      // Données en mode création : +/− par stat
+      // Données en mode création : +/- par stat
       const creaNiveaux = [
         { stat: "memoire",   nivField: "memoireNiveau",   label: "Mémoire",        niv: sd.memoireNiveau   ?? 1, val: sd.memoireMax,   prefix: "" },
         { stat: "emprise",   nivField: "empriseNiveau",   label: "Emprise",        niv: sd.empriseNiveau   ?? 1, val: sd.bonusEmprise, prefix: "+" },
@@ -250,7 +250,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
     const tbl = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
     // Coût incrémental selon la table d'achat création : utilise le score BRUT (hors bonus racial)
-    // rawScore = score stocké − bonus positif appliqué. Indice dans la table = niveau brut actuel.
+    // rawScore = score stocké - bonus positif appliqué. Indice dans la table = niveau brut actuel.
     // Au-delà de la table, on extrapole en continuant le delta croissant.
     const lastDelta = tbl.length >= 2 ? tbl[tbl.length - 1] - tbl[tbl.length - 2] : 1;
     const creaDelta = (rawScore) => {
@@ -656,7 +656,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     // Montée de niveau danseur
     html.find("[data-action='levelUpDanseur']").click(this._onLevelUpDanseur.bind(this));
 
-    // Création danseur — +/− niveau inline
+    // Création danseur — +/- niveau inline
     html.find("[data-action='danseurNiveauUp']").click(ev => this._onDanseurNiveau(ev, +1));
     html.find("[data-action='danseurNiveauDown']").click(ev => this._onDanseurNiveau(ev, -1));
 
@@ -1032,7 +1032,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       empBase:   { label: "Emprise (base)",          value: sd.emprise ?? 0, tooltip: empSourceLabel },
       connDans:  { label: compDanseurs?.name ?? "Conn. Danseurs", value: `+${scoreConnDanseurs}` },
       esprit:    { label: "Bonus Esprit",            value: `+${bonusEsprit}`,
-                   tooltip: `Esprit ${sd.esprit?.score ?? 0} − Esprit Noir ${sd.esprit?.noir ?? 0}` },
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} - Esprit Noir ${sd.esprit?.noir ?? 0}` },
       aptTotal:  { label: "Total Emprise",           value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
@@ -1269,7 +1269,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       empBase:   { label: "Emprise (base)",          value: sd.emprise ?? 0, tooltip: empSourceLabel },
       connDans:  { label: compDanseurs?.name ?? "Conn. Danseurs", value: `+${scoreConnDanseurs}` },
       esprit:    { label: "Bonus Esprit",            value: `+${bonusEsprit}`,
-                   tooltip: `Esprit ${sd.esprit?.score ?? 0} − Esprit Noir ${sd.esprit?.noir ?? 0}` },
+                   tooltip: `Esprit ${sd.esprit?.score ?? 0} - Esprit Noir ${sd.esprit?.noir ?? 0}` },
       aptTotal:  { label: "Total Emprise",           value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
@@ -2148,7 +2148,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   // ==============================
-  // Danseur — +/− niveau en mode création
+  // Danseur — +/- niveau en mode création
   // ==============================
   async _onDanseurNiveau(event, delta) {
     event.preventDefault();

@@ -35,8 +35,11 @@
           <th class="mb-col-toggle"></th>
           <th class="mb-col-name">Nom</th>
           <th class="mb-col-cat">Catégorie</th>
-          <th class="mb-col-score" title="Modificateur d'Attaque">ATK</th>
-          <th class="mb-col-malus" title="Modificateur de Défense">DEF</th>
+          <th class="mb-col-ini"  title="Modificateur d'Initiative">INI</th>
+          <th class="mb-col-att"  title="Modificateur d'Attaque">ATT</th>
+          <th class="mb-col-def"  title="Modificateur de Défense">DEF</th>
+          <th class="mb-col-dom"  title="Modificateur de Dommages">DOM</th>
+          <th class="mb-col-condition" title="Condition / Restriction">Condition</th>
           <th class="mb-col-action"></th>
         </tr>
       </thead>
@@ -58,12 +61,17 @@
             <span class="mb-badge mb-badge-manoeuvre">Manœuvre</span>
             {{/if}}
           </td>
-          <td class="mb-score">
-            {{#if (gt item.score 0)}}+{{item.score}}{{else if (lt item.score 0)}}{{item.score}}{{else}}0{{/if}}
+          <td class="mb-ini">
+            {{#if (eq item.ini null)}}var{{else if (gt item.ini 0)}}+{{item.ini}}{{else if (lt item.ini 0)}}{{item.ini}}{{else}}0{{/if}}
           </td>
-          <td class="mb-malus">
-            {{#if (gt item.malus 0)}}+{{item.malus}}{{else if (lt item.malus 0)}}{{item.malus}}{{else}}0{{/if}}
+          <td class="mb-att">
+            {{#if (eq item.att null)}}var{{else if (gt item.att 0)}}+{{item.att}}{{else if (lt item.att 0)}}{{item.att}}{{else}}0{{/if}}
           </td>
+          <td class="mb-def">
+            {{#if (eq item.def null)}}var{{else if (gt item.def 0)}}+{{item.def}}{{else if (lt item.def 0)}}{{item.def}}{{else}}0{{/if}}
+          </td>
+          <td class="mb-dom">{{item.dom}}</td>
+          <td class="mb-condition">{{item.condition}}</td>
           <td class="mb-action">
             {{#if item.hasInActor}}
             <i class="fas fa-check mb-check" title="Déjà apprise"></i>
@@ -77,12 +85,12 @@
         {{#if item.description}}
         <tr class="mb-desc-row" data-man-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
           <td></td>
-          <td colspan="5" class="mb-description-cell">{{item.description}}</td>
+          <td colspan="8" class="mb-description-cell">{{item.description}}</td>
         </tr>
         {{/if}}
         {{/each}}
         {{#unless items.length}}
-        <tr><td colspan="6" class="mb-empty">Aucun résultat trouvé.</td></tr>
+        <tr><td colspan="9" class="mb-empty">Aucun résultat trouvé.</td></tr>
         {{/unless}}
       </tbody>
     </table>

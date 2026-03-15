@@ -192,8 +192,12 @@ export class ManoeuvreData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       categorie:   new fields.StringField({ initial: "manoeuvre", choices: ["manoeuvre","botte"] }),
-      score:       new fields.NumberField({ initial: 0, integer: true }),
-      malus:       new fields.NumberField({ initial: 0, integer: true }),
+      // Modificateurs structurés (null = valeur variable, e.g. +X ou +MR)
+      ini:         new fields.NumberField({ initial: 0, integer: true, nullable: true }),
+      att:         new fields.NumberField({ initial: 0, integer: true, nullable: true }),
+      def:         new fields.NumberField({ initial: 0, integer: true, nullable: true }),
+      dom:         new fields.StringField({ initial: "0" }),
+      condition:   new fields.StringField({ initial: "" }),
       description: new fields.HTMLField({ initial: "" })
     };
   }

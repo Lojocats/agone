@@ -802,9 +802,12 @@
   opacity: 0.6;
 }
 
-/* ── Manœuvres : badge & toggle description (fiche acteur) ── */
-.agone .man-col-toggle { width: 22px; text-align: center; }
-.agone .man-col-badge  { width: 76px; text-align: center; }
+/* ── Manœuvres : table (fiche acteur) ── */
+.agone .man-col-toggle  { width: 22px; text-align: center; }
+.agone .man-col-name    { /* flexible */ }
+.agone .man-col-num     { width: 38px; text-align: center; font-size: 0.8em; font-weight: 600; white-space: nowrap; }
+.agone .man-col-dom     { width: 68px; text-align: center; font-size: 0.78em; white-space: nowrap; }
+.agone .man-col-actions { width: 46px; text-align: right; white-space: nowrap; }
 
 .agone .man-desc-toggle {
   background: none;
@@ -818,15 +821,33 @@
 }
 .agone .man-desc-toggle:hover { color: var(--agone-gold); }
 
+/* Ligne nom + badge */
+.agone .man-name-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Condition en sous-titre */
+.agone .man-condition {
+  font-size: 0.72em;
+  font-style: italic;
+  color: rgba(60,35,15,0.5);
+  margin-top: 1px;
+  line-height: 1.2;
+}
+
+/* Badge catégorie (Man. / Botte) */
 .agone .man-badge {
   display: inline-block;
   border-radius: 10px;
-  font-size: 9px;
-  padding: 1px 6px;
+  font-size: 8px;
+  padding: 1px 5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .agone .man-badge-manoeuvre {
   background: rgba(80,110,200,0.14);
@@ -839,9 +860,24 @@
   border: 1px solid rgba(200,120,40,0.4);
 }
 
+/* Valeur numérique colorée */
+.agone .man-val         { display: inline-block; min-width: 24px; text-align: center; border-radius: 3px; padding: 0 2px; }
+.agone .man-val-pos     { color: #1a7a1a; background: rgba(30,140,30,0.08); }
+.agone .man-val-neg     { color: #a01818; background: rgba(180,30,30,0.08); }
+.agone .man-val-zero    { color: rgba(60,35,15,0.4); }
+.agone .man-val-var     { color: rgba(60,35,15,0.4); font-style: italic; font-size: 0.9em; }
+
+/* Valeur DOM */
+.agone .man-dom {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78em;
+  color: rgba(60,35,15,0.75);
+}
+
+/* Ligne expand description */
 .agone tr.man-desc-expand td.man-desc-cell {
   font-size: 11px;
-  padding: 4px 12px 6px 36px;
+  padding: 4px 12px 6px 32px;
   color: rgba(60,35,15,0.82);
   font-style: italic;
   background: rgba(0,0,0,0.06);
@@ -938,7 +974,7 @@
   box-shadow: 0 0 0 2px rgba(201,162,39,0.15);
 }
 
-/* Séparateur opérateur (+, −, =) */
+/* Séparateur opérateur (+, -, =) */
 .agone .charges-stat-sep {
   font-size: 14px;
   font-weight: bold;
@@ -1036,7 +1072,7 @@
 /* Badge sur défaut : version plus atténuée */
 .agone .av-defaut-sect { opacity: 0.75; }
 
-/* Valeur du coût (+N ou −N) */
+/* Valeur du coût (+N ou -N) */
 .agone .av-cout-pos {
   font-size: 11px;
   font-weight: 700;

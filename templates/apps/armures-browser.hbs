@@ -44,7 +44,7 @@
           <th class="arb-col-genre">Catégorie</th>
           <th class="arb-col-type">Couverture</th>
           <th class="arb-col-prot" title="Protection">PRO</th>
-          <th class="arb-col-malus" title="Malus d'Agilité">−AGI</th>
+          <th class="arb-col-malus" title="Malus d'Agilité">-AGI</th>
           <th class="arb-col-action"></th>
         </tr>
       </thead>
@@ -55,7 +55,7 @@
           <td class="arb-genre">{{#if (eq item.genre "bouclier")}}<i class="fas fa-shield-alt"></i> Bouclier{{else}}<i class="fas fa-user-shield"></i> Armure{{/if}}</td>
           <td class="arb-type">{{item.typeLabel}}</td>
           <td class="arb-prot"><strong>{{item.protection}}</strong></td>
-          <td class="arb-malus">{{#if item.malusAgi}}−{{item.malusAgi}}{{else}}0{{/if}}</td>
+          <td class="arb-malus">{{#if item.malusAgi}}-{{item.malusAgi}}{{else}}0{{/if}}</td>
           <td class="arb-action">
             {{#if item.hasInActor}}
             <i class="fas fa-check arb-check" title="Déjà possédé"></i>

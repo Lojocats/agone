@@ -51,7 +51,7 @@ export class AgoneItem extends Item {
     if (this.type === "arme") {
       details = `<em>${sd.type ?? ""} · ${sd.style ?? ""}</em><br>Dom : ${sd.dommages ?? "-"} | ATT : ${sd.attackTotal ?? sd.attackBonus ?? 0} | DEF : ${sd.defenseTotal ?? sd.defenseBonus ?? 0}`;
     } else if (this.type === "armure") {
-      details = `PRO : ${sd.protection ?? 0} | −AGI : ${sd.malusAgi ?? 0}`;
+      details = `PRO : ${sd.protection ?? 0} | -AGI : ${sd.malusAgi ?? 0}`;
     } else if (this.type === "sort") {
       details = `Seuil : ${sd.seuil ?? 0} | Portée : ${sd.portee ?? "-"} | Durée : ${sd.duree ?? "-"}`;
     } else if (this.type === "pouvoir") {

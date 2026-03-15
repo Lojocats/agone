@@ -25,7 +25,7 @@
           <span class="charges-stat-label">Disponibles</span>
           <span class="charges-stat-val charges-disponibles">{{system.chargesDisponibles}}</span>
         </div>
-        <div class="charges-stat-sep">−</div>
+        <div class="charges-stat-sep">-</div>
         <div class="charges-stat">
           <span class="charges-stat-label">Dépensés</span>
           <span class="charges-stat-val charges-moins">{{system.chargesDepensees}}</span>
@@ -40,7 +40,7 @@
       <p class="charges-note"><i class="fas fa-exclamation-triangle"></i> Jeune : coûts des avantages ×2</p>
       {{/if}}
       {{#if system.chargesVieillard}}
-      <p class="charges-note">Vieillard : coûts des avantages −2 (min 1)</p>
+      <p class="charges-note">Vieillard : coûts des avantages -2 (min 1)</p>
       {{/if}}
     </div>
   </div>
@@ -118,7 +118,7 @@
           <span class="av-section-badge av-sect-{{don._avSection}} av-defaut-sect">{{don._avSectionLabel}}</span>
           {{/if}}
           <span class="don-name">{{don.name}}</span>
-          <span class="don-cout av-cout-neg">−{{don.system.cout}}</span>
+          <span class="don-cout av-cout-neg">-{{don.system.cout}}</span>
           <a class="btn-icon item-edit" data-item-id="{{don.id}}" title="Modifier"><i class="fas fa-edit"></i></a>
           <a class="btn-icon item-delete" data-item-id="{{don.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
         </li>

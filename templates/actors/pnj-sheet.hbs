@@ -135,15 +135,15 @@
                 <span class="bg-title">{{localize "AGONE.BlessuresGraves"}}</span>
                 <label class="bg-cell {{#if system.blessureGrave1}}bg-active{{/if}}">
                   <input type="checkbox" name="system.blessureGrave1" {{#if system.blessureGrave1}}checked{{/if}} />
-                  <span class="bg-dot">1</span><span class="bg-pen">−2</span>
+                  <span class="bg-dot">1</span><span class="bg-pen">-2</span>
                 </label>
                 <label class="bg-cell {{#if system.blessureGrave2}}bg-active{{/if}}">
                   <input type="checkbox" name="system.blessureGrave2" {{#if system.blessureGrave2}}checked{{/if}} />
-                  <span class="bg-dot">2</span><span class="bg-pen">−6</span>
+                  <span class="bg-dot">2</span><span class="bg-pen">-6</span>
                 </label>
                 <label class="bg-cell {{#if system.blessureGrave3}}bg-active{{/if}}">
                   <input type="checkbox" name="system.blessureGrave3" {{#if system.blessureGrave3}}checked{{/if}} />
-                  <span class="bg-dot">3</span><span class="bg-pen">−12</span>
+                  <span class="bg-dot">3</span><span class="bg-pen">-12</span>
                 </label>
                 {{#if system.malusBlessureGrave}}<span class="bg-total">{{system.malusBlessureGrave}}</span>{{/if}}
               </div>
@@ -176,7 +176,7 @@
           <div class="armure-row item-row" data-item-id="{{armure.id}}">
             <span class="armure-name flex1">{{armure.name}}</span>
             <span class="badge pro-badge">PRO {{armure.system.protection}}</span>
-            {{#if armure.system.malusAgi}}<span class="badge malus-badge">−AGI {{armure.system.malusAgi}}</span>{{/if}}
+            {{#if armure.system.malusAgi}}<span class="badge malus-badge">-AGI {{armure.system.malusAgi}}</span>{{/if}}
             {{#if ../../isOwner}}
             <a class="item-edit" style="margin-left:auto;"><i class="fas fa-edit"></i></a>
             <a class="item-delete"><i class="fas fa-trash"></i></a>

@@ -6,19 +6,31 @@
     </div>
   </header>
   <section class="sheet-body">
-    <div class="item-form-grid">
+    <div class="item-form-grid manoeuvre-stats-grid">
       <div class="form-group">
-        <label>{{localize "AGONE.Score"}}</label>
-        <input type="number" name="system.score" value="{{system.score}}" class="stat-num" />
+        <label>{{localize "AGONE.ManIni"}}</label>
+        <input type="number" name="system.ini" value="{{system.ini}}" class="stat-num" placeholder="var" />
       </div>
       <div class="form-group">
-        <label>{{localize "AGONE.Malus"}}</label>
-        <input type="number" name="system.malus" value="{{system.malus}}" class="stat-num" />
+        <label>{{localize "AGONE.ManAtt"}}</label>
+        <input type="number" name="system.att" value="{{system.att}}" class="stat-num" placeholder="var" />
       </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.ManDef"}}</label>
+        <input type="number" name="system.def" value="{{system.def}}" class="stat-num" placeholder="var" />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.ManDom"}}</label>
+        <input type="text" name="system.dom" value="{{system.dom}}" class="stat-text" placeholder="0" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>{{localize "AGONE.ManCondition"}}</label>
+      <input type="text" name="system.condition" value="{{system.condition}}" placeholder="ex. Farfadet uniquement, Réaction…" />
     </div>
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>
-      <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
+      <textarea name="system.description" class="description-textarea" rows="5">{{system.description}}</textarea>
     </div>
   </section>
 </form>
