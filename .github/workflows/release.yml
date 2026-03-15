@@ -1,0 +1,42 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get tag name
+        id: tag
+        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create archive
+        run: |
+          # Créer un ZIP du système (exclure les fichiers non pertinents)
+          zip -r agone-${{ steps.tag.outputs.version }}.zip \
+            css/ \
+            lang/ \
+            module/ \
+            packs/ \
+            templates/ \
+            system.json \
+            -x "*.git*" "*.gitignore" "_*.py"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: agone-${{ steps.tag.outputs.version }}.zip
+          body: |
+            Système Agone ${{ steps.tag.outputs.version }}
+            
+            Pour installer : téléchargez `agone-${{ steps.tag.outputs.version }}.zip` et extrayez-le dans votre dossier FoundryVTT/Data/systems/agone
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
