@@ -20,7 +20,7 @@
       </select>
       <select class="mb-possede-filter">
         <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
-        <option value="oui" {{#if (eq filterPossede "oui"}}selected{{/if}}>{{localize "AGONE.Browser.DejaApprises"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaApprises"}}</option>
         <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonApprises"}}</option>
       </select>
       <span class="mb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>

@@ -171,7 +171,6 @@
     "ManDom":           "Dommages",
     "ManCondition":     "Condition / Prérequis",
 
-    "Combat":          "Combat",
     "EtatSante":       "État de santé",
     "StatsCombat":     "Stats de combat",
     "PointsDeVie":     "Points de Vie",
@@ -268,7 +267,6 @@
     "Automne":            "Automne",
     "Hiver":              "Hiver",
     "Seuil":              "Seuil",
-    "Portee":             "Portée",
     "Duree":              "Durée",
     "Temps":              "Temps",
     "Danse":              "Temps d'incantation",
@@ -320,7 +318,6 @@
     "PouvoirFlamme":      "Pouvoir de Flamme",
     "Saisonin":           "Saisonin",
 
-    "Avantages":       "Avantages",
     "AvantagesDefauts":"Avantages & Défauts",
     "Avantage":        "Avantage",
     "Defauts":         "Défauts",
@@ -694,6 +691,7 @@
     "TenebresEndLabel":         "End.",
 
     "Combat": {
+      "Combat":          "Combat",
       "PdvMaxTooltip":   "BPdV {bpdv} + RESx3 + bonus 1d10",
       "SeuilBGTooltip":  "Seuil Blessure Grave (PdV ÷ 3)",
       "SeuilBCTooltip":  "Seuil Blessure Critique (PdV ÷ 2)",
@@ -714,6 +712,7 @@
     },
 
     "Avantages": {
+      "Avantages":       "Avantages",
       "ChargesSection":  "Charges",
       "ChargesSubtitle": "Base 10 pts (+5 Charge sociale optionnelle)",
       "Budget":          "Budget",
