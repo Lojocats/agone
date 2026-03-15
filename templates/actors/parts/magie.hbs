@@ -219,9 +219,11 @@
               <button type="button" class="roll-btn sort-card-name item-name" data-action="rollSort"
                       data-item-id="{{sort.id}}">{{sort.name}}</button>
             </div>
-            {{#if sort.system.typeMagie}}
-            <span class="sort-type-badge">{{sort.system.typeMagie}}{{#if sort.system.instrument}} / {{sort.system.instrument}}{{/if}}</span>
-            {{/if}}
+            <div class="sort-card-stats">
+              {{#if sort.system.typeMagie}}<span class="sort-type-badge">{{sort.system.typeMagie}}</span>{{/if}}
+              {{#if sort.system.instrument}}<span class="sort-type-badge">{{sort.system.instrument}}</span>{{/if}}
+              {{#if sort.system.seuil}}<span class="sort-type-badge">seuil {{sort.system.seuil}}</span>{{/if}}
+            </div>
             <div class="sort-card-stats">
               {{#if sort.system.portee}}<span class="sort-stat"><em>Portée</em> {{sort.system.portee}}</span>{{/if}}
               {{#if sort.system.duree}}<span class="sort-stat"><em>Durée</em> {{sort.system.duree}}</span>{{/if}}
