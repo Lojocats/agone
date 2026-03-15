@@ -21,11 +21,12 @@ export class AvantagesBrowser extends Application {
   constructor(actor, options = {}) {
     super(options);
     this.actor          = actor;
-    this._search        = "";
-    this._filterSection = "all";   // "all" | "charge" | "ame" | "corps" | ...
-    this._filterType    = "all";   // "all" | "avantage" | "defaut"
-    this._filterPossede = "all";   // "all" | "oui" | "non"
-    this._expanded      = new Set();
+    this._search          = "";
+    this._filterSection   = "all";   // "all" | "charge" | "ame" | "corps" | ...
+    this._filterType      = "all";   // "all" | "avantage" | "defaut"
+    this._filterPossede   = "all";   // "all" | "oui" | "non"
+    this._filterChargeExact = null;  // null = tous, sinon Number exact
+    this._expanded        = new Set();
   }
 
   /** @override */
@@ -84,6 +85,9 @@ export class AvantagesBrowser extends Application {
     } else if (this._filterPossede === "non") {
       items = items.filter(e => !e.hasInActor);
     }
+    if (this._filterChargeExact !== null) {
+      items = items.filter(e => e.charge === this._filterChargeExact);
+    }
 
     items.sort((a, b) => {
       // Avantages avant défauts, puis par section, puis par nom
@@ -92,13 +96,18 @@ export class AvantagesBrowser extends Application {
       return a.name.localeCompare(b.name, "fr");
     });
 
+    const allCharges = [...new Set(AVANTAGES_DATA.map(d => d.charge).filter(v => v != null))]
+      .sort((a, b) => a - b);
+
     return {
       items,
-      search        : this._search,
-      filterSection : this._filterSection,
-      filterType    : this._filterType,
-      filterPossede : this._filterPossede,
-      sections      : Object.entries(CAT_LABELS).map(([k, v]) => ({ key: k, label: v })),
+      search            : this._search,
+      filterSection     : this._filterSection,
+      filterType        : this._filterType,
+      filterPossede     : this._filterPossede,
+      filterChargeExact : this._filterChargeExact,
+      allCharges,
+      sections          : Object.entries(CAT_LABELS).map(([k, v]) => ({ key: k, label: v })),
     };
   }
 
@@ -122,16 +131,23 @@ export class AvantagesBrowser extends Application {
       this.render();
     });
 
+    html.find(".avb-charge-filter").on("change", e => {
+      const v = parseInt(e.currentTarget.value);
+      this._filterChargeExact = isNaN(v) ? null : v;
+      this.render();
+    });
+
     html.find(".avb-possede-filter").on("change", e => {
       this._filterPossede = e.currentTarget.value;
       this.render();
     });
 
     html.find(".avb-clear").on("click", () => {
-      this._search        = "";
-      this._filterSection = "all";
-      this._filterType    = "all";
-      this._filterPossede = "all";
+      this._search           = "";
+      this._filterSection    = "all";
+      this._filterType       = "all";
+      this._filterPossede    = "all";
+      this._filterChargeExact = null;
       this._expanded.clear();
       this.render();
     });

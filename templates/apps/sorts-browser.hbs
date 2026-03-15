@@ -24,8 +24,12 @@
     </div>
     <!-- Filtres secondaires -->
     <div class="sb-filter-row2">
-      <label>Seuil ≤</label>
-      <input type="number" class="sb-seuil-max" value="{{filterSeuilMax}}" placeholder="—" min="1" max="99">
+      <select class="sb-seuil-exact" title="Filtrer par seuil exact">
+        <option value="">Tous seuils</option>
+        {{#each allSeuils}}
+        <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>Seuil = {{this}}</option>
+        {{/each}}
+      </select>
       <select class="sb-possede-filter">
         <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous sorts</option>
         <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>

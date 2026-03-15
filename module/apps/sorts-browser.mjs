@@ -9,9 +9,10 @@ export class SortsBrowser extends Application {
   constructor(actor, options = {}) {
     super(options);
     this.actor          = actor;
-    this._search        = "";
-    this._filterTypes   = new Set();   // multi-select : ensemble de typeMagie
-    this._filterSeuilMax = null;       // null = pas de filtre, sinon Number
+    this._search         = "";
+    this._filterTypes    = new Set();   // multi-select : ensemble de typeMagie
+    this._filterSeuilMax   = null;     // null = pas de filtre, sinon Number (≤)
+    this._filterSeuilExact = null;     // null = pas de filtre, sinon Number (=)
     this._filterPossede  = "all";      // "all" | "oui" | "non"
     this._expanded = new Set(); // set of string idx
   }
@@ -74,7 +75,9 @@ export class SortsBrowser extends Application {
     if (this._filterTypes.size > 0) {
       sorts = sorts.filter(e => this._filterTypes.has(e.typeMagie));
     }
-    if (this._filterSeuilMax !== null) {
+    if (this._filterSeuilExact !== null) {
+      sorts = sorts.filter(e => e.seuil === this._filterSeuilExact);
+    } else if (this._filterSeuilMax !== null) {
       sorts = sorts.filter(e => e.seuil <= this._filterSeuilMax);
     }
     if (this._filterPossede === "oui") {
@@ -89,12 +92,17 @@ export class SortsBrowser extends Application {
       .sort()
       .map(t => ({ value: t, label: TYPE_LABELS[t] ?? t, active: this._filterTypes.has(t) }));
 
+    const allSeuils = [...new Set(SORTS_DATA.map(d => d.seuil).filter(v => v != null))]
+      .sort((a, b) => a - b);
+
     return {
       sorts,
       allTypes,
-      search         : this._search,
-      filterSeuilMax : this._filterSeuilMax ?? "",
-      filterPossede  : this._filterPossede,
+      allSeuils,
+      search          : this._search,
+      filterSeuilMax  : this._filterSeuilMax ?? "",
+      filterSeuilExact: this._filterSeuilExact,
+      filterPossede   : this._filterPossede,
       allTypesSelected: this._filterTypes.size === 0,
     };
   }
@@ -124,10 +132,21 @@ export class SortsBrowser extends Application {
       this.render();
     });
 
+    // Filtre seuil exact
+    html.find(".sb-seuil-exact").on("change", e => {
+      const v = parseInt(e.currentTarget.value);
+      this._filterSeuilExact = isNaN(v) ? null : v;
+      // Désactiver le filtre max si un exact est sélectionné
+      if (this._filterSeuilExact !== null) this._filterSeuilMax = null;
+      this.render();
+    });
+
     // Filtre seuil max
     html.find(".sb-seuil-max").on("input", foundry.utils.debounce(e => {
       const v = parseInt(e.currentTarget.value);
       this._filterSeuilMax = isNaN(v) ? null : v;
+      // Désactiver le filtre exact si le max est utilisé
+      if (this._filterSeuilMax !== null) this._filterSeuilExact = null;
       this._refocusSelector = ".sb-seuil-max";
       this.render();
     }, 300));
@@ -140,10 +159,11 @@ export class SortsBrowser extends Application {
 
     // Effacer les filtres
     html.find(".sb-clear").on("click", () => {
-      this._search        = "";
+      this._search          = "";
       this._filterTypes.clear();
-      this._filterSeuilMax = null;
-      this._filterPossede  = "all";
+      this._filterSeuilMax   = null;
+      this._filterSeuilExact = null;
+      this._filterPossede    = "all";
       this.render();
     });
 
