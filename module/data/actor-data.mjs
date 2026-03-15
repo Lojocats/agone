@@ -286,12 +286,12 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     this.flamme      = Math.min(this.corps.score, this.esprit.score, this.ame.score);
     this.flammeNoire = Math.min(corpsNoirTotal, espritNoirTotal, ameNoirTotal);
 
-    // PH max = Flamme × 2 (si non défini manuellement)
+    // PH max = Flamme x 2 (si non défini manuellement)
     if (this.ph.max === 0) this.ph.max = this.flamme * 2;
 
     // Stats dérivées de TAI
     this.mv  = this.mvOverride ?? taiTables.lookupTai(taiTables.taiToMv, this.tai);
-    // PdV max = BPdV(race) + RES × 3 + bonusDe (résultat du 1d10 de création)
+    // PdV max = BPdV(race) + RES x 3 + bonusDe (résultat du 1d10 de création)
     const bpdv = pData?.bpdv ?? taiTables.lookupTai(taiTables.taiToBpdv, this.tai);
     this.pdv.max = bpdv + (this.resistance.score * 3) + this.pdv.bonusDe;
     // Alias FVTT : la barre token cherche .value et .min, le schéma utilise .valeur
@@ -321,9 +321,9 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     this.defenseNaturelle = this.agilite.score + this.bonusCorps;
 
     // Aptitudes magiques
-    // Arts Magiques (Jorniste / Obscurantiste / Éclipsiste) : CRÉ × 2
+    // Arts Magiques (Jorniste / Obscurantiste / Éclipsiste) : CRÉ x 2
     this.aptitudeArtsMagiques = this.creativite.score * 2;
-    // Harmoniste (Accord / Cyse / Décorum / Geste) : ART × 2 = (CHA + CRÉ)
+    // Harmoniste (Accord / Cyse / Décorum / Geste) : ART x 2 = (CHA + CRÉ)
     this.aptitudeConjuration  = this.art * 2;
 
     // Seuils PdV

@@ -5,41 +5,41 @@
     <div class="avb-filter-row">
       <div class="avb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="avb-search" placeholder="Rechercher…" value="{{search}}">
+        <input type="text" class="avb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
       </div>
-      <button type="button" class="avb-clear" title="Effacer les filtres">
+      <button type="button" class="avb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
         <i class="fas fa-eraser"></i>
       </button>
     </div>
 
     <div class="avb-filter-row2">
       <select class="avb-section-filter">
-        <option value="all" {{#if (eq filterSection "all")}}selected{{/if}}>Toutes catégories</option>
+        <option value="all" {{#if (eq filterSection "all")}}selected{{/if}}>{{localize "AGONE.Browser.ToutesCategories"}}</option>
         {{#each sections as |s|}}
         <option value="{{s.key}}" {{#if (eq ../filterSection s.key)}}selected{{/if}}>{{s.label}}</option>
         {{/each}}
       </select>
 
       <select class="avb-type-filter">
-        <option value="all"      {{#if (eq filterType "all")}}selected{{/if}}>Avantages &amp; Défauts</option>
-        <option value="avantage" {{#if (eq filterType "avantage")}}selected{{/if}}>Avantages uniquement</option>
-        <option value="defaut"   {{#if (eq filterType "defaut")}}selected{{/if}}>Défauts uniquement</option>
+        <option value="all"      {{#if (eq filterType "all")}}selected{{/if}}>{{localize "AGONE.Browser.AvantagesDefauts"}}</option>
+        <option value="avantage" {{#if (eq filterType "avantage")}}selected{{/if}}>{{localize "AGONE.Browser.AvantagesUniquement"}}</option>
+        <option value="defaut"   {{#if (eq filterType "defaut")}}selected{{/if}}>{{localize "AGONE.Browser.DefautsUniquement"}}</option>
       </select>
 
       <select class="avb-charge-filter" title="Filtrer par charge exacte">
-        <option value="">Toutes charges</option>
+        <option value="">{{localize "AGONE.Browser.ToutesCharges"}}</option>
         {{#each allCharges}}
         <option value="{{this}}" {{#if (eq ../filterChargeExact this)}}selected{{/if}}>{{#if (gt this 0)}}+{{/if}}{{this}}</option>
         {{/each}}
       </select>
 
       <select class="avb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui"}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
       </select>
 
-      <span class="avb-count">{{items.length}} résultat(s)</span>
+      <span class="avb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
     </div>
   </div>
 
@@ -49,10 +49,10 @@
       <thead>
         <tr>
           <th class="avb-col-toggle"></th>
-          <th class="avb-col-name">Nom</th>
-          <th class="avb-col-section">Catégorie</th>
-          <th class="avb-col-type">Type</th>
-          <th class="avb-col-charge">Charge</th>
+          <th class="avb-col-name">{{localize "AGONE.Nom"}}</th>
+          <th class="avb-col-section">{{localize "AGONE.Categorie"}}</th>
+          <th class="avb-col-type">{{localize "AGONE.Type"}}</th>
+          <th class="avb-col-charge">{{localize "AGONE.Charge"}}</th>
           <th class="avb-col-action"></th>
         </tr>
       </thead>
@@ -61,7 +61,7 @@
         <tr class="avb-row avb-row-{{item.type}} {{#if item.hasInActor}}avb-has-item{{/if}}" data-av-idx="{{item.idx}}">
           <td>
             {{#if item.description}}
-            <button type="button" class="avb-desc-toggle btn-icon" data-action="toggleAvDesc" title="Voir la description">
+            <button type="button" class="avb-desc-toggle btn-icon" data-action="toggleAvDesc" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
             </button>
             {{/if}}
@@ -72,9 +72,9 @@
           </td>
           <td class="avb-type">
             {{#if (eq item.type "avantage")}}
-            <span class="avb-badge avb-badge-avantage">Avantage</span>
+            <span class="avb-badge avb-badge-avantage">{{localize "AGONE.Avantage"}}</span>
             {{else}}
-            <span class="avb-badge avb-badge-defaut">Défaut</span>
+            <span class="avb-badge avb-badge-defaut">{{localize "AGONE.Defaut"}}</span>
             {{/if}}
           </td>
           <td class="avb-charge">
@@ -86,9 +86,9 @@
           </td>
           <td class="avb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check avb-check" title="Déjà possédé"></i>
+            <i class="fas fa-check avb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="avb-add-btn btn-icon" data-action="addAvantage" title="Ajouter au personnage">
+            <button type="button" class="avb-add-btn btn-icon" data-action="addAvantage" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}
@@ -99,7 +99,7 @@
           <td></td>
           <td colspan="5" class="avb-description-cell">
             {{#if item.prerequis}}
-            <em class="avb-prerequis">Prérequis : {{item.prerequis}}</em>
+            <em class="avb-prerequis">{{localize "AGONE.Prerequis"}} : {{item.prerequis}}</em>
             {{/if}}
             {{item.description}}
           </td>
@@ -107,7 +107,7 @@
         {{/if}}
         {{/each}}
         {{#unless items.length}}
-        <tr><td colspan="6" class="avb-empty">Aucun résultat trouvé.</td></tr>
+        <tr><td colspan="6" class="avb-empty">{{localize "AGONE.Browser.AucunResultatTrouve"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

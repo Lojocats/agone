@@ -2,22 +2,22 @@
   <header class="sheet-header">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
     <div class="header-fields">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de la manœuvre" /></h1>
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder='{{localize "AGONE.NomManoeuvre"}}' /></h1>
     </div>
   </header>
   <section class="sheet-body">
     <div class="item-form-grid manoeuvre-stats-grid">
       <div class="form-group">
         <label>{{localize "AGONE.ManIni"}}</label>
-        <input type="number" name="system.ini" value="{{system.ini}}" class="stat-num" placeholder="var" />
+        <input type="number" name="system.ini" value="{{system.ini}}" class="stat-num" placeholder='{{localize "AGONE.Browser.Var"}}' />
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.ManAtt"}}</label>
-        <input type="number" name="system.att" value="{{system.att}}" class="stat-num" placeholder="var" />
+        <input type="number" name="system.att" value="{{system.att}}" class="stat-num" placeholder='{{localize "AGONE.Browser.Var"}}' />
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.ManDef"}}</label>
-        <input type="number" name="system.def" value="{{system.def}}" class="stat-num" placeholder="var" />
+        <input type="number" name="system.def" value="{{system.def}}" class="stat-num" placeholder='{{localize "AGONE.Browser.Var"}}' />
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.ManDom"}}</label>

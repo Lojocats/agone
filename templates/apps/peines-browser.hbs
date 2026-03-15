@@ -5,8 +5,8 @@
     <div class="pnb-filter-row">
       <div class="pnb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="pnb-search" placeholder="Rechercher…" value="{{search}}">
-        <button type="button" class="pnb-clear" title="Effacer les filtres">
+        <input type="text" class="pnb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
+        <button type="button" class="pnb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
           <i class="fas fa-eraser"></i>
         </button>
       </div>
@@ -14,19 +14,19 @@
 
     <div class="pnb-filter-row2">
       <select class="pnb-cat-filter">
-        <option value="all" {{#if (eq filterCategorie "all")}}selected{{/if}}>Toutes catégories</option>
+        <option value="all" {{#if (eq filterCategorie "all")}}selected{{/if}}>{{localize "AGONE.Browser.ToutesCategories"}}</option>
         {{#each categories as |c|}}
         <option value="{{c.key}}" {{#if (eq ../filterCategorie c.key)}}selected{{/if}}>{{c.label}}</option>
         {{/each}}
       </select>
 
       <select class="pnb-noir-filter">
-        <option value="all"   {{#if (eq filterNoir "all")}}selected{{/if}}>Corps &amp; Âme</option>
-        <option value="corps" {{#if (eq filterNoir "corps")}}selected{{/if}}>Corps noir</option>
-        <option value="ame"   {{#if (eq filterNoir "ame")}}selected{{/if}}>Âme noire</option>
+        <option value="all"   {{#if (eq filterNoir "all")}}selected{{/if}}>{{localize "AGONE.Browser.CorpsAme"}}</option>
+        <option value="corps" {{#if (eq filterNoir "corps")}}selected{{/if}}>{{localize "AGONE.Browser.CorpsNoir"}}</option>
+        <option value="ame"   {{#if (eq filterNoir "ame")}}selected{{/if}}>{{localize "AGONE.Browser.AmeNoire"}}</option>
       </select>
 
-      <span class="pnb-count">{{items.length}} résultat(s)</span>
+      <span class="pnb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
     </div>
   </div>
 
@@ -36,10 +36,10 @@
       <thead>
         <tr>
           <th class="pnb-col-toggle"></th>
-          <th class="pnb-col-name">Nom</th>
-          <th class="pnb-col-cat">Catégorie</th>
-          <th class="pnb-col-noir">Noir</th>
-          <th class="pnb-col-bienfait">Bienfait</th>
+          <th class="pnb-col-name">{{localize "AGONE.Nom"}}</th>
+          <th class="pnb-col-cat">{{localize "AGONE.Categorie"}}</th>
+          <th class="pnb-col-noir">{{localize "AGONE.Noir"}}</th>
+          <th class="pnb-col-bienfait">{{localize "AGONE.BienfaitLabel"}}</th>
           <th class="pnb-col-action"></th>
         </tr>
       </thead>
@@ -48,7 +48,7 @@
         <tr class="pnb-row {{#if item.hasInActor}}pnb-has-item{{/if}}" data-pn-idx="{{item.idx}}">
           <td>
             {{#if item.description}}
-            <button type="button" class="pnb-desc-toggle btn-icon" data-action="togglePeineDesc" title="Voir la description">
+            <button type="button" class="pnb-desc-toggle btn-icon" data-action="togglePeineDesc" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
             </button>
             {{/if}}
@@ -59,9 +59,9 @@
           </td>
           <td class="pnb-noir-cell">
             {{#if (eq item.noirEffect "corps")}}
-            <span class="pnb-noir-badge pnb-noir-corps">Corps</span>
-            {{else if (eq item.noirEffect "ame")}}
-            <span class="pnb-noir-badge pnb-noir-ame">Âme</span>
+            <span class="pnb-noir-badge pnb-noir-corps">{{localize "AGONE.Corps"}}</span>
+            {{else if (eq item.noirEffect "ame"}}
+            <span class="pnb-noir-badge pnb-noir-ame">{{localize "AGONE.Ame"}}</span>
             {{else}}
             <span class="pnb-noir-none">—</span>
             {{/if}}
@@ -70,14 +70,14 @@
             {{#if item.bienfait}}
             <span class="pnb-bienfait-name">{{item.bienfait}}</span>
             {{else}}
-            <span class="pnb-bienfait-none">Aucun</span>
+            <span class="pnb-bienfait-none">{{localize "AGONE.Aucun"}}</span>
             {{/if}}
           </td>
           <td class="pnb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check pnb-check" title="Déjà possédée"></i>
+            <i class="fas fa-check pnb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="pnb-add-btn btn-icon" data-action="addPeine" title="Ajouter au personnage">
+            <button type="button" class="pnb-add-btn btn-icon" data-action="addPeine" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}
@@ -92,7 +92,7 @@
         {{/each}}
         {{#unless items.length}}
         <tr>
-          <td colspan="6" class="pnb-empty">Aucune peine ne correspond aux filtres.</td>
+          <td colspan="6" class="pnb-empty">{{localize "AGONE.Browser.AucunePeineTrouvee"}}</td>
         </tr>
         {{/unless}}
       </tbody>

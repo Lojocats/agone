@@ -1,12 +1,12 @@
 /**
- * CalendrierAgone — Calendrier d'Harmonde (10 mois × 30 jours)
+ * CalendrierAgone — Calendrier d'Harmonde (10 mois x 30 jours)
  * Visible par tous les joueurs. Navigation réservée au MJ.
  */
 export class CalendrierAgone extends Application {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       id:        "agone-calendrier",
-      title:     "Calendrier d'Harmonde",
+      title:     game.i18n.localize("AGONE.CalendrierHarmonde"),
       template:  "systems/agone/templates/apps/calendrier.hbs",
       width:     400,
       height:    "auto",
@@ -66,7 +66,7 @@ export class CalendrierAgone extends Application {
       if (val) notes[noteKey] = val;
       else delete notes[noteKey];
       await game.settings.set("agone", "calendrierNotes", notes);
-      ui.notifications.info("Note sauvegardée.");
+      ui.notifications.info(game.i18n.localize("AGONE.Calendrier.NoteSauvegardee"));
     });
   }
 

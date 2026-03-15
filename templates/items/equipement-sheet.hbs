@@ -2,7 +2,7 @@
   <header class="sheet-header">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
     <div class="header-fields">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de l'équipement" /></h1>
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder='{{localize "AGONE.NomEquipement"}}' /></h1>
     </div>
   </header>
   <section class="sheet-body">
@@ -16,7 +16,7 @@
         <input type="number" name="system.poidsUnit" value="{{system.poidsUnit}}" class="stat-num" step="0.1" />
       </div>
       <div class="form-group">
-        <label>{{localize "AGONE.PoidsTotal"}} <em>(calculé)</em></label>
+        <label>{{localize "AGONE.PoidsTotal"}} <em>{{localize "AGONE.Calcule"}}</em></label>
         <span class="derived-val">{{system.poidsTotal}}</span>
       </div>
     </div>

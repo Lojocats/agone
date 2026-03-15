@@ -289,7 +289,7 @@
   padding: 4px 0;
 }
 
-/* Grille 30 jours (6 colonnes × 5 rangées) */
+/* Grille 30 jours (6 colonnes x 5 rangées) */
 .agone-calendrier-wrap .cal-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

@@ -4,8 +4,8 @@
   <div class="cb-filters">
     <div class="cb-search-wrap">
       <i class="fas fa-search cb-search-icon"></i>
-      <input type="text" class="cb-search" placeholder="Rechercher une compétence…" value="{{search}}" />
-      {{#if search}}<button type="button" class="cb-search-clear" title="Effacer">✕</button>{{/if}}
+      <input type="text" class="cb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}" />
+      {{#if search}}<button type="button" class="cb-search-clear" title='{{localize "AGONE.Browser.Effacer"}}'>✕</button>{{/if}}
     </div>
 
     <div class="cb-filter-row">
@@ -13,7 +13,7 @@
       <div class="cb-dom-filters">
         <label>
           <input type="checkbox" class="cb-all-check" {{#if allFamillesSelected}}checked{{/if}} />
-          Tous
+          {{localize "AGONE.Browser.Tous"}}
         </label>
         {{#each allFamilles as |f|}}
         <label>
@@ -25,9 +25,9 @@
 
       <!-- Possédées -->
       <select class="cb-possede-select">
-        <option value="all"  {{#if (eq filterPossede "all")}}selected{{/if}}>Toutes</option>
-        <option value="oui"  {{#if (eq filterPossede "oui")}}selected{{/if}}>Possédées</option>
-        <option value="non"  {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédées</option>
+        <option value="all"  {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
+        <option value="oui"  {{#if (eq filterPossede "oui"}}selected{{/if}}>{{localize "AGONE.Browser.Possedees"}}</option>
+        <option value="non"  {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
       </select>
     </div>
   </div>
@@ -37,9 +37,9 @@
     <table class="cb-table">
       <thead>
         <tr>
-          <th>Compétence</th>
-          <th>Famille</th>
-          <th>Attribut lié</th>
+          <th>{{localize "AGONE.Competences"}}</th>
+          <th>{{localize "AGONE.Famille"}}</th>
+          <th>{{localize "AGONE.AttributLie"}}</th>
           <th></th>
         </tr>
       </thead>
@@ -48,7 +48,7 @@
         <tr class="cb-row {{#if c.count}}cb-row-owned{{/if}}">
           <td class="cb-name">
             {{c.displayName}}
-            {{#if c.count}}<span class="cb-count-badge" title="Possédée {{c.count}} fois">×{{c.count}}</span>{{/if}}
+            {{#if c.count}}<span class="cb-count-badge" title="Possédée {{c.count}} fois">x{{c.count}}</span>{{/if}}
           </td>
           <td><span class="cb-fam-badge fam-{{c.famille}}">{{c.famille}}</span></td>
           <td class="cb-attr">{{c.attributLie}}</td>
@@ -62,7 +62,7 @@
         </tr>
         {{/each}}
         {{#unless competences.length}}
-        <tr><td colspan="4" class="cb-empty">Aucune compétence trouvée.</td></tr>
+        <tr><td colspan="4" class="cb-empty">{{localize "AGONE.Browser.AucuneCompTrouvee"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

@@ -25,7 +25,7 @@ export class ArmuresBrowser extends Application {
   }
 
   get title() {
-    return `Armures — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreArmures", { nom: this.actor.name });
   }
 
   /** @override */
@@ -34,7 +34,11 @@ export class ArmuresBrowser extends Application {
       this.actor.items.filter(i => i.type === "armure").map(i => i.name)
     );
 
-    const TYPE_LABELS = { "0":"Veste seule", "1":"Partielle", "2":"Complète" };
+    const TYPE_LABELS = {
+      "0": game.i18n.localize("AGONE.Armure.VesteSeule"),
+      "1": game.i18n.localize("AGONE.Armure.Partielle"),
+      "2": game.i18n.localize("AGONE.Armure.Complete"),
+    };
 
     let items = ARMURES_DATA.map((d, idx) => ({
       idx       : `a${idx}`,
@@ -104,7 +108,7 @@ export class ArmuresBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajoutée à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.ArmureAjoutee", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

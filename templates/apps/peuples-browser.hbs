@@ -5,20 +5,20 @@
     <div class="pb-filter-row">
       <div class="pb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="pb-search" placeholder="Rechercher un peuple..." value="{{search}}">
+        <input type="text" class="pb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
       </div>
-      <button type="button" class="pb-clear" title="Effacer les filtres">
+      <button type="button" class="pb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
         <i class="fas fa-eraser"></i>
       </button>
     </div>
 
     <div class="pb-filter-row2">
       <select class="pb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous les peuples</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Peuple actif</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Autres peuples</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousLesPeuples"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.PeupleActif"}}</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.AutresPeuples"}}</option>
       </select>
-      <span class="pb-count">{{items.length}} résultat(s)</span>
+      <span class="pb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
     </div>
   </div>
 
@@ -28,8 +28,8 @@
       <thead>
         <tr>
           <th class="pb-col-toggle"></th>
-          <th class="pb-col-name">Peuple</th>
-          <th class="pb-col-tai" title="TAI de base">TAI</th>
+          <th class="pb-col-name">{{localize "AGONE.PeupleLabel"}}</th>
+          <th class="pb-col-tai" title='{{localize "AGONE.TAI"}}'>{{localize "AGONE.Combat.Tai"}}</th>
           <th class="pb-col-action"></th>
         </tr>
       </thead>
@@ -38,21 +38,21 @@
         <tr class="pb-row {{#if item.isActif}}pb-row-actif{{/if}}" data-peuple-idx="{{item.idx}}">
           <td>
             {{#if item.description}}
-            <button type="button" class="pb-desc-toggle btn-icon" data-action="togglePeupleDesc" title="Voir la description">
+            <button type="button" class="pb-desc-toggle btn-icon" data-action="togglePeupleDesc" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
             </button>
             {{/if}}
           </td>
           <td class="pb-name">
             {{item.name}}
-            {{#if item.isActif}}<span class="pb-badge-actif">Actif</span>{{/if}}
+            {{#if item.isActif}}<span class="pb-badge-actif">{{localize "AGONE.Actif"}}</span>{{/if}}
           </td>
           <td class="pb-tai">{{item.taiBase}}</td>
           <td class="pb-action">
             {{#if item.isActif}}
-            <i class="fas fa-check pb-check" title="Peuple actif"></i>
+            <i class="fas fa-check pb-check" title='{{localize "AGONE.Browser.PeupleActif"}}'></i>
             {{else}}
-            <button type="button" class="pb-apply-btn btn-icon" data-action="applyPeuple" title="Appliquer ce peuple">
+            <button type="button" class="pb-apply-btn btn-icon" data-action="applyPeuple" title='{{localize "AGONE.Browser.AppliquerPeuple"}}'>
               <i class="fas fa-user-check"></i>
             </button>
             {{/if}}
@@ -66,7 +66,7 @@
         {{/if}}
         {{/each}}
         {{#unless items.length}}
-        <tr><td colspan="4" class="pb-empty">Aucun peuple trouvé.</td></tr>
+        <tr><td colspan="4" class="pb-empty">{{localize "AGONE.Browser.AucunPeupleTrouve"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

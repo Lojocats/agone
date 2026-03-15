@@ -27,7 +27,7 @@ export class ManoeuvresBrowser extends Application {
   }
 
   get title() {
-    return `Manœuvres & Bottes — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreManoeuvres", { nom: this.actor.name });
   }
 
   /** @override */
@@ -146,7 +146,7 @@ export class ManoeuvresBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajouté(e) à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.ManoeuvreAjoutee", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

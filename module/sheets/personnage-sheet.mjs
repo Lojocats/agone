@@ -52,8 +52,15 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Enrichit chaque avantage/défaut avec sa catégorie thématique (Âme, Corps, etc.)
     const AV_SECT_LABELS = {
-      charge: "Charges", ame: "Âme", corps: "Corps", esprit: "Esprit",
-      societe: "Société", emprise: "Emprise", arts: "Arts", saisons: "Saisons", flamme: "Flamme",
+      charge: game.i18n.localize("AGONE.CategorieCharges"),
+      ame: game.i18n.localize("AGONE.Ame"),
+      corps: game.i18n.localize("AGONE.Corps"),
+      esprit: game.i18n.localize("AGONE.Esprit"),
+      societe: game.i18n.localize("AGONE.CategorieSociete"),
+      emprise: game.i18n.localize("AGONE.Emprise"),
+      arts: game.i18n.localize("AGONE.CategorieArts"),
+      saisons: game.i18n.localize("AGONE.CategorieSaisons"),
+      flamme: game.i18n.localize("AGONE.Flamme"),
     };
     const avDataByName = new Map(AVANTAGES_DATA.map(d => [d.name, d]));
     for (const don of [...context.avantages, ...context.defauts]) {
@@ -132,8 +139,13 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Types de magie présents — pour le mini-filtre de l'onglet Magie
     const TYPE_LABELS_MAGIE = {
-      jorniste: "Jorniste", obscurantiste: "Obscurantiste", eclipsiste: "Éclipsiste",
-      accord: "Accord", cyse: "Cyse", geste: "Geste", decorum: "Décorum",
+      jorniste: game.i18n.localize("AGONE.Jorniste"),
+      obscurantiste: game.i18n.localize("AGONE.Obscurantiste"),
+      eclipsiste: game.i18n.localize("AGONE.Eclipsiste"),
+      accord: game.i18n.localize("AGONE.Accord"),
+      cyse: game.i18n.localize("AGONE.Cyse"),
+      geste: game.i18n.localize("AGONE.Geste"),
+      decorum: game.i18n.localize("AGONE.Decorum"),
     };
     context.sortTypes = [...new Set(context.sorts.map(s => s.system.typeMagie).filter(Boolean))]
       .sort()
@@ -173,7 +185,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         })),
       ];
     } else {
-      context.sortsGroups = context.sortsBySeuil.map(g => ({ label: `Seuil ${g.seuil}`, sorts: g.sorts }));
+      context.sortsGroups = context.sortsBySeuil.map(g => ({ label: `${game.i18n.localize("AGONE.Seuil")} ${g.seuil}`, sorts: g.sorts }));
     }
 
     // Enrichissement de la description HTML
@@ -565,7 +577,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       else empriseFormule = `(INT ${system.intelligence.score} + VOL ${system.volonte.score}) ÷ 2`;
 
       context.tooltipsDerives = {
-        melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}×2) ÷ 3 = ${system.melee}${srcStr("force","agilite")}`,
+        melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}x2) ÷ 3 = ${system.melee}${srcStr("force","agilite")}`,
         tir:    `(AGI ${system.agilite.score} + PER ${system.perception.score}) ÷ 2 = ${system.tir}${srcStr("agilite","perception")}`,
         art:    `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2${bsign(avArt)} = ${system.art}${srcStr("charisma","creativite","art_bonus")}`,
         initiative: `AGI ${system.agilite.score} + PER ${system.perception.score} + Bonus Corps ${bC}${bsign(avInit)} = ${system.initiative}\n${bonusCorpsDetail}${srcStr("agilite","perception","initiative_bonus")}`,

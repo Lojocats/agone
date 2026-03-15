@@ -4,7 +4,7 @@
     <span class="roll-label">{{label}}</span>
     {{#if rollType}}
     <span class="roll-type badge-{{rollType}}">
-      {{#if (eq rollType "ouvert")}}Jet Ouvert{{else}}Jet Fermé{{/if}}
+      {{#if (eq rollType "ouvert")}}{{localize "AGONE.JetOuvertLabel"}}{{else}}{{localize "AGONE.JetFermeLabel"}}{{/if}}
     </span>
     {{/if}}
   </div>

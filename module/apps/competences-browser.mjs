@@ -26,7 +26,7 @@ export class CompetencesBrowser extends Application {
   }
 
   get title() {
-    return `Compétences — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreComp", { nom: this.actor.name });
   }
 
   /** @override */

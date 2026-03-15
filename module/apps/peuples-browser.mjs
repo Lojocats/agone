@@ -27,7 +27,7 @@ export class PeuplesBrowser extends Application {
   }
 
   get title() {
-    return `Peuples — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitrePeuples", { nom: this.actor.name });
   }
 
   /** @override */
@@ -122,7 +122,7 @@ export class PeuplesBrowser extends Application {
             const sheet = this.actor.sheet;
             if (sheet?._applyPeuple) {
               await sheet._applyPeuple(item);
-              ui.notifications?.info(`${d.name} appliqué à ${this.actor.name}.`);
+              ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: d.name, acteur: this.actor.name }));
               this.render();
               return;
             }
@@ -131,7 +131,7 @@ export class PeuplesBrowser extends Application {
       }
       // Fallback : mettre le nom directement
       await this.actor.update({ "system.peuple": d.name });
-      ui.notifications?.info(`${d.name} appliqué à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

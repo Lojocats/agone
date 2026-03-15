@@ -30,7 +30,7 @@ export class ArmesBrowser extends Application {
   }
 
   get title() {
-    return `Armes — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreArmes", { nom: this.actor.name });
   }
 
   /** @override */
@@ -39,9 +39,20 @@ export class ArmesBrowser extends Application {
       this.actor.items.filter(i => i.type === "arme").map(i => i.name)
     );
 
-    const STYLE_LABELS = { melee:"Mêlée", trait:"Trait", jet:"Lancer", bouclier:"Bouclier" };
-    const TYPE_LABELS  = { P:"P (Perforant)", T:"T (Tranchant)", C:"C (Contondant)",
-                           TC:"TC", PC:"PC", PT:"PT" };
+    const STYLE_LABELS = {
+      melee   : game.i18n.localize("AGONE.Melee"),
+      trait   : game.i18n.localize("AGONE.Arme.Trait"),
+      jet     : game.i18n.localize("AGONE.Lancer"),
+      bouclier: game.i18n.localize("AGONE.Bouclier"),
+    };
+    const TYPE_LABELS = {
+      P : game.i18n.localize("AGONE.Arme.Perforant"),
+      T : game.i18n.localize("AGONE.Arme.Tranchant"),
+      C : game.i18n.localize("AGONE.Arme.Contondant"),
+      TC: game.i18n.localize("AGONE.TranchanteContondant"),
+      PC: game.i18n.localize("AGONE.PercutanteContondant"),
+      PT: game.i18n.localize("AGONE.Arme.PerforantTranchant"),
+    };
 
     let armes = _ALL_ARMES_DATA.map((d, idx) => ({
       idx        : String(idx),
@@ -182,7 +193,7 @@ export class ArmesBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajoutée à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.ArmeAjoutee", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

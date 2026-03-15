@@ -27,7 +27,7 @@ export class PouvoirsBrowser extends Application {
   }
 
   get title() {
-    return `Pouvoirs de Flamme — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitrePouvoirs", { nom: this.actor.name });
   }
 
   /** @override */
@@ -134,7 +134,7 @@ export class PouvoirsBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajouté à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.PouvoirAjoute", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

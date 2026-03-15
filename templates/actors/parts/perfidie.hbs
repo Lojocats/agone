@@ -14,10 +14,10 @@
     </div>
     <div class="perf-stat-separator"></div>
     <div class="perf-dif-legend">
-      <span class="perf-dif-range {{#ifGT system.perfidie 0}}perf-range-active{{/ifGT}}">0–50 → DIF 15</span>
-      <span class="perf-dif-range {{#ifGT system.perfidie 50}}perf-range-active{{/ifGT}}">51–75 → DIF 20</span>
-      <span class="perf-dif-range {{#ifGT system.perfidie 75}}perf-range-active{{/ifGT}}">76–90 → DIF 25</span>
-      <span class="perf-dif-range {{#ifGT system.perfidie 89}}perf-range-active{{/ifGT}}">90+ → DIF 30</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 0}}perf-range-active{{/ifGT}}">{{localize "AGONE.PerfidieRangeDif15"}}</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 50}}perf-range-active{{/ifGT}}">{{localize "AGONE.PerfidieRangeDif20"}}</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 75}}perf-range-active{{/ifGT}}">{{localize "AGONE.PerfidieRangeDif25"}}</span>
+      <span class="perf-dif-range {{#ifGT system.perfidie 89}}perf-range-active{{/ifGT}}">{{localize "AGONE.PerfidieRangeDif30"}}</span>
     </div>
   </div>
 
@@ -53,7 +53,7 @@
             <td class="item-drag-handle"><i class="fas fa-grip-vertical"></i></td>
             <td>
               {{#if peine.system.description}}
-              <button type="button" class="peine-desc-toggle btn-icon" data-item-id="{{peine.id}}" title="Description">
+              <button type="button" class="peine-desc-toggle btn-icon" data-item-id="{{peine.id}}" title='{{localize "AGONE.VoirDescription"}}'>
                 <i class="fas fa-chevron-right peine-toggle-icon"></i>
               </button>
               {{/if}}
@@ -61,9 +61,9 @@
             <td class="peine-name">{{peine.name}}</td>
             <td class="peine-noir">
               {{#if (eq peine.system.noirEffect "corps")}}
-              <span class="pn-noir-badge pn-noir-corps" data-tooltip="Corps noir +1">Corps</span>
+              <span class="pn-noir-badge pn-noir-corps" data-tooltip='{{localize "AGONE.PerfidieCorpsNoir1"}}'>{{localize "AGONE.Corps"}}</span>
               {{else if (eq peine.system.noirEffect "ame")}}
-              <span class="pn-noir-badge pn-noir-ame" data-tooltip="Âme noire +1">Âme</span>
+              <span class="pn-noir-badge pn-noir-ame" data-tooltip='{{localize "AGONE.PerfidieAmeNoire1"}}'>{{localize "AGONE.Ame"}}</span>
               {{else}}
               <span class="pn-noir-none">—</span>
               {{/if}}
@@ -71,26 +71,26 @@
             <td class="peine-bienfait-cell">
               {{#if peine.system.bienfait}}
                 {{#if peine.system.bienfaitAcquis}}
-                  <span class="pn-bienfait-acquis" data-tooltip="Bienfait acquis : {{peine.system.bienfait}}">
+                  <span class="pn-bienfait-acquis" data-tooltip='{{localize "AGONE.PerfidieBienfaitAcquis"}} {{peine.system.bienfait}}'>
                     <i class="fas fa-star"></i> {{peine.system.bienfait}}
                   </span>
                 {{else if isOwner}}
                   <button type="button" class="pn-acquerir-btn" data-action="acquerirBienfait" data-item-id="{{peine.id}}"
-                          data-tooltip="Acquérir « {{peine.system.bienfait}} » (+1 Perfidie)">
+                          data-tooltip='{{localize "AGONE.AcquerirBienfait"}} « {{peine.system.bienfait}} »'>
                     <i class="fas fa-unlock"></i> {{peine.system.bienfait}}
                   </button>
                 {{else}}
-                  <span class="pn-bienfait-dispo" data-tooltip="{{peine.system.bienfait}} (non acquis)">
+                  <span class="pn-bienfait-dispo" data-tooltip='{{peine.system.bienfait}} {{localize "AGONE.PerfidieNonAcquis"}}'>  
                     <i class="fas fa-lock"></i> {{peine.system.bienfait}}
                   </span>
                 {{/if}}
               {{else}}
-                <span class="pn-bienfait-none">Aucun</span>
+                <span class="pn-bienfait-none">{{localize "AGONE.Aucun"}}</span>
               {{/if}}
             </td>
             <td class="peine-actions">
               {{#if isOwner}}
-              <a class="item-delete" data-item-id="{{peine.id}}" title="Supprimer" tabindex="-1">
+              <a class="item-delete" data-item-id="{{peine.id}}" title='{{localize "AGONE.Supprimer"}}' tabindex="-1">
                 <i class="fas fa-trash fa-xs"></i>
               </a>
               {{/if}}

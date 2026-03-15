@@ -5,16 +5,16 @@
     <div class="sb-filter-row">
       <div class="sb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="sb-search" placeholder="Rechercher un sort ou un mot-clé..." value="{{search}}">
+        <input type="text" class="sb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
       </div>
-      <button type="button" class="sb-clear" title="Effacer les filtres">
+      <button type="button" class="sb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
         <i class="fas fa-eraser"></i>
       </button>
     </div>
     <!-- Filtres de type (checkboxes compactes) -->
     <div class="sb-type-checks">
       <label class="sb-type-lbl">
-        <input type="checkbox" class="sb-all-check" {{#if allTypesSelected}}checked{{/if}}> Tous
+        <input type="checkbox" class="sb-all-check" {{#if allTypesSelected}}checked{{/if}}> {{localize "AGONE.Browser.Tous"}}
       </label>
       {{#each allTypes}}
       <label class="sb-type-lbl">
@@ -25,18 +25,18 @@
     <!-- Filtres secondaires -->
     <div class="sb-filter-row2">
       <select class="sb-seuil-exact" title="Filtrer par seuil exact">
-        <option value="">Tous seuils</option>
+        <option value="">{{localize "AGONE.Browser.TousSeuils"}}</option>
         {{#each allSeuils}}
-        <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>Seuil = {{this}}</option>
+        <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>{{localize "AGONE.Browser.SeuilEgal"}} {{this}}</option>
         {{/each}}
       </select>
       <select class="sb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous sorts</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousSorts"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
       </select>
     </div>
-    <div class="sb-count">{{sorts.length}} sort(s)</div>
+    <div class="sb-count">{{sorts.length}} {{localize "AGONE.Browser.SortsCount"}}</div>
   </div>
 
   <!-- Liste -->
@@ -45,11 +45,11 @@
       <thead>
         <tr>
           <th class="sb-col-toggle"></th>
-          <th class="sb-col-name">Nom</th>
-          <th class="sb-col-type">Type / Accord</th>
-          <th class="sb-col-seuil">Seuil</th>
-          <th class="sb-col-portee">Portée</th>
-          <th class="sb-col-duree">Durée</th>
+          <th class="sb-col-name">{{localize "AGONE.Nom"}}</th>
+          <th class="sb-col-type">{{localize "AGONE.Browser.TypeAccord"}}</th>
+          <th class="sb-col-seuil">{{localize "AGONE.Seuil"}}</th>
+          <th class="sb-col-portee">{{localize "AGONE.Portee"}}</th>
+          <th class="sb-col-duree">{{localize "AGONE.Duree"}}</th>
           <th class="sb-col-danse">{{localize "AGONE.Danse"}}</th>
           <th class="sb-col-action"></th>
         </tr>
@@ -59,7 +59,7 @@
         <tr class="sb-sort-row {{#if sort.hasInActor}}sb-has-sort{{/if}}" data-sort-idx="{{sort.idx}}">
           <td>
             {{#if sort.description}}
-            <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDescBrowser" title="Voir la description">
+            <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDescBrowser" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas {{#if sort.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
             </button>
             {{/if}}
@@ -72,12 +72,12 @@
           <td class="sb-danse">{{sort.danse}}</td>
           <td class="sb-action">
             {{#if sort.hasInActor}}
-            <i class="fas fa-check sb-check" title="Déjà possédé"></i>
+            <i class="fas fa-check sb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{/if}}
-            <button type="button" class="sb-impro-btn btn-icon" data-action="rollSortImpro" title="Jet improvisé — seuil × 2 ({{multiply sort.seuil 2}})">
+            <button type="button" class="sb-impro-btn btn-icon" data-action="rollSortImpro" title='{{localize "AGONE.Browser.JetImprovise"}} ({{multiply sort.seuil 2}})'>
               <i class="fas fa-random"></i>
             </button>
-            <button type="button" class="sb-add-btn btn-icon" data-action="addSort" title="Ajouter au personnage">
+            <button type="button" class="sb-add-btn btn-icon" data-action="addSort" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
           </td>
@@ -90,7 +90,7 @@
         {{/if}}
         {{/each}}
         {{#unless sorts.length}}
-        <tr><td colspan="8" class="sb-empty">Aucun sort trouvé.</td></tr>
+        <tr><td colspan="8" class="sb-empty">{{localize "AGONE.Browser.AucunSortTrouve"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

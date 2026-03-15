@@ -47,7 +47,7 @@ AGONE.taiToMv = { "-2": 1, "-1": 2, "0": 3, "1": 4, "2": 6, "3": 8 };
 // TAI → Base de Points de Vie
 AGONE.taiToBpdv = { "-2": 10, "-1": 20, "0": 25, "1": 45, "2": 70, "3": 100 };
 
-// TAI → Modificateur de Poids (chargeMax = FOR × modPoids)
+// TAI → Modificateur de Poids (chargeMax = FOR x modPoids)
 AGONE.taiToModPoids = { "-2": 4, "-1": 6, "0": 7, "1": 10, "2": 15, "3": 20 };
 
 // Lookup générique par TAI (clampé entre -2 et +3)
@@ -178,7 +178,7 @@ AGONE.saisons = {
   hiver:     "Hiver",
 };
 
-// ── Calendrier d'Harmonde (10 mois × 30 jours) ──────────────────────────────
+// ── Calendrier d'Harmonde (10 mois x 30 jours) ──────────────────────────────
 AGONE.calendrier = {
   joursParMois: 30,
   mois: [

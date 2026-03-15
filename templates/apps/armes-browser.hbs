@@ -5,18 +5,18 @@
     <div class="ab-filter-row">
       <div class="ab-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="ab-search" placeholder="Rechercher une arme..." value="{{search}}">
+        <input type="text" class="ab-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
       </div>
-      <button type="button" class="ab-clear" title="Effacer les filtres">
+      <button type="button" class="ab-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
         <i class="fas fa-eraser"></i>
       </button>
     </div>
 
     <!-- Styles -->
     <div class="ab-type-checks">
-      <span class="ab-filter-label">Style :</span>
+      <span class="ab-filter-label">{{localize "AGONE.Browser.StyleLabel"}}</span>
       <label class="ab-type-lbl">
-        <input type="checkbox" class="ab-all-style" {{#if allStylesSelected}}checked{{/if}}> Tous
+        <input type="checkbox" class="ab-all-style" {{#if allStylesSelected}}checked{{/if}}> {{localize "AGONE.Browser.Tous"}}
       </label>
       {{#each allStyles}}
       <label class="ab-type-lbl">
@@ -27,9 +27,9 @@
 
     <!-- Types de dommages -->
     <div class="ab-type-checks">
-      <span class="ab-filter-label">Type :</span>
+      <span class="ab-filter-label">{{localize "AGONE.Browser.TypeLabel"}}</span>
       <label class="ab-type-lbl">
-        <input type="checkbox" class="ab-all-type" {{#if allTypesSelected}}checked{{/if}}> Tous
+        <input type="checkbox" class="ab-all-type" {{#if allTypesSelected}}checked{{/if}}> {{localize "AGONE.Browser.Tous"}}
       </label>
       {{#each allTypes}}
       <label class="ab-type-lbl">
@@ -40,14 +40,14 @@
 
     <!-- Filtres secondaires -->
     <div class="ab-filter-row2">
-      <label>FOR ≤</label>
+      <label>{{localize "AGONE.Browser.ForReq"}}</label>
       <input type="number" class="ab-req-for" value="{{filterReqFor}}" placeholder="—" min="1" max="20">
       <select class="ab-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Toutes les armes</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédées</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédées</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.ToutesLesArmes"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
       </select>
-      <span class="ab-count">{{armes.length}} arme(s)</span>
+      <span class="ab-count">{{armes.length}} {{localize "AGONE.Browser.ArmesCount"}}</span>
     </div>
   </div>
 
@@ -56,16 +56,16 @@
     <table class="ab-table">
       <thead>
         <tr>
-          <th class="ab-col-name">Nom</th>
-          <th class="ab-col-style">Style</th>
-          <th class="ab-col-tai">TAI</th>
-          <th class="ab-col-type">Type</th>
-          <th class="ab-col-init" title="Bonus d'initiative">Init</th>
-          <th class="ab-col-atk" title="Bonus d'attaque">ATK</th>
-          <th class="ab-col-def" title="Bonus de défense">DEF</th>
-          <th class="ab-col-dom">Dom</th>
-          <th class="ab-col-portee">Portée</th>
-          <th class="ab-col-req">FOR/AGI req.</th>
+          <th class="ab-col-name">{{localize "AGONE.Nom"}}</th>
+          <th class="ab-col-style">{{localize "AGONE.StyleArme"}}</th>
+          <th class="ab-col-tai">{{localize "AGONE.Combat.Tai"}}</th>
+          <th class="ab-col-type">{{localize "AGONE.TypeArme"}}</th>
+          <th class="ab-col-init" title='{{localize "AGONE.InitBonus"}}'>{{localize "AGONE.Combat.Init"}}</th>
+          <th class="ab-col-atk" title='{{localize "AGONE.AttackBonus"}}'>{{localize "AGONE.Combat.Atk"}}</th>
+          <th class="ab-col-def" title='{{localize "AGONE.DefenseBonus"}}'>{{localize "AGONE.Combat.Def"}}</th>
+          <th class="ab-col-dom">{{localize "AGONE.Combat.Dom"}}</th>
+          <th class="ab-col-portee">{{localize "AGONE.Portee"}}</th>
+          <th class="ab-col-req">{{localize "AGONE.Browser.ForAgiReq"}}</th>
           <th class="ab-col-action"></th>
         </tr>
       </thead>
@@ -87,9 +87,9 @@
           <td class="ab-req">{{arme.reqFor}} / {{arme.reqAgi}}</td>
           <td class="ab-action">
             {{#if arme.hasInActor}}
-            <i class="fas fa-check ab-check" title="Déjà possédée"></i>
+            <i class="fas fa-check ab-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="ab-add-btn btn-icon" data-action="addArme" title="Ajouter au personnage">
+            <button type="button" class="ab-add-btn btn-icon" data-action="addArme" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}
@@ -97,7 +97,7 @@
         </tr>
         {{/each}}
         {{#unless armes.length}}
-        <tr><td colspan="11" class="ab-empty">Aucune arme trouvée.</td></tr>
+        <tr><td colspan="11" class="ab-empty">{{localize "AGONE.Browser.AucuneArmeTrouvee"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

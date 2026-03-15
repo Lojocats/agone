@@ -385,7 +385,7 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:   `${label} ×2 : ${attrScore * 2}`,
+      base:   `${label} x2 : ${attrScore * 2}`,
       aspect: `Bonus d'aspect : ${bonusAspect}`,
       modif:  `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
@@ -727,7 +727,7 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
 
     const finalRoll = await this._sendRollToChat(roll, label, {
-      volonte: `${game.i18n.localize("AGONE.Volonte")} ×2 : ${volScore * 2}`,
+      volonte: `${game.i18n.localize("AGONE.Volonte")} x2 : ${volScore * 2}`,
       ame:     `${game.i18n.localize("AGONE.BonusAme")} : ${bonusAme}`,
       diff:    `${game.i18n.localize("AGONE.Difficulte")} : ${DIFFICULTE}`,
     });
@@ -855,7 +855,7 @@ export class AgoneActor extends Actor {
     const aptitudeLabel = compAltNom
       ? `Arts Magiques (min avec ${compAltNom}) : ${aptitude}`
       : `Arts Magiques : ${aptitude}`;
-    const seuilLabel = impro ? `Seuil : ${seuil} (${seuilBase} × 2, improvisé)` : `Seuil : ${seuil}`;
+    const seuilLabel = impro ? `Seuil : ${seuil} (${seuilBase} x 2, improvisé)` : `Seuil : ${seuil}`;
     await this._sendRollToChat(roll, label, {
       aptitude: aptitudeLabel,
       seuil:    seuilLabel,

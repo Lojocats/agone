@@ -13,15 +13,15 @@
         <div class="pdv-values">
           <span class="pdv-current {{#if system.blessuresCritique}}pdv-critique{{/if}}">{{system.pdv.valeur}}</span>
           <span class="pdv-sep">/</span>
-          <span class="pdv-max" title="BPdV {{bpdv}} + RES×3 + bonus 1d10">{{system.pdv.max}}</span>
+          <span class="pdv-max" title='{{localize "AGONE.Combat.PdvMaxTooltip"}}'>{{system.pdv.max}}</span>
           <span class="pdv-label">PdV</span>
         </div>
         <div class="pdv-track" title="{{system.pdv.valeur}} / {{system.pdv.max}}">
           <div class="pdv-fill" style="width:{{pdvPercent}}%;"></div>
         </div>
         <div class="pdv-seuils-row">
-          <span class="seuil-item seuil-bg" title="Seuil Blessure Grave (PdV ÷ 3)">BG {{system.seuilBlessureGrave}}</span>
-          <span class="seuil-item seuil-bc" title="Seuil Blessure Critique (PdV ÷ 2)">BC {{system.seuilBlessureCritique}}</span>
+          <span class="seuil-item seuil-bg" title='{{localize "AGONE.Combat.SeuilBGTooltip"}}'>BG {{system.seuilBlessureGrave}}</span>
+          <span class="seuil-item seuil-bc" title='{{localize "AGONE.Combat.SeuilBCTooltip"}}'>BC {{system.seuilBlessureCritique}}</span>
           <span class="pdv-bonus-inline">
             <span class="pdv-bonus-label">+1d10</span>
             <input type="number" name="system.pdv.bonusDe" value="{{system.pdv.bonusDe}}" class="stat-num pdv-bonus-input" min="0" max="10" />
@@ -83,7 +83,7 @@
         <div class="cstat-item">
           <span class="cstat-roll cstat-passive"><i class="fas fa-crosshairs"></i></span>
           <span class="cstat-score">{{system.esquiveDistance}}</span>
-          <span class="cstat-label">Esquive dist.</span>
+          <span class="cstat-label">{{localize "AGONE.Combat.EsquiveDist"}}</span>
         </div>
         <div class="cstat-item">
           <span class="cstat-roll cstat-passive"><i class="fas fa-hammer"></i></span>
@@ -93,7 +93,7 @@
         <div class="cstat-item">
           <span class="cstat-roll cstat-passive"><i class="fas fa-shield-halved"></i></span>
           <span class="cstat-score">{{system.armure.protection}}</span>
-          <span class="cstat-label">PRO totale</span>
+          <span class="cstat-label">{{localize "AGONE.Combat.ProTotale"}}</span>
         </div>
       </div>
     </div><!-- /.cstats-card -->
@@ -113,25 +113,25 @@
     <div class="armures-list">
       {{#each armures as |armure|}}
       <div class="armure-row {{#if armure.system.portee}}armure-worn{{/if}}" data-item-id="{{armure.id}}">
-        <label class="armure-portee-toggle" title="{{#if armure.system.portee}}Portée{{else}}Rangée{{/if}}">
+        <label class="armure-portee-toggle" title="{{#if armure.system.portee}}{{localize "AGONE.Rangee"}}{{else}}{{localize "AGONE.Rangee"}}{{/if}}">
           <input type="checkbox" class="armure-portee" data-item-id="{{armure.id}}" {{#if armure.system.portee}}checked{{/if}} />
           <i class="fas {{#if armure.system.portee}}fa-shield-alt{{else}}fa-shield{{/if}}"></i>
         </label>
         <span class="armure-name">{{armure.name}}</span>
-        <span class="armure-badge pro-badge">PRO {{armure.system.protection}}</span>
-        {{#if armure.system.malusAgi}}<span class="armure-badge malus-badge">-AGI {{armure.system.malusAgi}}</span>{{/if}}
-        {{#if armure.system.malusPer}}<span class="armure-badge malus-badge">-PER {{armure.system.malusPer}}</span>{{/if}}
+        <span class="armure-badge pro-badge">{{localize "AGONE.Combat.Pro"}} {{armure.system.protection}}</span>
+        {{#if armure.system.malusAgi}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusAgi"}} {{armure.system.malusAgi}}</span>{{/if}}
+        {{#if armure.system.malusPer}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusPer"}} {{armure.system.malusPer}}</span>{{/if}}
         <div class="row-actions">
-          <a class="item-edit" data-item-id="{{armure.id}}" title="Éditer"><i class="fas fa-pen"></i></a>
-          <a class="item-delete" data-item-id="{{armure.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
+          <a class="item-edit" data-item-id="{{armure.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
+          <a class="item-delete" data-item-id="{{armure.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </div>
       </div>
       {{/each}}
     </div>
     <div class="armure-totaux">
-      <span class="armure-total-item"><i class="fas fa-shield-alt"></i> PRO <strong>{{system.armure.protection}}</strong></span>
-      <span class="armure-total-item malus-total">-AGI <strong>{{#if system.armure.malusAgi}}{{system.armure.malusAgi}}{{else}}0{{/if}}</strong></span>
-      <span class="armure-total-item malus-total">-PER <strong>{{#if system.armure.malusPer}}{{system.armure.malusPer}}{{else}}0{{/if}}</strong></span>
+      <span class="armure-total-item"><i class="fas fa-shield-alt"></i> {{localize "AGONE.Combat.Pro"}} <strong>{{system.armure.protection}}</strong></span>
+      <span class="armure-total-item malus-total">{{localize "AGONE.Combat.MalusAgi"}} <strong>{{#if system.armure.malusAgi}}{{system.armure.malusAgi}}{{else}}0{{/if}}</strong></span>
+      <span class="armure-total-item malus-total">{{localize "AGONE.Combat.MalusPer"}} <strong>{{#if system.armure.malusPer}}{{system.armure.malusPer}}{{else}}0{{/if}}</strong></span>
     </div>
     {{else}}
     <p class="empty-list">{{localize "AGONE.AucuneArmure"}}</p>
@@ -153,12 +153,12 @@
         <tr>
           <th class="col-equipe" title="{{localize 'AGONE.Equipe'}}"><i class="fas fa-hand-paper"></i></th>
           <th class="col-arme-name">{{localize "AGONE.Nom"}}</th>
-          <th class="col-tai">TAI</th>
-          <th class="col-type">Type</th>
-          <th class="col-init"><i class="fas fa-bolt"></i> INIT</th>
-          <th class="col-atk"><i class="fas fa-dice-d10"></i> ATK</th>
-          <th class="col-def"><i class="fas fa-shield-alt"></i> DEF</th>
-          <th class="col-dom">DOM</th>
+          <th class="col-tai">{{localize "AGONE.TAI"}}</th>
+          <th class="col-type">{{localize "AGONE.Type"}}</th>
+          <th class="col-init"><i class="fas fa-bolt"></i> {{localize "AGONE.Combat.Init"}}</th>
+          <th class="col-atk"><i class="fas fa-dice-d10"></i> {{localize "AGONE.Combat.Atk"}}</th>
+          <th class="col-def"><i class="fas fa-shield-alt"></i> {{localize "AGONE.Combat.Def"}}</th>
+          <th class="col-dom">{{localize "AGONE.Combat.Dom"}}</th>
           <th class="col-row-actions"></th>
         </tr>
       </thead>
@@ -166,7 +166,7 @@
         {{#each armes as |arme|}}
         <tr class="item-row {{#if arme.system.equipe}}arme-equipee{{/if}}" data-item-id="{{arme.id}}">
           <td class="col-equipe">
-            <label class="arme-equipe-toggle" title="{{#if arme.system.equipe}}Équipée{{else}}Rangée{{/if}}">
+            <label class="arme-equipe-toggle" title="{{#if arme.system.equipe}}{{localize "AGONE.Equipee"}}{{else}}{{localize "AGONE.Rangee"}}{{/if}}">
               <input type="checkbox" class="arme-equipe" data-item-id="{{arme.id}}" {{#if arme.system.equipe}}checked{{/if}} />
               <i class="fas {{#if (eq arme.system.style 'bouclier')}}fa-shield{{else}}fa-hand-paper{{/if}} arme-equipe-icon"></i>
             </label>
@@ -174,12 +174,12 @@
           <td class="col-arme-name">
             <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{arme.id}}">{{arme.name}}</span>
             {{#if (eq arme.system.style "bouclier")}}
-            <span class="armure-badge pro-badge">PRO {{arme.system.protection}}</span>
-            {{#if arme.system.malusAgi}}<span class="armure-badge malus-badge">-AGI {{arme.system.malusAgi}}</span>{{/if}}
+            <span class="armure-badge pro-badge">{{localize "AGONE.Combat.Pro"}} {{arme.system.protection}}</span>
+            {{#if arme.system.malusAgi}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusAgi"}} {{arme.system.malusAgi}}</span>{{/if}}
             {{/if}}
           </td>
           <td class="col-tai">{{arme.system.tai}}</td>
-          <td class="col-type">{{#if (eq arme.system.style "bouclier")}}<i class="fas fa-shield-alt" title="Bouclier"></i>{{else}}{{arme.system.type}}{{/if}}</td>
+          <td class="col-type">{{#if (eq arme.system.style "bouclier")}}<i class="fas fa-shield-alt" title='{{localize "AGONE.Bouclier"}}'></i>{{else}}{{arme.system.type}}{{/if}}</td>
           <td class="col-init">
             {{#if (eq arme.system.style "bouclier")}}
             <span class="arme-score arme-score-inactive">—</span>
@@ -215,9 +215,9 @@
             {{/if}}
           </td>
           <td class="col-row-actions">
-            <a class="item-edit" data-item-id="{{arme.id}}" title="Éditer"><i class="fas fa-pen"></i></a>
-            <a class="item-delete" data-item-id="{{arme.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
-            <span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span>
+            <a class="item-edit" data-item-id="{{arme.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
+            <a class="item-delete" data-item-id="{{arme.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+            <span class="item-drag-handle" title='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
           </td>
         </tr>
         {{/each}}
@@ -243,10 +243,10 @@
         <tr>
           <th class="man-col-toggle"></th>
           <th class="man-col-name">{{localize "AGONE.Nom"}}</th>
-          <th class="man-col-num" title="Modificateur d'Initiative">INI</th>
-          <th class="man-col-num" title="Modificateur d'Attaque">ATT</th>
-          <th class="man-col-num" title="Modificateur de Défense">DEF</th>
-          <th class="man-col-dom" title="Dommages">DOM</th>
+          <th class="man-col-num" title='{{localize "AGONE.Combat.ModInit"}}'>INI</th>
+          <th class="man-col-num" title='{{localize "AGONE.Combat.ModAtt"}}'>ATT</th>
+          <th class="man-col-num" title='{{localize "AGONE.Combat.ModDef"}}'>DEF</th>
+          <th class="man-col-dom" title='{{localize "AGONE.Dommages"}}'>DOM</th>
           <th class="man-col-actions"></th>
           <th class="col-drag"></th>
         </tr>
@@ -256,7 +256,7 @@
         <tr class="item-row man-row" data-item-id="{{man.id}}">
           <td class="man-col-toggle">
             {{#if man.system.description}}
-            <button type="button" class="man-desc-toggle btn-icon" data-item-id="{{man.id}}" title="Description">
+            <button type="button" class="man-desc-toggle btn-icon" data-item-id="{{man.id}}" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas fa-chevron-right man-toggle-icon"></i>
             </button>
             {{/if}}
@@ -264,7 +264,7 @@
           <td class="man-col-name">
             <div class="man-name-line">
               <span class="man-badge man-badge-{{man.system.categorie}}">
-                {{#if (eq man.system.categorie "botte")}}Botte{{else}}Man.{{/if}}
+                {{#if (eq man.system.categorie "botte")}}{{localize "AGONE.Botte"}}{{else}}Man.{{/if}}
               </span>
               <button type="button" class="roll-btn item-name" data-action="rollManoeuvre" data-item-id="{{man.id}}">
                 {{man.name}}
@@ -276,17 +276,17 @@
           </td>
           <td class="man-col-num">
             <span class="man-val {{#if (eq man.system.ini null)}}man-val-var{{else if (gt man.system.ini 0)}}man-val-pos{{else if (lt man.system.ini 0)}}man-val-neg{{else}}man-val-zero{{/if}}">
-              {{#if (eq man.system.ini null)}}var{{else if (gt man.system.ini 0)}}+{{man.system.ini}}{{else if (lt man.system.ini 0)}}{{man.system.ini}}{{else}}0{{/if}}
+              {{#if (eq man.system.ini null)}}{{localize "AGONE.Browser.Var"}}{{else if (gt man.system.ini 0)}}+{{man.system.ini}}{{else if (lt man.system.ini 0)}}{{man.system.ini}}{{else}}0{{/if}}
             </span>
           </td>
           <td class="man-col-num">
             <span class="man-val {{#if (eq man.system.att null)}}man-val-var{{else if (gt man.system.att 0)}}man-val-pos{{else if (lt man.system.att 0)}}man-val-neg{{else}}man-val-zero{{/if}}">
-              {{#if (eq man.system.att null)}}var{{else if (gt man.system.att 0)}}+{{man.system.att}}{{else if (lt man.system.att 0)}}{{man.system.att}}{{else}}0{{/if}}
+              {{#if (eq man.system.att null)}}{{localize "AGONE.Browser.Var"}}{{else if (gt man.system.att 0)}}+{{man.system.att}}{{else if (lt man.system.att 0)}}{{man.system.att}}{{else}}0{{/if}}
             </span>
           </td>
           <td class="man-col-num">
             <span class="man-val {{#if (eq man.system.def null)}}man-val-var{{else if (gt man.system.def 0)}}man-val-pos{{else if (lt man.system.def 0)}}man-val-neg{{else}}man-val-zero{{/if}}">
-              {{#if (eq man.system.def null)}}var{{else if (gt man.system.def 0)}}+{{man.system.def}}{{else if (lt man.system.def 0)}}{{man.system.def}}{{else}}0{{/if}}
+              {{#if (eq man.system.def null)}}{{localize "AGONE.Browser.Var"}}{{else if (gt man.system.def 0)}}+{{man.system.def}}{{else if (lt man.system.def 0)}}{{man.system.def}}{{else}}0{{/if}}
             </span>
           </td>
           <td class="man-col-dom">
@@ -296,7 +296,7 @@
             <a class="item-edit" data-item-id="{{man.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
             <a class="item-delete" data-item-id="{{man.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
           </td>
-          <td class="col-drag"><span class="item-drag-handle" title="Déplacer"><i class="fas fa-grip-vertical"></i></span></td>
+          <td class="col-drag"><span class="item-drag-handle" title='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span></td>
         </tr>
         <tr class="man-desc-expand" data-item-id="{{man.id}}" style="display:none">
           <td></td>

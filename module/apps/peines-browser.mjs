@@ -1,11 +1,13 @@
 import { PEINES_PERFIDIE_DATA } from "../helpers/compendium-data.mjs";
 
 // Libellés lisibles des catégories de peines de Perfidie
-const CAT_LABELS = {
-  creature_masque : "Créatures du Masque",
-  lieu_perfidie   : "Lieu de Perfidie",
-  autre           : "Autres circonstances",
-};
+function _buildCatLabels() {
+  return {
+    creature_masque : game.i18n.localize("AGONE.PerfidieCatCreatures"),
+    lieu_perfidie   : game.i18n.localize("AGONE.PerfidieCatLieu"),
+    autre           : game.i18n.localize("AGONE.PerfidieCatAutres"),
+  };
+}
 
 /**
  * Navigateur des Peines de Perfidie — fenêtre de sélection avec filtres.
@@ -34,7 +36,7 @@ export class PeinesBrowser extends Application {
   }
 
   get title() {
-    return `Peines de Perfidie — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitrePerfidie", { nom: this.actor.name });
   }
 
   /** @override */
@@ -47,9 +49,9 @@ export class PeinesBrowser extends Application {
       idx          : String(idx),
       name         : d.name,
       categorie    : d.categorie,
-      categorieLabel: CAT_LABELS[d.categorie] ?? d.categorie,
+      categorieLabel: _buildCatLabels()[d.categorie] ?? d.categorie,
       noirEffect   : d.noirEffect,   // "corps" | "ame" | ""
-      noirLabel    : d.noirEffect === "corps" ? "Corps" : d.noirEffect === "ame" ? "Âme" : "—",
+      noirLabel    : d.noirEffect === "corps" ? game.i18n.localize("AGONE.Corps") : d.noirEffect === "ame" ? game.i18n.localize("AGONE.Ame") : "—",
       bienfait     : d.bienfait ?? "",
       description  : d.description ?? "",
       hasInActor   : actorPeineNames.has(d.name),
@@ -82,7 +84,7 @@ export class PeinesBrowser extends Application {
       search          : this._search,
       filterCategorie : this._filterCategorie,
       filterNoir      : this._filterNoir,
-      categories      : Object.entries(CAT_LABELS).map(([k, v]) => ({ key: k, label: v })),
+      categories      : Object.entries(_buildCatLabels()).map(([k, v]) => ({ key: k, label: v })),
     };
   }
 
@@ -149,7 +151,7 @@ export class PeinesBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajoutée à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.PeineAjoutee", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

@@ -30,7 +30,7 @@ export class SortsBrowser extends Application {
   }
 
   get title() {
-    return `Sorts — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreSorts", { nom: this.actor.name });
   }
 
   /** @override */
@@ -41,13 +41,13 @@ export class SortsBrowser extends Application {
 
     // Labels lisibles pour les types
     const TYPE_LABELS = {
-      jorniste      : "Jorniste",
-      obscurantiste : "Obscurantiste",
-      eclipsiste    : "Éclipsiste",
-      accord        : "Accord",
-      cyse          : "Cyse",
-      geste         : "Geste",
-      decorum       : "Décorum",
+      jorniste      : game.i18n.localize("AGONE.Jorniste"),
+      obscurantiste : game.i18n.localize("AGONE.Obscurantiste"),
+      eclipsiste    : game.i18n.localize("AGONE.Eclipsiste"),
+      accord        : game.i18n.localize("AGONE.Accord"),
+      cyse          : game.i18n.localize("AGONE.Cyse"),
+      geste         : game.i18n.localize("AGONE.Geste"),
+      decorum       : game.i18n.localize("AGONE.Decorum"),
     };
 
     let sorts = SORTS_DATA.map((d, idx) => ({
@@ -196,7 +196,7 @@ export class SortsBrowser extends Application {
       if (EMPRISE_TYPES.has(d.typeMagie)) {
         const danseurs = this.actor.items.filter(i => i.type === "danseur" && !i.system.modeCreation);
         if (!danseurs.length) {
-          ui.notifications.warn(`${this.actor.name} n'a aucun danseur disponible pour lancer ce sort d'emprise.`);
+          ui.notifications.warn(game.i18n.format("AGONE.Notif.AucunDanseurDisponible", { acteur: this.actor.name }));
           return;
         }
         let danseurId;
@@ -205,12 +205,12 @@ export class SortsBrowser extends Application {
         } else {
           const options = danseurs.map(dan => `<option value="${dan.id}">${dan.name}</option>`).join("");
           danseurId = await foundry.applications.api.DialogV2.prompt({
-            window:  { title: `Sort d'emprise improvis\u00e9 \u2014 ${d.name}` },
+            window:  { title: game.i18n.format("AGONE.Browser.TitreDialogSortImpro", { nom: d.name }) },
             content: `<div class="form-group" style="margin:8px 0">
-                        <label style="font-weight:600">Danseur \u00e0 utiliser&nbsp;:</label>
+                        <label style="font-weight:600">${game.i18n.localize("AGONE.Browser.DanseurAUtiliser")}</label>
                         <select name="danseurId" style="width:100%;margin-top:4px">${options}</select>
                       </div>`,
-            ok: { label: "Lancer", callback: (_ev, btn) => btn.form.elements.danseurId.value },
+            ok: { label: game.i18n.localize("AGONE.Lancer"), callback: (_ev, btn) => btn.form.elements.danseurId.value },
           });
           if (!danseurId) return;
         }
@@ -249,7 +249,7 @@ export class SortsBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajouté à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.SortAjoute", { nom: d.name, acteur: this.actor.name }));
       this.render(); // rafraîchit le checkmark
     });
   }

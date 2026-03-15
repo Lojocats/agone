@@ -5,42 +5,42 @@
   <div class="charges-card">
     <div class="charges-card-header">
       <i class="fas fa-balance-scale"></i>
-      <span class="charges-card-title">Charges</span>
-      <span class="charges-card-subtitle">Base 10 pts (+5 Charge sociale optionnelle)</span>
+      <span class="charges-card-title">{{localize "AGONE.Avantages.ChargesSection"}}</span>
+      <span class="charges-card-subtitle">{{localize "AGONE.Avantages.ChargesSubtitle"}}</span>
     </div>
     <div class="charges-card-body">
       <div class="charges-stats-row">
         <div class="charges-stat">
-          <span class="charges-stat-label">Budget</span>
+          <span class="charges-stat-label">{{localize "AGONE.Avantages.Budget"}}</span>
           <input type="number" name="system.ptsCharges.max" value="{{system.ptsCharges.max}}"
                  class="charges-stat-input" min="0" data-dtype="Number">
         </div>
         <div class="charges-stat-sep">+</div>
         <div class="charges-stat">
-          <span class="charges-stat-label">Récupérés</span>
+          <span class="charges-stat-label">{{localize "AGONE.Avantages.Recuperes"}}</span>
           <span class="charges-stat-val charges-plus">{{system.chargesRecuperees}}</span>
         </div>
         <div class="charges-stat-sep charges-stat-sep--eq">=</div>
         <div class="charges-stat charges-stat--main">
-          <span class="charges-stat-label">Disponibles</span>
+          <span class="charges-stat-label">{{localize "AGONE.Avantages.Disponibles"}}</span>
           <span class="charges-stat-val charges-disponibles">{{system.chargesDisponibles}}</span>
         </div>
         <div class="charges-stat-sep">-</div>
         <div class="charges-stat">
-          <span class="charges-stat-label">Dépensés</span>
+          <span class="charges-stat-label">{{localize "AGONE.Avantages.Depenses"}}</span>
           <span class="charges-stat-val charges-moins">{{system.chargesDepensees}}</span>
         </div>
         <div class="charges-stat-sep charges-stat-sep--eq">=</div>
         <div class="charges-stat charges-stat--solde">
-          <span class="charges-stat-label">Solde</span>
+          <span class="charges-stat-label">{{localize "AGONE.Avantages.Solde"}}</span>
           <span class="charges-stat-val {{system.chargesSoldeClass}}">{{system.chargesSolde}}</span>
         </div>
       </div>
       {{#if system.chargesJeune}}
-      <p class="charges-note"><i class="fas fa-exclamation-triangle"></i> Jeune : coûts des avantages ×2</p>
+      <p class="charges-note"><i class="fas fa-exclamation-triangle"></i> {{localize "AGONE.Avantages.JeuneNote"}}</p>
       {{/if}}
       {{#if system.chargesVieillard}}
-      <p class="charges-note">Vieillard : coûts des avantages -2 (min 1)</p>
+      <p class="charges-note">{{localize "AGONE.Avantages.VieillardNote"}}</p>
       {{/if}}
     </div>
   </div>
@@ -57,7 +57,7 @@
           <i class="fas fa-search"></i>
         </button>
         <button type="button" class="btn-icon item-create" data-type="don" data-categorie="avantage"
-                title="Créer un avantage">
+                title='{{localize "AGONE.Avantages.CreerAvantage"}}'>
           <i class="fas fa-plus"></i>
         </button>
       </div>
@@ -98,7 +98,7 @@
       <div class="av-col-header">
         <h4 class="av-col-title def-title"><i class="fas fa-exclamation-circle"></i> {{localize "AGONE.Defauts"}}</h4>
         <button type="button" class="btn-icon item-create" data-type="don" data-categorie="defaut"
-                title="Créer un défaut">
+                title='{{localize "AGONE.Avantages.CreerDefaut"}}'>
           <i class="fas fa-plus"></i>
         </button>
       </div>
@@ -108,7 +108,7 @@
         <li class="don-row item-row" data-item-id="{{don.id}}">
           <span class="item-drag-handle col-drag"><i class="fas fa-grip-vertical"></i></span>
           {{#if don.system.description}}
-          <button type="button" class="don-desc-toggle btn-icon" data-item-id="{{don.id}}" title="Description">
+          <button type="button" class="don-desc-toggle btn-icon" data-item-id="{{don.id}}" title='{{localize "AGONE.VoirDescription"}}'>
             <i class="fas fa-chevron-right don-toggle-icon"></i>
           </button>
           {{else}}
@@ -119,8 +119,8 @@
           {{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-neg">-{{don.system.cout}}</span>
-          <a class="btn-icon item-edit" data-item-id="{{don.id}}" title="Modifier"><i class="fas fa-edit"></i></a>
-          <a class="btn-icon item-delete" data-item-id="{{don.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
+          <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
+          <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
         <li class="don-desc-expand" data-item-id="{{don.id}}" style="display:none">

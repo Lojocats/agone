@@ -5,25 +5,25 @@
     <div class="mb-filter-row">
       <div class="mb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="mb-search" placeholder="Rechercher une manœuvre ou une botte..." value="{{search}}">
+        <input type="text" class="mb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
       </div>
-      <button type="button" class="mb-clear" title="Effacer les filtres">
+      <button type="button" class="mb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
         <i class="fas fa-eraser"></i>
       </button>
     </div>
 
     <div class="mb-filter-row2">
       <select class="mb-cat-filter">
-        <option value="all"       {{#if (eq filterCat "all")}}selected{{/if}}>Manœuvres & Bottes</option>
-        <option value="manoeuvre" {{#if (eq filterCat "manoeuvre")}}selected{{/if}}>Manœuvres uniquement</option>
-        <option value="botte"     {{#if (eq filterCat "botte")}}selected{{/if}}>Bottes uniquement</option>
+        <option value="all"       {{#if (eq filterCat "all")}}selected{{/if}}>{{localize "AGONE.Browser.ManoeuvresBottes"}}</option>
+        <option value="manoeuvre" {{#if (eq filterCat "manoeuvre")}}selected{{/if}}>{{localize "AGONE.Browser.ManoeuvresUniquement"}}</option>
+        <option value="botte"     {{#if (eq filterCat "botte")}}selected{{/if}}>{{localize "AGONE.Browser.BottesUniquement"}}</option>
       </select>
       <select class="mb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Toutes</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà apprises</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non apprises</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui"}}selected{{/if}}>{{localize "AGONE.Browser.DejaApprises"}}</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonApprises"}}</option>
       </select>
-      <span class="mb-count">{{items.length}} résultat(s)</span>
+      <span class="mb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
     </div>
   </div>
 
@@ -33,13 +33,13 @@
       <thead>
         <tr>
           <th class="mb-col-toggle"></th>
-          <th class="mb-col-name">Nom</th>
-          <th class="mb-col-cat">Catégorie</th>
-          <th class="mb-col-ini"  title="Modificateur d'Initiative">INI</th>
-          <th class="mb-col-att"  title="Modificateur d'Attaque">ATT</th>
-          <th class="mb-col-def"  title="Modificateur de Défense">DEF</th>
-          <th class="mb-col-dom"  title="Modificateur de Dommages">DOM</th>
-          <th class="mb-col-condition" title="Condition / Restriction">Condition</th>
+          <th class="mb-col-name">{{localize "AGONE.Nom"}}</th>
+          <th class="mb-col-cat">{{localize "AGONE.Categorie"}}</th>
+          <th class="mb-col-ini"  title='{{localize "AGONE.Combat.ModInit"}}'>{{localize "AGONE.ManIni"}}</th>
+          <th class="mb-col-att"  title='{{localize "AGONE.Combat.ModAtt"}}'>{{localize "AGONE.ManAtt"}}</th>
+          <th class="mb-col-def"  title='{{localize "AGONE.Combat.ModDef"}}'>{{localize "AGONE.ManDef"}}</th>
+          <th class="mb-col-dom"  title='{{localize "AGONE.Combat.ModDom"}}'>{{localize "AGONE.ManDom"}}</th>
+          <th class="mb-col-condition" title='{{localize "AGONE.ManCondition"}}'>{{localize "AGONE.ManCondition"}}</th>
           <th class="mb-col-action"></th>
         </tr>
       </thead>
@@ -48,7 +48,7 @@
         <tr class="mb-row mb-row-{{item.categorie}} {{#if item.hasInActor}}mb-has-item{{/if}}" data-man-idx="{{item.idx}}">
           <td>
             {{#if item.description}}
-            <button type="button" class="mb-desc-toggle btn-icon" data-action="toggleManDesc" title="Voir la description">
+            <button type="button" class="mb-desc-toggle btn-icon" data-action="toggleManDesc" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
             </button>
             {{/if}}
@@ -56,27 +56,27 @@
           <td class="mb-name">{{item.name}}</td>
           <td class="mb-cat">
             {{#if (eq item.categorie "botte")}}
-            <span class="mb-badge mb-badge-botte">Botte</span>
+            <span class="mb-badge mb-badge-botte">{{localize "AGONE.Botte"}}</span>
             {{else}}
-            <span class="mb-badge mb-badge-manoeuvre">Manœuvre</span>
+            <span class="mb-badge mb-badge-manoeuvre">{{localize "AGONE.Manoeuvre"}}</span>
             {{/if}}
           </td>
           <td class="mb-ini">
-            {{#if (eq item.ini null)}}var{{else if (gt item.ini 0)}}+{{item.ini}}{{else if (lt item.ini 0)}}{{item.ini}}{{else}}0{{/if}}
+            {{#if (eq item.ini null)}}{{localize "AGONE.Browser.Var"}}{{else if (gt item.ini 0)}}+{{item.ini}}{{else if (lt item.ini 0)}}{{item.ini}}{{else}}0{{/if}}
           </td>
           <td class="mb-att">
-            {{#if (eq item.att null)}}var{{else if (gt item.att 0)}}+{{item.att}}{{else if (lt item.att 0)}}{{item.att}}{{else}}0{{/if}}
+            {{#if (eq item.att null)}}{{localize "AGONE.Browser.Var"}}{{else if (gt item.att 0)}}+{{item.att}}{{else if (lt item.att 0)}}{{item.att}}{{else}}0{{/if}}
           </td>
           <td class="mb-def">
-            {{#if (eq item.def null)}}var{{else if (gt item.def 0)}}+{{item.def}}{{else if (lt item.def 0)}}{{item.def}}{{else}}0{{/if}}
+            {{#if (eq item.def null)}}{{localize "AGONE.Browser.Var"}}{{else if (gt item.def 0)}}+{{item.def}}{{else if (lt item.def 0)}}{{item.def}}{{else}}0{{/if}}
           </td>
           <td class="mb-dom">{{item.dom}}</td>
           <td class="mb-condition">{{item.condition}}</td>
           <td class="mb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check mb-check" title="Déjà apprise"></i>
+            <i class="fas fa-check mb-check" title='{{localize "AGONE.Browser.DejaApprises"}}'></i>
             {{else}}
-            <button type="button" class="mb-add-btn btn-icon" data-action="addManoeuvre" title="Ajouter au personnage">
+            <button type="button" class="mb-add-btn btn-icon" data-action="addManoeuvre" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}
@@ -90,7 +90,7 @@
         {{/if}}
         {{/each}}
         {{#unless items.length}}
-        <tr><td colspan="9" class="mb-empty">Aucun résultat trouvé.</td></tr>
+        <tr><td colspan="9" class="mb-empty">{{localize "AGONE.Browser.AucunResultatTrouve"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

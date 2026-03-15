@@ -2,7 +2,7 @@
   <header class="sheet-header">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" />
     <div class="header-fields">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Nom de l'arme" /></h1>
+      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder='{{localize "AGONE.NomArme"}}' /></h1>
     </div>
   </header>
   <section class="sheet-body">
@@ -48,7 +48,7 @@
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.Portee"}}</label>
-        <input type="text" name="system.portee" value="{{system.portee}}" placeholder="ex: 80 m / FOR×4 m" />
+        <input type="text" name="system.portee" value="{{system.portee}}" placeholder="ex: 80 m / FORx4 m" />
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.ReqFor"}}</label>
@@ -60,7 +60,7 @@
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.CompetenceLiee"}}</label>
-        <input type="text" name="system.competence" value="{{system.competence}}" placeholder="Nom de la compétence..." />
+        <input type="text" name="system.competence" value="{{system.competence}}" placeholder='{{localize "AGONE.NomCompetence"}}' />
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.Poids"}}</label>

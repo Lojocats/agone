@@ -5,25 +5,25 @@
     <div class="pvb-filter-row">
       <div class="pvb-search-wrap">
         <i class="fas fa-search"></i>
-        <input type="text" class="pvb-search" placeholder="Rechercher un pouvoir..." value="{{search}}">
+        <input type="text" class="pvb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
       </div>
-      <button type="button" class="pvb-clear" title="Effacer les filtres">
+      <button type="button" class="pvb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
         <i class="fas fa-eraser"></i>
       </button>
     </div>
 
     <div class="pvb-filter-row2">
       <select class="pvb-cat-filter">
-        <option value="all"     {{#if (eq filterCat "all")}}selected{{/if}}>Tous les pouvoirs</option>
-        <option value="flamme"  {{#if (eq filterCat "flamme")}}selected{{/if}}>Pouvoirs de Flamme</option>
-        <option value="saisonin" {{#if (eq filterCat "saisonin")}}selected{{/if}}>Pouvoirs Saisonins</option>
+        <option value="all"     {{#if (eq filterCat "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousLesPouvoirs"}}</option>
+        <option value="flamme"  {{#if (eq filterCat "flamme")}}selected{{/if}}>{{localize "AGONE.Browser.PouvoirsFlamme"}}</option>
+        <option value="saisonin" {{#if (eq filterCat "saisonin")}}selected{{/if}}>{{localize "AGONE.Browser.PouvoirsSaisonins"}}</option>
       </select>
       <select class="pvb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>Tous</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>Déjà possédés</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>Non possédés</option>
+        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+        <option value="oui" {{#if (eq filterPossede "oui"}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
       </select>
-      <span class="pvb-count">{{items.length}} résultat(s)</span>
+      <span class="pvb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
     </div>
   </div>
 
@@ -33,8 +33,8 @@
       <thead>
         <tr>
           <th class="pvb-col-toggle"></th>
-          <th class="pvb-col-name">Nom</th>
-          <th class="pvb-col-cat">Catégorie</th>
+          <th class="pvb-col-name">{{localize "AGONE.Nom"}}</th>
+          <th class="pvb-col-cat">{{localize "AGONE.Categorie"}}</th>
           <th class="pvb-col-action"></th>
         </tr>
       </thead>
@@ -43,7 +43,7 @@
         <tr class="pvb-row pvb-row-{{item.categorie}} {{#if item.hasInActor}}pvb-has-item{{/if}}" data-pouvoir-idx="{{item.idx}}">
           <td>
             {{#if item.description}}
-            <button type="button" class="pvb-desc-toggle btn-icon" data-action="togglePouvoirDesc" title="Voir la description">
+            <button type="button" class="pvb-desc-toggle btn-icon" data-action="togglePouvoirDesc" title='{{localize "AGONE.VoirDescription"}}'>
               <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
             </button>
             {{/if}}
@@ -51,16 +51,16 @@
           <td class="pvb-name">{{item.name}}</td>
           <td class="pvb-cat">
             {{#if (eq item.categorie "flamme")}}
-            <span class="pvb-badge pvb-badge-flamme">Flamme</span>
+            <span class="pvb-badge pvb-badge-flamme">{{localize "AGONE.PouvoirFlamme"}}</span>
             {{else}}
-            <span class="pvb-badge pvb-badge-saisonin">Saisonin</span>
+            <span class="pvb-badge pvb-badge-saisonin">{{localize "AGONE.Saisonin"}}</span>
             {{/if}}
           </td>
           <td class="pvb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check pvb-check" title="Déjà possédé"></i>
+            <i class="fas fa-check pvb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="pvb-add-btn btn-icon" data-action="addPouvoir" title="Ajouter au personnage">
+            <button type="button" class="pvb-add-btn btn-icon" data-action="addPouvoir" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}
@@ -74,7 +74,7 @@
         {{/if}}
         {{/each}}
         {{#unless items.length}}
-        <tr><td colspan="4" class="pvb-empty">Aucun résultat trouvé.</td></tr>
+        <tr><td colspan="4" class="pvb-empty">{{localize "AGONE.Browser.AucunResultatTrouve"}}</td></tr>
         {{/unless}}
       </tbody>
     </table>

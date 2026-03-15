@@ -27,7 +27,7 @@ export class DonsBrowser extends Application {
   }
 
   get title() {
-    return `Avantages & Défauts — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreAvantages", { nom: this.actor.name });
   }
 
   /** @override */
@@ -139,7 +139,7 @@ export class DonsBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajouté à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.DonAjoute", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }

@@ -1,17 +1,19 @@
 import { AVANTAGES_DATA } from "../helpers/compendium-data.mjs";
 
 // Libellés lisibles des catégories
-const CAT_LABELS = {
-  charge  : "Charges",
-  ame     : "Âme",
-  corps   : "Corps",
-  esprit  : "Esprit",
-  societe : "Société",
-  emprise : "Emprise",
-  arts    : "Arts",
-  saisons : "Saisons",
-  flamme  : "Flamme",
-};
+function _buildCatLabels() {
+  return {
+    charge  : game.i18n.localize("AGONE.CategorieCharges"),
+    ame     : game.i18n.localize("AGONE.Ame"),
+    corps   : game.i18n.localize("AGONE.Corps"),
+    esprit  : game.i18n.localize("AGONE.Esprit"),
+    societe : game.i18n.localize("AGONE.CategorieSociete"),
+    emprise : game.i18n.localize("AGONE.Emprise"),
+    arts    : game.i18n.localize("AGONE.CategorieArts"),
+    saisons : game.i18n.localize("AGONE.CategorieSaisons"),
+    flamme  : game.i18n.localize("AGONE.Flamme"),
+  };
+}
 
 /**
  * Navigateur d'avantages & défauts (données PDF) — fenêtre de sélection avec filtres.
@@ -42,7 +44,7 @@ export class AvantagesBrowser extends Application {
   }
 
   get title() {
-    return `Avantages & Défauts — ${this.actor.name}`;
+    return game.i18n.format("AGONE.Browser.TitreAvantages", { nom: this.actor.name });
   }
 
   /** @override */
@@ -55,7 +57,7 @@ export class AvantagesBrowser extends Application {
       idx        : String(idx),
       name       : d.name,
       section    : d.categorie,
-      sectionLabel: CAT_LABELS[d.categorie] ?? d.categorie,
+      sectionLabel: _buildCatLabels()[d.categorie] ?? d.categorie,
       type       : d.type,
       charge     : d.charge,
       chargeAbs  : Math.abs(d.charge),
@@ -107,7 +109,7 @@ export class AvantagesBrowser extends Application {
       filterPossede     : this._filterPossede,
       filterChargeExact : this._filterChargeExact,
       allCharges,
-      sections          : Object.entries(CAT_LABELS).map(([k, v]) => ({ key: k, label: v })),
+      sections          : Object.entries(_buildCatLabels()).map(([k, v]) => ({ key: k, label: v })),
     };
   }
 
@@ -177,7 +179,7 @@ export class AvantagesBrowser extends Application {
 
       // Description enrichie avec prérequis si présents
       let desc = d.description ?? "";
-      if (d.prerequis) desc = `<em>Prérequis : ${d.prerequis}</em><br>${desc}`;
+      if (d.prerequis) desc = `<em>${game.i18n.localize("AGONE.Prerequis")} : ${d.prerequis}</em><br>${desc}`;
 
       await Item.create({
         name  : d.name,
@@ -189,7 +191,7 @@ export class AvantagesBrowser extends Application {
         },
       }, { parent: this.actor });
 
-      ui.notifications?.info(`${d.name} ajouté à ${this.actor.name}.`);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.AvantageAjoute", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
   }
