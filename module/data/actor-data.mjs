@@ -177,9 +177,9 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       }),
 
       // Budget initial de Charges (avantages & défauts)
-      // Règle Vie antérieure : 10 pts de base (+ 5 optionnel pour une Charge sociale)
+      // Règle Vie antérieure : 5 pts de base (+ 5 optionnel pour une Charge sociale)
       ptsCharges: new fields.SchemaField({
-        max: new fields.NumberField({ initial: 10, integer: true, min: 0 })
+        max: new fields.NumberField({ initial: 5, integer: true, min: 0 })
       }),
 
       // Armure portée

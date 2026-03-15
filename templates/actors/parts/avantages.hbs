@@ -51,7 +51,7 @@
     <!-- Colonne Avantages -->
     <div class="av-col">
       <div class="av-col-header">
-        <h4 class="av-col-title av-title"><i class="fas fa-star"></i> {{localize "AGONE.Avantages"}}</h4>
+        <h4 class="av-col-title av-title"><i class="fas fa-star"></i> {{localize "AGONE.Avantages.Avantages"}}</h4>
         <button type="button" class="btn-icon compendium-browse" data-pack="agone.dons"
                 title='{{localize "AGONE.ParcourirDons"}}'>
           <i class="fas fa-search"></i>
@@ -118,7 +118,7 @@
           <span class="av-section-badge av-sect-{{don._avSection}} av-defaut-sect">{{don._avSectionLabel}}</span>
           {{/if}}
           <span class="don-name">{{don.name}}</span>
-          <span class="don-cout av-cout-neg">-{{don.system.cout}}</span>
+          <span class="don-cout av-cout-neg">{{don.system.cout}}</span>
           <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
           <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
