@@ -1,2 +1,4 @@
 /packs/*
 *.py
+packs/armes/LOG
+packs/armures/LOG
