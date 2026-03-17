@@ -9,16 +9,12 @@
     <div class="item-form-grid">
       <div class="form-group">
         <label>{{localize "AGONE.TypeMagie"}}</label>
-        <select name="system.typeMagie">
-          <option value="" {{#if (eq system.typeMagie "")}}selected{{/if}}>—</option>
-          <option value="jorniste" {{#if (eq system.typeMagie "jorniste")}}selected{{/if}}>{{localize "AGONE.Jorniste"}}</option>
-          <option value="obscurantiste" {{#if (eq system.typeMagie "obscurantiste")}}selected{{/if}}>{{localize "AGONE.Obscurantiste"}}</option>
-          <option value="eclipsiste" {{#if (eq system.typeMagie "eclipsiste")}}selected{{/if}}>{{localize "AGONE.Eclipsiste"}}</option>
-          <option value="accord" {{#if (eq system.typeMagie "accord")}}selected{{/if}}>{{localize "AGONE.Accord"}}</option>
-          <option value="cyse" {{#if (eq system.typeMagie "cyse")}}selected{{/if}}>{{localize "AGONE.Cyse"}}</option>
-          <option value="decorum" {{#if (eq system.typeMagie "decorum")}}selected{{/if}}>{{localize "AGONE.Decorum"}}</option>
-          <option value="geste" {{#if (eq system.typeMagie "geste")}}selected{{/if}}>{{localize "AGONE.Geste"}}</option>
-        </select>
+        <input type="text" name="system.typeMagie" value="{{system.typeMagie}}" list="agone-magic-types" placeholder='{{localize "AGONE.TypeMagiePlaceholder"}}' />
+        <datalist id="agone-magic-types">
+          {{#each magicTypeOptions as |opt|}}
+          <option value="{{opt}}"></option>
+          {{/each}}
+        </datalist>
       </div>
 
       {{#if (or (eq system.typeMagie "accord") (eq system.typeMagie "decorum"))}}

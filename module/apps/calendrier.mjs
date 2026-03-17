@@ -49,6 +49,42 @@ export class CalendrierAgone extends Application {
       await this._navigate(Number(delta), unit);
     });
 
+    // Changement d'année via label interactif
+    html.find("[data-open-year-picker]").on("click", async () => {
+      const currentYear = Number((game.settings.get("agone", "calendrierDate") ?? { an: 1 }).an) || 1;
+      const content = `
+        <form class="agone-year-picker-form">
+          <div class="form-group">
+            <label>${game.i18n.localize("AGONE.Calendrier.An")}</label>
+            <input type="number" name="annee" min="1" step="1" value="${currentYear}" />
+          </div>
+        </form>
+      `;
+
+      new Dialog({
+        title: game.i18n.localize("AGONE.Calendrier.ChangerAnnee"),
+        content,
+        buttons: {
+          cancel: {
+            label: game.i18n.localize("AGONE.Fermer"),
+          },
+          ok: {
+            label: game.i18n.localize("AGONE.Confirmer"),
+            callback: async (dialogHtml) => {
+              const yearInput = Number(dialogHtml.find("input[name='annee']").val());
+              await this._setYear(yearInput);
+            },
+          },
+        },
+        default: "ok",
+        render: (dialogHtml) => {
+          const input = dialogHtml.find("input[name='annee']");
+          input.trigger("focus");
+          input.trigger("select");
+        },
+      }).render(true);
+    });
+
     // Clic sur un jour
     html.find(".cal-day").on("click", async (e) => {
       const jour = Number(e.currentTarget.dataset.jour);
@@ -98,6 +134,17 @@ export class CalendrierAgone extends Application {
     if (newSaison !== game.settings.get("agone", "saisonMonde")) {
       await game.settings.set("agone", "saisonMonde", newSaison);
     }
+    this.render(false);
+  }
+
+  async _setYear(year) {
+    if (!Number.isInteger(year) || year < 1) return;
+
+    const date = { ...(game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1 }) };
+    if (date.an === year) return;
+
+    date.an = year;
+    await game.settings.set("agone", "calendrierDate", date);
     this.render(false);
   }
 }

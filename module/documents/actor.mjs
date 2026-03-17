@@ -823,17 +823,25 @@ export class AgoneActor extends Actor {
       geste:         "Geste",
       // jorniste / obscurantiste / eclipsiste → vérification sans domaine précis
     };
-    const typeMagie  = sort.system.typeMagie?.trim() ?? "";
+    const EMPRISE_TYPES = new Set(["jorniste", "obscurantiste", "eclipsiste"]);
+    const typeMagie  = sort.system.typeMagie?.trim().toLowerCase() ?? "";
+    let typeMagieResolved = typeMagie;
     const compAltNomGuard = sort.system.compAlt?.trim() ?? "";
+    if (!compAltNomGuard && typeMagie && !TYPES_TO_DOMAINE[typeMagie] && !EMPRISE_TYPES.has(typeMagie)) {
+      const selectedType = await this._promptMagicTypeFallback(typeMagie);
+      if (!selectedType) return null;
+      typeMagieResolved = selectedType;
+    }
+
     if (!compAltNomGuard) {
-      const domaineCible = TYPES_TO_DOMAINE[typeMagie] ?? null;
+      const domaineCible = TYPES_TO_DOMAINE[typeMagieResolved] ?? null;
       const hasArts = this.items.some(i =>
         i.type === "competence" &&
         i.name === "Arts Magiques" &&
         (domaineCible === null ? true : i.system.domaine === domaineCible)
       );
       if (!hasArts) {
-        const domainLabel = domaineCible ?? (typeMagie || "ce domaine");
+        const domainLabel = domaineCible ?? (typeMagieResolved || "ce domaine");
         ui.notifications.warn(`${this.name} ne possède pas Arts Magiques (${domainLabel}) pour lancer ce sort.`);
         return null;
       }
@@ -843,7 +851,7 @@ export class AgoneActor extends Actor {
     const seuil = impro ? seuilBase * 2 : seuilBase;
 
     // Aptitude : utilise le score de la compétence "Arts Magiques" du domaine exact du sort
-    const domaineCibleApt = TYPES_TO_DOMAINE[typeMagie] ?? null;
+    const domaineCibleApt = TYPES_TO_DOMAINE[typeMagieResolved] ?? null;
     let aptitude;
     let aptitudeDomainLabel;
     if (domaineCibleApt) {
@@ -1086,6 +1094,89 @@ export class AgoneActor extends Actor {
     this._lastRollType = result.type;
     this._lastBonusSpe = result.bonusSpe ?? 0;
     return result.modif;
+  }
+
+  async _promptMagicTypeFallback(unknownType) {
+    const normalize = (value) => value
+      ?.toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLowerCase() ?? "";
+
+    const domaineToType = {
+      accord: "accord",
+      cyse: "cyse",
+      decorum: "decorum",
+      geste: "geste",
+    };
+
+    const labelByType = {
+      jorniste: game.i18n.localize("AGONE.Jorniste"),
+      obscurantiste: game.i18n.localize("AGONE.Obscurantiste"),
+      eclipsiste: game.i18n.localize("AGONE.Eclipsiste"),
+      accord: game.i18n.localize("AGONE.Accord"),
+      cyse: game.i18n.localize("AGONE.Cyse"),
+      decorum: game.i18n.localize("AGONE.Decorum"),
+      geste: game.i18n.localize("AGONE.Geste"),
+    };
+
+    const options = [];
+    const added = new Set();
+    const addOption = (type) => {
+      if (!type || added.has(type)) return;
+      added.add(type);
+      options.push({ value: type, label: labelByType[type] ?? type });
+    };
+
+    const typeMage = (this.system?.typeMage ?? "").trim().toLowerCase();
+    if (["jorniste", "obscurantiste", "eclipsiste"].includes(typeMage)) addOption(typeMage);
+
+    this.items
+      .filter(i => i.type === "competence" && i.name === "Arts Magiques")
+      .forEach(i => {
+        const domaineKey = normalize(i.system?.domaine);
+        addOption(domaineToType[domaineKey]);
+      });
+
+    if (!options.length) {
+      ui.notifications.warn(game.i18n.localize("AGONE.AucunTypeMagieDisponible"));
+      return null;
+    }
+
+    const optionsHtml = options.map(o => `<option value="${o.value}">${o.label}</option>`).join("");
+    const result = await foundry.applications.api.DialogV2.wait({
+      window: { title: game.i18n.localize("AGONE.ChoisirTypeMagie") },
+      content: `
+        <form>
+          <div class="agone-roll-dialog">
+            <p>${game.i18n.format("AGONE.TypeMagieInconnu", { type: unknownType })}</p>
+            <div class="form-group">
+              <label>${game.i18n.localize("AGONE.TypeMagie")}</label>
+              <select name="typeMagie">${optionsHtml}</select>
+            </div>
+          </div>
+        </form>
+      `,
+      buttons: [
+        {
+          action: "ok",
+          icon: "fas fa-check",
+          label: game.i18n.localize("AGONE.Confirmer"),
+          default: true,
+          callback: (_event, button) => button.form.elements.typeMagie.value,
+        },
+        {
+          action: "cancel",
+          icon: "fas fa-times",
+          label: game.i18n.localize("AGONE.Annuler"),
+        },
+      ],
+      rejectClose: false,
+    });
+
+    if (!result || typeof result !== "string") return null;
+    return result;
   }
 
   /**

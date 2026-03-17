@@ -245,6 +245,10 @@
     "Sorts":              "Sorts & Œuvres",
     "AucunSort":          "Aucun sort",
     "TypeMagie":          "Type de magie",
+    "TypeMagiePlaceholder": "jorniste, accord, ou type personnalisé",
+    "ChoisirTypeMagie":   "Choisir le type de magie",
+    "TypeMagieInconnu":   "Type de magie non reconnu : {type}. Sélectionnez un type disponible pour ce lancer.",
+    "AucunTypeMagieDisponible": "Aucun type de magie disponible pour ce personnage.",
     "ArtsMagiques":       "Arts Magiques",
     "Conjuration":        "Conjuration",
     "Sorcellerie":        "Sorcellerie",
@@ -740,7 +744,8 @@
       "Sauvegarder":     "Sauvegarder",
       "NoteSauvegardee": "Note sauvegardée.",
       "An":              "An",
-      "Jour":            "Jour"
+      "Jour":            "Jour",
+      "ChangerAnnee":    "Changer l'année"
     },
 
     "Browser": {

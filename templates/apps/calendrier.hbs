@@ -4,7 +4,7 @@
   <div class="cal-header cal-saison-{{saison}}">
     <span class="cal-saison-badge">{{saisonLabel}}</span>
     <h2 class="cal-mois-nom">{{moisData.nom}}</h2>
-    <span class="cal-an">{{localize "AGONE.Calendrier.An"}} {{date.an}}</span>
+    <span class="cal-an{{#if isGM}} cal-an-clickable{{/if}}"{{#if isGM}} data-open-year-picker="1" title='{{localize "AGONE.Calendrier.ChangerAnnee"}}'{{/if}}>{{localize "AGONE.Calendrier.An"}} {{date.an}}</span>
   </div>
 
   <!-- Navigation (GM uniquement) -->

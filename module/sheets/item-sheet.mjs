@@ -2,6 +2,10 @@
  * Feuille d'item générique – gère tous les types d'items Agone.
  */
 export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
+  static get MAGIC_TYPE_DEFAULTS() {
+    return ["jorniste", "obscurantiste", "eclipsiste", "accord", "cyse", "decorum", "geste"];
+  }
+
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["agone", "sheet", "item"],
@@ -31,6 +35,16 @@ export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
     context.attributsLies   = CONFIG.AGONE.attributsLies;
     context.typesMagie      = CONFIG.AGONE.typesMagie;
     context.categoriesDon   = CONFIG.AGONE.categoriesDon;
+
+    const existingMagicTypes = game.items
+      .filter(i => i.type === "sort")
+      .map(i => (i.system?.typeMagie ?? "").trim().toLowerCase())
+      .filter(Boolean);
+    context.magicTypeOptions = [...new Set([
+      ...this.constructor.MAGIC_TYPE_DEFAULTS,
+      ...existingMagicTypes,
+    ])].sort((a, b) => a.localeCompare(b, "fr"));
+
     return context;
   }
 
@@ -40,6 +54,13 @@ export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
       this.form.querySelectorAll("input[type='number']").forEach(el => {
         if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
       });
+
+      if (this.item.type === "sort") {
+        const typeMagieInput = this.form.querySelector("input[name='system.typeMagie']");
+        if (typeMagieInput) {
+          typeMagieInput.value = typeMagieInput.value.trim().toLowerCase();
+        }
+      }
     }
     return super._onSubmit(event, options);
   }
