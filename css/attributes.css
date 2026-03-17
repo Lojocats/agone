@@ -159,6 +159,15 @@
   padding: 3px 0;
   border-bottom: 1px dotted rgba(92,58,30,0.3);
 }
+/* Le bouton-nom doit avoir une largeur fixe pour que toutes les lignes soient alignées */
+.agone .carac-row .stat-label {
+  flex: 0 0 88px;
+  width: 88px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ── Caractéristiques dérivées ───────────────────────────── */
 .agone .derived-grid {

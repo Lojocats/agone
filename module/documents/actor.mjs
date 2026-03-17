@@ -747,7 +747,7 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
 
     const finalRoll = await this._sendRollToChat(roll, label, {
-      volonte: `${game.i18n.localize("AGONE.Volonte")} x2 : ${volScore * 2}`,
+      volonte: `${game.i18n.localize("AGONE.Attribut.Volonte")} x2 : ${volScore * 2}`,
       ame:     `${game.i18n.localize("AGONE.BonusAme")} : ${bonusAme}`,
       diff:    `${game.i18n.localize("AGONE.Difficulte")} : ${DIFFICULTE}`,
     });

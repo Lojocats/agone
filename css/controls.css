@@ -28,17 +28,18 @@
 .agone .roll-btn-small {
   background: transparent;
   border: 1px solid var(--agone-border);
-  border-radius: 50%;
+  border-radius: var(--radius);
   width: 22px;
   height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
   color: var(--agone-brown);
   transition: background 0.2s, color 0.2s;
   padding: 0;
+  flex-shrink: 0;
 }
 .agone .roll-btn-small:hover {
   background: var(--agone-brown);
@@ -61,6 +62,13 @@
 .agone .carac-max-label {
   font-size: 10px;
   color: #a06010;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.agone .carac-min-label {
+  font-size: 10px;
+  color: #c04040;
   font-weight: 600;
   white-space: nowrap;
   opacity: 0.85;

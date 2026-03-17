@@ -612,6 +612,8 @@
     "ObedienceMagique":       "Obédience magique",
     "MaximumRacial":          "Maximum racial",
     "MaxLabel":               "max",
+    "MinimumRacial":          "Minimum racial",
+    "MinLabel":               "min",
     "NomPersonnage":          "Nom du personnage",
     "NomDemon":               "Nom du démon",
     "NomArme":                "Nom de l'arme",

@@ -555,19 +555,23 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const caracAtMax      = {};
     const caracBelowMin   = {};
     const caracEffectiveMax = {}; // max final affiché = raceMax + bonusAppliqué
+    const caracEffectiveMin = {}; // min final affiché = raceMin + bonusAppliqué
     const caracAtMaxCreation = {};
     for (const k of caracsKeys) {
       const bonus    = system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
       const rawScore = system[k].score - bonus;
       const raceMax  = peupleData?.[`${k}Max`] ?? null;
+      const raceMin  = peupleData?.[`${k}Min`] ?? null;
       caracAtMax[k]         = raceMax !== null && rawScore >= raceMax;
-      caracBelowMin[k]      = system.modeCreation && (peupleData?.[`${k}Min`] ?? null) !== null && rawScore < peupleData[`${k}Min`];
+      caracBelowMin[k]      = system.modeCreation && raceMin !== null && rawScore < raceMin;
       caracEffectiveMax[k]  = raceMax !== null ? raceMax + bonus : null;
+      caracEffectiveMin[k]  = raceMin !== null ? raceMin + bonus : null;
       caracAtMaxCreation[k] = system.modeCreation && caracAtMax[k];
     }
     context.caracAtMax         = caracAtMax;
     context.caracBelowMin      = caracBelowMin;
     context.caracEffectiveMax  = caracEffectiveMax;
+    context.caracEffectiveMin  = caracEffectiveMin;
     context.caracAtMaxCreation = caracAtMaxCreation;
 
     // ── Tooltips détaillés pour les stats dérivées ──────────────────────────────────────────────
