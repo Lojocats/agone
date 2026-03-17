@@ -24,10 +24,10 @@ export class AvantagesBrowser extends Application {
     super(options);
     this.actor          = actor;
     this._search          = "";
-    this._filterSection   = "all";   // "all" | "charge" | "ame" | "corps" | ...
-    this._filterType      = "all";   // "all" | "avantage" | "defaut"
-    this._filterPossede   = "all";   // "all" | "oui" | "non"
-    this._filterChargeExact = null;  // null = tous, sinon Number exact
+    this._filterSection   = "all";                         // "all" | "charge" | "ame" | "corps" | ...
+    this._filterType      = options.filterType ?? "all";   // "all" | "avantage" | "defaut" — peut être imposé à l'ouverture
+    this._filterPossede   = "all";                         // "all" | "oui" | "non"
+    this._filterChargeExact = null;                        // null = tous, sinon Number exact
     this._expanded        = new Set();
   }
 
@@ -185,7 +185,8 @@ export class AvantagesBrowser extends Application {
         name  : d.name,
         type  : "don",
         system: {
-          categorie  : d.type,          // "avantage" | "defaut"
+          categorie  : d.type,        // "avantage" | "defaut"
+          typeCharge : d.categorie,   // thème : charge | ame | corps | ...
           cout       : d.charge,
           description: desc,
         },

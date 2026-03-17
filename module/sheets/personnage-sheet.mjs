@@ -65,7 +65,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const avDataByName = new Map(AVANTAGES_DATA.map(d => [d.name, d]));
     for (const don of [...context.avantages, ...context.defauts]) {
       const sd = avDataByName.get(don.name);
-      don._avSection      = sd?.categorie ?? "";
+      // Préférer le typeCharge saisi manuellement sur l'item, sinon fallback sur la donnée statique
+      don._avSection      = don.system.typeCharge || sd?.categorie || "";
       don._avSectionLabel = AV_SECT_LABELS[don._avSection] ?? "";
     }
     context.sorts        = actor.items.filter(i => i.type === "sort").sort(bySort);
@@ -1828,8 +1829,12 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Avantages & Défauts → navigateur personnalisé (données PDF)
     if (packId === "agone.dons") {
+      const filterType = event.currentTarget.dataset.filterType ?? "all";
       if (!this._avantagesBrowser) {
-        this._avantagesBrowser = new AvantagesBrowser(this.actor);
+        this._avantagesBrowser = new AvantagesBrowser(this.actor, { filterType });
+      } else {
+        // Si le browser est déjà instancié, appliquer le filtre demandé
+        this._avantagesBrowser._filterType = filterType;
       }
       this._avantagesBrowser.render(true);
       return;

@@ -36,6 +36,20 @@ export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
     context.typesMagie      = CONFIG.AGONE.typesMagie;
     context.categoriesDon   = CONFIG.AGONE.categoriesDon;
 
+    // Options de type de charge pour la feuille de don
+    if (this.item.type === "don") {
+      context.typeChargeOptions = [
+        { key: "charge",  label: game.i18n.localize("AGONE.CategorieCharges") },
+        { key: "ame",     label: game.i18n.localize("AGONE.Ame") },
+        { key: "corps",   label: game.i18n.localize("AGONE.Corps") },
+        { key: "esprit",  label: game.i18n.localize("AGONE.Esprit") },
+        { key: "societe", label: game.i18n.localize("AGONE.CategorieSociete") },
+        { key: "emprise", label: game.i18n.localize("AGONE.Emprise") },
+        { key: "arts",    label: game.i18n.localize("AGONE.CategorieArts") },
+        { key: "saisons", label: game.i18n.localize("AGONE.CategorieSaisons") },
+        { key: "flamme",  label: game.i18n.localize("AGONE.Flamme") },
+      ];
+    }
     const existingMagicTypes = game.items
       .filter(i => i.type === "sort")
       .map(i => (i.system?.typeMagie ?? "").trim().toLowerCase())

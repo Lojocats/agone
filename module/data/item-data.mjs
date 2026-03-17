@@ -86,6 +86,7 @@ export class DonData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
       categorie:   new fields.StringField({ initial: "avantage", choices: ["avantage","defaut"] }),
+      typeCharge:  new fields.StringField({ initial: "" }),   // thème : charge | ame | corps | esprit | societe | emprise | arts | saisons | flamme
       cout:        new fields.NumberField({ initial: 0, integer: true }),
       description: new fields.HTMLField({ initial: "" })
     };

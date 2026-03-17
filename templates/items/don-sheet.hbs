@@ -15,6 +15,15 @@
         </select>
       </div>
       <div class="form-group">
+        <label>{{localize "AGONE.TypeCharge"}}</label>
+        <select name="system.typeCharge">
+          <option value="" {{#if (eq system.typeCharge "")}}selected{{/if}}>—</option>
+          {{#each typeChargeOptions as |opt|}}
+          <option value="{{opt.key}}" {{#if (eq ../system.typeCharge opt.key)}}selected{{/if}}>{{opt.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group">
         <label>{{localize "AGONE.Cout"}}</label>
         <input type="number" name="system.cout" value="{{system.cout}}" class="stat-num" />
       </div>
