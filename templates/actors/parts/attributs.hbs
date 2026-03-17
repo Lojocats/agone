@@ -14,7 +14,7 @@
             <label>{{localize "AGONE.Corps"}}</label>
             <input type="number" data-field="system.corps.score" data-raw-input="corps" value="{{rawAspect.corps}}" class="stat-num aspect-num" />
             <span class="derived-val aspect-total-val">{{system.corps.score}}</span>
-            <input type="number" name="system.corps.exp" value="{{system.corps.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeCorps"}}' />
+            {{#if showLevelUpAspect}}<input type="number" name="system.corps.exp" value="{{system.corps.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeCorps"}}' />{{/if}}
           </div>
           {{#if bonusRacialAspect.corps}}
           <div class="aspect-stat racial" title="{{localize "AGONE.BonusRacialPeuple"}} {{system.peuple}}">
@@ -63,7 +63,7 @@
             <label>{{localize "AGONE.Esprit"}}</label>
             <input type="number" data-field="system.esprit.score" data-raw-input="esprit" value="{{rawAspect.esprit}}" class="stat-num aspect-num" />
             <span class="derived-val aspect-total-val">{{system.esprit.score}}</span>
-            <input type="number" name="system.esprit.exp" value="{{system.esprit.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeEsprit"}}' />
+            {{#if showLevelUpAspect}}<input type="number" name="system.esprit.exp" value="{{system.esprit.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeEsprit"}}' />{{/if}}
           </div>
           {{#if bonusRacialAspect.esprit}}
           <div class="aspect-stat racial" title="{{localize "AGONE.BonusRacialPeuple"}} {{system.peuple}}">
@@ -112,7 +112,7 @@
             <label>{{localize "AGONE.Ame"}}</label>
             <input type="number" data-field="system.ame.score" data-raw-input="ame" value="{{rawAspect.ame}}" class="stat-num aspect-num" />
             <span class="derived-val aspect-total-val">{{system.ame.score}}</span>
-            <input type="number" name="system.ame.exp" value="{{system.ame.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeAme"}}' />
+            {{#if showLevelUpAspect}}<input type="number" name="system.ame.exp" value="{{system.ame.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeAme"}}' />{{/if}}
           </div>
           {{#if bonusRacialAspect.ame}}
           <div class="aspect-stat racial" title="{{localize "AGONE.BonusRacialPeuple"}} {{system.peuple}}">
@@ -252,7 +252,7 @@
         <span class="derived-val carac-total-val">{{system.agilite.score}}</span>
         {{#if bonusRacialCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.agilite 0)}}+{{/if}}{{bonusRacialCarac.agilite}}</span>{{/if}}
         {{#if bonusAvantageCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.agilite 0)}}+{{/if}}{{bonusAvantageCarac.agilite}}</span>{{/if}}
-        <input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.agilite}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.agilite}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.agilite}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.agilite}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -277,7 +277,7 @@
         <span class="derived-val carac-total-val">{{system.force.score}}</span>
         {{#if bonusRacialCarac.force}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.force 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.force 0)}}+{{/if}}{{bonusRacialCarac.force}}</span>{{/if}}
         {{#if bonusAvantageCarac.force}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.force 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.force 0)}}+{{/if}}{{bonusAvantageCarac.force}}</span>{{/if}}
-        <input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.force}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.force}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.force}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.force}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -302,7 +302,7 @@
         <span class="derived-val carac-total-val">{{system.perception.score}}</span>
         {{#if bonusRacialCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.perception 0)}}+{{/if}}{{bonusRacialCarac.perception}}</span>{{/if}}
         {{#if bonusAvantageCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.perception 0)}}+{{/if}}{{bonusAvantageCarac.perception}}</span>{{/if}}
-        <input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.perception}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.perception}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.perception}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.perception}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -327,7 +327,7 @@
         <span class="derived-val carac-total-val">{{system.resistance.score}}</span>
         {{#if bonusRacialCarac.resistance}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.resistance 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.resistance 0)}}+{{/if}}{{bonusRacialCarac.resistance}}</span>{{/if}}
         {{#if bonusAvantageCarac.resistance}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.resistance 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.resistance 0)}}+{{/if}}{{bonusAvantageCarac.resistance}}</span>{{/if}}
-        <input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.resistance}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.resistance}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.resistance}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.resistance}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -356,7 +356,7 @@
         <span class="derived-val carac-total-val">{{system.intelligence.score}}</span>
         {{#if bonusRacialCarac.intelligence}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.intelligence 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.intelligence 0)}}+{{/if}}{{bonusRacialCarac.intelligence}}</span>{{/if}}
         {{#if bonusAvantageCarac.intelligence}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.intelligence 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.intelligence 0)}}+{{/if}}{{bonusAvantageCarac.intelligence}}</span>{{/if}}
-        <input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.intelligence}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.intelligence}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.intelligence}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.intelligence}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -381,7 +381,7 @@
         <span class="derived-val carac-total-val">{{system.volonte.score}}</span>
         {{#if bonusRacialCarac.volonte}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.volonte 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.volonte 0)}}+{{/if}}{{bonusRacialCarac.volonte}}</span>{{/if}}
         {{#if bonusAvantageCarac.volonte}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.volonte 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.volonte 0)}}+{{/if}}{{bonusAvantageCarac.volonte}}</span>{{/if}}
-        <input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.volonte}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.volonte}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.volonte}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.volonte}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -410,7 +410,7 @@
         <span class="derived-val carac-total-val">{{system.charisma.score}}</span>
         {{#if bonusRacialCarac.charisma}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.charisma 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.charisma 0)}}+{{/if}}{{bonusRacialCarac.charisma}}</span>{{/if}}
         {{#if bonusAvantageCarac.charisma}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.charisma 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.charisma 0)}}+{{/if}}{{bonusAvantageCarac.charisma}}</span>{{/if}}
-        <input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.charisma}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.charisma}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.charisma}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.charisma}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
@@ -435,7 +435,7 @@
         <span class="derived-val carac-total-val">{{system.creativite.score}}</span>
         {{#if bonusRacialCarac.creativite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.creativite 0)}}racial-pos{{else}}racial-neg{{/if}}" title="Bonus racial : {{system.peuple}}">{{#if (gt bonusRacialCarac.creativite 0)}}+{{/if}}{{bonusRacialCarac.creativite}}</span>{{/if}}
         {{#if bonusAvantageCarac.creativite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.creativite 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{localize "AGONE.BonusAvantage"}}'>{{#if (gt bonusAvantageCarac.creativite 0)}}+{{/if}}{{bonusAvantageCarac.creativite}}</span>{{/if}}
-        <input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title="Exp." />
+        {{#if showLevelUpAspect}}<input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.creativite}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.creativite}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.creativite}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.creativite}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"

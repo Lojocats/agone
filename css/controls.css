@@ -525,11 +525,17 @@
   border-color: var(--agone-gold);
   box-shadow: 0 1px 5px rgba(201,162,39,0.15);
 }
-/* En-tête de carte : nom + spécialité */
+/* En-tête de carte : nom + ligne meta (spécialité + domaine) */
 .agone .comp-card-header {
   display: flex;
   flex-direction: column;
   gap: 1px;
+}
+.agone .comp-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 14px;
 }
 .agone .comp-card-name {
   background: none;
@@ -553,6 +559,11 @@
   opacity: 0.75;
   font-style: italic;
   line-height: 1.2;
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Corps de carte : stats + level */
 .agone .comp-card-body {
@@ -587,13 +598,13 @@
 .agone .comp-card-dom {
   font-size: 9px;
   color: var(--agone-brown);
-  opacity: 0.55;
-  width: 100%;
+  opacity: 0.6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-style: italic;
-  margin-top: 1px;
+  flex: 1;
+  min-width: 0;
 }
 .agone .comp-card-levelbtns {
   display: flex;

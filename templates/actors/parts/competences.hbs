@@ -47,18 +47,23 @@
                     title='{{localize "AGONE.JeterCompetence"}}'>
               {{comp.name}}
             </button>
-            {{#if comp.system.specialite}}
-            <span class="comp-card-spe" title='{{localize "AGONE.Specialite"}}'>&#9733; {{comp.system.specialite}}</span>
-            {{/if}}
+            <div class="comp-card-meta">
+              {{#if comp.system.domaine}}
+              <span class="comp-card-dom" title='{{localize "AGONE.Domaine"}}'><i class="fas fa-tag"></i> {{comp.system.domaine}}</span>
+              {{/if}}
+              {{#if comp.system.specialite}}
+              <span class="comp-card-spe" title='{{localize "AGONE.Specialite"}}'>&#9733; {{comp.system.specialite}}</span>
+              {{/if}}
+            </div>
           </div>
           <div class="comp-card-body">
             <div class="comp-card-stats">
               <label class="comp-card-stat-lbl">{{localize "AGONE.Score"}}</label>
               <input type="number" name="items.{{comp.id}}.system.score" value="{{comp.system.score}}"
                      class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.score" />
-              <label class="comp-card-stat-lbl">{{localize "AGONE.Exp"}}</label>
+              {{#if @root.showLevelUpAspect}}<label class="comp-card-stat-lbl">{{localize "AGONE.Exp"}}</label>
               <input type="number" name="items.{{comp.id}}.system.exp" value="{{comp.system.exp}}"
-                     class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />
+                     class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />{{/if}}
               <select class="comp-card-attr-badge inline-edit" data-item-id="{{comp.id}}" data-field="system.attributLie"
                       title='{{localize "AGONE.AttributLie"}}'>
                 <option value="agilite"      {{#if (eq comp.system.attributLie "agilite")}}selected{{/if}}>AGI</option>
@@ -73,9 +78,6 @@
                 <option value="tir"          {{#if (eq comp.system.attributLie "tir")}}selected{{/if}}>TIR</option>
               </select>
             </div>
-            {{#if comp.system.domaine}}
-            <div class="comp-card-dom">{{comp.system.domaine}}</div>
-            {{/if}}
             {{#if @root.showLevelUp}}
             <div class="comp-card-levelbtns">
               <button type="button" class="levelup-btn" data-action="levelUp"
