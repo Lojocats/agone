@@ -388,17 +388,23 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       c.coutAfficheDown = system.modeCreation ? c.creaCoutDown : c.xpCoutDown;
     }
 
-    // Compétences Arts Magiques par domaine (Accord, Décorum, Geste, Cyse)
+    // Compétences Arts Magiques par domaine (Accord, Décorum, Geste, Cyse + custom)
     // POT = Art + min(score_artsMag, score_compLiée) + bonusÂme
     // Accord → Musique | Cyse → Sculpture | Décorum → Peinture | Geste → Poésie
-    const DOMAINES_ARTS = ["Accord", "Décorum", "Geste", "Cyse"];
-    const ARTS_COMP_LIEE = {
-      "Accord":  "Musique",
-      "Cyse":    "Sculpture",
-      "Décorum": "Peinture",
-      "Geste":   "Poésie",
-    };
-    context.artsMagiquesByDomaine = DOMAINES_ARTS.map(domaine => {
+    const DOMAINES_ARTS_STD = [
+      { nom: "Accord",  compLiee: "Musique"   },
+      { nom: "Décorum", compLiee: "Peinture"  },
+      { nom: "Geste",   compLiee: "Poésie"    },
+      { nom: "Cyse",    compLiee: "Sculpture" },
+    ];
+    const domainesCustom = game.settings.get("agone", "domainesArtsCustom") ?? [];
+    const TOUS_DOMAINES = [
+      ...DOMAINES_ARTS_STD,
+      ...domainesCustom.map(d => ({ nom: d.nom, compLiee: d.compLiee ?? "" })),
+    ];
+    const ARTS_COMP_LIEE = Object.fromEntries(TOUS_DOMAINES.map(d => [d.nom, d.compLiee]));
+
+    context.artsMagiquesByDomaine = TOUS_DOMAINES.map(({ nom: domaine }) => {
       const comp = context.competences.find(c =>
         c.name === "Arts Magiques" && c.system.domaine === domaine
       );
@@ -704,6 +710,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     html.find("[data-action='rollAptitudeConjuration']").click(this._onRollAptitudeConjuration.bind(this));
     html.find("[data-action='rollArtDomaine']").click(this._onRollArtDomaine.bind(this));
     html.find("[data-action='rollImpArtDomaine']").click(this._onRollImpArtDomaine.bind(this));
+
+    // Ouvrir la config des domaines d'Arts Magiques (GM)
+    html.find("[data-action='openDomainesConfig']").click(() => {
+      new game.agone.DomainesArtsConfig().render(true);
+    });
 
     // Mini-filtre sorts (onglet Magie)
     html.find(".smf-search").on("input", this._onFiltreSorts.bind(this));

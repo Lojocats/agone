@@ -29,8 +29,9 @@ import { PersonnageSheet }   from "./sheets/personnage-sheet.mjs";
 import { SortsBrowser }     from "./apps/sorts-browser.mjs";
 import { AvantagesBrowser } from "./apps/avantages-browser.mjs";
 import { PeinesBrowser }   from "./apps/peines-browser.mjs";
-import { SaisonConfig }    from "./apps/saison-config.mjs";
-import { CalendrierAgone } from "./apps/calendrier.mjs";
+import { SaisonConfig }        from "./apps/saison-config.mjs";
+import { CalendrierAgone }     from "./apps/calendrier.mjs";
+import { DomainesArtsConfig }  from "./apps/domaines-arts-config.mjs";
 import {
   CompagnonSheet, DemonSheet, PnjSheet
 } from "./sheets/actor-sheets.mjs";
@@ -43,7 +44,7 @@ Hooks.once("init", () => {
   console.log("Agone | Initialisation du système");
 
   // Référence globale
-  game.agone = { AgoneActor, AgoneItem };
+  game.agone = { AgoneActor, AgoneItem, DomainesArtsConfig };
   CONFIG.AGONE = AGONE;
   // ── Saison du Monde (paramètre monde) ────────────────────────────────────
   game.settings.register("agone", "saisonMonde", {
@@ -91,6 +92,13 @@ Hooks.once("init", () => {
     type: Object,
     default: {},
   });
+  // ── Domaines d'Arts Magiques personnalisés ─────────────────────────────
+  game.settings.register("agone", "domainesArtsCustom", {
+    scope: "world", config: false,
+    type:  Array,
+    default: [],
+  });
+
   // Hachages des données des compendiums pour détection de changement
   game.settings.register("agone", "compendiumHashes", {
     scope: "world", config: false,

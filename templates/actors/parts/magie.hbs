@@ -3,7 +3,15 @@
 
   <!-- Aptitudes magiques -->
   <div class="aptitudes-block">
-    <h3 class="section-title">{{localize "AGONE.AptitudesMagiques"}}</h3>
+    <div class="section-header">
+      <h3 class="section-title">{{localize "AGONE.AptitudesMagiques"}}</h3>
+      {{#if isGM}}
+      <button type="button" class="btn-icon" data-action="openDomainesConfig"
+              title='{{localize "AGONE.DomainesArts.TitreConfig"}}'>
+        <i class="fas fa-cog"></i>
+      </button>
+      {{/if}}
+    </div>
 
     <!-- Arts Magiques par domaine -->
     {{#if artsMagiquesByDomaine.length}}

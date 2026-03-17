@@ -207,6 +207,130 @@
   border-color: var(--agone-brown, #5c3a1e);
 }
 
+/* ── Domaines Arts Magiques Config ───────────────────────── */
+.agone-domaines-arts-config .agone-dac-wrap {
+  padding: 8px 4px;
+  font-family: 'Crimson Text', Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.agone-domaines-arts-config .dac-section-title {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 13px;
+  color: var(--agone-brown, #5c3a1e);
+  border-bottom: 1px solid rgba(92,58,30,0.25);
+  padding-bottom: 3px;
+  margin: 0 0 6px 0;
+}
+.agone-domaines-arts-config .dac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.agone-domaines-arts-config .dac-table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.7;
+  text-align: left;
+  padding: 2px 6px;
+  border-bottom: 1px solid rgba(92,58,30,0.15);
+}
+.agone-domaines-arts-config .dac-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-domaines-arts-config .dac-row-standard { opacity: 0.75; }
+.agone-domaines-arts-config .dac-comp-liee { color: var(--agone-brown, #5c3a1e); }
+.agone-domaines-arts-config .dac-nom { font-weight: 600; }
+.agone-domaines-arts-config .dac-type-key {
+  font-size: 11px;
+  background: rgba(92,58,30,0.07);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.agone-domaines-arts-config .dac-comp-input {
+  width: 100%;
+  border: 1px solid rgba(92,58,30,0.25);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  background: rgba(255,255,255,0.55);
+}
+.agone-domaines-arts-config .dac-comp-input:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+}
+.agone-domaines-arts-config .dac-btn-remove {
+  background: none;
+  border: none;
+  color: #9a1a1a;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.7;
+  padding: 2px 5px;
+}
+.agone-domaines-arts-config .dac-btn-remove:hover { opacity: 1; }
+.agone-domaines-arts-config .dac-empty {
+  font-style: italic;
+  opacity: 0.65;
+  font-size: 12px;
+  margin: 4px 0;
+}
+.agone-domaines-arts-config .dac-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agone-domaines-arts-config .dac-add-form .form-group {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+.agone-domaines-arts-config .dac-add-form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone-domaines-arts-config .dac-add-form input[type='text'] {
+  border: 1px solid rgba(92,58,30,0.3);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 13px;
+  background: rgba(255,255,255,0.55);
+}
+.agone-domaines-arts-config .dac-add-form input[type='text']:focus {
+  outline: none;
+  border-color: var(--agone-gold, #c9a227);
+}
+.agone-domaines-arts-config .dac-add-hint {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.75;
+}
+.agone-domaines-arts-config .dac-btn-add {
+  align-self: flex-start;
+  background: rgba(92,58,30,0.1);
+  border: 1px solid rgba(92,58,30,0.35);
+  color: var(--agone-brown, #5c3a1e);
+  border-radius: 3px;
+  padding: 4px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: 'Crimson Text', Georgia, serif;
+  transition: background 0.15s;
+}
+.agone-domaines-arts-config .dac-btn-add:hover {
+  background: var(--agone-gold, #c9a227);
+  color: var(--agone-dark-text, #2a1a08);
+}
+
 /* ── Calendrier ──────────────────────────────────────────── */
 .agone-calendrier-wrap {
   background: var(--agone-parchment, #f4e8c1);

@@ -240,6 +240,26 @@
 
     "Magie":              "Magie",
     "AptitudesMagiques":  "Aptitudes magiques",
+
+    "DomainesArts": {
+      "TitreConfig":          "Domaines d'Arts Magiques",
+      "Standard":             "Domaines standards (non modifiables)",
+      "Personnalises":        "Domaines personnalisés",
+      "Domaine":              "Domaine",
+      "CompLiee":             "Compétence liée (prérequis)",
+      "TypeSort":             "Clé typeMagie",
+      "TypeSortHint":         "La clé de sort est le nom du domaine (insensible à la casse et aux accents).",
+      "Ajouter":              "Ajouter le domaine",
+      "AjouterTitre":         "Nouveau domaine",
+      "NomPlaceholder":       "ex : Pyromantie",
+      "CompLieePlaceholder":  "ex : Alchimie (laisser vide si aucune)",
+      "Vide":                 "Aucun domaine personnalisé. Ajoutez-en un ci-dessous.",
+      "Supprimer":            "Supprimer ce domaine",
+      "SupprimerConfirmTitre":"Supprimer le domaine",
+      "SupprimerConfirm":     "Supprimer le domaine « {nom} » ? Les sorts qui utilisent ce type de magie ne seront pas effacés.",
+      "NomObligatoire":       "Le nom du domaine est obligatoire.",
+      "NomExistant":          "Un domaine « {nom} » existe déjà (standard ou personnalisé)."
+    },
     "AptitudeArtsMagiques": "Arts Magiques",
     "AptitudeConjuration": "Harmoniste",
     "Sorts":              "Sorts & Œuvres",

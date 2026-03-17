@@ -823,6 +823,12 @@ export class AgoneActor extends Actor {
       geste:         "Geste",
       // jorniste / obscurantiste / eclipsiste → vérification sans domaine précis
     };
+    // Intégrer les domaines custom (clé = nom normalisé sans accents + minuscule)
+    const _customDomaines = game.settings.get("agone", "domainesArtsCustom") ?? [];
+    for (const d of _customDomaines) {
+      const key = d.nom?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+      if (key) TYPES_TO_DOMAINE[key] = d.nom;
+    }
     const EMPRISE_TYPES = new Set(["jorniste", "obscurantiste", "eclipsiste"]);
     const typeMagie  = sort.system.typeMagie?.trim().toLowerCase() ?? "";
     let typeMagieResolved = typeMagie;

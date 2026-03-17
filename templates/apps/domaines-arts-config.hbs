@@ -1,0 +1,85 @@
+<div class="agone-dac-wrap">
+
+  <!-- Domaines standards (lecture seule) -->
+  <section class="dac-section">
+    <h3 class="dac-section-title">{{localize "AGONE.DomainesArts.Standard"}}</h3>
+    <table class="dac-table">
+      <thead>
+        <tr>
+          <th>{{localize "AGONE.DomainesArts.Domaine"}}</th>
+          <th>{{localize "AGONE.DomainesArts.CompLiee"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each domainesStandard as |d|}}
+        <tr class="dac-row-standard">
+          <td>{{d.nom}}</td>
+          <td><em class="dac-comp-liee">{{d.compLiee}}</em></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Domaines personnalisés -->
+  <section class="dac-section">
+    <h3 class="dac-section-title">{{localize "AGONE.DomainesArts.Personnalises"}}</h3>
+
+    {{#if domainesCustom.length}}
+    <table class="dac-table">
+      <thead>
+        <tr>
+          <th>{{localize "AGONE.DomainesArts.Domaine"}}</th>
+          <th>{{localize "AGONE.DomainesArts.CompLiee"}}</th>
+          <th>{{localize "AGONE.DomainesArts.TypeSort"}}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each domainesCustom as |d idx|}}
+        <tr class="dac-row-custom">
+          <td class="dac-nom">{{d.nom}}</td>
+          <td>
+            <input type="text" class="dac-comp-input" value="{{d.compLiee}}"
+                   placeholder='{{localize "AGONE.DomainesArts.CompLieePlaceholder"}}'
+                   data-action="editCompLiee" data-idx="{{idx}}" />
+          </td>
+          <td><code class="dac-type-key">{{d.nom}}</code></td>
+          <td>
+            <button type="button" class="dac-btn-remove" data-action="removeDomaine" data-idx="{{idx}}"
+                    title='{{localize "AGONE.DomainesArts.Supprimer"}}'>
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+    <p class="dac-empty">{{localize "AGONE.DomainesArts.Vide"}}</p>
+    {{/if}}
+  </section>
+
+  <!-- Formulaire d'ajout -->
+  <section class="dac-section dac-add-section">
+    <h3 class="dac-section-title">{{localize "AGONE.DomainesArts.AjouterTitre"}}</h3>
+    <div class="dac-add-form">
+      <div class="form-group">
+        <label>{{localize "AGONE.DomainesArts.Domaine"}}</label>
+        <input type="text" class="dac-new-nom" placeholder='{{localize "AGONE.DomainesArts.NomPlaceholder"}}' />
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.DomainesArts.CompLiee"}}</label>
+        <input type="text" class="dac-new-comp" placeholder='{{localize "AGONE.DomainesArts.CompLieePlaceholder"}}' />
+      </div>
+      <div class="dac-add-hint">
+        <i class="fas fa-info-circle"></i>
+        {{localize "AGONE.DomainesArts.TypeSortHint"}}
+      </div>
+      <button type="button" class="dac-btn-add" data-action="addDomaine">
+        <i class="fas fa-plus"></i> {{localize "AGONE.DomainesArts.Ajouter"}}
+      </button>
+    </div>
+  </section>
+
+</div>
