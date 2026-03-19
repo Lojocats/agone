@@ -98,6 +98,24 @@
 .agone .aspect-stat.racial .derived-val.racial-pos { color: #2e7d32; font-weight: 700; }
 .agone .aspect-stat.racial .derived-val.racial-neg { color: #800000; font-weight: 700; }
 
+/* Bonus total aspect (row "derived") : couleur de texte uniquement, sans fond ni bordure */
+.agone .aspect-stat.derived .derived-val.racial-pos,
+.agone .aspect-stat.avantage .derived-val.racial-pos {
+  color: #2e7d32;
+  font-weight: 700;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.agone .aspect-stat.derived .derived-val.racial-neg,
+.agone .aspect-stat.avantage .derived-val.racial-neg {
+  color: #800000;
+  font-weight: 700;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
 /* ── Bouton level-up ─────────────────────────────────────── */
 /* Désactivé (max racial atteint) */
 .agone .levelup-btn[disabled],
@@ -112,13 +130,18 @@
   border: 1px solid var(--agone-gold, #c9a227);
   color: var(--agone-brown, #5a3e1b);
   border-radius: 3px;
-  padding: 1px 5px;
+  padding: 0 6px;
+  height: 22px;
+  min-width: 36px;
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 22px;
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 0.15s, background 0.15s;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 .agone .levelup-btn:hover:not(:disabled) {
   opacity: 1;
@@ -138,13 +161,18 @@
   border: 1px solid var(--agone-red, #9a2a2a);
   color: var(--agone-red, #9a2a2a);
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: 0 6px;
+  height: 22px;
+  min-width: 36px;
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 22px;
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.15s, background 0.15s;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 .agone .leveldown-btn:hover:not(:disabled) {
   opacity: 1;
@@ -236,6 +264,12 @@
 .agone input.stat-num {
   width: 52px;
   text-align: center;
+}
+/* Réserve d'exp dans les caracs/aspects : plus large pour un meilleur confort */
+.agone .carac-row .stat-num.exp,
+.agone .aspect-num.exp {
+  width: 56px;
+  font-size: 12px;
 }
 .agone input.inline-edit {
   width: 45px;
