@@ -1,0 +1,175 @@
+{{! ── COMBAT TRACKER MJ – AGONE ─────────────────────────────────────── }}
+<div class="agone-ct-wrap">
+
+  {{#unless hasCombat}}
+  {{! ── Pas de rencontre active ─────────────────────────────────────── }}
+  <div class="agone-ct-empty">
+    <i class="fas fa-swords"></i>
+    <p>{{localize "AGONE.Combat.AucuneRencontre"}}</p>
+    <span class="agone-ct-hint">{{localize "AGONE.Combat.AucuneRencontreHint"}}</span>    {{#if isGM}}
+    <button type="button" class="agone-ct-btn agone-ct-btn--start" data-action="createCombat" style="margin-top:10px">
+      <i class="fas fa-plus"></i> {{localize "AGONE.Combat.CreerCombat"}}
+    </button>
+    {{/if}}  </div>
+  {{else}}
+
+  {{! ── En-tête : round + navigation ───────────────────────────────── }}
+  <div class="agone-ct-header">
+    <div class="agone-ct-round">
+      <span class="agone-ct-round-label">{{localize "AGONE.Combat.Round"}}</span>
+      <span class="agone-ct-round-num">{{round}}</span>
+    </div>
+    <div class="agone-ct-nav">
+      {{#if isGM}}
+      {{#unless isStarted}}
+      <button type="button" class="agone-ct-btn agone-ct-btn--start" data-action="startCombat"
+              title='{{localize "AGONE.Combat.DebuterCombat"}}'>
+        <i class="fas fa-play"></i> {{localize "AGONE.Combat.Debut"}}
+      </button>
+      {{else}}
+      <button type="button" class="agone-ct-btn" data-action="prevTurn"
+              title='{{localize "AGONE.Combat.TourPrecedent"}}'>
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button type="button" class="agone-ct-btn" data-action="nextTurn"
+              title='{{localize "AGONE.Combat.TourSuivant"}}'>
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      {{/unless}}
+      <button type="button" class="agone-ct-btn" data-action="rollAllInit"
+              title='{{localize "AGONE.Combat.LancerToutesInit"}}'>
+        <i class="fas fa-dice-d10"></i>
+      </button>
+      <button type="button" class="agone-ct-btn agone-ct-btn--reset" data-action="resetInit"
+              title='{{localize "AGONE.Combat.ResetInit"}}'>
+        <i class="fas fa-undo"></i>
+      </button>
+      <button type="button" class="agone-ct-btn agone-ct-btn--end" data-action="endCombat"
+              title='{{localize "AGONE.Combat.TerminerCombat"}}'>
+        <i class="fas fa-stop"></i>
+      </button>
+      <button type="button" class="agone-ct-btn" data-action="addTokens"
+              title='{{localize "AGONE.Combat.AjouterTokens"}}'>
+        <i class="fas fa-user-plus"></i>
+      </button>
+      {{/if}}
+    </div>
+  </div>
+
+  {{! ── Liste des combattants ───────────────────────────────────────── }}
+  <div class="agone-ct-list">
+    {{#each combatants as |c|}}
+    <div class="agone-ct-row {{#if c.isActive}}ct-active{{/if}} {{#if c.isDefeated}}ct-defeated{{/if}}"
+         data-combatant-id="{{c.id}}" data-actor-id="{{c.actorId}}" data-token-id="{{c.tokenId}}"
+         data-scene-id="{{@root.sceneId}}">
+
+      {{! ── Colonne gauche : portrait + badge initiative ────────────── }}
+      <div class="agone-ct-portrait-wrap">
+        <img class="agone-ct-portrait" src="{{c.img}}" alt="{{c.name}}"
+             data-action="openSheet" title='{{localize "AGONE.OuvrirFiche"}}' />
+        <div class="agone-ct-init-badge" title='{{localize "AGONE.Initiative"}}'>
+          {{#if c.hasInitiative}}
+            <input type="number" class="ct-init-input" value="{{c.initiative}}" />
+          {{else}}
+            <span class="ct-init-dash">—</span>
+          {{/if}}
+        </div>
+      </div>
+
+      {{! ── Corps principal ──────────────────────────────────────────── }}
+      <div class="agone-ct-body">
+
+        {{! Ligne 1 : nom + boutons rapides ──────────────────────────── }}
+        <div class="agone-ct-name-row">
+          <span class="agone-ct-name">{{c.name}}</span>
+          <div class="agone-ct-actions">
+            {{#if @root.isGM}}
+            <button type="button" class="ct-action-btn" data-action="rollInit"
+                    title='{{localize "AGONE.Combat.LancerInit"}}'>
+              <i class="fas fa-dice-d10"></i>
+            </button>
+            <button type="button" class="ct-action-btn ct-btn-dmg" data-action="applyDamage"
+                    title='{{localize "AGONE.Combat.AppliquerDegats"}}'>
+              <i class="fas fa-sword"></i>
+            </button>
+            <button type="button" class="ct-action-btn ct-btn-heal" data-action="applySoin"
+                    title='{{localize "AGONE.Combat.AppliquerSoins"}}'>
+              <i class="fas fa-heart"></i>
+            </button>
+            <button type="button" class="ct-action-btn ct-btn-defeated" data-action="toggleDefeated"
+                    title='{{localize "AGONE.Combat.MarquerVaincu"}}'>
+              <i class="fas fa-skull"></i>
+            </button>
+            {{/if}}
+          </div>
+        </div>
+
+        {{! Ligne 2 : barre PdV ──────────────────────────────────────── }}
+        <div class="agone-ct-pdv-row">
+          <div class="agone-ct-pdv-track">
+            <div class="agone-ct-pdv-fill" style="width:{{c.pdvPct}}%; background:{{c.pdvColor}};"></div>
+          </div>
+          <input type="number" class="ct-pdv-input" value="{{c.pdvVal}}"
+                 min="0" max="{{c.pdvMax}}" title="PdV" />
+          <span class="agone-ct-pdv-sep">/</span>
+          <span class="agone-ct-pdv-max">{{c.pdvMax}}</span>
+        </div>
+
+        {{! Ligne 3 : blessures ──────────────────────────────────────── }}
+        <div class="agone-ct-blessures">
+          <span class="ct-bg-cell {{#if c.bg1}}ct-bg-active{{/if}}" data-field="blessureGrave1"
+                title='{{localize "AGONE.BlessureGrave"}} 1 (−2)'>BG1</span>
+          <span class="ct-bg-cell {{#if c.bg2}}ct-bg-active{{/if}}" data-field="blessureGrave2"
+                title='{{localize "AGONE.BlessureGrave"}} 2 (−6)'>BG2</span>
+          <span class="ct-bg-cell {{#if c.bg3}}ct-bg-active{{/if}}" data-field="blessureGrave3"
+                title='{{localize "AGONE.BlessureGrave"}} 3 (−12)'>BG3</span>
+          <span class="ct-bg-cell ct-bc-cell {{#if c.bc}}ct-bg-active{{/if}}" data-field="blessuresCritique"
+                title='{{localize "AGONE.BlessuresCritiques"}}'>
+            <i class="fas fa-skull-crossbones"></i>
+          </span>
+        </div>
+
+        {{! Ligne 4 : statuts ────────────────────────────────────────── }}
+        {{#if @root.isGM}}
+        <div class="agone-ct-statuts">
+          <button type="button" class="ct-status-btn {{#if c.inconscient}}ct-status-active{{/if}}"
+                  data-action="toggleStatus" data-status="inconscient"
+                  title='{{localize "AGONE.Inconscient"}}'>
+            <i class="fas fa-moon"></i>
+          </button>
+          <button type="button" class="ct-status-btn {{#if c.blesse}}ct-status-active{{/if}}"
+                  data-action="toggleStatus" data-status="blesse"
+                  title='{{localize "AGONE.Blesse"}}'>
+            <i class="fas fa-tint"></i>
+          </button>
+          <button type="button" class="ct-status-btn {{#if c.epuise}}ct-status-active{{/if}}"
+                  data-action="toggleStatus" data-status="epuise"
+                  title='{{localize "AGONE.Epuise"}}'>
+            <i class="fas fa-battery-empty"></i>
+          </button>
+          <button type="button" class="ct-status-btn {{#if c.immobilise}}ct-status-active{{/if}}"
+                  data-action="toggleStatus" data-status="immobilise"
+                  title='{{localize "AGONE.Immobilise"}}'>
+            <i class="fas fa-ban"></i>
+          </button>
+          <button type="button" class="ct-status-btn {{#if c.contraint}}ct-status-active{{/if}}"
+                  data-action="toggleStatus" data-status="contraint"
+                  title='{{localize "AGONE.Contraint"}}'>
+            <i class="fas fa-lock"></i>
+          </button>
+          <button type="button" class="ct-status-btn {{#if c.aveugle}}ct-status-active{{/if}}"
+                  data-action="toggleStatus" data-status="aveugle"
+                  title='{{localize "AGONE.Aveugle"}}'>
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        {{/if}}
+
+      </div>{{! /.agone-ct-body }}
+
+    </div>{{! /.agone-ct-row }}
+    {{/each}}
+  </div>{{! /.agone-ct-list }}
+
+  {{/unless}}
+</div>{{! /.agone-ct-wrap }}

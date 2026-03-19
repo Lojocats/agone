@@ -32,6 +32,7 @@ import { PeinesBrowser }   from "./apps/peines-browser.mjs";
 import { SaisonConfig }        from "./apps/saison-config.mjs";
 import { CalendrierAgone }     from "./apps/calendrier.mjs";
 import { DomainesArtsConfig }  from "./apps/domaines-arts-config.mjs";
+import { AgoreCombatTracker }  from "./apps/combat-tracker.mjs";
 import {
   CompagnonSheet, DemonSheet, PnjSheet
 } from "./sheets/actor-sheets.mjs";
@@ -44,7 +45,7 @@ Hooks.once("init", () => {
   console.log("Agone | Initialisation du système");
 
   // Référence globale
-  game.agone = { AgoneActor, AgoneItem, DomainesArtsConfig };
+  game.agone = { AgoneActor, AgoneItem, DomainesArtsConfig, AgoreCombatTracker };
   CONFIG.AGONE = AGONE;
   // ── Saison du Monde (paramètre monde) ────────────────────────────────────
   game.settings.register("agone", "saisonMonde", {
@@ -216,6 +217,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/pouvoirs-browser.hbs",
     "systems/agone/templates/apps/saison-config.hbs",
     "systems/agone/templates/apps/calendrier.hbs",
+    "systems/agone/templates/apps/combat-tracker.hbs",
   ];
   foundry.applications.handlebars.loadTemplates(templates);
 
@@ -417,6 +419,15 @@ Hooks.on("getSceneControlButtons", (controls) => {
         button: true,
         visible: game.user?.isGM ?? false,
         onChange: () => new SaisonConfig().render(true),
+      },
+      combatTracker: {
+        name: "combatTracker",
+        title: game.i18n.localize("AGONE.Combat.TitreTracker"),
+        icon: "fas fa-swords",
+        order: 3,
+        button: true,
+        visible: game.user?.isGM ?? false,
+        onChange: () => new AgoreCombatTracker().render(true),
       },
     },
   };

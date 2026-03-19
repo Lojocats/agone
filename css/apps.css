@@ -940,3 +940,300 @@
   color: var(--agone-gold, #c9a227);
   font-style: italic;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   AGONE – COMBAT TRACKER MJ
+   ═══════════════════════════════════════════════════════════ */
+
+.agone-combat-tracker .window-content {
+  padding: 0;
+  overflow: hidden;
+  background: var(--agone-parchment, #f4e8c1);
+}
+
+/* ── Conteneur principal ─────────────────────────────────── */
+.agone-ct-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: var(--agone-dark-text, #1a110a);
+}
+
+/* ── État vide (aucun combat) ────────────────────────────── */
+.agone-ct-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.6;
+}
+.agone-ct-empty i { font-size: 32px; }
+.agone-ct-empty p { font-size: 14px; font-weight: 600; margin: 0; }
+.agone-ct-hint    { font-size: 11px; font-style: italic; }
+
+/* ── En-tête ─────────────────────────────────────────────── */
+.agone-ct-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: linear-gradient(to right, var(--agone-brown-dark, #3b1e0a), var(--agone-brown, #5c3a1e));
+  color: var(--agone-parchment, #f4e8c1);
+  border-bottom: 2px solid var(--agone-gold, #c9a227);
+  flex-shrink: 0;
+}
+.agone-ct-round {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex: 1;
+}
+.agone-ct-round-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+.agone-ct-round-num {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--agone-gold, #c9a227);
+  line-height: 1;
+}
+.agone-ct-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.agone-ct-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(201,162,39,0.4);
+  color: var(--agone-parchment, #f4e8c1);
+  border-radius: var(--radius, 3px);
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.agone-ct-btn:hover          { background: rgba(201,162,39,0.25); }
+.agone-ct-btn--start         { width: auto; padding: 0 10px; gap: 5px; color: #4a3b1e; border-color: #8bc34a; background: #b8d98a; font-size: 11px; }
+.agone-ct-btn--start:hover   { background: #a0c46a; }
+.agone-ct-btn--end           { color: #f4b0b0; border-color: #c04040; }
+.agone-ct-btn--reset         { opacity: 0.7; }
+
+/* ── Liste ───────────────────────────────────────────────── */
+.agone-ct-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+}
+
+/* ── Ligne combattant ────────────────────────────────────── */
+.agone-ct-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(92,58,30,0.05);
+  border: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.agone-ct-row:hover           { border-color: rgba(201,162,39,0.3); }
+.agone-ct-row.ct-active       {
+  background: rgba(201,162,39,0.12);
+  border-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 0 1px rgba(201,162,39,0.2);
+}
+.agone-ct-row.ct-defeated     { opacity: 0.45; filter: grayscale(0.5); }
+
+/* ── Portrait + badge initiative ─────────────────────────── */
+.agone-ct-portrait-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.agone-ct-portrait {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  border: 1px solid var(--agone-border, #7d5a2a);
+  object-fit: cover;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.agone-ct-portrait:hover      { border-color: var(--agone-gold, #c9a227); }
+.agone-ct-init-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--agone-brown-dark, #3b1e0a);
+  border: 1px solid var(--agone-gold, #c9a227);
+  border-radius: 3px;
+  min-width: 22px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ct-init-input {
+  width: 30px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  color: var(--agone-gold, #c9a227);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  padding: 0;
+}
+.ct-init-dash {
+  color: var(--agone-gold, #c9a227);
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+/* ── Corps ───────────────────────────────────────────────── */
+.agone-ct-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Nom + actions rapides */
+.agone-ct-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone-ct-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--agone-dark-text, #1a110a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agone-ct-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.ct-action-btn {
+  background: transparent;
+  border: 1px solid var(--agone-border, #7d5a2a);
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.65;
+  transition: opacity 0.15s, background 0.15s;
+}
+.ct-action-btn:hover         { opacity: 1; background: rgba(92,58,30,0.1); }
+.ct-btn-dmg:hover            { border-color: #c04040; color: #c04040; }
+.ct-btn-heal:hover           { border-color: #3a8a3a; color: #3a8a3a; }
+.ct-btn-defeated:hover       { border-color: #600; color: #900; }
+
+/* Barre PdV */
+.agone-ct-pdv-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.agone-ct-pdv-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(92,58,30,0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.agone-ct-pdv-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.ct-pdv-input {
+  width: 36px;
+  height: 18px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(92,58,30,0.07);
+  border: 1px solid var(--agone-border, #7d5a2a);
+  border-radius: 3px;
+  color: var(--agone-dark-text, #1a110a);
+  padding: 0;
+}
+.agone-ct-pdv-sep,
+.agone-ct-pdv-max {
+  font-size: 10px;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.7;
+}
+
+/* Blessures */
+.agone-ct-blessures {
+  display: flex;
+  gap: 3px;
+}
+.ct-bg-cell {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(92,58,30,0.3);
+  color: var(--agone-brown, #5c3a1e);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+  user-select: none;
+}
+.ct-bg-cell:hover             { opacity: 0.8; }
+.ct-bg-cell.ct-bg-active      { opacity: 1; background: #c04040; border-color: #a03030; color: #fff; }
+.ct-bc-cell.ct-bg-active      { background: #6a0000; border-color: #900; }
+
+/* Statuts */
+.agone-ct-statuts {
+  display: flex;
+  gap: 3px;
+}
+.ct-status-btn {
+  background: transparent;
+  border: 1px solid rgba(92,58,30,0.25);
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.45;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+.ct-status-btn:hover          { opacity: 0.8; }
+.ct-status-btn.ct-status-active {
+  opacity: 1;
+  background: rgba(180,100,0,0.2);
+  border-color: var(--agone-gold, #c9a227);
+  color: var(--agone-brown-dark, #3b1e0a);
+}
