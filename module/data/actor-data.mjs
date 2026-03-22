@@ -313,9 +313,9 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       // eclipsiste (défaut)
       this.emprise = Math.floor((this.intelligence.score + this.volonte.score) / 2);
     }
-    // Art : Fée Noire = CHA seul ; autres = ⌊(CHA + CRÉ) / 2⌋
+    // Art : Fée Noire = CRÉ seul ; autres = ⌊(CHA + CRÉ) / 2⌋
     if (peupleKey === "feeNoire") {
-      this.art = this.charisma.score;
+      this.art = this.creativite.score;
     } else {
       this.art = Math.floor((this.charisma.score + this.creativite.score) / 2);
     }

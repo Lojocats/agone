@@ -302,9 +302,9 @@ export class AgoneActor extends Actor {
     else sd.emprise = Math.floor((sd.intelligence.score + sd.volonte.score) / 2);
     sd.emprise += b.emprise_bonus;
 
-    // Art : Fée Noire = CHA seul ; autres = ⌊(CHA + CRÉ) / 2⌋
+    // Art : Fée Noire = CRÉ seul ; autres = ⌊(CHA + CRÉ) / 2⌋
     if (peupleKey === "feeNoire") {
-      sd.art = sd.charisma.score + b.art_bonus;
+      sd.art = sd.creativite.score + b.art_bonus;
     } else {
       sd.art = Math.floor((sd.charisma.score + sd.creativite.score) / 2) + b.art_bonus;
     }

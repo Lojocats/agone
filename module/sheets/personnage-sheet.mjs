@@ -615,7 +615,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}x2) ÷ 3 = ${system.melee}${srcStr("force","agilite")}`,
         tir:    `(AGI ${system.agilite.score} + PER ${system.perception.score}) ÷ 2 = ${system.tir}${srcStr("agilite","perception")}`,
         art:    peupleKey === "feeNoire"
-          ? `CHA ${system.charisma.score}${bsign(avArt)} = ${system.art}${srcStr("charisma","art_bonus")}`
+          ? `CRÉ ${system.creativite.score}${bsign(avArt)} = ${system.art}${srcStr("creativite","art_bonus")}`
           : `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2↓${bsign(avArt)} = ${system.art}${srcStr("charisma","creativite","art_bonus")}`,
         initiative: `AGI ${system.agilite.score} + PER ${system.perception.score} + Bonus Corps ${bC}${bsign(avInit)} = ${system.initiative}\n${bonusCorpsDetail}${srcStr("agilite","perception","initiative_bonus")}`,
         initMagique: `Initiative ${system.initiative} + 10 = ${system.initMagique}`,

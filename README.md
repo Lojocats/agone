@@ -44,7 +44,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - 3 obédiences : **Jorniste, Obscurantiste, Éclipsiste**
 - Calcul de l'aptitude par domaine exact lors du lancer
 - Support des compétences alternatives (compAlt)
-- **Fée Noire** : Art = CHA uniquement
+- **Fée Noire** : Art = CRÉ uniquement
 
 ### Magie — Emprise & Danseurs
 - Fiches Danseurs avec endurance, mémoire et liste de sorts
