@@ -413,6 +413,7 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
     this.initiative = this.agilite + this.perception;
     this.melee = Math.floor((this.force + this.agilite * 2) / 3);
     this.demiCharge = Math.floor(this.chargeMax / 2);
+    this.defenseNaturelle = this.agilite;
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
     this.malusBlessureGrave = malusTable[this.blessuresGraves];
@@ -478,6 +479,7 @@ export class DemonData extends foundry.abstract.TypeDataModel {
     this.tir      = Math.floor((this.agilite + this.perception) / 2);
     this.initiative = this.agilite + this.perception;
     this.art      = Math.floor((this.charisma + this.creativite) / 2);
+    this.defenseNaturelle = this.agilite;
     // Seuils basés sur densité max
     this.seuilBlessureGrave    = Math.max(1, Math.floor(this.densite.max / 3));
     this.seuilBlessureCritique = Math.max(1, Math.floor(this.densite.max / 2));
@@ -518,6 +520,9 @@ export class PnjData extends foundry.abstract.TypeDataModel {
       creativite:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       bd:          new fields.NumberField({ initial: 0, integer: true }),
       flamme:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      corps:       new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      esprit:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      ame:         new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       blessureGrave1: new fields.BooleanField({ initial: false }),
       blessureGrave2: new fields.BooleanField({ initial: false }),
       blessureGrave3: new fields.BooleanField({ initial: false }),
@@ -525,6 +530,7 @@ export class PnjData extends foundry.abstract.TypeDataModel {
         protection: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         malusAgi:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
       }),
+      typeMage:     new fields.StringField({ initial: "eclipsiste", blank: false }),
       competences:  new fields.HTMLField({ initial: "" }),
       notes:        new fields.HTMLField({ initial: "" }),
       equipement:   new fields.StringField({ initial: "" })
@@ -535,6 +541,19 @@ export class PnjData extends foundry.abstract.TypeDataModel {
     this.melee      = Math.floor((this.force + this.agilite * 2) / 3);
     this.tir        = Math.floor((this.perception + this.agilite) / 2);
     this.initiative = this.agilite + this.perception;
+    this.art             = Math.floor((this.charisma + this.creativite) / 2);
+    this.defenseNaturelle = this.agilite;
+    if (this.typeMage === "jorniste")           this.emprise = this.intelligence;
+    else if (this.typeMage === "obscurantiste") this.emprise = this.volonte;
+    else                                        this.emprise = Math.floor((this.intelligence + this.volonte) / 2);
+    this.emprise += this.esprit;
+    this.seuilBlessureGrave    = Math.max(1, Math.floor(this.pdv.max / 3));
+    this.seuilBlessureCritique = Math.max(1, Math.floor(this.pdv.max / 2));
+    this.bonusCorps  = this.corps;
+    this.bonusEsprit = this.esprit;
+    this.bonusAme    = this.ame;
+    if (this.corps + this.esprit + this.ame > 0)
+      this.flamme = Math.min(this.corps, this.esprit, this.ame);
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
     this.malusBlessureGrave = malusTable[this.blessuresGraves];

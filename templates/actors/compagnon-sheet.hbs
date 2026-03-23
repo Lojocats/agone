@@ -36,7 +36,8 @@
 
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="attributs">{{localize "AGONE.Attributs"}}</a>
-    <a class="item" data-tab="combat">{{localize "AGONE.Combat"}}</a>
+    <a class="item" data-tab="combat">{{localize "AGONE.Combat.Combat"}}</a>
+    <a class="item" data-tab="competences">{{localize "AGONE.Competences"}}</a>
     <a class="item" data-tab="notes">{{localize "AGONE.Notes"}}</a>
   </nav>
 
@@ -93,6 +94,11 @@
                 <span class="cstat-score">{{system.demiCharge}}</span>
                 <span class="cstat-label">{{localize "AGONE.DemiCharge"}}</span>
               </div>
+              <div class="cstat-item">
+                <span class="cstat-roll cstat-passive"><i class="fas fa-shield-alt"></i></span>
+                <span class="cstat-score">{{system.defenseNaturelle}}</span>
+                <span class="cstat-label">DEF</span>
+              </div>
             </div>
           </div>
         </div>
@@ -140,45 +146,181 @@
 
     <!-- COMBAT -->
     <div class="tab" data-group="primary" data-tab="combat">
-      <div class="section-header">
-        <h3>{{localize "AGONE.Armes"}}</h3>
-        {{#if isOwner}}
-        <button type="button" class="item-create" data-type="arme">
-          <i class="fas fa-plus"></i> {{localize "AGONE.AjouterArme"}}
-        </button>
-        {{/if}}
-      </div>
-      {{#if armes.length}}
-      <table class="armes-table">
-        <thead>
-          <tr>
-            <th class="col-arme-name">{{localize "AGONE.Nom"}}</th>
-            <th>{{localize "AGONE.Attaque"}}</th>
-            <th>{{localize "AGONE.Dommages"}}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each armes as |arme|}}
-          <tr class="item-row" data-item-id="{{arme.id}}">
-            <td class="col-arme-name">{{arme.name}}</td>
-            <td><span class="arme-score">{{arme.system.attackTotal}}</span></td>
-            <td><span class="dom-base">{{arme.system.dommages}}</span></td>
-            <td class="col-row-actions">
-              <button type="button" class="roll-btn-small roll-atk-btn" data-action="rollAttaque"
-                      title="Attaque"><i class="fas fa-dice-d10"></i></button>
-              {{#if ../isOwner}}
-              <a class="item-edit"><i class="fas fa-edit"></i></a>
-              <a class="item-delete"><i class="fas fa-trash"></i></a>
+      <div class="combat-section">
+
+        <!-- LIGNE HAUTE : Santé + Stats Combat -->
+        <div class="combat-top-row">
+
+          <!-- SANTÉ -->
+          <div class="combat-card sante-card">
+            <h3 class="combat-card-title"><i class="fas fa-heartbeat"></i> {{localize "AGONE.EtatSante"}}</h3>
+            <div class="pdv-bar-wrap">
+              <div class="pdv-values">
+                <span class="pdv-current">{{system.pdv.valeur}}</span>
+                <span class="pdv-sep">/</span>
+                <span class="pdv-max">{{system.pdv.max}}</span>
+                <span class="pdv-label">PdV</span>
+              </div>
+              {{#if system.pdv.max}}
+              <div class="pdv-track">
+                <div class="pdv-fill" style="width:{{pdvPercent}}%;"></div>
+              </div>
               {{/if}}
-            </td>
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
-      {{else}}
-      <p class="npc-empty-hint">{{localize "AGONE.AucuneArme"}}</p>
-      {{/if}}
+            </div>
+            <div class="blessures-section">
+              <div class="bg-row">
+                <span class="bg-title">{{localize "AGONE.BlessuresGraves"}}</span>
+                <label class="bg-cell {{#if system.blessureGrave1}}bg-active{{/if}}">
+                  <input type="checkbox" name="system.blessureGrave1" {{#if system.blessureGrave1}}checked{{/if}} />
+                  <span class="bg-dot">1</span><span class="bg-pen">-2</span>
+                </label>
+                <label class="bg-cell {{#if system.blessureGrave2}}bg-active{{/if}}">
+                  <input type="checkbox" name="system.blessureGrave2" {{#if system.blessureGrave2}}checked{{/if}} />
+                  <span class="bg-dot">2</span><span class="bg-pen">-6</span>
+                </label>
+                <label class="bg-cell {{#if system.blessureGrave3}}bg-active{{/if}}">
+                  <input type="checkbox" name="system.blessureGrave3" {{#if system.blessureGrave3}}checked{{/if}} />
+                  <span class="bg-dot">3</span><span class="bg-pen">-12</span>
+                </label>
+                {{#if system.malusBlessureGrave}}<span class="bg-total">{{system.malusBlessureGrave}}</span>{{/if}}
+              </div>
+            </div>
+          </div><!-- /.sante-card -->
+
+          <!-- STATS DE COMBAT -->
+          <div class="combat-card cstats-card">
+            <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.StatsCombat"}}</h3>
+            <div class="cstats-grid">
+              <div class="cstat-item">
+                <button type="button" class="cstat-roll" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
+                <span class="cstat-score">{{system.initiative}}</span>
+                <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
+              </div>
+              <div class="cstat-item">
+                <span class="cstat-roll cstat-passive"><i class="fas fa-sword"></i></span>
+                <span class="cstat-score">{{system.melee}}</span>
+                <span class="cstat-label">{{localize "AGONE.Melee"}}</span>
+              </div>
+              <div class="cstat-item">
+                <span class="cstat-roll cstat-passive"><i class="fas fa-weight-hanging"></i></span>
+                <span class="cstat-score">{{system.demiCharge}}</span>
+                <span class="cstat-label">{{localize "AGONE.DemiCharge"}}</span>
+              </div>
+            </div>
+          </div><!-- /.cstats-card -->
+
+        </div><!-- /.combat-top-row -->
+
+        <!-- ARMURE -->
+        <div class="combat-card armure-card">
+          <div class="combat-card-header">
+            <h3 class="combat-card-title"><i class="fas fa-shield-halved"></i> {{localize "AGONE.Armure.Label"}}</h3>
+            <div class="card-btns">
+              <button type="button" class="compendium-browse btn-icon" data-pack="agone.armures" title='{{localize "AGONE.ParcourirArmures"}}'><i class="fas fa-search"></i></button>
+              <button type="button" class="item-create btn-icon" data-type="armure" title='{{localize "AGONE.AjouterArmure"}}'><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+          {{#if armures.length}}
+          <div class="armures-list">
+            {{#each armures as |armure|}}
+            <div class="armure-row {{#if armure.system.portee}}armure-worn{{/if}}" data-item-id="{{armure.id}}">
+              <label class="armure-portee-toggle">
+                <input type="checkbox" class="armure-portee" data-item-id="{{armure.id}}" {{#if armure.system.portee}}checked{{/if}} />
+                <i class="fas {{#if armure.system.portee}}fa-shield-alt{{else}}fa-shield{{/if}}"></i>
+              </label>
+              <span class="armure-name">{{armure.name}}</span>
+              <span class="armure-badge pro-badge">{{localize "AGONE.Combat.Pro"}} {{armure.system.protection}}</span>
+              {{#if armure.system.malusAgi}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusAgi"}} {{armure.system.malusAgi}}</span>{{/if}}
+              <div class="row-actions">
+                <a class="item-edit" data-item-id="{{armure.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
+                <a class="item-delete" data-item-id="{{armure.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+              </div>
+            </div>
+            {{/each}}
+          </div>
+          {{else}}
+          <p class="empty-list">{{localize "AGONE.AucuneArmure"}}</p>
+          {{/if}}
+        </div><!-- /.armure-card -->
+
+        <!-- ARMES -->
+        <div class="combat-card armes-card">
+          <div class="combat-card-header">
+            <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.Armes"}}</h3>
+            <div class="card-btns">
+              <button type="button" class="compendium-browse btn-icon" data-pack="agone.armes" title='{{localize "AGONE.ParcourirArmes"}}'><i class="fas fa-search"></i></button>
+              <button type="button" class="item-create btn-icon" data-type="arme" title='{{localize "AGONE.AjouterArme"}}'><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+          {{#if armes.length}}
+          <table class="armes-table">
+            <thead>
+              <tr>
+                <th class="col-equipe" title="{{localize 'AGONE.Equipe'}}"><i class="fas fa-hand-paper"></i></th>
+                <th class="col-arme-name">{{localize "AGONE.Nom"}}</th>
+                <th class="col-tai">{{localize "AGONE.TAI"}}</th>
+                <th class="col-type">{{localize "AGONE.Type"}}</th>
+                <th class="col-init"><i class="fas fa-bolt"></i> {{localize "AGONE.Combat.Init"}}</th>
+                <th class="col-atk"><i class="fas fa-dice-d10"></i> {{localize "AGONE.Combat.Atk"}}</th>
+                <th class="col-def"><i class="fas fa-shield-alt"></i> {{localize "AGONE.Combat.Def"}}</th>
+                <th class="col-dom">{{localize "AGONE.Combat.Dom"}}</th>
+                <th class="col-row-actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each armes as |arme|}}
+              <tr class="item-row {{#if arme.system.equipe}}arme-equipee{{/if}}" data-item-id="{{arme.id}}">
+                <td class="col-equipe">
+                  <label class="arme-equipe-toggle">
+                    <input type="checkbox" class="arme-equipe" data-item-id="{{arme.id}}" {{#if arme.system.equipe}}checked{{/if}} />
+                    <i class="fas fa-hand-paper arme-equipe-icon"></i>
+                  </label>
+                </td>
+                <td class="col-arme-name">
+                  <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{arme.id}}">{{arme.name}}</span>
+                </td>
+                <td class="col-tai">{{arme.system.tai}}</td>
+                <td class="col-type">{{arme.system.type}}</td>
+                <td class="col-init">
+                  <div class="arme-cell">
+                    <span class="arme-score">{{arme.system.initTotal}}</span>
+                    <button type="button" class="roll-btn-small roll-init-btn" data-action="rollInitiative" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
+                  </div>
+                </td>
+                <td class="col-atk">
+                  <div class="arme-cell">
+                    <span class="arme-score">{{arme.system.attackTotal}}</span>
+                    <button type="button" class="roll-btn-small roll-atk-btn" data-action="rollAttaque" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterAttaque"}}'><i class="fas fa-dice-d10"></i></button>
+                  </div>
+                </td>
+                <td class="col-def">
+                  <div class="arme-cell">
+                    <span class="arme-score">{{arme.system.defenseTotal}}</span>
+                    <button type="button" class="roll-btn-small roll-def-btn" data-action="rollParade" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterParade"}}'><i class="fas fa-shield-alt"></i></button>
+                  </div>
+                </td>
+                <td class="col-dom">
+                  <span class="dom-base">{{arme.system.dommages}}</span>
+                </td>
+                <td class="col-row-actions">
+                  <a class="item-edit" data-item-id="{{arme.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
+                  <a class="item-delete" data-item-id="{{arme.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+          {{else}}
+          <p class="empty-list">{{localize "AGONE.AucuneArme"}}</p>
+          {{/if}}
+        </div><!-- /.armes-card -->
+
+      </div><!-- /.combat-section -->
+    </div>
+
+    <!-- COMPÉTENCES -->
+    <div class="tab" data-group="primary" data-tab="competences">
+      {{> systems/agone/templates/actors/parts/competences.hbs}}
     </div>
 
     <!-- NOTES -->
@@ -188,93 +330,5 @@
       </div>
     </div>
 
-  </section>
-</form>
-
-      <div class="header-row secondary-stats">
-        <div class="stat-box">
-          <label>{{localize "AGONE.PdV"}}</label>
-          <input type="number" name="system.pdv.valeur" value="{{system.pdv.valeur}}" class="stat-num" />
-          <span>/</span>
-          <input type="number" name="system.pdv.max" value="{{system.pdv.max}}" class="stat-num" />
-        </div>
-        <div class="stat-box">
-          <label>{{localize "AGONE.BlessuresGraves"}}</label>
-          <input type="number" name="system.blessuresGraves" value="{{system.blessuresGraves}}" class="stat-num" max="3" />
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="infos">{{localize "AGONE.Caracteristiques"}}</a>
-    <a class="item" data-tab="combat">{{localize "AGONE.Combat"}}</a>
-  </nav>
-
-  <section class="sheet-body">
-    <div class="tab" data-group="primary" data-tab="infos">
-      <div class="carac-grid">
-        <div class="carac-row">
-          <label>{{localize "AGONE.Attribut.Agilite"}}</label>
-          <input type="number" name="system.agilite" value="{{system.agilite}}" class="stat-num" />
-        </div>
-        <div class="carac-row">
-          <label>{{localize "AGONE.Attribut.Force"}}</label>
-          <input type="number" name="system.force" value="{{system.force}}" class="stat-num" />
-        </div>
-        <div class="carac-row">
-          <label>{{localize "AGONE.Attribut.Perception"}}</label>
-          <input type="number" name="system.perception" value="{{system.perception}}" class="stat-num" />
-        </div>
-        <div class="carac-row">
-          <label>{{localize "AGONE.Attribut.Resistance"}}</label>
-          <input type="number" name="system.resistance" value="{{system.resistance}}" class="stat-num" />
-        </div>
-        <div class="carac-row">
-          <label>{{localize "AGONE.ChargeMax"}}</label>
-          <input type="number" name="system.chargeMax" value="{{system.chargeMax}}" class="stat-num" />
-        </div>
-        <div class="carac-row">
-          <label>{{localize "AGONE.Initiative"}}</label>
-          <span class="derived-val">{{system.initiative}}</span>
-          <button type="button" class="roll-btn-small" data-action="rollInitiative">
-            <i class="fas fa-dice-d10"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab" data-group="primary" data-tab="combat">
-      <div class="section-header">
-        <h3>{{localize "AGONE.Armes"}}</h3>
-        <button type="button" class="item-create" data-type="arme"><i class="fas fa-plus"></i></button>
-      </div>
-      {{#if armes.length}}
-      <table class="armes-table">
-        <thead>
-          <tr>
-            <th>{{localize "AGONE.Nom"}}</th>
-            <th>{{localize "AGONE.Dommages"}}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each armes as |arme|}}
-          <tr class="item-row" data-item-id="{{arme.id}}">
-            <td>{{arme.name}}</td>
-            <td>{{arme.system.dommages}}</td>
-            <td>
-              <button type="button" class="roll-btn-small" data-action="rollAttaque" data-item-id="{{arme.id}}">
-                <i class="fas fa-dice-d10"></i>
-              </button>
-              <a class="item-edit" data-item-id="{{arme.id}}"><i class="fas fa-edit"></i></a>
-              <a class="item-delete" data-item-id="{{arme.id}}"><i class="fas fa-trash"></i></a>
-            </td>
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
-      {{/if}}
-    </div>
   </section>
 </form>

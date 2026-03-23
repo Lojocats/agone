@@ -180,6 +180,13 @@ export class AgoneActor extends Actor {
         this._applyAvantagesEffets();
       }
     }
+
+    // Esquive pour PNJ (AGI + compétence Esquive + Bonus Corps)
+    if (this.type === "pnj") {
+      const compEsquivePnj = this.items.find(i => i.type === "competence" && i.name === "Esquive");
+      const scoreEsquivePnj = compEsquivePnj?.system.score ?? 0;
+      systemData.esquiveTotal = systemData.agilite + scoreEsquivePnj + (systemData.bonusCorps ?? 0);
+    }
   }
 
   /**
