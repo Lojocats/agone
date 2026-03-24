@@ -554,18 +554,22 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const caracsKeys = ['agilite', 'force', 'perception', 'resistance', 'intelligence', 'volonte', 'charisma', 'creativite'];
     const caracAtMax      = {};
     const caracBelowMin   = {};
-    const caracEffectiveMax = {}; // max final affiché = raceMax + bonusAppliqué
-    const caracEffectiveMin = {}; // min final affiché = raceMin + bonusAppliqué
+    const caracEffectiveMax = {}; // max final affiché = raceMax + bonusAppliqué (raceMax est un plafond brut)
+    const caracEffectiveMin = {}; // min final affiché = raceMin (raceMin est un plancher sur le score TOTAL)
     const caracAtMaxCreation = {};
     for (const k of caracsKeys) {
       const bonus    = system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+      const posBonus = Math.max(0, bonus);
       const rawScore = system[k].score - bonus;
       const raceMax  = peupleData?.[`${k}Max`] ?? null;
       const raceMin  = peupleData?.[`${k}Min`] ?? null;
+      // raceMax est un plafond sur le score BRUT (achat) → total max = raceMax + posBonus
       caracAtMax[k]         = raceMax !== null && rawScore >= raceMax;
-      caracBelowMin[k]      = system.modeCreation && raceMin !== null && rawScore < raceMin;
-      caracEffectiveMax[k]  = raceMax !== null ? raceMax + bonus : null;
-      caracEffectiveMin[k]  = raceMin !== null ? raceMin + bonus : null;
+      // raceMin est un plancher sur le score TOTAL → comparer directement avec le score stocké
+      caracBelowMin[k]      = system.modeCreation && raceMin !== null && system[k].score < raceMin;
+      caracEffectiveMax[k]  = raceMax !== null ? raceMax + posBonus : null;
+      // raceMin est déjà exprimé en score total, pas besoin d'ajouter le bonus
+      caracEffectiveMin[k]  = raceMin ?? null;
       caracAtMaxCreation[k] = system.modeCreation && caracAtMax[k];
     }
     context.caracAtMax         = caracAtMax;
@@ -2002,14 +2006,30 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // Retire l'ancien bonus appliqué, ajoute le nouveau bonus POSITIF uniquement.
     // Le max racial s'applique sur le score brut (acheté), soit total <= rawMax + posBonus.
-    // Les malus (valeurs négatives) sont stockés dans peupleMalusEnAttente.
+    // Tous les modificateurs raciaux (bonus ET malus) sont appliqués immédiatement.
     const calcScoreCrea = (current, oldApplied, newPosBonus, newMax) => {
       let v = Math.max(0, (current ?? 0) - (oldApplied ?? 0) + newPosBonus);
       if (newMax != null) v = Math.min(v, newMax + newPosBonus);
       return v;
     };
-    const posB = k => Math.max(0, nw[`${k}Bonus`] ?? 0);
-    const negB = k => Math.min(0, nw[`${k}Bonus`] ?? 0);
+    const totB = k => nw[`${k}Bonus`] ?? 0;
+
+    // Coût de création forcé : raceMin et compensation des malus négatifs (score plancher 0)
+    const _creaTbl  = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
+    const _creaLast = _creaTbl.length >= 2 ? _creaTbl[_creaTbl.length-1] - _creaTbl[_creaTbl.length-2] : 1;
+    const _creaCost = (n) => n <= 0 ? 0 : (n < _creaTbl.length ? _creaTbl[n] : _creaTbl[_creaTbl.length-1] + (n - _creaTbl.length + 1) * _creaLast);
+    // forcedRaw = achat minimum imposé en points de création (hors bonus racial)
+    const _forcedRaw = (k) => {
+      const bon = totB(k);
+      const pos = Math.max(0, bon);
+      return Math.max(
+        bon < 0 ? -bon : 0,
+        Math.max(0, (nw[`${k}Min`] ?? 0) - pos)
+      );
+    };
+    let _forcedCost = 0;
+    for (const _k of ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'])
+      _forcedCost += _creaCost(_forcedRaw(_k));
 
     const update = {
       "system.peuple":                 peupleItem.name,
@@ -2018,42 +2038,42 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       "system.mvOverride":             nw.mvBase  ?? (CONFIG.AGONE.peuplesData[peupleKey]?.mvBase ?? null),
       "system.mvVol":                  nw.mvVolBase || (CONFIG.AGONE.peuplesData[peupleKey]?.mvVolBase ?? 0),
       "system.peupleCompetenceIds":    newCompIds,
-      "system.peupleBonusApplique.corpsBonus":        Math.max(0, nw.corpsBonus   ?? 0),
-      "system.peupleBonusApplique.espritBonus":       Math.max(0, nw.espritBonus  ?? 0),
-      "system.peupleBonusApplique.ameBonus":          Math.max(0, nw.ameBonus     ?? 0),
-      "system.peupleBonusApplique.agiliteBonus":      posB('agilite'),
-      "system.peupleBonusApplique.forceBonus":        posB('force'),
-      "system.peupleBonusApplique.perceptionBonus":   posB('perception'),
-      "system.peupleBonusApplique.resistanceBonus":   posB('resistance'),
-      "system.peupleBonusApplique.intelligenceBonus": posB('intelligence'),
-      "system.peupleBonusApplique.volonteBonus":      posB('volonte'),
-      "system.peupleBonusApplique.charismaBonus":     posB('charisma'),
-      "system.peupleBonusApplique.creativiteBonus":   posB('creativite'),
-      // Malus négatifs en attente (appliqués à la fin de création)
-      "system.peupleMalusEnAttente.corpsBonus":        Math.min(0, nw.corpsBonus  ?? 0),
-      "system.peupleMalusEnAttente.espritBonus":       Math.min(0, nw.espritBonus ?? 0),
-      "system.peupleMalusEnAttente.ameBonus":          Math.min(0, nw.ameBonus    ?? 0),
-      "system.peupleMalusEnAttente.agiliteBonus":      negB('agilite'),
-      "system.peupleMalusEnAttente.forceBonus":        negB('force'),
-      "system.peupleMalusEnAttente.perceptionBonus":   negB('perception'),
-      "system.peupleMalusEnAttente.resistanceBonus":   negB('resistance'),
-      "system.peupleMalusEnAttente.intelligenceBonus": negB('intelligence'),
-      "system.peupleMalusEnAttente.volonteBonus":      negB('volonte'),
-      "system.peupleMalusEnAttente.charismaBonus":     negB('charisma'),
-      "system.peupleMalusEnAttente.creativiteBonus":   negB('creativite'),
-      // Aspects : conserve les valeurs, retire l'ancien bonus racial, ajoute le nouveau
-      "system.corps.score":  Math.max(1, (sd.corps?.score  ?? 1) - (old.corpsBonus  ?? 0)) + posB('corps'),
-      "system.esprit.score": Math.max(1, (sd.esprit?.score ?? 1) - (old.espritBonus ?? 0)) + posB('esprit'),
-      "system.ame.score":    Math.max(1, (sd.ame?.score    ?? 1) - (old.ameBonus    ?? 0)) + posB('ame'),
-      // Reset total : attributs remis à 0 + bonus racial positif
-      "system.agilite.score":      posB('agilite'),
-      "system.force.score":        posB('force'),
-      "system.perception.score":   posB('perception'),
-      "system.resistance.score":   posB('resistance'),
-      "system.intelligence.score": posB('intelligence'),
-      "system.volonte.score":      posB('volonte'),
-      "system.charisma.score":     posB('charisma'),
-      "system.creativite.score":   posB('creativite'),
+      "system.peupleBonusApplique.corpsBonus":        nw.corpsBonus   ?? 0,
+      "system.peupleBonusApplique.espritBonus":       nw.espritBonus  ?? 0,
+      "system.peupleBonusApplique.ameBonus":          nw.ameBonus     ?? 0,
+      "system.peupleBonusApplique.agiliteBonus":      totB('agilite'),
+      "system.peupleBonusApplique.forceBonus":        totB('force'),
+      "system.peupleBonusApplique.perceptionBonus":   totB('perception'),
+      "system.peupleBonusApplique.resistanceBonus":   totB('resistance'),
+      "system.peupleBonusApplique.intelligenceBonus": totB('intelligence'),
+      "system.peupleBonusApplique.volonteBonus":      totB('volonte'),
+      "system.peupleBonusApplique.charismaBonus":     totB('charisma'),
+      "system.peupleBonusApplique.creativiteBonus":   totB('creativite'),
+      // Malus déjà appliqués — peupleMalusEnAttente toujours à 0
+      "system.peupleMalusEnAttente.corpsBonus":        0,
+      "system.peupleMalusEnAttente.espritBonus":       0,
+      "system.peupleMalusEnAttente.ameBonus":          0,
+      "system.peupleMalusEnAttente.agiliteBonus":      0,
+      "system.peupleMalusEnAttente.forceBonus":        0,
+      "system.peupleMalusEnAttente.perceptionBonus":   0,
+      "system.peupleMalusEnAttente.resistanceBonus":   0,
+      "system.peupleMalusEnAttente.intelligenceBonus": 0,
+      "system.peupleMalusEnAttente.volonteBonus":      0,
+      "system.peupleMalusEnAttente.charismaBonus":     0,
+      "system.peupleMalusEnAttente.creativiteBonus":   0,
+      // Aspects : conserve les valeurs, retire l'ancien bonus racial, ajoute le nouveau (total)
+      "system.corps.score":  Math.max(1, (sd.corps?.score  ?? 1) - (old.corpsBonus  ?? 0)) + totB('corps'),
+      "system.esprit.score": Math.max(1, (sd.esprit?.score ?? 1) - (old.espritBonus ?? 0)) + totB('esprit'),
+      "system.ame.score":    Math.max(1, (sd.ame?.score    ?? 1) - (old.ameBonus    ?? 0)) + totB('ame'),
+      // Reset total : attributs remis au minimum forcé (racial total + achat minimum imposé)
+      "system.agilite.score":      Math.max(0, totB('agilite')      + _forcedRaw('agilite')),
+      "system.force.score":        Math.max(0, totB('force')        + _forcedRaw('force')),
+      "system.perception.score":   Math.max(0, totB('perception')   + _forcedRaw('perception')),
+      "system.resistance.score":   Math.max(0, totB('resistance')   + _forcedRaw('resistance')),
+      "system.intelligence.score": Math.max(0, totB('intelligence') + _forcedRaw('intelligence')),
+      "system.volonte.score":      Math.max(0, totB('volonte')      + _forcedRaw('volonte')),
+      "system.charisma.score":     Math.max(0, totB('charisma')     + _forcedRaw('charisma')),
+      "system.creativite.score":   Math.max(0, totB('creativite')   + _forcedRaw('creativite')),
       // Contraintes raciales persistantes
       "system.agilite.raceMin":      nw.agiliteMin      ?? null,
       "system.agilite.raceMax":      nw.agiliteMax      ?? null,
@@ -2071,8 +2091,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       "system.charisma.raceMax":     nw.charismaMax     ?? null,
       "system.creativite.raceMin":   nw.creativiteMin   ?? null,
       "system.creativite.raceMax":   nw.creativiteMax   ?? null,
-      // Réinitialisation des points de création
-      "system.ptsCreationCarac.depense": 0,
+      // Réinitialisation des points de création (coût initial = minimums raciaux forcés)
+      "system.ptsCreationCarac.depense": _forcedCost,
       "system.ptsCreationComp.depense":  0,
       "system.saisonPerso":          nw.saisonDefaut || (CONFIG.AGONE.peuplesData[peupleKey]?.saisonDefaut ?? ""),
     };
@@ -2256,11 +2276,14 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       if (type === "aspect") {
         return ui.notifications.warn(game.i18n.localize("AGONE.AspectsBloquesCrea"));
       }
-      const pool   = (type === "carac") ? sd.ptsCreationCarac : sd.ptsCreationComp;
-      const bonus  = (type === "carac") ? (sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0) : 0;
-      const rawScore = Math.max(0, currentScore - bonus);
+      const pool      = (type === "carac") ? sd.ptsCreationCarac : sd.ptsCreationComp;
+      const bonus     = (type === "carac") ? (sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0) : 0;
+      const rawScore  = Math.max(0, currentScore - bonus);
+      const raceMin   = (type === "carac") ? (sd[key]?.raceMin ?? 0) : 0;
+      const posBonus  = Math.max(0, bonus);
+      const forcedRaw = Math.max(bonus < 0 ? -bonus : 0, Math.max(0, raceMin - posBonus));
 
-      if (rawScore <= 0) {
+      if (rawScore <= forcedRaw) {
         return ui.notifications.warn(game.i18n.localize("AGONE.RemboursementImpossible"));
       }
       const remboursement = creaDelta(rawScore - 1);
@@ -2485,12 +2508,21 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const sd = this.actor.system;
     const caracs  = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'];
     const aspects = ['corps','esprit','ame'];
-    const upd = { "system.ptsCreationCarac.depense": 0 };
+    const _cTbl  = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
+    const _cLast = _cTbl.length >= 2 ? _cTbl[_cTbl.length-1] - _cTbl[_cTbl.length-2] : 1;
+    const _cCost = (n) => n <= 0 ? 0 : (n < _cTbl.length ? _cTbl[n] : _cTbl[_cTbl.length-1] + (n - _cTbl.length + 1) * _cLast);
+    let initCost = 0;
+    const upd = {};
 
     for (const k of caracs) {
-      const bonus = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
-      upd[`system.${k}.score`] = Math.max(0, bonus);
+      const bonus    = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+      const raceMin  = sd[k]?.raceMin ?? 0;
+      const posBonus  = Math.max(0, bonus);
+      const forcedRaw = Math.max(bonus < 0 ? -bonus : 0, Math.max(0, raceMin - posBonus));
+      upd[`system.${k}.score`] = Math.max(0, bonus + forcedRaw);
+      initCost += _cCost(forcedRaw);
     }
+    upd["system.ptsCreationCarac.depense"] = initCost;
     for (const asp of aspects) {
       upd[`system.${asp}.score`] = 0;
     }
@@ -2529,7 +2561,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     });
     if (!confirmed) return;
 
-    // Appliquer les malus raciaux en attente sur les scores
+    // Les malus raciaux sont désormais appliqués dès la sélection du peuple.
+    // peupleMalusEnAttente est toujours à 0 — cette boucle n'a plus d'effet mais reste
+    // présente à titre défensif pour des personnages créés avec l'ancienne version.
     const sd     = this.actor.system;
     const malus  = sd.peupleMalusEnAttente ?? {};
     const caracs = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'];
@@ -2576,8 +2610,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   async _onRawInputChange(event) {
     event.preventDefault();
     const input    = event.currentTarget;
-    const field    = input.dataset.field;           // ex. "system.corps.score"
-    const key      = input.dataset.rawInput;        // ex. "corps"
+    const field    = input.dataset.field;
+    const key      = input.dataset.rawInput;
     const rawValue = Math.max(0, Number(input.value) || 0);
     const posB     = this.actor.system.peupleBonusApplique?.[`${key}Bonus`] ?? 0;
     await this.actor.update({ [field]: rawValue + posB });

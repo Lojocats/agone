@@ -903,7 +903,6 @@ export const AVANTAGES_EFFETS = {
   "Fragile":                   [{ stat:"resistance",      delta: -1 }],
   "Malingre":                  [{ stat:"force",           delta: -1 }],
   "Marque de l'Ombre":         [{ stat:"corps_noir",      delta:  1 }],
-  "Obèse":                     [{ stat:"agilite",         delta: -1 }],  // choix EG → on pénalise AGI
   "Vieillard":                 [{ stat:"force",           delta: -1 }, { stat:"resistance", delta: -1 }, { stat:"charges_reduction", delta: 2 }],
   "Sens déficients (1 sens)":  [{ stat:"perception",      delta: -1 }],
   "Sens déficients (2 sens)":  [{ stat:"perception",      delta: -1 }],
