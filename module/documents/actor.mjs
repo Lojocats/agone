@@ -474,40 +474,96 @@ export class AgoneActor extends Actor {
 
   // Jet d'une compétence non acquise (score 0, malus -3 automatique)
   async rollCompetenceSansItem(nom, attributLie, domaine) {
-    const sd        = this.system;
-    const attrKey   = attributLie ?? "agilite";
-    const attrScore = sd[attrKey]?.score ?? sd[attrKey] ?? 0;
+    const sd     = this.system;
+    const attrKey = attributLie ?? "agilite"; // défaut pour la présélection dans le dialog
 
-    const attrConfig = CONFIG.AGONE.attributs[attrKey] ?? {};
+    const label = nom;
+
+    // Construire les options du sélecteur d'attribut
+    const attrOptions = Object.entries(CONFIG.AGONE.attributs)
+      .map(([key, cfg]) => {
+        const score = sd[key]?.score ?? 0;
+        const locLabel = game.i18n.localize(cfg.label ?? key);
+        const selected = key === attrKey ? "selected" : "";
+        return `<option value="${key}" ${selected}>${locLabel} (${cfg.abbr}) : ${score}</option>`;
+      })
+      .join("");
+
+    const result = await foundry.applications.api.DialogV2.wait({
+      window:  { title: label },
+      content: `
+        <form>
+          <div class="agone-roll-dialog">
+            <p><strong>${label}</strong></p>
+            <div class="form-group">
+              <label>${game.i18n.localize("AGONE.AttributLie")}</label>
+              <select id="attrChosen" name="attrChosen">${attrOptions}</select>
+            </div>
+            <div class="form-group">
+              <label>${game.i18n.localize("AGONE.BonusMalus")}</label>
+              <input type="number" id="modif" name="modif" value="0" autofocus/>
+            </div>
+            <div class="form-group form-check">
+              <input type="checkbox" id="typeJet" name="typeJet" checked />
+              <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
+            </div>
+          </div>
+        </form>
+      `,
+      buttons: [
+        {
+          action:  "lancer",
+          icon:    "fas fa-dice-d10",
+          label:   game.i18n.localize("AGONE.Lancer"),
+          default: true,
+          callback: (event, button) => ({
+            attrChosen: button.form.elements.attrChosen.value,
+            modif:      parseInt(button.form.elements.modif.value) || 0,
+            type:       button.form.elements.typeJet.checked ? "ouvert" : "ferme",
+          })
+        },
+        {
+          action: "annuler",
+          icon:   "fas fa-times",
+          label:  game.i18n.localize("AGONE.Annuler"),
+        }
+      ],
+      rejectClose: false,
+    });
+
+    if (!result || typeof result === "string") return null;
+    this._lastRollType = result.type;
+    this._lastBonusSpe = 0;
+
+    const chosenKey = result.attrChosen ?? attrKey;
+    const chosenScore = sd[chosenKey]?.score ?? 0;
+    const chosenCfg   = CONFIG.AGONE.attributs[chosenKey] ?? {};
+    const modif = result.modif;
+
     let bonusAspect = 0;
-    if (attrConfig.aspect === "corps")  bonusAspect = sd.bonusCorps  ?? 0;
-    if (attrConfig.aspect === "esprit") bonusAspect = sd.bonusEsprit ?? 0;
-    if (attrConfig.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
-
-    const label = nom + (domaine ? ` [${domaine}]` : "");
-    const modif = await this._dialogModificateur(label, { specialite: "" });
-    if (modif === null) return;
+    if (chosenCfg.aspect === "corps")  bonusAspect = sd.bonusCorps  ?? 0;
+    if (chosenCfg.aspect === "esprit") bonusAspect = sd.bonusEsprit ?? 0;
+    if (chosenCfg.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const bonusSpe    = this._lastBonusSpe ?? 0;
-    const malusArmure = (attrKey === "agilite" || attrKey === "perception")
+    const malusArmure = (chosenKey === "agilite" || chosenKey === "perception")
       ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
       "1d10x10 + @comp + @attr + @bonus + @modif",
       {
-        comp: 0,
-        attr: attrScore,
-        bonus: bonusAspect + bonusSpe,
+        comp:  0,
+        attr:  chosenScore,
+        bonus: bonusAspect,
         modif: modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin
       }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       competence: `${label} : 0 (${game.i18n.localize("AGONE.MalusCompNonApprise")})`,
-      attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
-      aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
+      attribut:  `${game.i18n.localize(chosenCfg.label ?? chosenKey)} : ${chosenScore}`,
+      aspect:    `Bonus d'aspect : ${bonusAspect}`,
       modif:     `Bonus/Malus : ${modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     });
