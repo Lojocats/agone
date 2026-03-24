@@ -270,7 +270,7 @@
       <!-- HEADER : nom + stats + actions -->
       <div class="danseur-header">
         <div class="danseur-info">
-          <span class="danseur-nom">{{d.name}}</span>
+          <input class="danseur-nom inline-edit" type="text" data-item-id="{{d.id}}" data-field="name" value="{{d.name}}" placeholder='{{localize "AGONE.NomDanseur"}}'>
           {{#if d.system.modeCreation}}
           <span class="danseur-pts-badge {{#if (lt d.system.ptsCreationRestants 0)}}pts-deficit{{/if}}">
             {{d.system.ptsCreationDepense}}/{{d.system.ptsCreationMax}} pts

@@ -375,7 +375,24 @@
   flex-wrap: wrap;
   gap: 4px;
 }
-.agone .danseur-nom { font-weight: 600; font-size: 13px; }
+.agone .danseur-nom {
+  font-weight: 600;
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 1px 4px;
+  color: inherit;
+  width: auto;
+  min-width: 80px;
+  transition: border-color 0.15s;
+}
+.agone .danseur-nom:hover,
+.agone .danseur-nom:focus {
+  border-color: var(--agone-gold, #b8860b);
+  background: rgba(255,255,255,0.07);
+  outline: none;
+}
 .agone .danseur-stat {
   font-size: 11px;
   color: var(--agone-brown);
