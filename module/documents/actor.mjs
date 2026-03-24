@@ -861,7 +861,6 @@ export class AgoneActor extends Actor {
     }
 
     const seuilBase = sort.system.seuil ?? 0;
-    const seuil = impro ? seuilBase * 2 : seuilBase;
 
     // Aptitude : utilise le score de la compétence "Arts Magiques" du domaine exact du sort
     const domaineCibleApt = TYPES_TO_DOMAINE[typeMagieResolved] ?? null;
@@ -900,8 +899,11 @@ export class AgoneActor extends Actor {
     }
 
     const label = impro ? `${sort.name} (improvisé)` : sort.name;
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const dialogResult = await this._dialogSort(label, seuilBase, impro);
+    if (dialogResult === null) return;
+    const { modif, seuilBonus } = dialogResult;
+
+    const seuilFinal = impro ? (seuilBase + seuilBonus) * 2 : seuilBase + seuilBonus;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const roll = new Roll(
@@ -910,11 +912,19 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
 
-    const succes = roll.total >= seuil;
+    const succes = roll.total >= seuilFinal;
     const aptitudeLabel = compAltNom
       ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compAltNom}) : ${aptitude}`
       : aptitudeDomainLabel;
-    const seuilLabel = impro ? `Seuil : ${seuil} (${seuilBase} x 2, improvisé)` : `Seuil : ${seuil}`;
+    let seuilLabel;
+    if (impro && seuilBonus > 0)
+      seuilLabel = `Seuil : ${seuilFinal} ((${seuilBase} + ${seuilBonus}) x 2, improvisé)`;
+    else if (impro)
+      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} x 2, improvisé)`;
+    else if (seuilBonus > 0)
+      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} + ${seuilBonus} augmenté)`;
+    else
+      seuilLabel = `Seuil : ${seuilFinal}`;
     await this._sendRollToChat(roll, label, {
       aptitude: aptitudeLabel,
       seuil:    seuilLabel,
@@ -1051,6 +1061,66 @@ export class AgoneActor extends Actor {
       if (sd.saisonPerso && sd.saisonPerso === saisonMonde) return 1;
       return this.items.some(i => i.type === "danseur" && i.system.saison === saisonMonde) ? 1 : 0;
     } catch { return 0; }
+  }
+
+  /**
+   * Affiche un dialog spécialisé pour le lancer de sort avec bonus/malus et augmentation du seuil.
+   * @param {string} label     - Titre du dialog
+   * @param {number} seuilBase - Seuil de base du sort (affiché à titre indicatif)
+   * @param {boolean} impro    - Si vrai, le seuil sera doublé
+   * @returns {Promise<{modif: number, seuilBonus: number}|null>}
+   */
+  async _dialogSort(label, seuilBase = 0, impro = false) {
+    const seuilInfo = impro
+      ? `${seuilBase} × 2 = ${seuilBase * 2} (improvisé)`
+      : `${seuilBase}`;
+
+    const result = await foundry.applications.api.DialogV2.wait({
+      window:  { title: label },
+      content: `
+        <form>
+          <div class="agone-roll-dialog">
+            <p><strong>${label}</strong></p>
+            <div class="form-group">
+              <label>${game.i18n.localize("AGONE.BonusMalus")}</label>
+              <input type="number" id="modif" name="modif" value="0" autofocus/>
+            </div>
+            <div class="form-group">
+              <label>${game.i18n.localize("AGONE.AugmentationSeuil")} <em>(base : ${seuilInfo})</em></label>
+              <input type="number" id="seuilBonus" name="seuilBonus" value="0" min="0"/>
+            </div>
+            <div class="form-group form-check">
+              <input type="checkbox" id="typeJet" name="typeJet" checked />
+              <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
+            </div>
+          </div>
+        </form>
+      `,
+      buttons: [
+        {
+          action:   "lancer",
+          icon:     "fas fa-dice-d10",
+          label:    game.i18n.localize("AGONE.Lancer"),
+          default:  true,
+          callback: (event, button) => ({
+            modif:      parseInt(button.form.elements.modif.value)      || 0,
+            seuilBonus: parseInt(button.form.elements.seuilBonus.value) || 0,
+            type:       button.form.elements.typeJet.checked ? "ouvert" : "ferme",
+          })
+        },
+        {
+          action: "annuler",
+          icon:   "fas fa-times",
+          label:  game.i18n.localize("AGONE.Annuler"),
+        }
+      ],
+      rejectClose: false,
+    });
+
+    if (!result || typeof result === "string") return null;
+    this._lastRollType = result.type;
+    this._lastBonusSpe = 0;
+    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus) };
   }
 
   /**

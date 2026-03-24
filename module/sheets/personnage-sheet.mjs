@@ -249,11 +249,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       context.competencesGroups = [
         ...ORDRE_FAMILLES.filter(f => _byFam[f]).map(f => ({
           label: f, className: "fam-badge",
-          comps: _byFam[f].sort((a, b) => (b.system.score ?? 0) - (a.system.score ?? 0)),
+          comps: _byFam[f].sort((a, b) => a.name.localeCompare(b.name, "fr")),
         })),
         ...Object.keys(_byFam).filter(f => !ORDRE_FAMILLES.includes(f)).map(f => ({
           label: f, className: "fam-badge",
-          comps: _byFam[f].sort((a, b) => (b.system.score ?? 0) - (a.system.score ?? 0)),
+          comps: _byFam[f].sort((a, b) => a.name.localeCompare(b.name, "fr")),
         })),
       ];
     }
