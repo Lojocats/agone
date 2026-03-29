@@ -188,6 +188,7 @@
       <div class="cstat-item" title="{{tooltipsDerives.art}}">
         <span class="cstat-roll cstat-passive"><i class="fas fa-palette"></i></span>
         <span class="cstat-score">{{system.art}}</span>
+        {{#if bonusDonArt}}<span class="racial-bonus-badge {{#if (lt bonusDonArt 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonArt 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonArt 0)}}+{{/if}}{{bonusDonArt}}</span>{{/if}}
         {{#if bonusDeriveSupp.art}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.art 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.art 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.art 0)}}+{{/if}}{{bonusDeriveSupp.art}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.Art"}}</span>
       </div>
@@ -195,6 +196,7 @@
       <div class="cstat-item" title="{{tooltipsDerives.initiative}}">
         <button type="button" class="cstat-roll" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
         <span class="cstat-score">{{system.initiative}}</span>
+        {{#if bonusDonInitiative}}<span class="racial-bonus-badge {{#if (lt bonusDonInitiative 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonInitiative 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonInitiative 0)}}+{{/if}}{{bonusDonInitiative}}</span>{{/if}}
         {{#if bonusDeriveSupp.initiative}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.initiative 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.initiative 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.initiative 0)}}+{{/if}}{{bonusDeriveSupp.initiative}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
       </div>
@@ -230,6 +232,7 @@
       <div class="cstat-item cstat-emprise" title="{{tooltipsDerives.emprise}}">
         <span class="cstat-roll cstat-passive"><i class="fas fa-fire"></i></span>
         <span class="cstat-score">{{system.emprise}}</span>
+        {{#if bonusDonEmprise}}<span class="racial-bonus-badge {{#if (lt bonusDonEmprise 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonEmprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonEmprise 0)}}+{{/if}}{{bonusDonEmprise}}</span>{{/if}}
         {{#if bonusDeriveSupp.emprise}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.emprise 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.emprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.emprise 0)}}+{{/if}}{{bonusDeriveSupp.emprise}}</span>{{/if}}
         <div class="cstat-emprise-wrap">
           <span class="cstat-label">{{localize "AGONE.Emprise"}}</span>

@@ -310,6 +310,10 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     for (const k of ['melee','tir','art','initiative','initMagique','defenseNaturelle','bd','esquive','emprise']) {
       context.bonusDeriveSupp[k] = (system.bonusAttributsSupp ?? []).reduce((s, e) => e.attribut === k ? s + (Number(e.valeur) || 0) : s, 0);
     }
+    // Bonus de dons (avantages/défauts) sur les stats dérivées à bonus dédié
+    context.bonusDonArt        = system.avantageArtBonus        ?? 0;
+    context.bonusDonInitiative = system.avantageInitiativeBonus ?? 0;
+    context.bonusDonEmprise    = system.avantageEmpriseBonus    ?? 0;
 
     context.xpCout = {
       corps:        (system.corps.score        + 1) * m.aspect,
@@ -637,17 +641,17 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       else empriseFormule = `(INT ${system.intelligence.score} + VOL ${system.volonte.score}) ÷ 2`;
 
       context.tooltipsDerives = {
-        melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}x2) ÷ 3 = ${system.melee}${srcStr("force","agilite")}`,
-        tir:    `(AGI ${system.agilite.score} + PER ${system.perception.score}) ÷ 2 = ${system.tir}${srcStr("agilite","perception")}`,
+        melee:  `(FOR ${system.force.score} + AGI ${system.agilite.score}x2) ÷ 3 = ${system.melee}${srcStr("melee")}`,
+        tir:    `(AGI ${system.agilite.score} + PER ${system.perception.score}) ÷ 2 = ${system.tir}${srcStr("tir")}`,
         art:    peupleKey === "feeNoire"
-          ? `CRÉ ${system.creativite.score}${bsign(avArt)} = ${system.art}${srcStr("creativite","art_bonus")}`
-          : `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2↓${bsign(avArt)} = ${system.art}${srcStr("charisma","creativite","art_bonus")}`,
-        initiative: `AGI ${system.agilite.score} + PER ${system.perception.score} + Bonus Corps ${bC}${bsign(avInit)} = ${system.initiative}\n${bonusCorpsDetail}${srcStr("agilite","perception","initiative_bonus")}`,
-        initMagique: `Initiative ${system.initiative} + 10 = ${system.initMagique}`,
-        defenseNaturelle: `AGI ${system.agilite.score} + Bonus Corps ${bC} = ${system.defenseNaturelle}\n${bonusCorpsDetail}${srcStr("agilite")}`,
-        bd:     `Tableau FOR ${system.force.score} + TAI ${system.tai} = ${system.bd}${srcStr("force","tai")}`,
-        esquive: `AGI ${system.agilite.score} + Esquive ${escComp} + Bonus Corps ${bC} = ${system.esquiveTotal}\n${bonusCorpsDetail}${srcStr("agilite")}`,
-        emprise: `${empriseFormule}${bsign(avEmp)} = ${system.emprise}${srcStr("intelligence","volonte","emprise_bonus")}`,
+          ? `CRÉ ${system.creativite.score}${bsign(avArt)} = ${system.art}${srcStr("art_bonus","art")}`
+          : `(CHA ${system.charisma.score} + CRÉ ${system.creativite.score}) ÷ 2↓${bsign(avArt)} = ${system.art}${srcStr("art_bonus","art")}`,
+        initiative: `AGI ${system.agilite.score} + PER ${system.perception.score} + Bonus Corps ${bC}${bsign(avInit)} = ${system.initiative}\n${bonusCorpsDetail}${srcStr("initiative_bonus","initiative")}`,
+        initMagique: `Initiative ${system.initiative} + 10 = ${system.initMagique}${srcStr("initiative_bonus","initiative")}`,
+        defenseNaturelle: `AGI ${system.agilite.score} + Bonus Corps ${bC} = ${system.defenseNaturelle}\n${bonusCorpsDetail}${srcStr("defenseNaturelle")}`,
+        bd:     `Tableau FOR ${system.force.score} + TAI ${system.tai} = ${system.bd}${srcStr("bd")}`,
+        esquive: `AGI ${system.agilite.score} + Esquive ${escComp} + Bonus Corps ${bC} = ${system.esquiveTotal}\n${bonusCorpsDetail}${srcStr("esquive")}`,
+        emprise: `${empriseFormule}${bsign(avEmp)} = ${system.emprise}${srcStr("emprise_bonus","emprise")}`,
       };
     }
 
