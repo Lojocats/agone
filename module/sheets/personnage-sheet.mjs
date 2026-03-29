@@ -49,6 +49,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     context.dons         = actor.items.filter(i => i.type === "don" && i.system.categorie === "avantage").sort(bySort);
     context.avantages    = context.dons;  // alias pour avantages.hbs
     context.defauts      = actor.items.filter(i => i.type === "don" && i.system.categorie === "defaut").sort(bySort);
+    context.bonusAttributsSupp = system.bonusAttributsSupp ?? [];
 
     // Enrichit chaque avantage/défaut avec sa catégorie thématique (Âme, Corps, etc.)
     const AV_SECT_LABELS = {
@@ -302,6 +303,12 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       context.bonusRacialCarac[k]   = racialNet(k);
       context.bonusAvantageCarac[k] = avBonus(k);
       context.rawCaracVal[k]        = rawCarac(k);
+    }
+
+    // Bonus/malus personnalisés sur les stats dérivées (pour badges dans le template)
+    context.bonusDeriveSupp = {};
+    for (const k of ['melee','tir','art','initiative','initMagique','defenseNaturelle','bd','esquive','emprise']) {
+      context.bonusDeriveSupp[k] = (system.bonusAttributsSupp ?? []).reduce((s, e) => e.attribut === k ? s + (Number(e.valeur) || 0) : s, 0);
     }
 
     context.xpCout = {
@@ -878,6 +885,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       icon?.classList.toggle("fa-chevron-down");
     });
 
+    // Bonus/malus d'attributs supplémentaires
+    html.find(".bonus-supp-add").click(this._onBonusSuppAdd.bind(this));
+    html.find(".bonus-supp-delete").click(this._onBonusSuppDelete.bind(this));
+    html.on("change", ".bonus-supp-field", this._onBonusSuppChange.bind(this));
+
     // Toggle description peines de Perfidie
     html.on("click", ".peine-desc-toggle", ev => {
       const id = ev.currentTarget.dataset.itemId;
@@ -1014,6 +1026,76 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       content: `<p>${game.i18n.format("AGONE.ConfirmationSuppression", { nom: item.name })}</p>`
     });
     if (confirmed) await item.delete();
+  }
+
+  async _onBonusSuppAdd(event) {
+    event.preventDefault();
+    const entries = foundry.utils.deepClone(this.actor.system.bonusAttributsSupp ?? []);
+    entries.push({ categorie: "avantage", attribut: "agilite", valeur: 0, description: "" });
+    await this.actor.update({ "system.bonusAttributsSupp": entries });
+  }
+
+  async _onBonusSuppDelete(event) {
+    event.preventDefault();
+    const idx = Number(event.currentTarget.dataset.idx);
+    const entries = foundry.utils.deepClone(this.actor.system.bonusAttributsSupp ?? []);
+    entries.splice(idx, 1);
+    await this.actor.update({ "system.bonusAttributsSupp": entries });
+  }
+
+  async _onBonusSuppChange(event) {
+    const el    = event.currentTarget;
+    const idx   = Number(el.closest("[data-idx]").dataset.idx);
+    const field = el.dataset.field;
+    const value = el.type === "number" ? (Number(el.value) || 0) : el.value;
+    const entries = foundry.utils.deepClone(this.actor.system.bonusAttributsSupp ?? []);
+    if (!entries[idx]) return;
+
+    const tentative = foundry.utils.deepClone(entries);
+    tentative[idx][field] = value;
+
+    // Validation uniquement pour les stats primaires (les dérivées n'ont pas de plancher)
+    const PRIMAIRES = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite','corps','esprit','ame'];
+    const sd  = this.actor.system;
+    const tbl = CONFIG.AGONE?.tableAchatCreation ?? [0,1,2,3,4,5,7,10,14,19,25];
+    const lastDelta = tbl[tbl.length-1] - tbl[tbl.length-2];
+    const creaTotal = (n) => n <= 0 ? 0 : n < tbl.length ? tbl[n] : tbl[tbl.length-1] + (n - (tbl.length - 1)) * lastDelta;
+
+    const update = { "system.bonusAttributsSupp": tentative };
+
+    for (const k of PRIMAIRES) {
+      if (!sd[k]) continue;
+      const currentSuppBonus = entries.reduce((s, e)    => e.attribut === k ? s + (Number(e.valeur) || 0) : s, 0);
+      const newSuppBonus     = tentative.reduce((s, e)  => e.attribut === k ? s + (Number(e.valeur) || 0) : s, 0);
+      const delta            = newSuppBonus - currentSuppBonus;
+      const newEffective     = (sd[k]?.score ?? 0) + delta;
+
+      if (newEffective < 0) {
+        const deficit = -newEffective;
+        if (sd.modeCreation) {
+          const racialBonus  = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+          // Valeur stockée en DB = score transient - avantageBonus (qui inclut don + bonusSupp courants)
+          const dbStored = (sd[k]?.score ?? 0) - (sd[k]?.avantageBonus ?? 0);
+          const rawBase  = Math.max(0, dbStored - racialBonus);
+          const cost     = creaTotal(rawBase + deficit) - creaTotal(rawBase);
+          const depense  = update["system.ptsCreationCarac.depense"] ?? sd.ptsCreationCarac.depense;
+          const available = sd.ptsCreationCarac.max - depense;
+          if (cost <= available) {
+            const caracLabel = game.i18n.localize(`AGONE.Attribut.${k.charAt(0).toUpperCase() + k.slice(1)}`) || k;
+            update[`system.${k}.score`] = dbStored + deficit;
+            update["system.ptsCreationCarac.depense"] = depense + cost;
+            ui.notifications.info(game.i18n.format("AGONE.BonusSuppCompensation", { carac: caracLabel, cost }));
+          } else {
+            ui.notifications.warn(game.i18n.format("AGONE.BonusSuppInsuffisantPts", { cost, available }));
+            return;
+          }
+        } else {
+          ui.notifications.warn(game.i18n.localize("AGONE.BonusSuppNegatifRefuse"));
+          return;
+        }
+      }
+    }
+    await this.actor.update(update);
   }
 
   async _onItemSendChat(event) {

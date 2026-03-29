@@ -215,7 +215,15 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
       monnaie: new fields.SchemaField({
         pieceOr: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
         bribe:   new fields.NumberField({ initial: 0, integer: true, min: 0 })
-      })
+      }),
+
+      // Bonus/malus d'attributs supplémentaires (avantages & défauts personnalisés)
+      bonusAttributsSupp: new fields.ArrayField(new fields.SchemaField({
+        categorie:   new fields.StringField({ initial: "avantage" }),
+        attribut:    new fields.StringField({ initial: "agilite" }),
+        valeur:      new fields.NumberField({ initial: 0, integer: true }),
+        description: new fields.StringField({ initial: "" }),
+      }))
     };
   }
 

@@ -178,6 +178,21 @@ export class AgoneActor extends Actor {
 
         // Effets mécaniques des avantages & défauts
         this._applyAvantagesEffets();
+
+        // Bonus/malus d'attributs supplémentaires (bonusAttributsSupp) — stats dérivées
+        const _bsArr = systemData.bonusAttributsSupp ?? [];
+        if (_bsArr.length > 0) {
+          const _bs = (k) => _bsArr.reduce((s, e) => e.attribut === k ? s + (Number(e.valeur) || 0) : s, 0);
+          systemData.melee            = (systemData.melee            ?? 0) + _bs('melee');
+          systemData.tir              = (systemData.tir              ?? 0) + _bs('tir');
+          systemData.art              = (systemData.art              ?? 0) + _bs('art');
+          systemData.initiative       = (systemData.initiative       ?? 0) + _bs('initiative');
+          systemData.initMagique      = (systemData.initMagique      ?? 0) + _bs('initMagique');
+          systemData.defenseNaturelle = (systemData.defenseNaturelle ?? 0) + _bs('defenseNaturelle');
+          systemData.bd               = (systemData.bd               ?? 0) + _bs('bd');
+          systemData.esquiveTotal     = (systemData.esquiveTotal     ?? 0) + _bs('esquive');
+          systemData.emprise          = (systemData.emprise          ?? 0) + _bs('emprise');
+        }
       }
     }
 
@@ -199,7 +214,9 @@ export class AgoneActor extends Actor {
     const T  = CONFIG.AGONE;
 
     const dons = this.items.filter(i => i.type === "don");
-    if (!dons.length) return;
+    const _primairesSupp = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite','corps','esprit','ame'];
+    const _hasSuppPrimaire = (sd.bonusAttributsSupp ?? []).some(e => _primairesSupp.includes(e.attribut));
+    if (!dons.length && !_hasSuppPrimaire) return;
 
     // Accumulation des deltas
     const b = {
@@ -227,6 +244,13 @@ export class AgoneActor extends Actor {
         } else if (e.delta !== undefined) {
           b[e.stat] = (b[e.stat] ?? 0) + e.delta;
         }
+      }
+    }
+
+    // Bonus/malus d'attributs supplémentaires sur stats primaires
+    for (const e of (sd.bonusAttributsSupp ?? [])) {
+      if (_primairesSupp.includes(e.attribut)) {
+        b[e.attribut] = (b[e.attribut] ?? 0) + (Number(e.valeur) || 0);
       }
     }
 

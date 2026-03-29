@@ -1,4 +1,4 @@
-import { AVANTAGES_DATA } from "../helpers/compendium-data.mjs";
+import { AVANTAGES_DATA, AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
 
 // Libellés lisibles des catégories
 function _buildCatLabels() {
@@ -176,6 +176,49 @@ export class AvantagesBrowser extends Application {
       if (isNaN(idx)) return;
       const d = AVANTAGES_DATA[idx];
       if (!d) return;
+
+      // ----- Validation : effets négatifs sur stats primaires -----
+      const PRIMAIRES   = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite','corps','esprit','ame'];
+      const effets      = AVANTAGES_EFFETS[d.name] ?? [];
+      const sd          = this.actor.system;
+      const tbl         = CONFIG.AGONE?.tableAchatCreation ?? [0,1,2,3,4,5,7,10,14,19,25];
+      const lastDelta   = tbl[tbl.length-1] - tbl[tbl.length-2];
+      const creaTotal   = (n) => n <= 0 ? 0 : n < tbl.length ? tbl[n] : tbl[tbl.length-1] + (n - (tbl.length - 1)) * lastDelta;
+      const update      = {};
+
+      for (const effet of effets) {
+        const k = effet.stat;
+        if (!PRIMAIRES.includes(k) || effet.delta === undefined || effet.delta >= 0) continue;
+        const newEffective = (sd[k]?.score ?? 0) + effet.delta;
+        if (newEffective >= 0) continue;
+
+        const deficit = -newEffective;
+        if (sd.modeCreation) {
+          const racialBonus = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
+          const dbStored    = (sd[k]?.score ?? 0) - (sd[k]?.avantageBonus ?? 0);
+          const rawBase     = Math.max(0, dbStored - racialBonus);
+          const cost        = creaTotal(rawBase + deficit) - creaTotal(rawBase);
+          const depense     = update["system.ptsCreationCarac.depense"] ?? sd.ptsCreationCarac.depense;
+          const available   = sd.ptsCreationCarac.max - depense;
+          if (cost <= available) {
+            const caracLabel = game.i18n.localize(`AGONE.Attribut.${k.charAt(0).toUpperCase() + k.slice(1)}`) || k;
+            update[`system.${k}.score`] = dbStored + deficit;
+            update["system.ptsCreationCarac.depense"] = depense + cost;
+            ui.notifications.info(game.i18n.format("AGONE.BonusSuppCompensation", { carac: caracLabel, cost }));
+          } else {
+            ui.notifications.warn(game.i18n.format("AGONE.BonusSuppInsuffisantPts", { cost, available }));
+            return;
+          }
+        } else {
+          ui.notifications.warn(game.i18n.localize("AGONE.BonusSuppNegatifRefuse"));
+          return;
+        }
+      }
+
+      // Appliquer la compensation avant de créer l'item
+      if (Object.keys(update).length > 0) {
+        await this.actor.update(update);
+      }
 
       // Description enrichie avec prérequis si présents
       let desc = d.description ?? "";

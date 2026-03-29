@@ -162,6 +162,9 @@
     "ConfirmerRetrogradeNiveau":     "Rétrograder au niveau inférieur et récupérer {remboursement} ?",
     "ScoreDejaZero":                 "Ce score est déjà à 0, impossible de rétrograder.",
     "RemboursementImpossible":       "Impossible de rétrograder : ce niveau correspond au bonus racial (non remboursable).",
+    "BonusSuppCompensation":         "{cost} pts de création dépensés pour compenser le malus sur {carac}.",
+    "BonusSuppInsuffisantPts":       "Impossible d'appliquer ce malus : il faudrait {cost} pts de création, mais seulement {available} sont disponibles.",
+    "BonusSuppNegatifRefuse":        "Ce malus rendrait la statistique négative. Utilisez le mode création pour compenser automatiquement.",
 
     "Manoeuvres":       "Manœuvres & Bottes",
     "AjouterManoeuvre": "Ajouter une manœuvre",
@@ -781,7 +784,16 @@
       "JeuneNote":       "Jeune : coûts des avantages x2",
       "VieillardNote":   "Vieillard : coûts des avantages -2 (min 1)",
       "CreerAvantage":   "Créer un avantage",
-      "CreerDefaut":     "Créer un défaut"
+      "CreerDefaut":     "Créer un défaut",
+      "BonusSupp": {
+        "Titre":       "Bonus/malus d'attributs personnalisés",
+        "Ajouter":     "Ajouter un bonus/malus d'attribut",
+        "Categorie":   "Type",
+        "Attribut":    "Attribut",
+        "Valeur":      "Valeur",
+        "Description": "Description",
+        "Vide":        "Aucun bonus ou malus d'attribut défini"
+      }
     },
 
     "Calendrier": {

@@ -140,4 +140,89 @@
 
   </div><!-- /.av-def-grid -->
 
+  <!-- ── Bonus/Malus d'attributs supplémentaires ────────────────────── -->
+  <div class="bonus-supp-section">
+    <div class="bonus-supp-header">
+      <h4 class="section-title" style="margin:0">
+        <i class="fas fa-sliders-h"></i>
+        {{localize "AGONE.Avantages.BonusSupp.Titre"}}
+      </h4>
+      <button type="button" class="btn-icon bonus-supp-add"
+              title='{{localize "AGONE.Avantages.BonusSupp.Ajouter"}}'>
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+    {{#if bonusAttributsSupp.length}}
+    <table class="bonus-supp-table">
+      <thead>
+        <tr>
+          <th>{{localize "AGONE.Avantages.BonusSupp.Categorie"}}</th>
+          <th>{{localize "AGONE.Avantages.BonusSupp.Attribut"}}</th>
+          <th>{{localize "AGONE.Avantages.BonusSupp.Valeur"}}</th>
+          <th>{{localize "AGONE.Avantages.BonusSupp.Description"}}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each bonusAttributsSupp as |entry|}}
+        <tr data-idx="{{@index}}">
+          <td>
+            <select class="bonus-supp-field" data-field="categorie">
+              <option value="avantage" {{#if (eq entry.categorie "avantage")}}selected{{/if}}>{{localize "AGONE.Avantage"}}</option>
+              <option value="defaut"   {{#if (eq entry.categorie "defaut")}}selected{{/if}}>{{localize "AGONE.Defaut"}}</option>
+            </select>
+          </td>
+          <td>
+            <select class="bonus-supp-field" data-field="attribut">
+              <optgroup label="{{localize "AGONE.Aspects"}}">
+                <option value="corps"        {{#if (eq entry.attribut "corps")}}selected{{/if}}>{{localize "AGONE.Corps"}}</option>
+                <option value="esprit"       {{#if (eq entry.attribut "esprit")}}selected{{/if}}>{{localize "AGONE.Esprit"}}</option>
+                <option value="ame"          {{#if (eq entry.attribut "ame")}}selected{{/if}}>{{localize "AGONE.Ame"}}</option>
+              </optgroup>
+              <optgroup label="{{localize "AGONE.Caracteristiques"}}">
+                <option value="agilite"      {{#if (eq entry.attribut "agilite")}}selected{{/if}}>{{localize "AGONE.Attribut.Agilite"}}</option>
+                <option value="force"        {{#if (eq entry.attribut "force")}}selected{{/if}}>{{localize "AGONE.Attribut.Force"}}</option>
+                <option value="perception"   {{#if (eq entry.attribut "perception")}}selected{{/if}}>{{localize "AGONE.Attribut.Perception"}}</option>
+                <option value="resistance"   {{#if (eq entry.attribut "resistance")}}selected{{/if}}>{{localize "AGONE.Attribut.Resistance"}}</option>
+                <option value="intelligence" {{#if (eq entry.attribut "intelligence")}}selected{{/if}}>{{localize "AGONE.Attribut.Intelligence"}}</option>
+                <option value="volonte"      {{#if (eq entry.attribut "volonte")}}selected{{/if}}>{{localize "AGONE.Attribut.Volonte"}}</option>
+                <option value="charisma"     {{#if (eq entry.attribut "charisma")}}selected{{/if}}>{{localize "AGONE.Attribut.Charisma"}}</option>
+                <option value="creativite"   {{#if (eq entry.attribut "creativite")}}selected{{/if}}>{{localize "AGONE.Attribut.Creativite"}}</option>
+              </optgroup>
+              <optgroup label="{{localize "AGONE.CaracDerivees"}}">
+                <option value="melee"            {{#if (eq entry.attribut "melee")}}selected{{/if}}>{{localize "AGONE.Melee"}}</option>
+                <option value="tir"              {{#if (eq entry.attribut "tir")}}selected{{/if}}>{{localize "AGONE.Tir"}}</option>
+                <option value="art"              {{#if (eq entry.attribut "art")}}selected{{/if}}>{{localize "AGONE.Art"}}</option>
+                <option value="initiative"       {{#if (eq entry.attribut "initiative")}}selected{{/if}}>{{localize "AGONE.Initiative"}}</option>
+                <option value="initMagique"      {{#if (eq entry.attribut "initMagique")}}selected{{/if}}>{{localize "AGONE.InitMagique"}}</option>
+                <option value="defenseNaturelle" {{#if (eq entry.attribut "defenseNaturelle")}}selected{{/if}}>{{localize "AGONE.DefenseNaturelle"}}</option>
+                <option value="bd"               {{#if (eq entry.attribut "bd")}}selected{{/if}}>{{localize "AGONE.BD"}}</option>
+                <option value="esquive"          {{#if (eq entry.attribut "esquive")}}selected{{/if}}>{{localize "AGONE.EsquiveTotal"}}</option>
+                <option value="emprise"          {{#if (eq entry.attribut "emprise")}}selected{{/if}}>{{localize "AGONE.Emprise"}}</option>
+              </optgroup>
+            </select>
+          </td>
+          <td>
+            <input type="number" class="bonus-supp-field bonus-supp-val"
+                   data-field="valeur" value="{{entry.valeur}}" />
+          </td>
+          <td>
+            <input type="text" class="bonus-supp-field bonus-supp-desc"
+                   data-field="description" value="{{entry.description}}" placeholder="…" />
+          </td>
+          <td>
+            <button type="button" class="btn-icon bonus-supp-delete"
+                    data-idx="{{@index}}" title='{{localize "AGONE.Supprimer"}}'>
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+    <p class="empty-list">{{localize "AGONE.Avantages.BonusSupp.Vide"}}</p>
+    {{/if}}
+  </div><!-- /.bonus-supp-section -->
+
 </div><!-- /.avantages-section -->
