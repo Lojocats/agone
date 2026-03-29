@@ -587,20 +587,34 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     // ── Tooltips détaillés pour les stats dérivées ──────────────────────────────────────────────
     {
-      // Sources avantages/défauts par stat
+      // Sources avantages/défauts par stat — { pos: [...], neg: [...] }
       const donsAll = actor.items.filter(i => i.type === "don");
       const statSrc = {};
       for (const don of donsAll) {
         for (const e of (AVANTAGES_EFFETS[don.name] ?? [])) {
           if (e.delta !== undefined && e.delta !== 0) {
-            if (!statSrc[e.stat]) statSrc[e.stat] = [];
-            statSrc[e.stat].push(`${e.delta > 0 ? "+" : ""}${e.delta} (${don.name})`);
+            if (!statSrc[e.stat]) statSrc[e.stat] = { pos: [], neg: [] };
+            const entry = `${e.delta > 0 ? "+" : ""}${e.delta} (${don.name})`;
+            (e.delta > 0 ? statSrc[e.stat].pos : statSrc[e.stat].neg).push(entry);
           }
         }
       }
+      // bonusAttributsSupp — contributions personnalisées
+      for (const e of (system.bonusAttributsSupp ?? [])) {
+        const v = Number(e.valeur) || 0;
+        if (v === 0) continue;
+        const k = e.attribut;
+        if (!statSrc[k]) statSrc[k] = { pos: [], neg: [] };
+        const label = e.description ? `${v > 0 ? "+" : ""}${v} (${e.description})` : `${v > 0 ? "+" : ""}${v}`;
+        (v > 0 ? statSrc[k].pos : statSrc[k].neg).push(label);
+      }
       const srcStr = (...stats) => {
-        const all = stats.flatMap(s => statSrc[s] ?? []);
-        return all.length ? "\n  dont avantages : " + all.join(", ") : "";
+        const pos = stats.flatMap(s => statSrc[s]?.pos ?? []);
+        const neg = stats.flatMap(s => statSrc[s]?.neg ?? []);
+        const parts = [];
+        if (pos.length) parts.push("avantages : " + pos.join(", "));
+        if (neg.length) parts.push("défauts : "   + neg.join(", "));
+        return parts.length ? "\n  dont " + parts.join(" | ") : "";
       };
       const bsign = v => v === 0 ? "" : (v > 0 ? ` + ${v}` : ` − ${Math.abs(v)}`);
 
@@ -2220,7 +2234,8 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       const pDatRace  = CONFIG.AGONE?.peuplesData?.[pKeyRace] ?? {};
       const maxRacial = pDatRace[`${key}Max`] ?? null;
       const bonusApp  = sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0;
-      const rawScore  = (sd[key]?.score ?? 0) - bonusApp;
+      const avBonus   = sd[key]?.avantageBonus ?? 0;
+      const rawScore  = (sd[key]?.score ?? 0) - avBonus - bonusApp;
       if (maxRacial !== null && rawScore >= maxRacial) {
         return ui.notifications.warn(game.i18n.localize("AGONE.MaxRacialAtteint"));
       }
@@ -2257,7 +2272,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
       if (isCarac) {
         await this.actor.update({
-          [`system.${key}.score`]:          (sd[key].score ?? 0) + 1,
+          [`system.${key}.score`]:          ((sd[key].score ?? 0) - (sd[key]?.avantageBonus ?? 0)) + 1,
           "system.ptsCreationCarac.depense": (pool.depense ?? 0) + creaCout,
         });
       } else if (type === "competence") {
@@ -2310,7 +2325,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     if (isCarac) {
       await this.actor.update({
-        [`system.${key}.score`]: (sd[key].score ?? 0) + 1,
+        [`system.${key}.score`]: ((sd[key].score ?? 0) - (sd[key]?.avantageBonus ?? 0)) + 1,
         ...(fromLocal   > 0 ? { [`system.${key}.exp`]:       localExp - fromLocal                      } : {}),
         ...(fromGeneral > 0 ? { "system.experience.courante": sd.experience.courante - fromGeneral      } : {}),
         "system.experience.totale": (sd.experience.totale ?? 0) + xpCout,
@@ -2343,8 +2358,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     const item         = (type === "competence") ? this.actor.items.get(itemId) : null;
     const currentScore = (type === "competence") ? (item?.system.score ?? 0) : (sd[key]?.score ?? 0);
+    // sourceScore = valeur stockée en DB (score transient sans effets transitoires don/bonusSupp)
+    const avBonus0     = (type === "carac" || type === "aspect") ? (sd[key]?.avantageBonus ?? 0) : 0;
+    const sourceScore  = currentScore - avBonus0;
 
-    if (currentScore <= 0) {
+    if (sourceScore <= 0) {
       return ui.notifications.warn(game.i18n.localize("AGONE.ScoreDejaZero"));
     }
 
@@ -2360,7 +2378,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       }
       const pool      = (type === "carac") ? sd.ptsCreationCarac : sd.ptsCreationComp;
       const bonus     = (type === "carac") ? (sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0) : 0;
-      const rawScore  = Math.max(0, currentScore - bonus);
+      const rawScore  = Math.max(0, sourceScore - bonus);
       const raceMin   = (type === "carac") ? (sd[key]?.raceMin ?? 0) : 0;
       const posBonus  = Math.max(0, bonus);
       const forcedRaw = Math.max(bonus < 0 ? -bonus : 0, Math.max(0, raceMin - posBonus));
@@ -2372,7 +2390,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
       if (type === "carac") {
         await this.actor.update({
-          [`system.${key}.score`]:           currentScore - 1,
+          [`system.${key}.score`]:           sourceScore - 1,
           "system.ptsCreationCarac.depense": Math.max(0, (pool.depense ?? 0) - remboursement),
         });
       } else if (type === "competence" && item) {
@@ -2391,7 +2409,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
     if (isCaracOrAspect) {
       await this.actor.update({
-        [`system.${key}.score`]:       currentScore - 1,
+        [`system.${key}.score`]:       sourceScore - 1,
         "system.experience.courante":  (sd.experience.courante ?? 0) + xpRemboursement,
         "system.experience.totale":    Math.max(0, (sd.experience.totale ?? 0) - xpRemboursement),
       });
