@@ -38,11 +38,6 @@ export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicatio
     return game.i18n.format("AGONE.Browser.TitrePerfidie", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorPeineNames = new Set(
       this.actor.items.filter(i => i.type === "peine").map(i => i.name)

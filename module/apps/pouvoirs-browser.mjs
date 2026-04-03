@@ -29,11 +29,6 @@ export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicat
     return game.i18n.format("AGONE.Browser.TitrePouvoirs", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorPouvoirNames = new Set(
       this.actor.items.filter(i => i.type === "pouvoir").map(i => i.name)

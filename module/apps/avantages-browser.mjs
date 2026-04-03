@@ -46,11 +46,6 @@ export class AvantagesBrowser extends foundry.applications.api.HandlebarsApplica
     return game.i18n.format("AGONE.Browser.TitreAvantages", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorDonNames = new Set(
       this.actor.items.filter(i => i.type === "don").map(i => i.name)

@@ -31,6 +31,7 @@ import { AvantagesBrowser } from "./apps/avantages-browser.mjs";
 import { PeinesBrowser }   from "./apps/peines-browser.mjs";
 import { SaisonConfig }        from "./apps/saison-config.mjs";
 import { CalendrierAgone }     from "./apps/calendrier.mjs";
+import { CalendrierWidget }    from "./apps/calendrier-widget.mjs";
 import { DomainesArtsConfig }  from "./apps/domaines-arts-config.mjs";
 import { AgoreCombatTracker }  from "./apps/combat-tracker.mjs";
 import {
@@ -86,12 +87,23 @@ Hooks.once("init", () => {
   game.settings.register("agone", "calendrierDate", {
     scope: "world", config: false,
     type: Object,
-    default: { jour: 1, mois: 1, an: 1 },
+    default: { jour: 1, mois: 1, an: 1, heure: 8, minute: 0 },
   });
   game.settings.register("agone", "calendrierNotes", {
     scope: "world", config: false,
     type: Object,
     default: {},
+  });
+  game.settings.register("agone", "calendrierMeteo", {
+    scope: "world", config: false,
+    type: String,
+    default: "",
+  });
+  // ── Thème visuel (clair / sombre, par joueur) ─────────────────────────────
+  game.settings.register("agone", "agoneTheme", {
+    scope: "client", config: false,
+    type: String,
+    default: "light",
   });
   // ── Domaines d'Arts Magiques personnalisés ─────────────────────────────
   game.settings.register("agone", "domainesArtsCustom", {
@@ -217,6 +229,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/pouvoirs-browser.hbs",
     "systems/agone/templates/apps/saison-config.hbs",
     "systems/agone/templates/apps/calendrier.hbs",
+    "systems/agone/templates/apps/calendrier-widget.hbs",
     "systems/agone/templates/apps/combat-tracker.hbs",
   ];
   foundry.applications.handlebars.loadTemplates(templates);
@@ -238,6 +251,13 @@ Hooks.once("init", () => {
 });
 
 /* ============================================================================
+ * THÈME VISUEL
+ * ========================================================================= */
+function _applyAgoneTheme(theme) {
+  document.body.classList.toggle("agone-dark", theme === "dark");
+}
+
+/* ============================================================================
  * READY HOOK
  * ========================================================================= */
 Hooks.once("ready", async () => {
@@ -251,6 +271,24 @@ Hooks.once("ready", async () => {
       if (moisData) await game.settings.set("agone", "saisonMonde", moisData.saison);
     } catch {}
   }
+
+  // ── Widget calendrier (HUD haut d'écran) ─────────────────────────────
+  game.agone.calendrierWidget = new CalendrierWidget();
+  game.agone.calendrierWidget.render(true);
+
+  // Applique le thème au démarrage
+  _applyAgoneTheme(game.settings.get("agone", "agoneTheme"));
+
+  // Re-rendu du widget à chaque changement de setting calendrier, météo ou thème
+  Hooks.on("updateSetting", (setting) => {
+    const key = setting.key ?? "";
+    if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo" || key === "agone.saisonMonde") {
+      game.agone.calendrierWidget?.render(true);
+    }
+    if (key === "agone.agoneTheme") {
+      _applyAgoneTheme(game.settings.get("agone", "agoneTheme"));
+    }
+  });
 
   if (!game.user.isGM) return;
 
@@ -411,23 +449,27 @@ Hooks.on("getSceneControlButtons", (controls) => {
         button: true,
         onChange: () => new CalendrierAgone().render(true),
       },
-      saison: {
-        name: "saison",
-        title: game.i18n.localize("AGONE.ConfigSaison"),
-        icon: "fas fa-sun",
-        order: 2,
-        button: true,
-        visible: game.user?.isGM ?? false,
-        onChange: () => new SaisonConfig().render(true),
-      },
       combatTracker: {
         name: "combatTracker",
         title: game.i18n.localize("AGONE.Combat.TitreTracker"),
         icon: "fas fa-swords",
-        order: 3,
+        order: 2,
         button: true,
         visible: game.user?.isGM ?? false,
         onChange: () => new AgoreCombatTracker().render(true),
+      },
+      darkMode: {
+        name: "darkMode",
+        title: game.i18n.localize("AGONE.ModeSombre"),
+        icon: "fas fa-moon",
+        order: 3,
+        toggle: true,
+        active: game.settings.get("agone", "agoneTheme") === "dark",
+        onChange: (_event, active) => {
+          const newTheme = active ? "dark" : "light";
+          _applyAgoneTheme(newTheme);
+          game.settings.set("agone", "agoneTheme", newTheme);
+        },
       },
     },
   };

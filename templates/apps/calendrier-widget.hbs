@@ -1,0 +1,27 @@
+{{! ── WIDGET CALENDRIER – bande HUD haut d'écran ────────────────────────── }}
+<div id="agone-cal-widget" class="agone-cal-widget">
+
+  <span class="acw-saison acw-saison-{{saison}}" title="{{saisonLabel}}">{{saisonLabel}}</span>
+
+  <button type="button" class="acw-date acw-clickable" data-action="openCalendrier"
+          title='Ouvrir le calendrier'>
+    <i class="fas fa-calendar-alt"></i>
+    <span>{{dateCourte}}</span>
+  </button>
+
+  <span class="acw-time">
+    <i class="fas fa-clock"></i> {{timeStr}}
+  </span>
+
+  <span class="acw-moon" title="{{moonPhase.label}}">{{moonPhase.icon}}</span>
+
+  {{#if isGM}}
+  <button type="button" class="acw-meteo acw-clickable" data-action="cycleMeteo"
+          title="Cliquer pour changer la météo">
+    {{meteoIcon}} <span class="acw-meteo-label">{{meteoLabel}}</span>
+  </button>
+  {{else}}
+  <span class="acw-meteo" title="{{meteoLabel}}">{{meteoIcon}}</span>
+  {{/if}}
+
+</div>

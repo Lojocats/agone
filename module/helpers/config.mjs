@@ -178,6 +178,29 @@ AGONE.saisons = {
   hiver:     "Hiver",
 };
 
+// ── Météo ────────────────────────────────────────────────────────────────────
+AGONE.meteoTypes = [
+  { id: "",          icon: "—",  label: "—"               },
+  { id: "ensoleille",icon: "☀️", label: "Ensoleillé"      },
+  { id: "nuageux",   icon: "⛅", label: "Nuageux"         },
+  { id: "pluie",     icon: "🌧️", label: "Pluie"           },
+  { id: "orage",     icon: "⛈️", label: "Orage"           },
+  { id: "brouillard",icon: "🌫️", label: "Brouillard"      },
+  { id: "neige",     icon: "❄️", label: "Neige"           },
+];
+
+// ── Phases de lune (cycle 28 jours) ─────────────────────────────────────────
+AGONE.phasesLune = [
+  { icon: "🌑", label: "Nouvelle lune"     },
+  { icon: "🌒", label: "Premier croissant" },
+  { icon: "🌓", label: "Premier quartier"  },
+  { icon: "🌔", label: "Lune gibbeuse croissante" },
+  { icon: "🌕", label: "Pleine lune"       },
+  { icon: "🌖", label: "Lune gibbeuse décroissante" },
+  { icon: "🌗", label: "Dernier quartier"  },
+  { icon: "🌘", label: "Dernier croissant" },
+];
+
 // ── Calendrier d'Harmonde (10 mois x 30 jours) ──────────────────────────────
 AGONE.calendrier = {
   joursParMois: 30,

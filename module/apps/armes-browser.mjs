@@ -32,11 +32,6 @@ export class ArmesBrowser extends foundry.applications.api.HandlebarsApplication
     return game.i18n.format("AGONE.Browser.TitreArmes", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorArmeNames = new Set(
       this.actor.items.filter(i => i.type === "arme").map(i => i.name)

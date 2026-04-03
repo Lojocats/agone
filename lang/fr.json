@@ -1,6 +1,7 @@
 {
   "AGONE": {
     "NomSysteme": "Agone",
+    "ModeSombre": "Mode sombre",
 
     "FeuillePersonnage":  "Feuille de Personnage",
     "FeuilleCompagnon":   "Feuille de Compagnon",
@@ -797,19 +798,28 @@
     },
 
     "Calendrier": {
-      "AnneePrecedente": "Année précédente",
-      "MoisPrecedent":   "Mois précédent",
-      "MoisSuivant":     "Mois suivant",
-      "AnneeSuivante":   "Année suivante",
-      "JourPrecedent":   "Jour précédent",
-      "JourSuivant":     "Jour suivant",
-      "NoteDuJour":      "Note du jour :",
-      "NotePlaceholder": "Événement, note roleplay…",
-      "Sauvegarder":     "Sauvegarder",
-      "NoteSauvegardee": "Note sauvegardée.",
-      "An":              "An",
-      "Jour":            "Jour",
-      "ChangerAnnee":    "Changer l'année"
+      "AnneePrecedente":  "Année précédente",
+      "MoisPrecedent":    "Mois précédent",
+      "MoisSuivant":      "Mois suivant",
+      "AnneeSuivante":    "Année suivante",
+      "JourPrecedent":    "Jour précédent",
+      "JourSuivant":      "Jour suivant",
+      "HeurePrecedente":  "Reculer 1 heure",
+      "HeureSuivante":    "Avancer 1 heure",
+      "MinutePrecedente": "Reculer 15 minutes",
+      "MinuteSuivante":   "Avancer 15 minutes",
+      "Avancer6h":        "Avancer de 6 heures",
+      "Avancer12h":       "Avancer de 12 heures",
+      "AvancerNuit":      "Passer la nuit (8h)",
+      "Meteo":            "Météo",
+      "MeteoHint":        "(clic pour changer)",
+      "NoteDuJour":       "Note du jour :",
+      "NotePlaceholder":  "Événement, note roleplay…",
+      "Sauvegarder":      "Sauvegarder",
+      "NoteSauvegardee":  "Note sauvegardée.",
+      "An":               "An",
+      "Jour":             "Jour",
+      "ChangerAnnee":     "Changer l'année"
     },
 
     "Browser": {

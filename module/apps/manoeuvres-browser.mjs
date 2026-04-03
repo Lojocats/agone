@@ -29,11 +29,6 @@ export class ManoeuvresBrowser extends foundry.applications.api.HandlebarsApplic
     return game.i18n.format("AGONE.Browser.TitreManoeuvres", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorManNames = new Set(
       this.actor.items.filter(i => i.type === "manoeuvre").map(i => i.name)

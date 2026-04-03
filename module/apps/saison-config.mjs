@@ -13,11 +13,6 @@ export class SaisonConfig extends foundry.applications.api.HandlebarsApplication
     form: { template: "systems/agone/templates/apps/saison-config.hbs" },
   };
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const current = game.settings.get("agone", "saisonMonde") ?? "";
     return {

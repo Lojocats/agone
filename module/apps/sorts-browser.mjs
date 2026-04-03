@@ -32,11 +32,6 @@ export class SortsBrowser extends foundry.applications.api.HandlebarsApplication
     return game.i18n.format("AGONE.Browser.TitreSorts", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorSortNames = new Set(
       this.actor.items.filter(i => i.type === "sort").map(i => i.name)

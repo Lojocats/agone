@@ -28,11 +28,6 @@ export class CompetencesBrowser extends foundry.applications.api.HandlebarsAppli
     return game.i18n.format("AGONE.Browser.TitreComp", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const FAMILLES = ["Épreuve", "Maraude", "Savoir", "Société", "Occulte"];
 

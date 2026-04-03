@@ -26,11 +26,6 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
     return game.i18n.localize("AGONE.DomainesArts.TitreConfig");
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   /** Domaines standards intégrés au système (non éditables). */
   static get STANDARD_DOMAINES() {
     return [

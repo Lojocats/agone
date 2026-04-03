@@ -1,10 +1,30 @@
 <div class="agone-calendrier-wrap">
 
-  <!-- En-tête saison / mois / an -->
+  <!-- En-tête : saison / lune / mois / an -->
   <div class="cal-header cal-saison-{{saison}}">
     <span class="cal-saison-badge">{{saisonLabel}}</span>
     <h2 class="cal-mois-nom">{{moisData.nom}}</h2>
-    <span class="cal-an{{#if isGM}} cal-an-clickable{{/if}}"{{#if isGM}} data-open-year-picker="1" title='{{localize "AGONE.Calendrier.ChangerAnnee"}}'{{/if}}>{{localize "AGONE.Calendrier.An"}} {{date.an}}</span>
+    <div class="cal-header-right">
+      <span class="cal-moon-badge" title="{{moonPhase.label}}">{{moonPhase.icon}}</span>
+      <span class="cal-an{{#if isGM}} cal-an-clickable{{/if}}"
+            {{#if isGM}}data-open-year-picker="1" title='{{localize "AGONE.Calendrier.ChangerAnnee"}}'{{/if}}>
+        {{localize "AGONE.Calendrier.An"}} {{date.an}}
+      </span>
+    </div>
+  </div>
+
+  <!-- Météo -->
+  <div class="cal-meteo-row" title='{{localize "AGONE.Calendrier.Meteo"}}'>
+    <span class="cal-meteo-icon">{{meteoIcon}}</span>
+    {{#if isGM}}
+      <select class="cal-meteo-select" name="meteo">
+        {{#each meteoTypes}}
+          <option value="{{id}}" {{#if (eq id ../meteoId)}}selected{{/if}}>{{icon}} {{label}}</option>
+        {{/each}}
+      </select>
+    {{else}}
+      <span class="cal-meteo-label">{{meteoLabel}}</span>
+    {{/if}}
   </div>
 
   <!-- Navigation (GM uniquement) -->
@@ -20,14 +40,30 @@
     <button type="button" class="cal-nav-btn" data-nav="1" data-delta="-1" data-unit="jour" title='{{localize "AGONE.Calendrier.JourPrecedent"}}'>◀ {{localize "AGONE.Calendrier.Jour"}}</button>
     <button type="button" class="cal-nav-btn" data-nav="1" data-delta="1"  data-unit="jour" title='{{localize "AGONE.Calendrier.JourSuivant"}}'>{{localize "AGONE.Calendrier.Jour"}} ▶</button>
   </div>
+
+  <!-- Navigation heure (GM uniquement) -->
+  <div class="cal-nav-bar cal-time-bar">
+    <button type="button" class="cal-nav-btn cal-nav-btn--sm" data-nav="1" data-delta="-1" data-unit="heure"  title='{{localize "AGONE.Calendrier.HeurePrecedente"}}'>◀ 1h</button>
+    <button type="button" class="cal-nav-btn cal-nav-btn--sm" data-nav="1" data-delta="-1" data-unit="minute" title='{{localize "AGONE.Calendrier.MinutePrecedente"}}'>◀ 15m</button>
+    <span class="cal-time-display">⏰ {{timeStr}}</span>
+    <button type="button" class="cal-nav-btn cal-nav-btn--sm" data-nav="1" data-delta="1"  data-unit="minute" title='{{localize "AGONE.Calendrier.MinuteSuivante"}}'>15m ▶</button>
+    <button type="button" class="cal-nav-btn cal-nav-btn--sm" data-nav="1" data-delta="1"  data-unit="heure"  title='{{localize "AGONE.Calendrier.HeureSuivante"}}'>1h ▶</button>
+  </div>
+  <div class="cal-quick-btns">
+    <button type="button" class="cal-quick-btn" data-advance-hours="6"  title='{{localize "AGONE.Calendrier.Avancer6h"}}'>+6h</button>
+    <button type="button" class="cal-quick-btn" data-advance-hours="8"  title='{{localize "AGONE.Calendrier.AvancerNuit"}}'>🌙 +8h</button>
+    <button type="button" class="cal-quick-btn" data-advance-hours="12" title='{{localize "AGONE.Calendrier.Avancer12h"}}'>+12h</button>
+  </div>
+
   {{else}}
-  <div class="cal-date-display">{{ordinal}}</div>
+  <div class="cal-date-display">{{ordinal}} · ⏰ {{timeStr}}</div>
   {{/if}}
 
-  <!-- Grille 30 jours (5 x 6) -->
+  <!-- Grille 30 jours -->
   <div class="cal-grid">
     {{#each jours as |j|}}
-    <div class="cal-day {{#if j.actif}}today{{/if}}{{#if ../isGM}} clickable{{/if}}" data-jour="{{j.num}}">{{j.num}}</div>
+    <div class="cal-day {{#if j.actif}}today{{/if}}{{#if ../isGM}} clickable{{/if}}{{#if j.hasNote}} has-note{{/if}}"
+         data-jour="{{j.num}}">{{j.num}}</div>
     {{/each}}
   </div>
 

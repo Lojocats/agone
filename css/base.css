@@ -35,8 +35,429 @@
   box-sizing: border-box;
 }
 
+/* ── Foundry v14 dark mode isolation ─────────────────────── */
+/* Foundry v14 applique color-scheme:dark + --input-background-color sombre
+   sur toutes les fenêtres. On force le thème clair dans l'espace Agone.     */
+.application.agone,
+.window-app.agone {
+  /* Réinitialise les variables CSS de Foundry v14 dans notre scope */
+  --background:               var(--agone-parchment);
+  --color-text-primary:       var(--agone-dark-text);
+  --color-text-emphatic:      var(--agone-brown-dark);
+  --color-form-label:         var(--agone-brown);
+  --color-form-label-hover:   var(--agone-brown-dark);
+  --color-form-hint:          var(--agone-brown);
+  --input-background-color:   var(--agone-input-bg);
+  --input-text-color:         var(--agone-dark-text);
+  --input-border-color:       rgba(92, 58, 30, 0.35);
+  --input-box-shadow:         none;
+  --input-focus-outline-color: var(--agone-gold);
+  --input-placeholder-color:  rgba(44, 26, 8, 0.45);
+  color-scheme:               light;
+  color:                      var(--agone-dark-text);
+}
+.application.agone .window-content,
+.window-app.agone .window-content {
+  background: var(--agone-parchment);
+  color:      var(--agone-dark-text);
+}
+
 /* ── Scrollbar ───────────────────────────────────────────── */
 .agone ::-webkit-scrollbar { width: 6px; }
 .agone ::-webkit-scrollbar-track { background: rgba(92,58,30,0.1); }
 .agone ::-webkit-scrollbar-thumb { background: var(--agone-brown); border-radius: 3px; }
 .agone ::-webkit-scrollbar-thumb:hover { background: var(--agone-gold); }
+
+/* ============================================================
+   AGONE – Mode Sombre
+   Activé par body.agone-dark (toggle JS côté client)
+   ============================================================ */
+
+/* ── 1. Remapping des variables CSS Agone + Foundry v14 ──── */
+body.agone-dark .application.agone,
+body.agone-dark .window-app.agone {
+  --agone-parchment:    #1c1208;
+  --agone-parchment2:   #251809;
+  --agone-dark-text:    #d4b896;
+  --agone-brown:        #a07840;
+  --agone-brown-dark:   #c9a060;
+  --agone-gold:         #e0c060;
+  --agone-gold-light:   #f0d880;
+  --agone-input-bg:     rgba(255,255,255,0.08);
+  --agone-border:       #6b491e;
+  --agone-noir:         #9090c8;
+  --agone-noir-text:    #c0c0d0;
+  --color-text-dark-secondary: #c0a060;
+  --background:                #1c1208;
+  --color-text-primary:        #d4b896;
+  --color-text-emphatic:       #c9a060;
+  --color-form-label:          #a07840;
+  --color-form-label-hover:    #c9a060;
+  --color-form-hint:           #907030;
+  --input-background-color:    rgba(255,255,255,0.08);
+  --input-text-color:          #d4b896;
+  --input-border-color:        rgba(180,130,60,0.35);
+  --input-placeholder-color:   rgba(212,184,150,0.4);
+  --input-focus-outline-color: #e0c060;
+  color-scheme: dark;
+  color: #d4b896;
+  background: #1c1208 !important;
+}
+
+/* ── 1b. Window-header item sheets (AppV1) ──────────────── */
+body.agone-dark .window-app.agone .window-header,
+body.agone-dark .application.agone .window-header {
+  background: linear-gradient(135deg, #160c04, #2d1a0a) !important;
+  border-bottom: 1px solid #6b491e !important;
+  color: #d4b896 !important;
+}
+body.agone-dark .window-app.agone .window-header .window-title,
+body.agone-dark .application.agone .window-header .window-title { color: #e0c060 !important; }
+body.agone-dark .window-app.agone .window-header a.header-button { color: #c9a060; }
+
+/* ── 2. Window content + feuilles AppV1 ─────────────────── */
+body.agone-dark .application.agone .window-content,
+body.agone-dark .window-app.agone .window-content {
+  background: #1c1208 !important;
+  color: #d4b896;
+}
+body.agone-dark .agone.sheet {
+  background: #1c1208 !important;
+  color: #d4b896 !important;
+}
+
+/* ── 2b. Header feuille (gradient forcé sombre) ──────────── */
+body.agone-dark .agone .sheet-header,
+body.agone-dark .window-app.agone .sheet-header {
+  background: linear-gradient(135deg, #160c04, #2d1a0a) !important;
+  border-bottom-color: #6b491e !important;
+  color: #d4b896 !important;
+}
+/* Inputs dans le header : transparent sur fond sombre (pas de boîte blanche) */
+body.agone-dark .agone .sheet-header input,
+body.agone-dark .window-app.agone .sheet-header input {
+  background: transparent !important;
+  color: #d4b896 !important;
+  border-color: rgba(180,130,60,0.25) !important;
+}
+body.agone-dark .agone .sheet-header .charname input,
+body.agone-dark .agone .sheet-header .header-row label,
+body.agone-dark .agone .window-header {
+  color: #d4b896 !important;
+}
+
+/* ── 3. Inputs, selects, textareas ───────────────────────── */
+body.agone-dark .agone input,
+body.agone-dark .agone select,
+body.agone-dark .agone textarea,
+body.agone-dark .agone-saison-config .sc-row input[type="number"],
+body.agone-dark .agone-domaines-arts-config .dac-comp-input,
+body.agone-dark .agone-domaines-arts-config .dac-add-form input[type="text"],
+body.agone-dark .charges-compteur .charges-input,
+body.agone-dark .agone .charges-stat-input,
+body.agone-dark .agone .bonus-supp-table input[type="number"] {
+  background: rgba(255,255,255,0.08) !important;
+  color: #d4b896 !important;
+  border-color: rgba(180,130,60,0.35) !important;
+}
+body.agone-dark .agone input:focus,
+body.agone-dark .agone select:focus,
+body.agone-dark .agone textarea:focus {
+  background: rgba(255,255,255,0.12) !important;
+  outline-color: #e0c060 !important;
+}
+
+/* ── 4. Fonds blancs-transparents → cartes / panneaux ────── */
+body.agone-dark .agone .identite-card,
+body.agone-dark .agone .peuple-drop-zone,
+body.agone-dark .agone .identite-editor,
+body.agone-dark .agone .cmp-card,
+body.agone-dark .agone .charges-card,
+body.agone-dark .agone .npc-equip-textarea,
+body.agone-dark .agone .editor-container,
+body.agone-dark .agone li.don-desc-expand,
+body.agone-dark .agone .sort-card,
+body.agone-dark .agone .sort-card-actions,
+body.agone-dark .agone .danseur-inline-num,
+body.agone-dark .agone .demon-inline-num,
+body.agone-dark .agone.item .form-group textarea,
+body.agone-dark .agone.peuple .bonus-input {
+  background: rgba(255,255,255,0.05) !important;
+  color: #d4b896;
+}
+body.agone-dark .agone .identite-card-header {
+  background: rgba(255,255,255,0.08) !important;
+}
+/* Selects inline identity */
+body.agone-dark .agone .identite-row select {
+  background: rgba(255,255,255,0.08) !important;
+  color: #d4b896 !important;
+}
+/* Emprise type select */
+body.agone-dark .agone .emprise-type-select,
+body.agone-dark .agone .cstat-emprise-wrap .emprise-type-select {
+  background: rgba(255,255,255,0.08) !important;
+  color: #d4b896 !important;
+}
+
+/* ── 5. Calendrier ───────────────────────────────────────── */
+body.agone-dark .agone-calendrier-wrap .cal-day {
+  background: rgba(255,255,255,0.04) !important;
+}
+body.agone-dark .agone-calendrier-wrap .cal-note-area,
+body.agone-dark .agone-calendrier-wrap .cal-note-input {
+  background: rgba(255,255,255,0.05) !important;
+  color: #d4b896 !important;
+}
+body.agone-dark .agone-calendrier-wrap .cal-meteo-row {
+  background: rgba(255,255,255,0.04) !important;
+}
+
+/* ── 6. Fenêtres navigateurs (browsers) ──────────────────── */
+body.agone-dark .sorts-browser .window-content,
+body.agone-dark .armes-browser .window-content,
+body.agone-dark .armures-browser .window-content,
+body.agone-dark .dons-browser .window-content,
+body.agone-dark .avantages-browser .window-content,
+body.agone-dark .manoeuvres-browser .window-content,
+body.agone-dark .competences-browser .window-content,
+body.agone-dark .peuples-browser .window-content,
+body.agone-dark .pouvoirs-browser .window-content,
+body.agone-dark .peines-browser-app .window-content {
+  background: #1c1208 !important;
+  color: #d4b896;
+}
+body.agone-dark .sorts-browser .sb-search-wrap,
+body.agone-dark .armes-browser .ab-search-wrap,
+body.agone-dark .armures-browser .arb-search-wrap,
+body.agone-dark .dons-browser .db-search-wrap,
+body.agone-dark .avantages-browser .avb-search-wrap,
+body.agone-dark .manoeuvres-browser .mb-search-wrap,
+body.agone-dark .competences-browser .cb-search-wrap,
+body.agone-dark .peuples-browser .pb-search-wrap,
+body.agone-dark .pouvoirs-browser .pvb-search-wrap {
+  background: rgba(255,255,255,0.05) !important;
+}
+body.agone-dark .peuples-browser .pb-card {
+  background: rgba(255,255,255,0.04) !important;
+  color: #d4b896;
+}
+
+/* ── 7. Titres, onglets, labels ──────────────────────────── */
+body.agone-dark .agone h1,
+body.agone-dark .agone h2,
+body.agone-dark .agone h3,
+body.agone-dark .agone h4 { color: var(--agone-gold, #e0c060); }
+
+body.agone-dark .agone .sheet-tabs                { background: #2a1808 !important; border-bottom-color: #6b491e !important; }
+body.agone-dark .agone .sheet-tabs .item          { color: #c9a060; border-bottom-color: transparent; }
+body.agone-dark .agone .sheet-tabs .item:hover    { color: #f0d880; }
+body.agone-dark .agone .sheet-tabs .item.active   { color: #e0c060; border-bottom-color: #e0c060; font-weight: 600; }
+
+body.agone-dark .agone hr,
+body.agone-dark .agone .sheet-section,
+body.agone-dark .agone .sheet-body { border-color: rgba(180,130,60,0.25); }
+
+/* ── 8. Couleurs sémantiques : VERT positif ──────────────── */
+body.agone-dark .agone-roll-card    .roll-total.critique,
+body.agone-dark .agone-roll-card    .roll-result-label.critique,
+body.agone-dark .agone              .pro-badge,
+body.agone-dark .agone              .ab-bouclier-pro,
+body.agone-dark .agone              .charges-plus,
+body.agone-dark .agone              .charges-ok,
+body.agone-dark .charges-compteur  .charges-ok,
+body.agone-dark .agone              .man-val-pos,
+body.agone-dark .agone              .av-title,
+body.agone-dark .agone              .aspect-stat.racial .derived-val.racial-pos {
+  color: #6ecf7a !important;
+}
+body.agone-dark .agone .man-val-pos { background: rgba(30,140,30,0.15) !important; }
+
+/* ── 9. Couleurs sémantiques : BLEU liens/familiarity ────── */
+body.agone-dark .agone .roll-def-btn { color: #8ab4f8 !important; border-color: rgba(138,180,248,0.3) !important; }
+body.agone-dark .agone .comp-score-badge.fam-badge { color: #8ab4f8 !important; border-color: rgba(138,180,248,0.3) !important; }
+
+/* ── 10. Couleurs sémantiques : badges de score sombres ──── */
+body.agone-dark .agone .comp-score-badge.score-5,
+body.agone-dark .agone .comp-score-badge.score-10 { color: #d4b896 !important; }
+
+/* ── 11. Sections d'avantages (av-sect-*) ────────────────── */
+body.agone-dark .agone .av-sect-esprit  { color: #8ab4f8 !important; background: rgba(30,100,180,0.2)  !important; border-color: rgba(138,180,248,0.35) !important; }
+body.agone-dark .agone .av-sect-societe { color: #6ecf7a !important; background: rgba(40,130,60,0.2)   !important; border-color: rgba(110,207,122,0.35) !important; }
+body.agone-dark .agone .av-sect-arts    { color: #8ab4f8 !important; background: rgba(60,120,180,0.2)  !important; border-color: rgba(138,180,248,0.35) !important; }
+body.agone-dark .agone .av-sect-saisons { color: #4dd0c4 !important; background: rgba(30,160,140,0.2)  !important; border-color: rgba(77,208,196,0.35)  !important; }
+body.agone-dark .agone .av-sect-corps   { color: #e0a060 !important; background: rgba(180,70,20,0.2)   !important; border-color: rgba(224,160,96,0.35)  !important; }
+body.agone-dark .agone .av-sect-ame     { color: #c984e0 !important; background: rgba(140,60,160,0.2)  !important; border-color: rgba(201,132,224,0.35) !important; }
+body.agone-dark .agone .av-sect-flamme  { color: #f28b82 !important; background: rgba(200,60,20,0.2)   !important; border-color: rgba(242,139,130,0.35) !important; }
+body.agone-dark .agone .av-sect-charge  { color: #c9a060 !important; background: rgba(92,58,30,0.2)    !important; border-color: rgba(201,160,96,0.35)  !important; }
+body.agone-dark .agone .av-sect-emprise { color: #e0b060 !important; background: rgba(200,130,0,0.2)   !important; border-color: rgba(224,176,96,0.35)  !important; }
+
+/* Coût avantages/défauts */
+body.agone-dark .agone .av-cout-pos { color: #6ecf7a !important; }
+body.agone-dark .agone .av-cout-neg { color: #f28b82 !important; }
+body.agone-dark .agone .def-title   { color: #f28b82 !important; }
+body.agone-dark .agone .def-title i { color: #f28b82 !important; }
+
+/* Bouton description + panneau expand (avantages & pouvoirs) */
+body.agone-dark .agone .don-desc-toggle   { color: rgba(180,140,80,0.7)  !important; }
+body.agone-dark .agone li.don-desc-expand { background: rgba(255,255,255,0.05) !important; }
+body.agone-dark .agone .don-desc-text     { color: #c0a060 !important; }
+body.agone-dark .agone .pouvoir-desc-toggle { color: rgba(180,140,80,0.7) !important; }
+body.agone-dark .agone .pouvoir-desc-expand { color: #c0a060 !important; background: rgba(255,255,255,0.03) !important; }
+body.agone-dark .agone .pouvoir-name-btn    { color: #d4b896 !important; }
+
+/* Note/reminders charges */
+body.agone-dark .agone .charges-note  { color: #c08040 !important; }
+
+/* Mode création : feedback caracs */
+body.agone-dark .agone .carac-max-label { color: #e0b060 !important; }
+body.agone-dark .agone .carac-min-label { color: #f28b82 !important; }
+body.agone-dark .agone .carac-row.carac-at-max .stat-num:not(.exp) { color: #e0b060 !important; border-color: #b87820 !important; }
+body.agone-dark .agone .carac-row.carac-min-requis .stat-num:not(.exp) { color: #f28b82 !important; border-color: #c04040 !important; }
+body.agone-dark .agone .danseur-valider-btn { color: #6ecf7a !important; border-color: rgba(110,207,122,0.4) !important; background: rgba(30,107,48,0.2) !important; }
+
+/* ── 11b. Ténèbres / Perfidie : noir (#1a1a2e) et hardcoded rgba(26,26,46,...) ─── */
+/* --agone-noir remappé à #9090c8 via §1, mais certains rgba restent hardcodés */
+body.agone-dark .agone .tene-stats-bar,
+body.agone-dark .agone .perf-stats-bar { background: rgba(144,144,200,0.08) !important; border-color: rgba(144,144,200,0.3) !important; }
+body.agone-dark .agone .paliers-table thead th { color: #c9a060 !important; border-bottom-color: #c9a060 !important; background: rgba(100,80,40,0.12) !important; }
+body.agone-dark .agone .peines-table thead th  { color: #c9a060 !important; border-bottom-color: #c9a060 !important; background: rgba(100,80,40,0.12) !important; }
+body.agone-dark .agone .peine-desc-cell { color: #c0a060 !important; background: rgba(255,255,255,0.03) !important; }
+body.agone-dark .peines-browser-app .pnb-description-cell { color: #c0a060 !important; background: rgba(255,255,255,0.03) !important; border-bottom-color: rgba(144,144,200,0.12) !important; }
+body.agone-dark .agone .bienfait-perfidie-desc { color: #c0a060 !important; }
+body.agone-dark .agone .pn-bienfait-dispo,
+body.agone-dark .agone .pn-bienfait-none,
+body.agone-dark .agone .perf-empty,
+body.agone-dark .agone .pn-bienfait-none { color: rgba(180,140,80,0.55) !important; }
+body.agone-dark .agone .bienfait-peines-src { color: rgba(180,140,80,0.55) !important; }
+/* Badges corps/âme noire hardcodés foncés */
+body.agone-dark .agone .pn-noir-corps,
+body.agone-dark .peines-browser-app .pnb-noir-corps,
+body.agone-dark .peines-browser-app .pnb-cat-creature_masque { color: #f28b82 !important; background: rgba(160,40,40,0.25) !important; border-color: rgba(242,139,130,0.4) !important; }
+body.agone-dark .agone .pn-noir-ame,
+body.agone-dark .peines-browser-app .pnb-noir-ame,
+body.agone-dark .peines-browser-app .pnb-cat-lieu_perfidie { color: #8ab4f8 !important; background: rgba(60,80,180,0.25) !important; border-color: rgba(138,180,248,0.4) !important; }
+/* Tables rows avec opacity trop faible */
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) { opacity: 0.30; }
+body.agone-dark .agone .paliers-table .palier-row td { border-bottom-color: rgba(144,144,200,0.1) !important; }
+/* Perf range legend */
+body.agone-dark .agone .perf-dif-range { color: rgba(144,144,200,0.45) !important; border-color: rgba(144,144,200,0.18) !important; }
+body.agone-dark .agone .perf-dif-range.perf-range-active { color: #9090c8 !important; background: rgba(144,144,200,0.15) !important; border-color: #9090c8 !important; }
+
+/* ── 11c. Aptitudes magiques (arts par domaine) ──────────── */
+body.agone-dark .agone .arts-domaines-table .arts-absent td { opacity: 0.55; }
+body.agone-dark .agone .arts-comp-liee-score { color: #a07840 !important; }
+body.agone-dark .agone .arts-comp-liee-nom   { opacity: 1 !important; color: #907030 !important; }
+body.agone-dark .agone .arts-spe-hint        { color: #c9a060 !important; }
+body.agone-dark .agone .arts-comp-liee-manquante { color: #f28b82 !important; }
+body.agone-dark .agone .arts-levelup-pair .levelup-btn-liee { background: rgba(255,255,255,0.06) !important; border-color: #6b491e !important; color: #d4b896 !important; }
+
+/* ── 12. Couleur sombre hardcodée (trop sombre sur dark bg) - rouge ───── */
+body.agone-dark .agone .seuil-bg { color: #e08030 !important; }
+body.agone-dark .agone .seuil-bc { color: #e05050 !important; }
+body.agone-dark .agone .malus-badge,
+body.agone-dark .agone .ab-bouclier-malus,
+body.agone-dark .agone .armure-total-item.malus-total,
+body.agone-dark .agone .roll-atk-btn,
+body.agone-dark .agone .aspect-stat.racial .derived-val.racial-neg,
+body.agone-dark .agone .man-val-neg { color: #f28b82 !important; }
+body.agone-dark .agone .man-val-neg { background: rgba(180,30,30,0.15) !important; }
+
+/* ── 13. Scrollbar dark ──────────────────────────────────── */
+body.agone-dark .agone ::-webkit-scrollbar-track { background: rgba(255,200,100,0.05); }
+body.agone-dark .agone ::-webkit-scrollbar-thumb { background: #6b491e; }
+body.agone-dark .agone ::-webkit-scrollbar-thumb:hover { background: #a07840; }
+
+/* ── 14. Roll cards : alertes critique/fumble ────────────── */
+body.agone-dark .agone-roll-card .critique-alert { color: #6ecf7a !important; background: rgba(30,120,50,0.15) !important; border-color: rgba(110,207,122,0.35) !important; }
+body.agone-dark .agone-roll-card .fumble-alert   { color: #f28b82 !important; background: rgba(140,30,30,0.18) !important; border-color: rgba(242,139,130,0.35) !important; }
+
+/* ── 15. Browsers : desc-toggle, badges couleurs ─────────── */
+/* Boutons "▼" description dans tous les browsers */
+body.agone-dark .sorts-browser .desc-toggle,
+body.agone-dark .armes-browser .desc-toggle,
+body.agone-dark .armures-browser .desc-toggle,
+body.agone-dark .dons-browser .desc-toggle,
+body.agone-dark .avantages-browser .avb-table .desc-toggle,
+body.agone-dark .manoeuvres-browser .desc-toggle,
+body.agone-dark .competences-browser .desc-toggle,
+body.agone-dark .pouvoirs-browser .desc-toggle { color: rgba(180,140,80,0.55) !important; }
+/* Badges bleus dans avantages/manoeuvres/armes browsers */
+body.agone-dark .avantages-browser .avb-badge     { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }
+body.agone-dark .manoeuvres-browser .mb-badge-manoeuvre { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }
+body.agone-dark .manoeuvres-browser .mb-badge-botte     { color: #e0a060 !important; background: rgba(200,120,40,0.2) !important; border-color: rgba(224,160,96,0.35) !important; }
+/* Badges verts dans dons/pouvoirs browsers */
+body.agone-dark .dons-browser .db-badge-avantage   { color: #6ecf7a !important; background: rgba(30,130,60,0.2) !important; border-color: rgba(110,207,122,0.35) !important; }
+body.agone-dark .pouvoirs-browser .pvb-badge-saisonin { color: #6ecf7a !important; background: rgba(60,130,80,0.2) !important; border-color: rgba(110,207,122,0.35) !important; }
+/* Avantages browser : ligne prérequis et badge brun foncé */
+body.agone-dark .avantages-browser .avb-table .avb-prerequis-row td { color: #c9a060 !important; background: rgba(201,162,39,0.08) !important; }
+/* Browsers : labels texte rgba(60,35,15,...) */
+body.agone-dark .sorts-browser .sb-filter-sep,
+body.agone-dark .sorts-browser .sb-lbl,
+body.agone-dark .armes-browser,
+body.agone-dark .armures-browser,
+body.agone-dark .dons-browser,
+body.agone-dark .avantages-browser,
+body.agone-dark .manoeuvres-browser,
+body.agone-dark .competences-browser,
+body.agone-dark .pouvoirs-browser { color: #d4b896; }
+
+/* ── 16. Manœuvres (fiche) : labels trop sombres ─────────── */
+/* Tous les th génériques : --agone-brown devient doré en dark mode */
+body.agone-dark .agone table th {
+  background: #2a1808 !important;
+  color: #d4b896 !important;
+  border-bottom-color: rgba(180,130,60,0.3) !important;
+}
+/* .roll-btn utilisé comme span de nom d'item (armes, compétences…) :
+   le gradient var(--agone-brown)→var(--agone-brown-dark) devient doré en dark */
+body.agone-dark .agone .roll-btn,
+body.agone-dark .agone button.roll-btn {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.07), rgba(255,255,255,0.03)) !important;
+  color: #d4b896 !important;
+  border-color: rgba(180,130,60,0.3) !important;
+}
+body.agone-dark .agone .roll-btn:hover,
+body.agone-dark .agone button.roll-btn:hover {
+  background: rgba(180,130,60,0.18) !important;
+  color: #f0d880 !important;
+}
+body.agone-dark .agone .man-badge-manoeuvre { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }
+body.agone-dark .agone .man-badge-botte     { color: #e0a060 !important; background: rgba(200,120,40,0.2) !important; border-color: rgba(224,160,96,0.35) !important; }
+body.agone-dark .agone .man-desc-toggle     { color: rgba(180,140,80,0.6) !important; }
+body.agone-dark .agone .man-condition       { color: rgba(180,140,80,0.55) !important; }
+body.agone-dark .agone .man-val-zero,
+body.agone-dark .agone .man-val-var         { color: rgba(180,140,80,0.5) !important; }
+body.agone-dark .agone .man-dom             { color: rgba(180,140,80,0.7) !important; }
+body.agone-dark .agone tr.man-desc-expand td.man-desc-cell { color: #c0a060 !important; background: rgba(255,255,255,0.03) !important; }
+
+/* ── 17. Sorts carte (bg parchement → dark) ──────────────── */
+body.agone-dark .agone .sort-card           { background: rgba(255,255,255,0.05) !important; border-color: rgba(180,130,60,0.2) !important; }
+body.agone-dark .agone .bonus-supp-table select,
+body.agone-dark .agone .bonus-supp-table input { background: rgba(255,255,255,0.08) !important; color: #d4b896 !important; }
+
+/* ── 18. Select météo calendrier dark mode ───────────────── */
+body.agone-dark .agone-calendrier-wrap .cal-meteo-select {
+  color: #c9a060 !important;
+  background: #2a1808 !important;
+  border: 1px solid rgba(180,130,60,0.3) !important;
+  border-radius: 3px;
+}
+
+/* ── 19. Ténèbres/Perfidie : labels vides restants ──────── */
+body.agone-dark .agone .pn-noir-none,
+body.agone-dark .peines-browser-app .pnb-noir-none,
+body.agone-dark .peines-browser-app .pnb-bienfait-none { color: rgba(180,140,80,0.4) !important; }
+body.agone-dark .peines-browser-app .pnb-empty { color: rgba(180,140,80,0.45) !important; }
+body.agone-dark .agone .perf-browser-btn { color: #c9a060 !important; border-color: rgba(201,160,96,0.35) !important; background: rgba(92,58,30,0.12) !important; }
+body.agone-dark .peines-browser-app .pnb-filters { background: rgba(255,255,255,0.04) !important; border-color: rgba(144,144,200,0.15) !important; }
+
+/* ── 20. Select emprise (hardcoded #f5ede0) ──────────────── */
+body.agone-dark .agone .emprise-type-select { background: rgba(255,255,255,0.08) !important; color: #d4b896 !important; border-color: rgba(180,130,60,0.35) !important; }
+
+/* ── 21. Combat tracker : header doré → sombre ───────────── */
+body.agone-dark .agone-combat-tracker .agone-ct-header {
+  background: linear-gradient(to right, #160c04, #2a1808) !important;
+  color: #d4b896 !important;
+  border-bottom-color: rgba(180,130,60,0.4) !important;
+}

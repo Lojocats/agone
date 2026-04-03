@@ -29,11 +29,6 @@ export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicati
     return game.i18n.format("AGONE.Browser.TitrePeuples", { nom: this.actor.name });
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   async _prepareContext(options) {
     const actorPeuple = this.actor.system.peuple ?? "";
 

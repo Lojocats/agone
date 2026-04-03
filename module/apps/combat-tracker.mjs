@@ -28,11 +28,6 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     return game.i18n.localize("AGONE.Combat.TitreTracker");
   }
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = "";
-    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
-  }
-
   // ── Données ──────────────────────────────────────────────────────────────
 
   async _prepareContext(options) {
