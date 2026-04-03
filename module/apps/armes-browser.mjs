@@ -5,36 +5,39 @@ const _ALL_ARMES_DATA = [...ARMES_DATA, ...BOUCLIERS_DATA];
 /**
  * Navigateur d'armes Agone — fenêtre de sélection avec filtres.
  */
-export class ArmesBrowser extends Application {
+export class ArmesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
     this.actor          = actor;
     this._search        = "";
-    this._filterStyles  = new Set();  // melee | trait | jet
-    this._filterTypes   = new Set();  // P | T | C | TC | PC | PT
-    this._filterReqFor  = null;       // null = pas de filtre, sinon Number (FOR max)
-    this._filterPossede = "all";      // "all" | "oui" | "non"
+    this._filterStyles  = new Set();
+    this._filterTypes   = new Set();
+    this._filterReqFor  = null;
+    this._filterPossede = "all";
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-armes-browser",
-      classes   : ["agone", "armes-browser"],
-      template  : "systems/agone/templates/apps/armes-browser.hbs",
-      width     : 900,
-      height    : 640,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-armes-browser",
+    classes : ["agone", "armes-browser"],
+    position: { width: 900, height: 640 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/armes-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitreArmes", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const actorArmeNames = new Set(
       this.actor.items.filter(i => i.type === "arme").map(i => i.name)
     );
@@ -114,9 +117,17 @@ export class ArmesBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const html = $(this.element);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
 
     html.find(".ab-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
@@ -196,23 +207,5 @@ export class ArmesBrowser extends Application {
       ui.notifications?.info(game.i18n.format("AGONE.Notif.ArmeAjoutee", { nom: d.name, acteur: this.actor.name }));
       this.render();
     });
-  }
-
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
   }
 }

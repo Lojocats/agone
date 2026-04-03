@@ -2,20 +2,29 @@
  * CalendrierAgone — Calendrier d'Harmonde (10 mois x 30 jours)
  * Visible par tous les joueurs. Navigation réservée au MJ.
  */
-export class CalendrierAgone extends Application {
-  static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
-      id:        "agone-calendrier",
-      title:     game.i18n.localize("AGONE.CalendrierHarmonde"),
-      template:  "systems/agone/templates/apps/calendrier.hbs",
-      width:     400,
-      height:    "auto",
-      resizable: false,
-      classes:   ["agone", "agone-calendrier"],
-    });
+export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+
+  static DEFAULT_OPTIONS = {
+    id      : "agone-calendrier",
+    classes : ["agone", "agone-calendrier"],
+    position: { width: 400 },
+    window  : { resizable: false },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/calendrier.hbs" },
+  };
+
+  get title() {
+    return game.i18n.localize("AGONE.CalendrierHarmonde");
   }
 
-  getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const date    = game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1 };
     const moisArr = CONFIG.AGONE.calendrier.mois;
     const moisData = moisArr[(date.mois - 1)] ?? moisArr[0];
@@ -37,8 +46,9 @@ export class CalendrierAgone extends Application {
     return { date, jours, moisData, saison, saisonLabel, ordinal, noteJour, isGM: game.user.isGM };
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const html = $(this.element);
 
     // Lecture seule pour les joueurs
     if (!game.user.isGM) return;

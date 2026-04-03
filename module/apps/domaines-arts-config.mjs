@@ -9,17 +9,26 @@
  *
  * Données persistées dans le setting monde "domainesArtsCustom" (Array).
  */
-export class DomainesArtsConfig extends Application {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id:        "agone-domaines-arts-config",
-      title:     game.i18n.localize("AGONE.DomainesArts.TitreConfig"),
-      template:  "systems/agone/templates/apps/domaines-arts-config.hbs",
-      width:     500,
-      height:    "auto",
-      resizable: false,
-      classes:   ["agone", "agone-domaines-arts-config"],
-    });
+export class DomainesArtsConfig extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+
+  static DEFAULT_OPTIONS = {
+    id      : "agone-domaines-arts-config",
+    classes : ["agone", "agone-domaines-arts-config"],
+    position: { width: 500 },
+    window  : { resizable: false },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/domaines-arts-config.hbs" },
+  };
+
+  get title() {
+    return game.i18n.localize("AGONE.DomainesArts.TitreConfig");
+  }
+
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
   }
 
   /** Domaines standards intégrés au système (non éditables). */
@@ -32,7 +41,7 @@ export class DomainesArtsConfig extends Application {
     ];
   }
 
-  getData() {
+  async _prepareContext(options) {
     const custom = game.settings.get("agone", "domainesArtsCustom") ?? [];
     return {
       domainesStandard: this.constructor.STANDARD_DOMAINES,
@@ -40,8 +49,9 @@ export class DomainesArtsConfig extends Application {
     };
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const html = $(this.element);
 
     // Ajouter un domaine
     html.find("[data-action='addDomaine']").on("click", async () => {

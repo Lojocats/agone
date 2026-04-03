@@ -3,35 +3,38 @@ import { POUVOIRS_DATA } from "../helpers/compendium-data.mjs";
 /**
  * Navigateur de Pouvoirs de Flamme & Saisonins Agone — fenêtre de sélection avec filtres.
  */
-export class PouvoirsBrowser extends Application {
+export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
     this.actor          = actor;
     this._search        = "";
-    this._filterCat     = "all";   // "all" | "flamme" | "saisonin"
-    this._filterPossede = "all";   // "all" | "oui" | "non"
+    this._filterCat     = "all";
+    this._filterPossede = "all";
     this._expanded      = new Set();
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-pouvoirs-browser",
-      classes   : ["agone", "pouvoirs-browser"],
-      template  : "systems/agone/templates/apps/pouvoirs-browser.hbs",
-      width     : 680,
-      height    : 560,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-pouvoirs-browser",
+    classes : ["agone", "pouvoirs-browser"],
+    position: { width: 680, height: 560 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/pouvoirs-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitrePouvoirs", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const actorPouvoirNames = new Set(
       this.actor.items.filter(i => i.type === "pouvoir").map(i => i.name)
     );
@@ -74,9 +77,17 @@ export class PouvoirsBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
+    const html = $(this.element);
 
     html.find(".pvb-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
@@ -139,21 +150,4 @@ export class PouvoirsBrowser extends Application {
     });
   }
 
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
-  }
 }

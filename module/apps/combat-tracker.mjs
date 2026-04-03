@@ -11,22 +11,31 @@
  *   - Application de dégâts / soins rapides
  *   - Mise à jour en temps réel via Hooks
  */
-export class AgoreCombatTracker extends Application {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id:        "agone-combat-tracker",
-      title:     game.i18n.localize("AGONE.Combat.TitreTracker"),
-      template:  "systems/agone/templates/apps/combat-tracker.hbs",
-      width:     420,
-      height:    "auto",
-      resizable: true,
-      classes:   ["agone", "agone-combat-tracker"],
-    });
+export class AgoreCombatTracker extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+
+  static DEFAULT_OPTIONS = {
+    id      : "agone-combat-tracker",
+    classes : ["agone", "agone-combat-tracker"],
+    position: { width: 420 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/combat-tracker.hbs" },
+  };
+
+  get title() {
+    return game.i18n.localize("AGONE.Combat.TitreTracker");
+  }
+
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
   }
 
   // ── Données ──────────────────────────────────────────────────────────────
 
-  getData() {
+  async _prepareContext(options) {
     const combat = game.combat;
 
     if (!combat) {
@@ -107,8 +116,10 @@ export class AgoreCombatTracker extends Application {
 
   // ── Listeners ────────────────────────────────────────────────────────────
 
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    if (!this._hookIds) this._registerHooks();
+    const html = $(this.element);
 
     // ── Navigation de tour ──────────────────────────────────────────────
     html.find("[data-action='prevTurn']").on("click", () => game.combat?.previousTurn());
@@ -315,12 +326,6 @@ export class AgoreCombatTracker extends Application {
       Hooks.on("createActiveEffect",() => this.render(false)),
       Hooks.on("deleteActiveEffect",() => this.render(false)),
     ];
-  }
-
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    if (!this._hookIds) this._registerHooks();
   }
 
   /** @override */

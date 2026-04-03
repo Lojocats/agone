@@ -4,37 +4,40 @@ import { SORTS_DATA } from "../helpers/compendium-data.mjs";
  * Navigateur de sorts Agone — fenêtre de sélection avec filtres.
  * Remplace l'ouverture brute du compendium.
  */
-export class SortsBrowser extends Application {
+export class SortsBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
-    this.actor          = actor;
-    this._search         = "";
-    this._filterTypes    = new Set();   // multi-select : ensemble de typeMagie
-    this._filterSeuilMax   = null;     // null = pas de filtre, sinon Number (≤)
-    this._filterSeuilExact = null;     // null = pas de filtre, sinon Number (=)
-    this._filterPossede  = "all";      // "all" | "oui" | "non"
-    this._expanded = new Set(); // set of string idx
+    this.actor             = actor;
+    this._search           = "";
+    this._filterTypes      = new Set();
+    this._filterSeuilMax   = null;
+    this._filterSeuilExact = null;
+    this._filterPossede    = "all";
+    this._expanded         = new Set();
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-sorts-browser",
-      classes   : ["agone", "sorts-browser"],
-      template  : "systems/agone/templates/apps/sorts-browser.hbs",
-      width     : 820,
-      height    : 660,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-sorts-browser",
+    classes : ["agone", "sorts-browser"],
+    position: { width: 820, height: 660 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/sorts-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitreSorts", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const actorSortNames = new Set(
       this.actor.items.filter(i => i.type === "sort").map(i => i.name)
     );
@@ -107,9 +110,17 @@ export class SortsBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
+    const html = $(this.element);
 
     // Recherche (avec debounce)
     html.find(".sb-search").on("input", foundry.utils.debounce(e => {
@@ -254,21 +265,4 @@ export class SortsBrowser extends Application {
     });
   }
 
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
-  }
 }

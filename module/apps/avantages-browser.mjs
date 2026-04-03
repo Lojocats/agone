@@ -18,37 +18,40 @@ function _buildCatLabels() {
 /**
  * Navigateur d'avantages & défauts (données PDF) — fenêtre de sélection avec filtres.
  */
-export class AvantagesBrowser extends Application {
+export class AvantagesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
-    this.actor          = actor;
+    this.actor            = actor;
     this._search          = "";
-    this._filterSection   = "all";                         // "all" | "charge" | "ame" | "corps" | ...
-    this._filterType      = options.filterType ?? "all";   // "all" | "avantage" | "defaut" — peut être imposé à l'ouverture
-    this._filterPossede   = "all";                         // "all" | "oui" | "non"
-    this._filterChargeExact = null;                        // null = tous, sinon Number exact
+    this._filterSection   = "all";
+    this._filterType      = options.filterType ?? "all";
+    this._filterPossede   = "all";
+    this._filterChargeExact = null;
     this._expanded        = new Set();
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-avantages-browser",
-      classes   : ["agone", "avantages-browser"],
-      template  : "systems/agone/templates/apps/avantages-browser.hbs",
-      width     : 740,
-      height    : 580,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-avantages-browser",
+    classes : ["agone", "avantages-browser"],
+    position: { width: 740, height: 580 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/avantages-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitreAvantages", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const actorDonNames = new Set(
       this.actor.items.filter(i => i.type === "don").map(i => i.name)
     );
@@ -113,9 +116,17 @@ export class AvantagesBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
+    const html = $(this.element);
 
     html.find(".avb-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
@@ -240,21 +251,4 @@ export class AvantagesBrowser extends Application {
     });
   }
 
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
-  }
 }

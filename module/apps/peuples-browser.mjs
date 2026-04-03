@@ -4,34 +4,37 @@ import { PEUPLES_DATA } from "../helpers/compendium-data.mjs";
  * Navigateur de peuples Agone — fenêtre de sélection avec filtres.
  * Applique un peuple sur l'acteur (via drag ou bouton Appliquer).
  */
-export class PeuplesBrowser extends Application {
+export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
     this.actor          = actor;
     this._search        = "";
-    this._filterPossede = "all";   // "all" | "oui" | "non"
+    this._filterPossede = "all";
     this._expanded      = new Set();
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-peuples-browser",
-      classes   : ["agone", "peuples-browser"],
-      template  : "systems/agone/templates/apps/peuples-browser.hbs",
-      width     : 680,
-      height    : 540,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-peuples-browser",
+    classes : ["agone", "peuples-browser"],
+    position: { width: 680, height: 540 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/peuples-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitrePeuples", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const actorPeuple = this.actor.system.peuple ?? "";
 
     let items = PEUPLES_DATA.map((d, idx) => ({
@@ -65,9 +68,17 @@ export class PeuplesBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
+    const html = $(this.element);
 
     html.find(".pb-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
@@ -136,21 +147,4 @@ export class PeuplesBrowser extends Application {
     });
   }
 
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
-  }
 }

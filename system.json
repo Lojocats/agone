@@ -2,11 +2,11 @@
   "id": "agone",
   "title": "Agone",
   "description": "Système Agone — Jeu de rôle fantasy médiéval pour Foundry VTT",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "compatibility": {
     "minimum": "13",
     "verified": "13",
-    "maximum": "13"
+    "maximum": "14"
   },
   "authors": [
     {
@@ -25,6 +25,11 @@
       "lang": "fr",
       "name": "Français",
       "path": "lang/fr.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
     }
   ],
   "documentTypes": {

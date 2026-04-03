@@ -3,34 +3,37 @@
  * Permet d'ajouter des compétences depuis la liste de référence CONFIG.AGONE.competences.
  * Une même compétence peut être ajoutée plusieurs fois (ex : Arts Magiques avec domaines différents).
  */
-export class CompetencesBrowser extends Application {
+export class CompetencesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
-    this.actor         = actor;
-    this._search       = "";
-    this._filterFams   = new Set();   // sous-ensemble de Épreuve/Maraude/Savoir/Société/Occulte
-    this._filterPossede = "all";      // "all" | "oui" | "non"
+    this.actor          = actor;
+    this._search        = "";
+    this._filterFams    = new Set();
+    this._filterPossede = "all";
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-competences-browser",
-      classes   : ["agone", "competences-browser"],
-      template  : "systems/agone/templates/apps/competences-browser.hbs",
-      width     : 660,
-      height    : 560,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-competences-browser",
+    classes : ["agone", "competences-browser"],
+    position: { width: 660, height: 560 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/competences-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitreComp", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const FAMILLES = ["Épreuve", "Maraude", "Savoir", "Société", "Occulte"];
 
     // Compter combien de fois chaque compétence est possédée
@@ -79,9 +82,17 @@ export class CompetencesBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
+    const html = $(this.element);
 
     // Recherche (avec debounce)
     html.find(".cb-search").on("input", foundry.utils.debounce(e => {
@@ -131,21 +142,4 @@ export class CompetencesBrowser extends Application {
     });
   }
 
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
-  }
 }

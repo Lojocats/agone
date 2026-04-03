@@ -12,35 +12,38 @@ function _buildCatLabels() {
 /**
  * Navigateur des Peines de Perfidie — fenêtre de sélection avec filtres.
  */
-export class PeinesBrowser extends Application {
+export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   constructor(actor, options = {}) {
     super(options);
     this.actor            = actor;
     this._search          = "";
-    this._filterCategorie = "all";  // "all" | "creature_masque" | "lieu_perfidie" | "autre"
-    this._filterNoir      = "all";  // "all" | "corps" | "ame"
+    this._filterCategorie = "all";
+    this._filterNoir      = "all";
     this._expanded        = new Set();
   }
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id        : "agone-peines-browser",
-      classes   : ["agone", "peines-browser"],
-      template  : "systems/agone/templates/apps/peines-browser.hbs",
-      width     : 720,
-      height    : 560,
-      resizable : true,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    id      : "agone-peines-browser",
+    classes : ["agone", "peines-browser"],
+    position: { width: 720, height: 560 },
+    window  : { resizable: true },
+  };
+
+  static PARTS = {
+    form: { template: "systems/agone/templates/apps/peines-browser.hbs" },
+  };
 
   get title() {
     return game.i18n.format("AGONE.Browser.TitrePerfidie", { nom: this.actor.name });
   }
 
-  /** @override */
-  async getData() {
+  _replaceHTML(result, content, options) {
+    content.innerHTML = "";
+    for (const html of Object.values(result)) content.insertAdjacentHTML("beforeend", html);
+  }
+
+  async _prepareContext(options) {
     const actorPeineNames = new Set(
       this.actor.items.filter(i => i.type === "peine").map(i => i.name)
     );
@@ -88,9 +91,17 @@ export class PeinesBrowser extends Application {
     };
   }
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const sel = this._refocusSelector;
+    if (sel) {
+      this._refocusSelector = null;
+      requestAnimationFrame(() => {
+        const el = this.element.querySelector(sel);
+        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
+      });
+    }
+    const html = $(this.element);
 
     html.find(".pnb-search").on("input", foundry.utils.debounce(e => {
       this._search = e.currentTarget.value.trim();
@@ -156,21 +167,4 @@ export class PeinesBrowser extends Application {
     });
   }
 
-  /** @override */
-  async _render(force, options) {
-    await super._render(force, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.find(sel)[0];
-        if (el) {
-          el.focus();
-          if (typeof el.setSelectionRange === "function") {
-            try { el.setSelectionRange(el.value.length, el.value.length); } catch {}
-          }
-        }
-      });
-    }
-  }
 }
