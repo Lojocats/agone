@@ -41,7 +41,7 @@ export class ArmeData extends foundry.abstract.TypeDataModel {
       portee:      new fields.StringField({ initial: "" }),
       reqFor:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       reqAgi:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
-      competence:  new fields.StringField({ initial: "" }), // nom de la compétence liée
+      competence:  new fields.StringField({ initial: "" }), // domaine de la compétence liée (ex: Mêlée, Tir, Jet)
       description: new fields.StringField({ initial: "" }),
       poids:       new fields.NumberField({ initial: 0, min: 0 }),
       // Champs complémentaires (boucliers et état d'équipement)

@@ -691,7 +691,7 @@ export class AgoneActor extends Actor {
     const nomComp = arme.system.competence;
     let scoreComp = 0;
     if (nomComp) {
-      const comp = this.items.find(i => i.type === "competence" && i.name === nomComp);
+      const comp = this.items.find(i => i.type === "competence" && i.system.domaine === nomComp);
       scoreComp = comp?.system.score ?? 0;
     }
 
@@ -733,7 +733,7 @@ export class AgoneActor extends Actor {
     const nomComp = arme.system.competence;
     let scoreComp = 0;
     if (nomComp) {
-      const comp = this.items.find(i => i.type === "competence" && i.name === nomComp);
+      const comp = this.items.find(i => i.type === "competence" && i.system.domaine === nomComp);
       scoreComp = comp?.system.score ?? 0;
     }
 

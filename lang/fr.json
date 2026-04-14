@@ -628,6 +628,7 @@
     "NomArme":                "Nom de l'arme",
     "NomArmure":              "Nom de l'armure",
     "NomCompetence":          "Nom de la compétence",
+    "DomaineCompetence":       "Domaine de la compétence (ex: Mélée, Tir, Jet)",
     "NomEquipement":          "Nom de l'équipement",
     "NomManoeuvre":           "Nom de la manœuvre",
     "NomPouvoir":             "Nom du pouvoir",

@@ -627,6 +627,7 @@
     "NomArme":                "Nom de l'arme",
     "NomArmure":              "Nom de l'armure",
     "NomCompetence":          "Nom de la compétence",
+    "DomaineCompetence":       "Skill domain (e.g.: Melee, Ranged, Thrown)",
     "NomEquipement":          "Nom de l'équipement",
     "NomManoeuvre":           "Nom de la manœuvre",
     "NomPouvoir":             "Nom du pouvoir",

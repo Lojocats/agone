@@ -19,11 +19,11 @@ export class AgoneItem extends Item {
       const baseAtk = style === "trait" ? (asd.tir ?? 0) : (asd.melee ?? 0);
       const bonusCorps = asd.bonusCorps ?? 0;
 
-      // Trouver compétence liée
+      // Trouver compétence liée par domaine
       let scoreComp = 0;
       if (sd.competence && this.actor.items) {
         const comp = this.actor.items.find(i =>
-          i.type === "competence" && i.name === sd.competence
+          i.type === "competence" && i.system.domaine === sd.competence
         );
         scoreComp = comp?.system.score ?? 0;
       }
