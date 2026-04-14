@@ -9,56 +9,81 @@
   </header>
 
   <section class="sheet-body">
-    <!-- Niveaux de création (1–7) → valeurs via table officielle -->
+
+    <!-- Budget de points de création -->
+    <div class="danseur-pts-creation">
+      <label>{{localize "AGONE.DanseurPtsCreationMax"}}</label>
+      <input type="number" name="system.ptsCreationMax" value="{{system.ptsCreationMax}}" min="1" class="pts-creation-input">
+      <span class="pts-derivee">
+        {{localize "AGONE.DanseurDepenses"}} : {{system.ptsCreationDepense}} ·
+        {{localize "AGONE.DanseurRestants"}} : <strong class="{{#if (lt system.ptsCreationRestants 0)}}pts-deficit{{/if}}">{{system.ptsCreationRestants}}</strong>
+      </span>
+    </div>
+
+    <!-- Grille des stats (niveau par stat + bonus) -->
+    <table class="danseur-stats-table">
+      <thead>
+        <tr>
+          <th>Stat</th>
+          <th>{{localize "AGONE.DanseurNivSuffix"}}</th>
+          <th>{{localize "AGONE.DanseurBaseTable"}}</th>
+          <th>{{localize "AGONE.DanseurBonus"}}</th>
+          <th>{{localize "AGONE.DanseurTotal"}}</th>
+          <th>{{localize "AGONE.DanseurCourante"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Mémoire -->
+        <tr>
+          <td><strong>{{localize "AGONE.MemoreDanseur"}}</strong></td>
+          <td><input type="number" name="system.memoireNiveau" value="{{system.memoireNiveau}}" min="1" max="7" class="stat-niv-input"></td>
+          <td class="derived-base"></td>
+          <td><input type="number" name="system.memoireBonus" value="{{system.memoireBonus}}" class="stat-bonus-input"></td>
+          <td class="derived-total">{{system.memoireMax}}</td>
+          <td><input type="number" name="system.memoireActuelle" value="{{system.memoireActuelle}}" min="0" class="stat-curr-input"></td>
+        </tr>
+        <!-- Endurance -->
+        <tr>
+          <td><strong>{{localize "AGONE.EnduranceDanseur"}}</strong></td>
+          <td><input type="number" name="system.enduranceNiveau" value="{{system.enduranceNiveau}}" min="1" max="7" class="stat-niv-input"></td>
+          <td class="derived-base"></td>
+          <td><input type="number" name="system.enduranceBonus" value="{{system.enduranceBonus}}" class="stat-bonus-input"></td>
+          <td class="derived-total">{{system.enduranceMax}}</td>
+          <td><input type="number" name="system.enduranceActuelle" value="{{system.enduranceActuelle}}" min="0" class="stat-curr-input"></td>
+        </tr>
+        <!-- Bonus d'Emprise -->
+        <tr>
+          <td><strong>{{localize "AGONE.BonusEmprise"}}</strong></td>
+          <td><input type="number" name="system.empriseNiveau" value="{{system.empriseNiveau}}" min="1" max="7" class="stat-niv-input"></td>
+          <td class="derived-base"></td>
+          <td><input type="number" name="system.empriseBonus" value="{{system.empriseBonus}}" class="stat-bonus-input"></td>
+          <td class="derived-total">+{{system.bonusEmprise}}</td>
+          <td>—</td>
+        </tr>
+        <!-- Empathie -->
+        <tr>
+          <td><strong>{{localize "AGONE.EmpathieDanseur"}}</strong></td>
+          <td><input type="number" name="system.empathieNiveau" value="{{system.empathieNiveau}}" min="1" max="7" class="stat-niv-input"></td>
+          <td class="derived-base"></td>
+          <td><input type="number" name="system.empathieBonus" value="{{system.empathieBonus}}" class="stat-bonus-input"></td>
+          <td class="derived-total">{{system.empathie}}</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Capacité mémoire en Seuil -->
+    <div class="danseur-memoire-bloc">
+      <span>{{localize "AGONE.DanseurCapaciteSeuil"}} : <strong>{{system.capaciteSeuil}}</strong> pts</span>
+      <small>({{system.memoireMax}} cases × 5 · {{localize "AGONE.DanseurMemoireExplain"}})</small>
+    </div>
+
+    <!-- Expérience + Saison -->
     <div class="danseur-stats-grid">
-      <!-- Mémoire -->
-      <div class="danseur-stat-group">
-        <label>{{localize "AGONE.MemoreDanseur"}} {{localize "AGONE.DanseurNivSuffix"}}</label>
-        <div class="curr-max-pair">
-          <input type="number" name="system.memoireNiveau" value="{{system.memoireNiveau}}" min="1" max="7" placeholder="1">
-          <span class="derived-val">→ {{system.memoireMax}}</span>
-        </div>
-        <label style="font-size:10px;opacity:0.6">{{localize "AGONE.DanseurCourante"}}</label>
-        <input type="number" name="system.memoireActuelle" value="{{system.memoireActuelle}}" min="0">
-      </div>
-      <!-- Endurance -->
-      <div class="danseur-stat-group">
-        <label>{{localize "AGONE.EnduranceDanseur"}} {{localize "AGONE.DanseurNivSuffix"}}</label>
-        <div class="curr-max-pair">
-          <input type="number" name="system.enduranceNiveau" value="{{system.enduranceNiveau}}" min="1" max="7" placeholder="1">
-          <span class="derived-val">→ {{system.enduranceMax}}</span>
-        </div>
-        <label style="font-size:10px;opacity:0.6">{{localize "AGONE.DanseurCourante"}}</label>
-        <input type="number" name="system.enduranceActuelle" value="{{system.enduranceActuelle}}" min="0">
-      </div>
-      <!-- Emprise -->
-      <div class="danseur-stat-group">
-        <label>{{localize "AGONE.BonusEmprise"}} {{localize "AGONE.DanseurNivSuffix"}}</label>
-        <div class="curr-max-pair">
-          <input type="number" name="system.empriseNiveau" value="{{system.empriseNiveau}}" min="1" max="7" placeholder="1">
-          <span class="derived-val">→ +{{system.bonusEmprise}}</span>
-        </div>
-      </div>
-      <!-- Empathie -->
-      <div class="danseur-stat-group">
-        <label>{{localize "AGONE.EmpathieDanseur"}} {{localize "AGONE.DanseurNivSuffix"}}</label>
-        <div class="curr-max-pair">
-          <input type="number" name="system.empathieNiveau" value="{{system.empathieNiveau}}" min="1" max="7" placeholder="1">
-          <span class="derived-val">→ {{system.empathie}}</span>
-        </div>
-      </div>
-      <!-- Expérience -->
       <div class="danseur-stat-group">
         <label>{{localize "AGONE.ExperienceDanseur"}}</label>
         <input type="number" name="system.experience" value="{{system.experience}}" min="0" placeholder="0">
       </div>
-      <!-- Points de création max -->
-      <div class="danseur-stat-group">
-        <label>{{localize "AGONE.DanseurPtsCreationMax"}}</label>
-        <input type="number" name="system.ptsCreationMax" value="{{system.ptsCreationMax}}" min="0" placeholder="17">
-        <small style="font-size:10px;opacity:0.6">{{localize "AGONE.DanseurDepenses"}} : {{system.ptsCreationDepense}} / {{localize "AGONE.DanseurRestants"}} : {{system.ptsCreationRestants}}</small>
-      </div>
-      <!-- Saison du Saisonin -->
       <div class="danseur-stat-group">
         <label>{{localize "AGONE.SaisonSaisonin"}}</label>
         <select name="system.saison">
@@ -71,16 +96,10 @@
       </div>
     </div>
 
-    <!-- Mode création -->
-    <div class="form-group">
-      <label>{{localize "AGONE.DanseurModeCreationActif"}}</label>
-      <input type="checkbox" name="system.modeCreation" {{#if system.modeCreation}}checked{{/if}}>
-    </div>
-
     <!-- Description -->
     <div class="form-group">
       <label>{{localize "AGONE.Description"}}</label>
-      {{editor system.description name="system.description" button=true editable=isEditable}}
+      <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
     </div>
   </section>
 </form>

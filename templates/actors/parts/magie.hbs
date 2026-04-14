@@ -272,11 +272,15 @@
         <div class="danseur-info">
           <input class="danseur-nom inline-edit" type="text" data-item-id="{{d.id}}" data-field="name" value="{{d.name}}" placeholder='{{localize "AGONE.NomDanseur"}}'>
           {{#if d.system.modeCreation}}
-          <span class="danseur-pts-badge {{#if (lt d.system.ptsCreationRestants 0)}}pts-deficit{{/if}}">
-            {{d.system.ptsCreationDepense}}/{{d.system.ptsCreationMax}} pts
+          <span class="danseur-pts-badge {{#if (lt d.ptsRestants 0)}}pts-deficit{{/if}}">
+            {{d.ptsDepense}} /
+            <input class="danseur-inline-num danseur-pts-max-input" type="number"
+                   data-item-id="{{d.id}}" data-field="ptsCreationMax"
+                   value="{{d.ptsBudget}}" min="4" title='{{localize "AGONE.DanseurPtsCreationMax"}}'>
+            pts &middot; restants : <strong>{{d.ptsRestants}}</strong>
           </span>
           {{else}}
-          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title="Mémoire">Mém : {{d.assignedCount}}/{{d.system.memoireMax}}</span>
+          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title="Mémoire (pts Seuil)">Mém : {{d.memoireUtilisee}}/{{d.capaciteSeuil}} pts</span>
           <span class="danseur-stat" title="Endurance">End :
             <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0">
             /{{d.system.enduranceMax}}
@@ -307,23 +311,30 @@
       </div>
 
       {{#if d.system.modeCreation}}
-      <!-- MODE CRÉATION : table officielle +/- niveaux -->
+      <!-- MODE CRÉATION : 17 pts à répartir, chaque stat a son propre niveau -->
       <div class="danseur-crea-section">
         {{#each d.creaNiveaux as |cn|}}
         <div class="danseur-crea-row">
           <span class="danseur-crea-label">{{cn.label}}</span>
           <button type="button" class="danseur-niv-btn" data-action="danseurNiveauDown"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
-                  {{#unless cn.canDown}}disabled{{/unless}}>-</button>
-          <span class="danseur-niv-num">{{cn.niv}}</span>
+                  {{#unless cn.canDown}}disabled{{/unless}}>−</button>
+          <span class="danseur-niv-num" title="Coût : {{cn.cout}} pt(s)">{{cn.niv}}</span>
           <button type="button" class="danseur-niv-btn" data-action="danseurNiveauUp"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   {{#unless cn.canUp}}disabled{{/unless}}>+</button>
+          <button type="button" class="danseur-niv-btn danseur-roll-indiv-btn" data-action="danseurRollStatIndiv"
+                  data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
+                  data-stat-key="{{cn.stat}}" data-label="{{cn.label}}" data-prefix="{{cn.prefix}}"
+                  title="Jet 3d10 pour {{cn.label}}"><i class="fas fa-dice"></i></button>
           <span class="danseur-crea-arrow">&#8594;</span>
           <span class="danseur-crea-val">{{cn.prefix}}{{cn.val}}</span>
           {{#if cn.nextVal}}<span class="danseur-next-val">(niv.{{cn.nextNiv}} &#8594; {{cn.prefix}}{{cn.nextVal}})</span>{{/if}}
         </div>
         {{/each}}
+        <div class="danseur-crea-capacite">
+          Capacité mémoire : <strong>{{d.capaciteSeuil}}</strong> pts Seuil
+        </div>
       </div>
       {{else}}
       {{/if}}
@@ -347,7 +358,7 @@
         </div>
         {{/each}}
         {{#unless d.isFull}}
-        <div class="danseur-drop-hint"><i class="fas fa-arrow-down"></i> Glisser un sort ici</div>
+        <div class="danseur-drop-hint"><i class="fas fa-arrow-down"></i> Glisser un sort ici ({{d.memoireUtilisee}}/{{d.capaciteSeuil}} pts Seuil)</div>
         {{/unless}}
       </div>
     </div>

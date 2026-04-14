@@ -16,6 +16,24 @@
       <label title="{{localize "AGONE.Tenebres"}} ÷ 10">{{localize "AGONE.Noirceur"}}</label>
       <span class="derived-val tene-noirceur">{{system.noirceur}}</span>
     </div>
+    <div class="tene-stat-separator"></div>
+    <!-- Bouton Conjuration Démonologie -->
+    <div class="tene-stat-item">
+      <button type="button" class="tene-roll-btn" data-action="rollConjurationDemonologie"
+              title="1d10 + Noirceur + Démonologie">
+        <i class="fas fa-dice-d10"></i> Conjuration
+      </button>
+    </div>
+    <div class="tene-stat-separator"></div>
+    <!-- Toggle mode manuel -->
+    <div class="tene-stat-item tene-mode-toggle">
+      <button type="button" class="tene-mode-btn {{#if tenebresModeManuel}}active{{/if}}"
+              data-action="toggleTenebresModeManuel"
+              title="{{#if tenebresModeManuel}}Repasser en mode automatique{{else}}Passer en mode manuel (cochez les paliers manuellement){{/if}}">
+        <i class="fas fa-{{#if tenebresModeManuel}}lock-open{{else}}lock{{/if}}"></i>
+        {{#if tenebresModeManuel}}Manuel{{else}}Auto{{/if}}
+      </button>
+    </div>
   </div>
 
   <!-- ── Corps principal ────────────────────────────────────── -->
@@ -27,113 +45,135 @@
       <table class="paliers-table" summary="Tableau récapitulatif des paliers, peines et bienfaits">
         <thead>
           <tr>
+            {{#if tenebresModeManuel}}<th class="col-check"></th>{{/if}}
             <th class="col-palier">{{localize "AGONE.Palier"}}</th>
             <th class="col-peine">{{localize "AGONE.Peines"}}</th>
             <th class="col-bienfait">{{localize "AGONE.Bienfaits"}}</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="palier-row{{#ifGT system.tenebres 9}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "10")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 9}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "10")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="10" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "10")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">10</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip10"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.diablotin"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip10"}}'>{{localize "AGONE.Bienfait.cercle1"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 19}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "20")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 19}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "20")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="20" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "20")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">20</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip20"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.cauchemars"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip20"}}'>{{localize "AGONE.Bienfait.diablotin2"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 29}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "30")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 29}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "30")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="30" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "30")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">30</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip30"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.demonFacetieux"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip30"}}'>{{localize "AGONE.Bienfait.cercle2"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 39}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "40")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 39}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "40")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="40" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "40")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">40</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip40"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.somnambule"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 49}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "50")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 49}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "50")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="50" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "50")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">50</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip50"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.insomniaque"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 54}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "55")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 54}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "55")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="55" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "55")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">55</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip55"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.mepris"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 59}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "60")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 59}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "60")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="60" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "60")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">60</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip60"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.devianceSexuelle"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 64}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "65")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 64}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "65")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="65" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "65")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">65</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip65"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.scarificationsLunaires"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 69}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "70")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 69}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "70")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="70" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "70")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">70</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip70"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.jumeauDemoniaque"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip70"}}'>{{localize "AGONE.Bienfait.cercle3"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 74}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "75")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 74}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "75")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="75" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "75")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">75</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip75"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.obsessionOmbre"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip75"}}'>{{localize "AGONE.Bienfait.nyctalopie"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 77}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "78")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 77}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "78")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="78" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "78")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">78</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip78"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.presenceOppressante"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip78"}}'>{{localize "AGONE.Bienfait.parlerMorts"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 80}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "81")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 80}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "81")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="81" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "81")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">81</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip81"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.alterationSens"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip81"}}'>{{localize "AGONE.Bienfait.detecterDemons"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 83}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "84")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 83}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "84")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="84" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "84")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">84</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip84"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.sangNoir"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 86}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "87")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 86}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "87")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="87" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "87")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">87</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip87"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.apparenceDemoniaque"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 89}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "90")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 89}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "90")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="90" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "90")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">90</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip90"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.ombrePerfidie"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 91}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "92")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 91}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "92")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="92" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "92")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">92</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip92"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.siamoisTenebres"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip92"}}'>{{localize "AGONE.Bienfait.cercle4"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 93}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "94")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 93}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "94")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="94" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "94")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">94</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip94"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.malediction"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 95}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "96")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 95}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "96")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="96" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "96")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">96</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip96"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.ombreVivante"}}</td>
             <td class="col-bienfait"></td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 97}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "98")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 97}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "98")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="98" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "98")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">98</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip98"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.portailInterieur"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip98"}}'>{{localize "AGONE.Bienfait.cercle5"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 98}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "99")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 98}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "99")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="99" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "99")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">99</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip99"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.marqueHautsDiables"}}</td>
             <td class="col-bienfait bienfait-yes" data-tooltip='{{localize "AGONE.TenebresBienfaitTooltip99"}}'>{{localize "AGONE.Bienfait.detecterTenebres"}}</td>
           </tr>
-          <tr class="palier-row{{#ifGT system.tenebres 99}} palier-reached{{/ifGT}}">
+          <tr class="palier-row{{#if tenebresModeManuel}}{{#if (lookup paliersManuels "100")}} palier-reached{{/if}}{{else}}{{#ifGT system.tenebres 99}} palier-reached{{/ifGT}}{{/if}}">
+            {{#if tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if (lookup paliersManuels "100")}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="100" title="Cocher/décocher ce palier"><i class="fas fa-{{#if (lookup paliersManuels "100")}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
             <td class="col-palier">100</td>
             <td class="col-peine" data-tooltip='{{localize "AGONE.TenebresPalierTooltip100"}}'><span class="peine-dot"></span>{{localize "AGONE.Peine.dechu"}}</td>
             <td class="col-bienfait"></td>

@@ -135,13 +135,20 @@ export class DanseurData extends foundry.abstract.TypeDataModel {
     return {
       description:       new fields.HTMLField({ initial: "" }),
       experience:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      // Mode création actif (true = en cours de création, false = play mode)
       modeCreation:      new fields.BooleanField({ initial: true }),
-      ptsCreationMax:    new fields.NumberField({ initial: 17, integer: true, min: 0 }),
-      // Niveaux de création (1-7) → valeurs dérivées via table officielle
+      // Budget total de points de création (défaut : 17 selon les règles)
+      ptsCreationMax:    new fields.NumberField({ initial: 17, integer: true, min: 1 }),
+      // Niveau par stat (1-7) — coût en pts de création = valeur du niveau
       memoireNiveau:     new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
       empriseNiveau:     new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
       empathieNiveau:    new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
       enduranceNiveau:   new fields.NumberField({ initial: 1, integer: true, min: 1, max: 7 }),
+      // Bonus individuels par stat (ajoutés aux valeurs de la table, pour ajustements fins)
+      memoireBonus:      new fields.NumberField({ initial: 0, integer: true }),
+      empriseBonus:      new fields.NumberField({ initial: 0, integer: true }),
+      empathieBonus:     new fields.NumberField({ initial: 0, integer: true }),
+      enduranceBonus:    new fields.NumberField({ initial: 0, integer: true }),
       saison:            new fields.StringField({ initial: "" }),
       // Valeurs courantes (état actuel)
       memoireActuelle:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
@@ -150,14 +157,17 @@ export class DanseurData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
-    const niv = n => Math.max(0, Math.min(6, (n ?? 1) - 1));
-    this.memoireMax   = DANSEUR_TABLE.memoire[niv(this.memoireNiveau)];
-    this.bonusEmprise = DANSEUR_TABLE.emprise[niv(this.empriseNiveau)];
-    this.empathie     = DANSEUR_TABLE.empathie[niv(this.empathieNiveau)];
-    this.enduranceMax = DANSEUR_TABLE.endurance[niv(this.enduranceNiveau)];
+    const clamp = (n) => Math.max(0, Math.min(6, (n ?? 1) - 1));
+    this.memoireMax    = DANSEUR_TABLE.memoire[clamp(this.memoireNiveau)]   + (this.memoireBonus   ?? 0);
+    this.bonusEmprise  = DANSEUR_TABLE.emprise[clamp(this.empriseNiveau)]   + (this.empriseBonus   ?? 0);
+    this.empathie      = DANSEUR_TABLE.empathie[clamp(this.empathieNiveau)] + (this.empathieBonus  ?? 0);
+    this.enduranceMax  = DANSEUR_TABLE.endurance[clamp(this.enduranceNiveau)]+ (this.enduranceBonus ?? 0);
+    // Points dépensés = somme des niveaux (1 pt investi → ligne 1, 2 pts → ligne 2, etc.)
     this.ptsCreationDepense  = (this.memoireNiveau ?? 1) + (this.empriseNiveau ?? 1)
                              + (this.empathieNiveau ?? 1) + (this.enduranceNiveau ?? 1);
     this.ptsCreationRestants = (this.ptsCreationMax ?? 17) - this.ptsCreationDepense;
+    // Capacité totale de mémoire en points de Seuil (chaque case = 5 pts de Seuil)
+    this.capaciteSeuil = this.memoireMax * 5;
   }
 }
 

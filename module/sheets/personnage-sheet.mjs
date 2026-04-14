@@ -1,4 +1,4 @@
-import { SortsBrowser } from "../apps/sorts-browser.mjs";
+﻿import { SortsBrowser } from "../apps/sorts-browser.mjs";
 import { CompetencesBrowser } from "../apps/competences-browser.mjs";
 import { ArmesBrowser } from "../apps/armes-browser.mjs";
 import { ArmuresBrowser } from "../apps/armures-browser.mjs";
@@ -113,18 +113,21 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         empathie:  [ 2,  3,  4,  5,  6,  7,  8],
         endurance: [ 1,  2,  3,  4,  5,  6,  7],
       };
-      const niv = (n, mn) => Math.max(0, Math.min(6, (n ?? 1) - 1));
 
-      // Données en mode création : +/- par stat
+      // Données en mode création : +/- par stat, coût = niveau
+      const ptsBudget   = sd.ptsCreationMax ?? 17;
+      const ptsDepense  = sd.ptsCreationDepense ?? 4;
+      const ptsRestants = sd.ptsCreationRestants ?? (ptsBudget - ptsDepense);
       const creaNiveaux = [
-        { stat: "memoire",   nivField: "memoireNiveau",   label: "Mémoire",        niv: sd.memoireNiveau   ?? 1, val: sd.memoireMax,   prefix: "" },
-        { stat: "emprise",   nivField: "empriseNiveau",   label: "Emprise",        niv: sd.empriseNiveau   ?? 1, val: sd.bonusEmprise, prefix: "+" },
-        { stat: "empathie",  nivField: "empathieNiveau",  label: "Empathie",       niv: sd.empathieNiveau  ?? 1, val: sd.empathie,     prefix: "" },
-        { stat: "endurance", nivField: "enduranceNiveau", label: "Endurance",      niv: sd.enduranceNiveau ?? 1, val: sd.enduranceMax, prefix: "" },
+        { stat: "memoire",   nivField: "memoireNiveau",   label: "Mémoire",   niv: sd.memoireNiveau   ?? 1, val: sd.memoireMax,   prefix: "" },
+        { stat: "emprise",   nivField: "empriseNiveau",   label: "Emprise",   niv: sd.empriseNiveau   ?? 1, val: sd.bonusEmprise, prefix: "+" },
+        { stat: "empathie",  nivField: "empathieNiveau",  label: "Empathie",  niv: sd.empathieNiveau  ?? 1, val: sd.empathie,     prefix: "" },
+        { stat: "endurance", nivField: "enduranceNiveau", label: "Endurance", niv: sd.enduranceNiveau ?? 1, val: sd.enduranceMax, prefix: "" },
       ].map(x => ({
         ...x,
+        cout:    x.niv,                    // coût actuel = niveau
         canDown: x.niv > 1,
-        canUp:   x.niv < 7 && (sd.ptsCreationRestants ?? 0) > 0,
+        canUp:   x.niv < 7 && ptsRestants >= (x.niv + 1 - x.niv),  // il faut 1 pt de plus
         nextVal: x.niv < 7 ? TBL[x.stat][x.niv] : null,
         nextNiv: x.niv < 7 ? x.niv + 1 : null,
       }));
@@ -134,8 +137,11 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
         system: d.system,
         assignedSorts,
         assignedCount: assignedSorts.length,
-        isFull: d.system.memoireMax > 0 && assignedSorts.length >= d.system.memoireMax,
+        memoireUtilisee: assignedSorts.reduce((sum, s) => sum + (s.seuil ?? 0), 0),
+        isFull: (assignedSorts.reduce((sum, s) => sum + (s.seuil ?? 0), 0)) >= (sd.capaciteSeuil ?? sd.memoireMax * 5),
         creaNiveaux,
+        ptsDepense, ptsRestants, ptsBudget,
+        capaciteSeuil: sd.capaciteSeuil ?? (sd.memoireMax * 5),
       };
     });
 
@@ -655,6 +661,12 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       };
     }
 
+    // ── Ténèbres : mode manuel des paliers ────────────────────────────
+    context.tenebresModeManuel = this.actor.getFlag("agone", "tenebresModeManuel") ?? false;
+    if (context.tenebresModeManuel) {
+      context.paliersManuels = this.actor.getFlag("agone", "paliersManuels") ?? {};
+    }
+
     return context;
   }
 
@@ -742,6 +754,9 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     html.find("[data-action='toggleSortDesc']").click(this._onToggleSortDesc.bind(this));
     html.find("[data-action='rollAptitudeMagie']").click(this._onRollAptitudeMagie.bind(this));
     html.find("[data-action='rollAptitudeConjuration']").click(this._onRollAptitudeConjuration.bind(this));
+    html.find("[data-action='rollConjurationDemonologie']").click(this._onRollConjurationDemonologie.bind(this));
+    html.find("[data-action='toggleTenebresModeManuel']").click(this._onToggleTenebresModeManuel.bind(this));
+    html.find("[data-action='togglePalierManuel']").click(this._onTogglePalierManuel.bind(this));
     html.find("[data-action='rollArtDomaine']").click(this._onRollArtDomaine.bind(this));
     html.find("[data-action='rollImpArtDomaine']").click(this._onRollImpArtDomaine.bind(this));
 
@@ -830,9 +845,10 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     // Montée de niveau danseur
     html.find("[data-action='levelUpDanseur']").click(this._onLevelUpDanseur.bind(this));
 
-    // Création danseur — +/- niveau inline
-    html.find("[data-action='danseurNiveauUp']").click(ev => this._onDanseurNiveau(ev, +1));
+    // Création danseur — +/- niveau par stat
+    html.find("[data-action='danseurNiveauUp']").click(ev   => this._onDanseurNiveau(ev, +1));
     html.find("[data-action='danseurNiveauDown']").click(ev => this._onDanseurNiveau(ev, -1));
+    html.find("[data-action='danseurRollStatIndiv']").click(this._onDanseurRollStatIndiv.bind(this));
 
     // Valider / réactiver mode création danseur
     html.find("[data-action='validerCreationDanseur']").click(this._onValiderCreationDanseur.bind(this));
@@ -1393,14 +1409,17 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const sort         = this.actor.items.get(data.itemId);
     if (!danseur || !sort) return;
 
-    const memoireMax    = danseur.system.memoireMax ?? 0;
-    const assignedCount = this.actor.items.filter(i =>
+    const capaciteSeuil  = danseur.system.capaciteSeuil ?? (danseur.system.memoireMax * 5);
+    const assignedSorts  = this.actor.items.filter(i =>
       i.type === "sort" && i.system.danseurNom === danseur.name
-    ).length;
+    );
+    const memoireUtilisee = assignedSorts.reduce((sum, i) => sum + (i.system.seuil ?? 0), 0);
+    const sortSeuil       = sort.system.seuil ?? 0;
 
-    if (memoireMax > 0 && assignedCount >= memoireMax && sort.system.danseurNom !== danseur.name) {
+    // Bloquer seulement si c'est un nouveau sort ET qu'il ne rentre plus
+    if (sort.system.danseurNom !== danseur.name && capaciteSeuil > 0 && memoireUtilisee + sortSeuil > capaciteSeuil) {
       ui.notifications.warn(
-        game.i18n.format("AGONE.DanseurMemoirePleine", { nom: danseur.name, max: memoireMax })
+        game.i18n.format("AGONE.DanseurMemoirePleine", { nom: danseur.name, max: capaciteSeuil })
       );
       return;
     }
@@ -1735,6 +1754,82 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
       aptitude: `${label} : ${sd.aptitudeConjuration ?? 0}`,
       modif: `Bonus/Malus : ${modif}`
     });
+  }
+
+  async _onRollConjurationDemonologie(event) {
+    event.preventDefault();
+    const sd     = this.actor.system;
+    const label  = game.i18n.localize("AGONE.RollConjurationDemonologie") || "Conjuration (Démonologie)";
+    const modif  = await this.actor._dialogModificateur(label);
+    if (modif === null) return;
+    // Chercher la compétence Démonologie parmi les items de l'acteur
+    const compDemon = this.actor.items.find(i =>
+      i.type === "competence" && (i.name.toLowerCase().includes("démonologi") || i.name.toLowerCase().includes("demonologi"))
+    );
+    const scoreComp = compDemon?.system?.score ?? 0;
+    const noirceur  = sd.noirceur ?? 0;
+    const roll = new Roll("1d10x10 + @noirceur + @comp + @modif", { noirceur, comp: scoreComp, modif });
+    await roll.evaluate();
+    await this.actor._sendRollToChat(roll, label, {
+      noirceur: `Noirceur : ${noirceur}`,
+      demonologie: `Démonologie : ${scoreComp}`,
+      modif: `Bonus/Malus : ${modif}`
+    });
+  }
+
+  async _onToggleTenebresModeManuel(event) {
+    event.preventDefault();
+    const cur = this.actor.getFlag("agone", "tenebresModeManuel") ?? false;
+    const activating = !cur;
+
+    if (activating) {
+      // Passage auto → manuel : initialiser paliersManuels depuis la valeur de ténèbres
+      // actuelle, pour que l'état de départ soit identique au mode auto.
+      const ten = this.actor.system.tenebres ?? 0;
+      const SEUILS = [10, 20, 30, 40, 50, 55, 60, 65, 70, 75, 78, 81, 84, 87, 90, 92, 94, 96, 98, 99, 100];
+      const paliers = {};
+      for (const s of SEUILS) paliers[String(s)] = ten >= s;
+      await this.actor.setFlag("agone", "paliersManuels", paliers);
+    }
+
+    await this.actor.setFlag("agone", "tenebresModeManuel", activating);
+  }
+
+  async _onTogglePalierManuel(event) {
+    event.preventDefault();
+    const seuil     = event.currentTarget.dataset.seuil;
+    const paliers   = foundry.utils.deepClone(this.actor.getFlag("agone", "paliersManuels") ?? {});
+    const wasActive = !!paliers[seuil];
+    paliers[seuil]  = !wasActive;
+    await this.actor.setFlag("agone", "paliersManuels", paliers);
+
+    // Si on active un palier démon, créer le démon correspondant s'il n'existe pas encore
+    const PALIERS_DEMON = { "10": "diablotin", "30": "demonFacetieux", "70": "jumeauDemoniaque", "92": "siamoisTenebres" };
+    const NOM_DEMON = {
+      diablotin:        "AGONE.Peine.diablotin",
+      demonFacetieux:   "AGONE.Peine.demonFacetieux",
+      jumeauDemoniaque: "AGONE.Peine.jumeauDemoniaque",
+      siamoisTenebres:  "AGONE.Peine.siamoisTenebres",
+    };
+    const origine = PALIERS_DEMON[seuil];
+    if (origine && !wasActive) {
+      const alreadyExistsItem = this.actor.items.some(
+        i => i.type === "demon" && i.system.origine === origine
+      );
+      const linkedUuids = this.actor.getFlag("agone", "demons") ?? [];
+      const alreadyExistsActor = linkedUuids.some(uuid => {
+        const doc = fromUuidSync?.(uuid);
+        return doc?.system?.origine === origine;
+      });
+      if (!alreadyExistsItem && !alreadyExistsActor) {
+        const name = game.i18n.localize(NOM_DEMON[origine]) || origine;
+        const newActor = await Actor.create({ name, type: "demon", system: { origine } });
+        if (newActor) {
+          await this.actor.setFlag("agone", "demons", [...linkedUuids, newActor.uuid]);
+          ui.notifications.info(game.i18n.format("AGONE.DemonAutoApparu", { name }));
+        }
+      }
+    }
   }
 
   async _onRollArtDomaine(event) {
@@ -2480,20 +2575,61 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   // ==============================
+  // Danseur — jet 3d10 pour une stat en mode création
+  // ==============================
+  // ==============================
+  // ==============================
+  // Danseur — jet 3d10 individuel pour une stat
+  // ==============================
+  async _onDanseurRollStatIndiv(event) {
+    event.preventDefault();
+    const btn     = event.currentTarget;
+    const itemId  = btn.dataset.itemId;
+    const stat    = btn.dataset.stat;     // ex. "memoireNiveau"
+    const statKey = btn.dataset.statKey; // ex. "memoire"
+    const label   = btn.dataset.label;   // ex. "Mémoire"
+    const prefix  = btn.dataset.prefix ?? "";
+    const danseur = this.actor.items.get(itemId);
+    if (!danseur) return;
+
+    const SEUILS = [3, 4, 12, 17, 24, 28, 30];
+    const TBL = {
+      memoire:   [12, 14, 16, 18, 24, 30, 40],
+      emprise:   [ 0,  1,  2,  3,  4,  5,  6],
+      empathie:  [ 2,  3,  4,  5,  6,  7,  8],
+      endurance: [ 1,  2,  3,  4,  5,  6,  7],
+    };
+
+    const roll  = await new Roll("3d10").evaluate();
+    const total = roll.total;
+    let niveau  = 1;
+    for (let i = 0; i < SEUILS.length; i++) {
+      if (total >= SEUILS[i]) niveau = i + 1;
+    }
+    const valeur = TBL[statKey][niveau - 1];
+
+    await roll.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+      flavor: `<strong>${danseur.name}</strong> — ${label} (3d10) : <strong>${total}</strong> → Niv. ${niveau} (${prefix}${valeur})`
+    });
+    await danseur.update({ [`system.${stat}`]: niveau });
+  }
+
+  // ==============================
   // Danseur — +/- niveau en mode création
   // ==============================
   async _onDanseurNiveau(event, delta) {
     event.preventDefault();
     const btn     = event.currentTarget;
     const itemId  = btn.dataset.itemId;
-    const stat    = btn.dataset.stat;          // ex. "memoireNiveau"
+    const stat    = btn.dataset.stat;   // ex. "memoireNiveau"
     const danseur = this.actor.items.get(itemId);
     if (!danseur) return;
     const current = danseur.system[stat] ?? 1;
     const next    = Math.max(1, Math.min(7, current + delta));
     if (next === current) return;
-    // Vérifier les pts restants si montée
-    if (delta > 0 && (danseur.system.ptsCreationRestants ?? 0) <= 0) {
+    // Vérifier le budget si montée (coût = delta en pts)
+    if (delta > 0 && (danseur.system.ptsCreationRestants ?? 0) < 1) {
       return ui.notifications.warn(game.i18n.localize("AGONE.PasAssezPtsCrea") || "Plus de points de création disponibles.");
     }
     await danseur.update({ [`system.${stat}`]: next });
@@ -2508,9 +2644,6 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     const danseur = this.actor.items.get(id);
     if (!danseur) return;
     const sd = danseur.system;
-    if ((sd.ptsCreationRestants ?? 0) < 0) {
-      return ui.notifications.warn(game.i18n.localize("AGONE.DanseurPtsDeficit"));
-    }
     const confirmed = await foundry.applications.api.DialogV2.confirm({
       title:   game.i18n.localize("AGONE.DanseurValiderCrea"),
       content: `<p>${game.i18n.format("AGONE.DanseurValiderCreaConfirm", { nom: danseur.name })}</p>`

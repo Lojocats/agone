@@ -56,7 +56,8 @@ export class AgoneActor extends Actor {
     if (this.type === "personnage" && changed.system?.tenebres !== undefined) {
       const oldTene = this.system.tenebres ?? 0;
       const newTene = Number(changed.system.tenebres);
-      if (newTene > oldTene) {
+      const modeManuel = this.getFlag("agone", "tenebresModeManuel") ?? false;
+      if (!modeManuel && newTene > oldTene) {
         const PALIERS_DEMON = [
           { palier: 10, origine: "diablotin"        },
           { palier: 30, origine: "demonFacetieux"   },
