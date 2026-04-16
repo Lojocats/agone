@@ -1,19 +1,22 @@
 /**
- * Feuille de Compagnon / Monture
+ * Feuille de Compagnon / Monture — API ApplicationV2 / ActorSheetV2
  */
-export class CompagnonSheet extends foundry.appv1.sheets.ActorSheet {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["agone", "sheet", "actor", "compagnon"],
-      template: "systems/agone/templates/actors/compagnon-sheet.hbs",
-      width: 720,
-      height: 650,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributs" }]
-    });
-  }
+export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+  static DEFAULT_OPTIONS = {
+    classes: ["agone", "sheet", "actor", "compagnon"],
+    position: { width: 720, height: 650 },
+    window: { resizable: true },
+  };
 
-  async getData(options = {}) {
-    const context = await super.getData(options);
+  static PARTS = {
+    form: {
+      template: "systems/agone/templates/actors/compagnon-sheet.hbs",
+      scrollable: [".sheet-body"],
+    },
+  };
+
+  async _prepareContext(options) {
+    const context = {};
     const system  = this.actor.system;
     context.system  = system;
     context.actor   = this.actor;
@@ -49,17 +52,35 @@ export class CompagnonSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   /** @override */
-  async _onSubmit(event, options = {}) {
-    if (this.form) {
-      this.form.querySelectorAll("input[type='number']").forEach(el => {
-        if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
-      });
-    }
-    return super._onSubmit(event, options);
-  }
+  _onRender(context, options) {
+    super._onRender(context, options);
 
-  activateListeners(html) {
-    super.activateListeners(html);
+    // Normaliser les inputs numériques vides
+    this.element.addEventListener("change", (ev) => {
+      if (ev.target.matches("input[type='number']")) {
+        if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
+      }
+    }, true);
+
+    // Gestion des onglets
+    const html = $(this.element);
+    const activeTab = this._currentTab ?? "attributs";
+    html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".tab[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+      const tab = e.currentTarget.dataset.tab;
+      if (!tab) return;
+      this._currentTab = tab;
+      html.find(".sheet-tabs .item").removeClass("active");
+      e.currentTarget.classList.add("active");
+      html.find(".tab").removeClass("active");
+      html.find(`.tab[data-tab="${tab}"]`).addClass("active");
+    });
+
     if (!this.isEditable) return;
     html.find(".item-create").click(this._onItemCreate.bind(this));
     html.find(".item-edit").click(this._onItemEdit.bind(this));
@@ -170,21 +191,24 @@ export class CompagnonSheet extends foundry.appv1.sheets.ActorSheet {
 }
 
 /**
- * Feuille de Démon
+ * Feuille de Démon — API ApplicationV2 / ActorSheetV2
  */
-export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["agone", "sheet", "actor", "demon"],
-      template: "systems/agone/templates/actors/demon-sheet.hbs",
-      width: 700,
-      height: 650,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributs" }]
-    });
-  }
+export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+  static DEFAULT_OPTIONS = {
+    classes: ["agone", "sheet", "actor", "demon"],
+    position: { width: 700, height: 650 },
+    window: { resizable: true },
+  };
 
-  async getData(options = {}) {
-    const context = await super.getData(options);
+  static PARTS = {
+    form: {
+      template: "systems/agone/templates/actors/demon-sheet.hbs",
+      scrollable: [".sheet-body"],
+    },
+  };
+
+  async _prepareContext(options) {
+    const context = {};
     context.system   = this.actor.system;
     context.isOwner  = this.actor.isOwner;
     context.armes    = this.actor.items.filter(i => i.type === "arme");
@@ -239,17 +263,35 @@ export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   /** @override */
-  async _onSubmit(event, options = {}) {
-    if (this.form) {
-      this.form.querySelectorAll("input[type='number']").forEach(el => {
-        if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
-      });
-    }
-    return super._onSubmit(event, options);
-  }
+  _onRender(context, options) {
+    super._onRender(context, options);
 
-  activateListeners(html) {
-    super.activateListeners(html);
+    // Normaliser les inputs numériques vides
+    this.element.addEventListener("change", (ev) => {
+      if (ev.target.matches("input[type='number']")) {
+        if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
+      }
+    }, true);
+
+    // Gestion des onglets
+    const html = $(this.element);
+    const activeTab = this._currentTab ?? "attributs";
+    html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".tab[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+      const tab = e.currentTarget.dataset.tab;
+      if (!tab) return;
+      this._currentTab = tab;
+      html.find(".sheet-tabs .item").removeClass("active");
+      e.currentTarget.classList.add("active");
+      html.find(".tab").removeClass("active");
+      html.find(`.tab[data-tab="${tab}"]`).addClass("active");
+    });
+
     if (!this.isEditable) return;
     html.find(".item-create").click(async (e) => {
       e.preventDefault();
@@ -344,21 +386,24 @@ export class DemonSheet extends foundry.appv1.sheets.ActorSheet {
 }
 
 /**
- * Feuille de PNJ
+ * Feuille de PNJ — API ApplicationV2 / ActorSheetV2
  */
-export class PnjSheet extends foundry.appv1.sheets.ActorSheet {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["agone", "sheet", "actor", "pnj"],
-      template: "systems/agone/templates/actors/pnj-sheet.hbs",
-      width: 750,
-      height: 700,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributs" }]
-    });
-  }
+export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+  static DEFAULT_OPTIONS = {
+    classes: ["agone", "sheet", "actor", "pnj"],
+    position: { width: 750, height: 700 },
+    window: { resizable: true },
+  };
 
-  async getData(options = {}) {
-    const context = await super.getData(options);
+  static PARTS = {
+    form: {
+      template: "systems/agone/templates/actors/pnj-sheet.hbs",
+      scrollable: [".sheet-body"],
+    },
+  };
+
+  async _prepareContext(options) {
+    const context = {};
     const system  = this.actor.system;
     context.system  = system;
     context.actor   = this.actor;
@@ -473,17 +518,35 @@ export class PnjSheet extends foundry.appv1.sheets.ActorSheet {
   }
 
   /** @override */
-  async _onSubmit(event, options = {}) {
-    if (this.form) {
-      this.form.querySelectorAll("input[type='number']").forEach(el => {
-        if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
-      });
-    }
-    return super._onSubmit(event, options);
-  }
+  _onRender(context, options) {
+    super._onRender(context, options);
 
-  activateListeners(html) {
-    super.activateListeners(html);
+    // Normaliser les inputs numériques vides
+    this.element.addEventListener("change", (ev) => {
+      if (ev.target.matches("input[type='number']")) {
+        if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
+      }
+    }, true);
+
+    // Gestion des onglets
+    const html = $(this.element);
+    const activeTab = this._currentTab ?? "attributs";
+    html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".tab[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+      const tab = e.currentTarget.dataset.tab;
+      if (!tab) return;
+      this._currentTab = tab;
+      html.find(".sheet-tabs .item").removeClass("active");
+      e.currentTarget.classList.add("active");
+      html.find(".tab").removeClass("active");
+      html.find(`.tab[data-tab="${tab}"]`).addClass("active");
+    });
+
     if (!this.isEditable) return;
     html.find(".item-create").click(async (e) => {
       e.preventDefault();

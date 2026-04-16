@@ -151,12 +151,13 @@ Hooks.once("init", () => {
   };
 
   // ── Feuilles ────────────────────────────────────────────────────────────
-  const _Actors   = foundry.documents.collections.Actors;
-  const _Items    = foundry.documents.collections.Items;
-  const _ActorSheet = foundry.appv1.sheets.ActorSheet;
-  const _ItemSheet  = foundry.appv1.sheets.ItemSheet;
+  const _Actors = foundry.documents.collections.Actors;
+  const _Items  = foundry.documents.collections.Items;
 
-  _Actors.unregisterSheet("core", _ActorSheet);
+  // Désenregistrer les feuilles par défaut (v1 et v2) avant d'enregistrer les nôtres
+  try { _Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet); } catch { /* ignoré si absent */ }
+  try { _Actors.unregisterSheet("core", foundry.applications.sheets.ActorSheetV2); } catch { /* ignoré si absent */ }
+
   _Actors.registerSheet("agone", PersonnageSheet, {
     types: ["personnage"], makeDefault: true,
     label: "AGONE.FeuillePersonnage"
@@ -174,7 +175,8 @@ Hooks.once("init", () => {
     label: "AGONE.FeuillePnj"
   });
 
-  _Items.unregisterSheet("core", _ItemSheet);
+  try { _Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet); } catch { /* ignoré si absent */ }
+  try { _Items.unregisterSheet("core", foundry.applications.sheets.ItemSheetV2); } catch { /* ignoré si absent */ }
   _Items.registerSheet("agone", AgoneItemSheet, {
     makeDefault: true,
     label: "AGONE.FeuilleItem"

@@ -12,26 +12,26 @@ import { BIENFAITS_PERFIDIE_DATA, AVANTAGES_DATA, AVANTAGES_EFFETS } from "../he
 
 /**
  * Feuille de personnage Agone (Personnage Joueur)
- * Utilise l'API ActorSheet standard (compatible v12/v13)
+ * API ApplicationV2 / ActorSheetV2 — compatible Foundry 14
  */
-export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
+export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["agone", "sheet", "actor", "personnage"],
+  static DEFAULT_OPTIONS = {
+    classes: ["agone", "sheet", "actor", "personnage"],
+    position: { width: 870, height: 800 },
+    window: { resizable: true },
+  };
+
+  static PARTS = {
+    form: {
       template: "systems/agone/templates/actors/personnage-sheet.hbs",
-      width: 870,
-      height: 800,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributs" }],
-      scrollY: [".sheet-body"],
-      dragDrop: [{ dragSelector: ".item-list .item", dropSelector: null }]
-    });
-  }
+      scrollable: [".sheet-body"],
+    },
+  };
 
   /** @override */
-  async getData(options = {}) {
-    const context = await super.getData(options);
+  async _prepareContext(options) {
+    const context = {};
     const actor    = this.actor;
     const system   = actor.system;
 
@@ -672,42 +672,55 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
   /**
    * @override
-   * Conserve le focus sur le champ actif après re-render (évite que l'éditeur
-   * ProseMirror de l'onglet Identité ne vole le focus lors de la sauvegarde).
+   * Sauvegarde le nom du champ focalisé AVANT le re-render pour le restaurer après.
    */
-  async _render(force, options) {
-    // Mémoriser le champ focalisé AVANT le re-render
+  async _renderHTML(context, options) {
     const focused = document.activeElement;
-    const isOurInput = this.element?.[0]?.contains(focused) &&
+    const isOurInput = this.element?.contains(focused) &&
       ["INPUT", "SELECT", "TEXTAREA"].includes(focused?.tagName ?? "");
-    const focusedName = isOurInput ? (focused.name || null) : null;
+    this._pendingFocusName = isOurInput ? (focused.name || null) : null;
+    return super._renderHTML(context, options);
+  }
 
-    await super._render(force, options);
+  /** @override */
+  _onRender(context, options) {
+    super._onRender(context, options);
 
-    // Restaurer le focus si un champ nommé de la fiche l'avait
-    if (focusedName) {
+    // Restaurer le focus après re-render
+    if (this._pendingFocusName) {
+      const name = this._pendingFocusName;
+      this._pendingFocusName = null;
       requestAnimationFrame(() => {
-        const el = this.form?.querySelector(`[name="${CSS.escape(focusedName)}"]`);
+        const el = this.element.querySelector(`[name="${CSS.escape(name)}"]`);
         if (el) el.focus();
       });
     }
-  }
 
-  /** @override */
-  async _onSubmit(event, options = {}) {
-    // Convertir les inputs type="number" vides en "0" avant que FormDataExtended
-    // ne les lise comme NaN (valueAsNumber d'un champ vide = NaN).
-    if (this.form) {
-      this.form.querySelectorAll("input[type='number']").forEach(el => {
-        if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
-      });
-    }
-    return super._onSubmit(event, options);
-  }
+    // Normaliser les inputs numériques vides avant la sauvegarde automatique V2
+    this.element.addEventListener("change", (ev) => {
+      if (ev.target.matches("input[type='number']")) {
+        if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
+      }
+    }, true);
 
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+    // Gestion des onglets (remplace le système Tabs de l'API v1)
+    const html = $(this.element);
+    const activeTab = this._currentTab ?? "attributs";
+    html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".tab[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+      const tab = e.currentTarget.dataset.tab;
+      if (!tab) return;
+      this._currentTab = tab;
+      html.find(".sheet-tabs .item").removeClass("active");
+      e.currentTarget.classList.add("active");
+      html.find(".tab").removeClass("active");
+      html.find(`.tab[data-tab="${tab}"]`).addClass("active");
+    });
 
     // Sections dépliables
     html.find(".section-toggle").click(this._onToggleSection.bind(this));
@@ -1978,7 +1991,7 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
 
   async _onArmureMalusChange(event) {
     // Déclenche la mise à jour pour recalculer malusPer
-    const form = this.element.find("form");
+    const form = $(this.element).find("form");
     const malusAgi = parseInt(form.find("[name='system.armure.malusAgi']").val()) || 0;
     const type     = form.find("[name='system.armure.type']").val();
     let malusPer = 0;
@@ -2154,14 +2167,18 @@ export class PersonnageSheet extends foundry.appv1.sheets.ActorSheet {
     await this.actor.update(update);
   }
 
-  // ── Drop d'un item de type peuple ──────────────────────────────────────
+  // ── Drop d'un item de type peuple (API V2) ────────────────────────────
   /** @override */
-  async _onDropItem(event, data) {
-    const item = await Item.fromDropData(data);
-    if (!item || item.type !== "peuple") {
-      return super._onDropItem(event, data);
+  async _onDrop(event) {
+    const data = TextEditor.getDragEventData(event);
+    if (data?.type === "Item") {
+      const item = await Item.fromDropData(data);
+      if (item?.type === "peuple") {
+        await this._applyPeuple(item);
+        return;
+      }
     }
-    await this._applyPeuple(item);
+    return super._onDrop(event);
   }
 
   async _applyPeuple(peupleItem) {

@@ -1,26 +1,36 @@
 /**
- * Feuille d'item générique – gère tous les types d'items Agone.
+ * Feuille d'item générique — API ApplicationV2 / ItemSheetV2
  */
-export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
+export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
   static get MAGIC_TYPE_DEFAULTS() {
     return ["jorniste", "obscurantiste", "eclipsiste", "accord", "cyse", "decorum", "geste"];
   }
 
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["agone", "sheet", "item"],
-      width: 520,
-      height: 480,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
-    });
+  static DEFAULT_OPTIONS = {
+    classes: ["agone", "sheet", "item"],
+    position: { width: 520, height: 480 },
+    window: { resizable: true },
+  };
+
+  // Le template est dynamique selon le type d'item, défini dans _prepareContext
+  static PARTS = {
+    form: {
+      template: "systems/agone/templates/items/competence-sheet.hbs", // fallback par défaut
+      scrollable: [".sheet-body"],
+    },
+  };
+
+  /** @override — retourne le bon template selon le type d'item */
+  async _preparePartContext(partId, context, options) {
+    const ctx = await super._preparePartContext(partId, context, options);
+    if (partId === "form") {
+      ctx.template = `systems/agone/templates/items/${this.item.type}-sheet.hbs`;
+    }
+    return ctx;
   }
 
-  get template() {
-    return `systems/agone/templates/items/${this.item.type}-sheet.hbs`;
-  }
-
-  async getData(options = {}) {
-    const context = await super.getData(options);
+  async _prepareContext(options) {
+    const context = {};
     context.system = this.item.system;
     context.item   = this.item;
     context.config = CONFIG.AGONE;
@@ -63,24 +73,44 @@ export class AgoneItemSheet extends foundry.appv1.sheets.ItemSheet {
   }
 
   /** @override */
-  async _onSubmit(event, options = {}) {
-    if (this.form) {
-      this.form.querySelectorAll("input[type='number']").forEach(el => {
-        if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
-      });
+  _onRender(context, options) {
+    super._onRender(context, options);
 
-      if (this.item.type === "sort") {
-        const typeMagieInput = this.form.querySelector("input[name='system.typeMagie']");
-        if (typeMagieInput) {
-          typeMagieInput.value = typeMagieInput.value.trim().toLowerCase();
-        }
+    // Normaliser les inputs numériques vides
+    this.element.addEventListener("change", (ev) => {
+      if (ev.target.matches("input[type='number']")) {
+        if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
-    }
-    return super._onSubmit(event, options);
-  }
+    }, true);
 
-  activateListeners(html) {
-    super.activateListeners(html);
+    // Normaliser typeMagie en minuscule
+    if (this.item.type === "sort") {
+      this.element.addEventListener("change", (ev) => {
+        if (ev.target.matches("input[name='system.typeMagie']")) {
+          ev.target.value = ev.target.value.trim().toLowerCase();
+        }
+      });
+    }
+
+    // Gestion des onglets
+    const html = $(this.element);
+    const activeTab = this._currentTab ?? "description";
+    html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".tab[data-tab]").each((_, el) => {
+      el.classList.toggle("active", el.dataset.tab === activeTab);
+    });
+    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+      const tab = e.currentTarget.dataset.tab;
+      if (!tab) return;
+      this._currentTab = tab;
+      html.find(".sheet-tabs .item").removeClass("active");
+      e.currentTarget.classList.add("active");
+      html.find(".tab").removeClass("active");
+      html.find(`.tab[data-tab="${tab}"]`).addClass("active");
+    });
+
     // Bouton "envoyer en chat"
     html.find("[data-action='toChat']").click(async (e) => {
       e.preventDefault();

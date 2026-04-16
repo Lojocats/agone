@@ -901,5 +901,28 @@
       "SortAjoute":               "{nom} added to {acteur}.",
       "AucunDanseurDisponible":   "{acteur} has no dancer available to cast this emprise spell."
     }
+  },
+
+  "TYPES": {
+    "Actor": {
+      "personnage": "Character",
+      "compagnon":  "Companion",
+      "demon":      "Demon",
+      "pnj":        "NPC"
+    },
+    "Item": {
+      "competence":  "Skill",
+      "arme":        "Weapon",
+      "armure":      "Armor",
+      "don":         "Advantage / Flaw",
+      "sort":        "Spell",
+      "equipement":  "Equipment",
+      "pouvoir":     "Flame Power",
+      "manoeuvre":   "Maneuver",
+      "peuple":      "People",
+      "danseur":     "Dancer",
+      "demon":       "Demon (item)",
+      "peine":       "Perfidie Penance"
+    }
   }
 }

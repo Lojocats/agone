@@ -911,5 +911,28 @@
       "SortAjoute":               "{nom} ajouté à {acteur}.",
       "AucunDanseurDisponible":   "{acteur} n'a aucun danseur disponible pour lancer ce sort d'emprise."
     }
+  },
+
+  "TYPES": {
+    "Actor": {
+      "personnage": "Personnage",
+      "compagnon":  "Compagnon",
+      "demon":      "Démon",
+      "pnj":        "PNJ"
+    },
+    "Item": {
+      "competence":  "Compétence",
+      "arme":        "Arme",
+      "armure":      "Armure",
+      "don":         "Avantage / Défaut",
+      "sort":        "Sort",
+      "equipement":  "Équipement",
+      "pouvoir":     "Pouvoir de Flamme",
+      "manoeuvre":   "Manouvre",
+      "peuple":      "Peuple",
+      "danseur":     "Danseur",
+      "demon":       "Démon (item)",
+      "peine":       "Peine de Perfidie"
+    }
   }
 }
