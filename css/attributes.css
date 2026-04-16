@@ -17,6 +17,10 @@
   gap: 10px;
   flex-wrap: wrap;
 }
+/* En mode level-up, les aspects occupent toute la largeur de la grille */
+.agone .aspects-section:has(.levelup-btn) {
+  grid-column: 1 / -1;
+}
 .agone .aspect-block {
   flex: 1;
   min-width: 120px;

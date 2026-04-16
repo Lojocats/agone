@@ -168,9 +168,26 @@
   font-weight: 600;
 }
 
+/* ── Layout flex V2 : scroll interne au sheet-body ──────── */
+/* Scope sur .sheet uniquement pour ne pas affecter les browsers */
+.application.agone.sheet .window-content {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.application.agone.sheet .window-content > form.sheet {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 /* ── Corps de feuille ────────────────────────────────────── */
 .agone .sheet-body {
   padding: 10px 14px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
