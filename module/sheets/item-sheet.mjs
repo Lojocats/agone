@@ -20,13 +20,15 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     },
   };
 
-  /** @override — retourne le bon template selon le type d'item */
-  async _preparePartContext(partId, context, options) {
-    const ctx = await super._preparePartContext(partId, context, options);
-    if (partId === "form") {
-      ctx.template = `systems/agone/templates/items/${this.item.type}-sheet.hbs`;
-    }
-    return ctx;
+  /** @override — template dynamique selon le type d'item */
+  async _renderHTML(context, options) {
+    const template = `systems/agone/templates/items/${this.item.type}-sheet.hbs`;
+    const html = await renderTemplate(template, context);
+    const el = document.createElement("div");
+    el.innerHTML = html;
+    const partNode = el.firstElementChild ?? el;
+    partNode.setAttribute("data-application-part", "form");
+    return { form: partNode };
   }
 
   async _prepareContext(options) {
@@ -72,23 +74,40 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     return context;
   }
 
+  /** @override — sauvegarde/restaure le scroll autour du remplacement DOM */
+  _replaceHTML(result, content, options) {
+    const scrollEl = content.querySelector(".sheet-body");
+    const savedScroll = scrollEl ? scrollEl.scrollTop : 0;
+    super._replaceHTML(result, content, options);
+    if (savedScroll > 0) {
+      const newScrollEl = content.querySelector(".sheet-body");
+      if (newScrollEl) newScrollEl.scrollTop = savedScroll;
+    }
+  }
+
   /** @override */
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Normaliser les inputs numériques vides
-    this.element.addEventListener("change", (ev) => {
-      if (ev.target.matches("input[type='number']")) {
-        if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
-      }
-    }, true);
-
-    // Normaliser typeMagie en minuscule
-    if (this.item.type === "sort") {
-      this.element.addEventListener("change", (ev) => {
-        if (ev.target.matches("input[name='system.typeMagie']")) {
-          ev.target.value = ev.target.value.trim().toLowerCase();
+    // ── Sauvegarde automatique de tous les champs nommés ─────────────────
+    // Le form est remplacé à chaque render donc ce listener ne s'accumule pas.
+    const form = this.element.querySelector("form");
+    if (form) {
+      form.addEventListener("change", async (ev) => {
+        const el = ev.target;
+        if (!el.name) return;
+        // Normaliser nombres
+        if (el.type === "number") {
+          if (el.value === "" || isNaN(Number(el.value))) el.value = "0";
         }
+        // Normaliser typeMagie
+        if (el.name === "system.typeMagie") {
+          el.value = el.value.trim().toLowerCase();
+        }
+        const value = el.type === "checkbox" ? el.checked
+                    : el.type === "number"   ? Number(el.value)
+                    : el.value;
+        await this.item.update(foundry.utils.expandObject({ [el.name]: value }));
       });
     }
 

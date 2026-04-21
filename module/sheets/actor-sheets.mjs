@@ -6,6 +6,7 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
     classes: ["agone", "sheet", "actor", "compagnon"],
     position: { width: 720, height: 650 },
     window: { resizable: true },
+    form: { submitOnChange: true },
   };
 
   static PARTS = {
@@ -55,12 +56,28 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Normaliser les inputs numériques vides
+    // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, true);
+
+    // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
+    const _actorForm = this.element.querySelector("form");
+    if (_actorForm) {
+      _actorForm.addEventListener("change", async (ev) => {
+        const el = ev.target;
+        if (!el.name) return;
+        if (el.classList.contains("inline-edit")) return;
+        if (el.classList.contains("arme-equipe")) return;
+        if (el.classList.contains("armure-portee")) return;
+        const value = el.type === "checkbox" ? el.checked
+                    : el.type === "number"   ? Number(el.value)
+                    : el.value;
+        await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
+      });
+    }
 
     // Gestion des onglets
     const html = $(this.element);
@@ -198,6 +215,7 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
     classes: ["agone", "sheet", "actor", "demon"],
     position: { width: 700, height: 650 },
     window: { resizable: true },
+    form: { submitOnChange: true },
   };
 
   static PARTS = {
@@ -266,12 +284,28 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Normaliser les inputs numériques vides
+    // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, true);
+
+    // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
+    const _actorForm = this.element.querySelector("form");
+    if (_actorForm) {
+      _actorForm.addEventListener("change", async (ev) => {
+        const el = ev.target;
+        if (!el.name) return;
+        if (el.classList.contains("inline-edit")) return;
+        if (el.classList.contains("arme-equipe")) return;
+        if (el.classList.contains("armure-portee")) return;
+        const value = el.type === "checkbox" ? el.checked
+                    : el.type === "number"   ? Number(el.value)
+                    : el.value;
+        await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
+      });
+    }
 
     // Gestion des onglets
     const html = $(this.element);
@@ -393,6 +427,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
     classes: ["agone", "sheet", "actor", "pnj"],
     position: { width: 750, height: 700 },
     window: { resizable: true },
+    form: { submitOnChange: true },
   };
 
   static PARTS = {
@@ -521,12 +556,28 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Normaliser les inputs numériques vides
+    // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, true);
+
+    // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────────
+    const _actorForm = this.element.querySelector("form");
+    if (_actorForm) {
+      _actorForm.addEventListener("change", async (ev) => {
+        const el = ev.target;
+        if (!el.name) return;
+        if (el.classList.contains("inline-edit")) return;
+        if (el.classList.contains("arme-equipe")) return;
+        if (el.classList.contains("armure-portee")) return;
+        const value = el.type === "checkbox" ? el.checked
+                    : el.type === "number"   ? Number(el.value)
+                    : el.value;
+        await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
+      });
+    }
 
     // Gestion des onglets
     const html = $(this.element);

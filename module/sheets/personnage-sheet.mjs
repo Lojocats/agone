@@ -20,6 +20,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     classes: ["agone", "sheet", "actor", "personnage"],
     position: { width: 870, height: 800 },
     window: { resizable: true },
+    form: { submitOnChange: true },
   };
 
   static PARTS = {
@@ -696,12 +697,33 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       });
     }
 
-    // Normaliser les inputs numériques vides avant la sauvegarde automatique V2
+    // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, true);
+
+    // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
+    const _actorForm = this.element.querySelector("form");
+    if (_actorForm) {
+      _actorForm.addEventListener("change", async (ev) => {
+        const el = ev.target;
+        if (!el.name) return;
+        // Champs gérés par handlers spécialisés (items ou calculs dérivés)
+        if (el.classList.contains("inline-edit")) return;
+        if (el.classList.contains("arme-equipe")) return;
+        if (el.classList.contains("armure-portee")) return;
+        if (el.classList.contains("danseur-inline-num")) return;
+        if (el.classList.contains("demon-inline-num")) return;
+        // Ces champs ont des handlers spécialisés qui recalculent des dérivées
+        if (["system.armure.portee", "system.armure.malusAgi", "system.armure.type"].includes(el.name)) return;
+        const value = el.type === "checkbox" ? el.checked
+                    : el.type === "number"   ? Number(el.value)
+                    : el.value;
+        await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
+      });
+    }
 
     // Gestion des onglets (remplace le système Tabs de l'API v1)
     const html = $(this.element);
