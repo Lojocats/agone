@@ -284,8 +284,13 @@ Hooks.once("ready", async () => {
   // ── Météo → Scène ───────────────────────────────────────────────────────
   /**
    * Applique l'effet météo et la luminosité à la scène active.
-   * Seul le GM peut modifier la scène.
+   * Utilise FXMaster si disponible (particules + filtres riches),
+   * sinon fallback sur le weather natif Foundry V14.
    */
+
+  // IDs des effets FXMaster actuellement actifs (pour les arrêter avant d'en appliquer de nouveaux)
+  let _agoneWeatherFxIds = null;
+
   async function _applyWeatherToScene() {
     if (!game.user.isGM) return;
     const scene = canvas.scene;
@@ -295,46 +300,126 @@ Hooks.once("ready", async () => {
     const date    = game.settings.get("agone", "calendrierDate") ?? { heure: 8, minute: 0 };
     const heure   = date.heure ?? 8;
 
-    // ── Effets de particules (weather) ──────────────────────────────────
-    // Foundry V14 : scene.weather est une chaîne de l'id d'effet SpecialEffect
-    const WEATHER_EFFECTS = {
-      "":           "",
-      "ensoleille": "",
-      "nuageux":    "",
-      "pluie":      "rain",
-      "orage":      "rainstorm",
-      "brouillard": "fog",
-      "neige":      "snow",
-    };
-    const weatherEffect = WEATHER_EFFECTS[meteoId] ?? "";
-
-    // ── Luminosité selon météo + heure ───────────────────────────────────
-    // Calcule un niveau de luminosité globale (0.0–1.0) pour l'éclairage ambiant
+    // ── Luminosité selon heure + météo ──────────────────────────────────
     let brightness;
-    if      (heure >= 22 || heure < 5)  brightness = 0.0;   // nuit
-    else if (heure >= 20)               brightness = 0.15;  // crépuscule tardif
-    else if (heure >= 18)               brightness = 0.35;  // coucher soleil
-    else if (heure >= 6 && heure < 8)   brightness = 0.45;  // lever soleil
-    else                                brightness = 0.75;  // journée
+    if      (heure >= 22 || heure < 5)  brightness = 0.0;
+    else if (heure >= 20)               brightness = 0.15;
+    else if (heure >= 18)               brightness = 0.35;
+    else if (heure >= 6 && heure < 8)   brightness = 0.45;
+    else                                brightness = 0.75;
 
-    // Modificateurs météo
     const METEO_BRIGHTNESS = {
-      "ensoleille": +0.15,
-      "nuageux":    -0.10,
-      "pluie":      -0.15,
-      "orage":      -0.25,
-      "brouillard": -0.20,
-      "neige":      -0.05,
-      "":            0,
+      "ensoleille":   +0.15, "nuageux":     -0.10, "pluie":       -0.15,
+      "orage":        -0.25, "brouillard":  -0.20, "neige":       -0.05,
+      "grele":        -0.20, "blizzard":    -0.30, "chaleur":     +0.20,
+      "nuit":         -0.05, "automne":     -0.05, "cendres":     -0.30,
+      "brumechaleur": +0.05, "": 0,
     };
     brightness = Math.max(0, Math.min(1, brightness + (METEO_BRIGHTNESS[meteoId] ?? 0)));
 
-    const updateData = {
-      weather: weatherEffect,
-      "environment.globalLight.luminosity": brightness,
-    };
+    // ── FXMaster (si le module est actif) ────────────────────────────────
+    const hasFXMaster = game.modules.get("fxmaster")?.active && typeof FXMASTER !== "undefined";
 
-    await scene.update(updateData);
+    if (hasFXMaster) {
+      // Arrêter les effets précédents proprement
+      if (_agoneWeatherFxIds) {
+        try {
+          await FXMASTER.api.effects.stop({ ..._agoneWeatherFxIds, skipFading: false });
+        } catch { /* ignore si déjà disparu */ }
+        _agoneWeatherFxIds = null;
+      }
+
+      // Définition des effets FXMaster par météo
+      // Particules disponibles : autumnleaves, bats, birds, bubbles, clouds, crows,
+      //   eagles, embers, fog, hail, rain, rats, snow, snowstorm, spiders, stars
+      // Filtres disponibles    : bloom, color, fog, lightning, oldfilm, predator, underwater
+      const METEO_FX = {
+        "ensoleille": [
+          { kind: "filter", type: "color", options: { color: { value: "#fff0cc", apply: true }, saturation: 1.05, contrast: 1.02 } },
+        ],
+        "nuageux": [
+          { kind: "particle", type: "clouds", options: { scale: 1.0, density: 0.08, speed: 0.5, alpha: 0.45 } },
+          { kind: "filter",   type: "color",  options: { color: { value: "#c8d4de", apply: true }, saturation: 0.85 } },
+        ],
+        "pluie": [
+          { kind: "particle", type: "rain",  options: { direction: 90, density: 0.15, speed: 1.2 } },
+          { kind: "filter",   type: "color", options: { color: { value: "#90aec0", apply: true }, saturation: 0.75 } },
+        ],
+        "orage": [
+          { kind: "particle", type: "rain",      options: { direction: 95, density: 0.35, speed: 1.8 } },
+          { kind: "filter",   type: "lightning", options: {} },
+          { kind: "filter",   type: "color",     options: { color: { value: "#6680a0", apply: true }, saturation: 0.6 } },
+        ],
+        "brouillard": [
+          { kind: "particle", type: "fog",   options: { scale: 1.2, density: 0.12, speed: 0.4, alpha: 0.55 } },
+          { kind: "filter",   type: "color", options: { color: { value: "#a8b8c0", apply: true }, saturation: 0.65 } },
+        ],
+        "neige": [
+          { kind: "particle", type: "snow",  options: { direction: 90, density: 0.12, speed: 0.9 } },
+          { kind: "filter",   type: "color", options: { color: { value: "#d8eaff", apply: true }, saturation: 0.8 } },
+        ],
+        "grele": [
+          { kind: "particle", type: "hail",   options: { direction: 92, density: 0.20, speed: 1.6 } },
+          { kind: "particle", type: "clouds", options: { scale: 0.9, density: 0.06, speed: 0.6, alpha: 0.5 } },
+          { kind: "filter",   type: "color",  options: { color: { value: "#9eb8cc", apply: true }, saturation: 0.7 } },
+        ],
+        "blizzard": [
+          { kind: "particle", type: "snowstorm", options: { direction: 95, density: 0.30, speed: 2.0 } },
+          { kind: "filter",   type: "color",     options: { color: { value: "#c0d8f0", apply: true }, saturation: 0.5 } },
+        ],
+        "chaleur": [
+          { kind: "filter", type: "color", options: { color: { value: "#ffcc88", apply: true }, saturation: 1.1, contrast: 1.05 } },
+          { kind: "filter", type: "bloom", options: { blur: 3, bloomScale: 1.3, threshold: 0.35 } },
+        ],
+        "nuit": [
+          { kind: "particle", type: "stars", options: { scale: 0.8, density: 0.12, alpha: 0.85 } },
+          { kind: "filter",   type: "color", options: { color: { value: "#1a2040", apply: true }, saturation: 0.6 } },
+        ],
+        "automne": [
+          { kind: "particle", type: "autumnleaves", options: { direction: 88, density: 0.10, speed: 0.7 } },
+          { kind: "filter",   type: "color",        options: { color: { value: "#d4a870", apply: true }, saturation: 1.1 } },
+        ],
+        "cendres": [
+          { kind: "particle", type: "embers", options: { density: 0.15, speed: 0.6, alpha: 0.7, tint: { value: "#808080", apply: true } } },
+          { kind: "filter",   type: "color",  options: { color: { value: "#887060", apply: true }, saturation: 0.4 } },
+        ],
+        "brumechaleur": [
+          { kind: "filter", type: "predator", options: {} },
+          { kind: "filter", type: "color",    options: { color: { value: "#e8c890", apply: true }, saturation: 0.9 } },
+        ],
+      };
+
+      const fxEffects = METEO_FX[meteoId];
+      if (fxEffects?.length) {
+        try {
+          _agoneWeatherFxIds = await FXMASTER.api.effects.play({ effects: fxEffects });
+        } catch (e) {
+          console.warn("Agone | FXMaster weather play failed:", e);
+        }
+      }
+
+      // FXMaster gère les particules → on vide le weather natif, on pose la luminosité
+      await scene.update({
+        weather: "",
+        "environment.globalLight.luminosity": brightness,
+      });
+      return;
+    }
+
+    // ── Fallback : weather natif Foundry V14 ─────────────────────────────
+    const WEATHER_EFFECTS = {
+      "": "", "ensoleille": "", "nuageux": "",
+      "pluie": "rain", "orage": "rainstorm",
+      "brouillard": "fog", "neige": "snow",
+      "grele": "rain", "blizzard": "snow",
+      "chaleur": "", "nuit": "",
+      "automne": "", "cendres": "",
+      "brumechaleur": "",
+    };
+    await scene.update({
+      weather: WEATHER_EFFECTS[meteoId] ?? "",
+      "environment.globalLight.luminosity": brightness,
+    });
   }
 
   // Re-rendu du widget à chaque changement de setting calendrier, météo ou thème

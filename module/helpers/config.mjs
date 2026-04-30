@@ -180,13 +180,20 @@ AGONE.saisons = {
 
 // ── Météo ────────────────────────────────────────────────────────────────────
 AGONE.meteoTypes = [
-  { id: "",          icon: "—",  label: "—"               },
-  { id: "ensoleille",icon: "☀️", label: "Ensoleillé"      },
-  { id: "nuageux",   icon: "⛅", label: "Nuageux"         },
-  { id: "pluie",     icon: "🌧️", label: "Pluie"           },
-  { id: "orage",     icon: "⛈️", label: "Orage"           },
-  { id: "brouillard",icon: "🌫️", label: "Brouillard"      },
-  { id: "neige",     icon: "❄️", label: "Neige"           },
+  { id: "",           icon: "—",  label: "—"                    },
+  { id: "ensoleille", icon: "☀️", label: "Ensoleillé"            },
+  { id: "nuageux",    icon: "⛅", label: "Nuageux"               },
+  { id: "pluie",      icon: "🌧️", label: "Pluie"                 },
+  { id: "orage",      icon: "⛈️", label: "Orage"                 },
+  { id: "brouillard", icon: "🌫️", label: "Brouillard"             },
+  { id: "neige",      icon: "❄️", label: "Neige"                 },
+  { id: "grele",      icon: "🌨️", label: "Grêle"                 },
+  { id: "blizzard",   icon: "🌪️", label: "Blizzard"              },
+  { id: "chaleur",    icon: "🔆", label: "Chaleur accablante"    },
+  { id: "nuit",       icon: "🌙", label: "Nuit étoilée"           },
+  { id: "automne",    icon: "🍂", label: "Vent d'automne"         },
+  { id: "cendres",    icon: "🌋", label: "Pluie de cendres"       },
+  { id: "brumechaleur",icon: "🌅",label: "Brume de chaleur"       },
 ];
 
 // ── Phases de lune (cycle 28 jours) ─────────────────────────────────────────
