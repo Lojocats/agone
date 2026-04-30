@@ -281,11 +281,70 @@ Hooks.once("ready", async () => {
   // Applique le thème au démarrage
   _applyAgoneTheme(game.settings.get("agone", "agoneTheme"));
 
+  // ── Météo → Scène ───────────────────────────────────────────────────────
+  /**
+   * Applique l'effet météo et la luminosité à la scène active.
+   * Seul le GM peut modifier la scène.
+   */
+  async function _applyWeatherToScene() {
+    if (!game.user.isGM) return;
+    const scene = canvas.scene;
+    if (!scene) return;
+
+    const meteoId = game.settings.get("agone", "calendrierMeteo") ?? "";
+    const date    = game.settings.get("agone", "calendrierDate") ?? { heure: 8, minute: 0 };
+    const heure   = date.heure ?? 8;
+
+    // ── Effets de particules (weather) ──────────────────────────────────
+    // Foundry V14 : scene.weather est une chaîne de l'id d'effet SpecialEffect
+    const WEATHER_EFFECTS = {
+      "":           "",
+      "ensoleille": "",
+      "nuageux":    "",
+      "pluie":      "rain",
+      "orage":      "rainstorm",
+      "brouillard": "fog",
+      "neige":      "snow",
+    };
+    const weatherEffect = WEATHER_EFFECTS[meteoId] ?? "";
+
+    // ── Luminosité selon météo + heure ───────────────────────────────────
+    // Calcule un niveau de luminosité globale (0.0–1.0) pour l'éclairage ambiant
+    let brightness;
+    if      (heure >= 22 || heure < 5)  brightness = 0.0;   // nuit
+    else if (heure >= 20)               brightness = 0.15;  // crépuscule tardif
+    else if (heure >= 18)               brightness = 0.35;  // coucher soleil
+    else if (heure >= 6 && heure < 8)   brightness = 0.45;  // lever soleil
+    else                                brightness = 0.75;  // journée
+
+    // Modificateurs météo
+    const METEO_BRIGHTNESS = {
+      "ensoleille": +0.15,
+      "nuageux":    -0.10,
+      "pluie":      -0.15,
+      "orage":      -0.25,
+      "brouillard": -0.20,
+      "neige":      -0.05,
+      "":            0,
+    };
+    brightness = Math.max(0, Math.min(1, brightness + (METEO_BRIGHTNESS[meteoId] ?? 0)));
+
+    const updateData = {
+      weather: weatherEffect,
+      "environment.globalLight.luminosity": brightness,
+    };
+
+    await scene.update(updateData);
+  }
+
   // Re-rendu du widget à chaque changement de setting calendrier, météo ou thème
   Hooks.on("updateSetting", (setting) => {
     const key = setting.key ?? "";
     if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo" || key === "agone.saisonMonde") {
       game.agone.calendrierWidget?.render(true);
+    }
+    if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo") {
+      _applyWeatherToScene();
     }
     if (key === "agone.agoneTheme") {
       _applyAgoneTheme(game.settings.get("agone", "agoneTheme"));
