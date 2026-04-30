@@ -564,6 +564,9 @@
     "SanteLabel0":       "Palier mort (0 PdV)",
     "SanteLabel0Hint":   "Texte au survol quand le personnage est à 0 PdV.",
 
+    "MeteoAutoApply":     "Appliquer la météo à la scène",
+    "MeteoAutoApplyHint": "Si activé, chaque changement de météo ou d'heure dans le calendrier applique automatiquement les effets visuels (particules, filtres, luminosité) sur la scène active.",
+
     "SaisonMonde":      "Saison du Monde",
     "SaisonMondeHint":  "La saison actuelle d'Harmonde. Les personnages dont la saison correspond gagnent +1 à tous leurs jets.",
     "SaisonPerso":      "Saison personnelle",

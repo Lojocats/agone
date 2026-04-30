@@ -99,6 +99,16 @@ Hooks.once("init", () => {
     type: String,
     default: "",
   });
+  // ── Application automatique de la météo sur la scène ───────────────────
+  game.settings.register("agone", "meteoAutoApply", {
+    name: "AGONE.MeteoAutoApply",
+    hint: "AGONE.MeteoAutoApplyHint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+  });
+
   // ── Thème visuel (clair / sombre, par joueur) ─────────────────────────────
   game.settings.register("agone", "agoneTheme", {
     scope: "client", config: false,
@@ -293,6 +303,7 @@ Hooks.once("ready", async () => {
 
   async function _applyWeatherToScene() {
     if (!game.user.isGM) return;
+    if (!game.settings.get("agone", "meteoAutoApply")) return;
     const scene = canvas.scene;
     if (!scene) return;
 
