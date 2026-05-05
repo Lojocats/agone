@@ -164,6 +164,27 @@
   border: none;
 }
 /* Description du sort */
+.agone-roll-card .roll-sort-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+.agone-roll-card .sort-meta-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(93,58,30,0.1);
+  border: 1px solid rgba(93,58,30,0.2);
+  color: var(--agone-brown);
+  white-space: nowrap;
+}
+.agone-roll-card .sort-meta-badge.sort-type {
+  background: rgba(201,162,39,0.15);
+  border-color: rgba(201,162,39,0.4);
+  font-weight: 600;
+  text-transform: capitalize;
+}
 .agone-roll-card .roll-sort-desc-content {
   padding: 6px 8px;
   font-size: 11px;

@@ -1012,7 +1012,15 @@ export class AgoneActor extends Actor {
       resultat: succes ? "✔ Succès" : "✘ Échec",
       modif:    `Bonus/Malus : ${modif}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    }, { description: sort.system.description ?? "" });
+    }, {
+      description: sort.system.description ?? "",
+      sortMeta: {
+        typeMagie: sort.system.typeMagie ?? "",
+        portee:    sort.system.portee    ?? "",
+        duree:     sort.system.duree     ?? "",
+        danse:     sort.system.danse     ?? "",
+      }
+    });
     return roll;
   }
 
@@ -1070,7 +1078,15 @@ export class AgoneActor extends Actor {
       aptTotal:  { label: "Total Emprise",  value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",  value: modif >= 0 ? `+${modif}` : modif },
-    }, { description: sortData.description ?? "" });
+    }, {
+      description: sortData.description ?? "",
+      sortMeta: {
+        typeMagie: sortData.typeMagie ?? "",
+        portee:    sortData.portee    ?? "",
+        duree:     sortData.duree     ?? "",
+        danse:     sortData.danse     ?? "",
+      }
+    });
 
     await danseur.update({ "system.enduranceActuelle": newEnd });
     return roll;
@@ -1424,7 +1440,8 @@ export class AgoneActor extends Actor {
         actorId:       this.id,
         arme:          extra.arme ?? null,
         typeJetCombat: extra.typeJet ?? null,
-        description:   extra.description || null
+        description:   extra.description || null,
+        sortMeta:      extra.sortMeta     || null
       }
     );
 

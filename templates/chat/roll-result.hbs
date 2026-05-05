@@ -47,6 +47,15 @@
   </div>
   {{/if}}
 
+  {{#if sortMeta}}
+  <div class="roll-sort-meta">
+    {{#if sortMeta.typeMagie}}<span class="sort-meta-badge sort-type">{{sortMeta.typeMagie}}</span>{{/if}}
+    {{#if sortMeta.portee}}<span class="sort-meta-badge"><i class="fas fa-location-arrow"></i> {{sortMeta.portee}}</span>{{/if}}
+    {{#if sortMeta.duree}}<span class="sort-meta-badge"><i class="fas fa-hourglass-half"></i> {{sortMeta.duree}}</span>{{/if}}
+    {{#if sortMeta.danse}}<span class="sort-meta-badge"><i class="fas fa-music"></i> {{sortMeta.danse}}</span>{{/if}}
+  </div>
+  {{/if}}
+
   {{#if description}}
   <details class="roll-sort-description">
     <summary><i class="fas fa-book-open"></i> Description du sort</summary>

@@ -220,7 +220,7 @@ export class SortsBrowser extends foundry.applications.api.HandlebarsApplication
           });
           if (!danseurId) return;
         }
-        await this.actor.rollSortImproDanseur(danseurId, { name: d.name, seuil: d.seuil, description: d.description ?? "" });
+        await this.actor.rollSortImproDanseur(danseurId, { name: d.name, seuil: d.seuil, description: d.description ?? "", typeMagie: d.typeMagie ?? "", portee: d.portee ?? "", duree: d.duree ?? "", danse: d.danse ?? "" });
         return;
       }
 

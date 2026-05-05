@@ -1596,7 +1596,15 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       aptTotal:  { label: "Total Emprise",           value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
-    }, { description: sort.system.description ?? "" });
+    }, {
+      description: sort.system.description ?? "",
+      sortMeta: {
+        typeMagie: sort.system.typeMagie ?? "",
+        portee:    sort.system.portee    ?? "",
+        duree:     sort.system.duree     ?? "",
+        danse:     sort.system.danse     ?? "",
+      }
+    });
 
     // Décrémenter l'endurance du danseur
     await danseur.update({ "system.enduranceActuelle": newEnd });
