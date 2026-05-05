@@ -104,7 +104,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     context.danseurs = danseurItems.map(d => {
       const assignedSorts = actor.items
         .filter(s => s.type === "sort" && s.system.danseurNom === d.name)
-        .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie, seuil: s.system.seuil, portee: s.system.portee, duree: s.system.duree, danse: s.system.danse }));
+        .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie, seuil: s.system.seuil, portee: s.system.portee, duree: s.system.duree, danse: s.system.danse, description: s.system.description ?? "" }));
       const sd = d.system;
 
       // Table officielle Agône (colonnes : niv 1–7)
@@ -143,6 +143,8 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
         creaNiveaux,
         ptsDepense, ptsRestants, ptsBudget,
         capaciteSeuil: sd.capaciteSeuil ?? (sd.memoireMax * 5),
+        potentielEmprise: (context.system.aptitudeEmprise ?? 0) + (sd.bonusEmprise ?? 0),
+        potentielImpro: (context.system.creativite?.score ?? 0) + (sd.empathie ?? 0) + (context.system.bonusEsprit ?? 0),
       };
     });
 
@@ -1580,9 +1582,11 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       apt: aptitude, bd: bonusDanseur, modif
     });
     await roll.evaluate();
+    const succes = roll.total >= seuil;
     await this.actor._sendRollToChat(roll, label, {
       sort:      { label: "Sort",  value: sort.name },
       seuil:     { label: "Seuil", value: seuil, tooltip: "Score total à atteindre pour réussir le sort" },
+      resultat:  { label: "Résultat", value: succes ? "✔ Succès" : "✘ Échec" },
       danseur:   { label: "Danseur",                value: danseur.name },
       endurance: { label: "Endurance",              value: `${endBefore} → ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
       empBase:   { label: "Emprise (base)",          value: sd.emprise ?? 0, tooltip: empSourceLabel },
@@ -1592,7 +1596,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       aptTotal:  { label: "Total Emprise",           value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
-    });
+    }, { description: sort.system.description ?? "" });
 
     // Décrémenter l'endurance du danseur
     await danseur.update({ "system.enduranceActuelle": newEnd });

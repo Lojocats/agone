@@ -398,6 +398,19 @@
   color: var(--agone-brown);
   white-space: nowrap;
 }
+.agone .danseur-pot-emp {
+  font-weight: 600;
+  color: var(--agone-gold, #c9a227);
+  border-left: 1px solid rgba(93,58,30,0.25);
+  padding-left: 4px;
+}
+.agone .danseur-pot-impro {
+  font-weight: 600;
+  color: var(--agone-brown);
+  opacity: 0.85;
+  border-left: 1px solid rgba(93,58,30,0.25);
+  padding-left: 4px;
+}
 .agone .danseur-roll-btn {
   background: var(--agone-brown);
   border: 1px solid var(--agone-gold);
@@ -456,18 +469,22 @@
   line-height: inherit;
 }
 .agone .slot-name:hover { color: var(--agone-gold); text-decoration: underline; }
-.agone .slot-desc-toggle {
-  background: transparent;
-  border: none;
-  color: var(--agone-brown);
-  opacity: 0.55;
-  cursor: pointer;
-  padding: 0 2px;
-  font-size: 10px;
-  flex-shrink: 0;
-  line-height: 1;
+.agone .slot-details {
+  margin-top: 2px;
 }
-.agone .slot-desc-toggle:hover { opacity: 1; }
+.agone .slot-details > summary {
+  font-size: 10px;
+  color: var(--agone-brown);
+  opacity: 0.65;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  padding: 1px 2px;
+}
+.agone .slot-details > summary::-webkit-details-marker { display: none; }
+.agone .slot-details > summary::before { content: '▶\00a0'; font-size: 8px; }
+.agone .slot-details[open] > summary::before { content: '▼\00a0'; }
+.agone .slot-details > summary:hover { opacity: 1; }
 .agone .slot-description {
   font-size: 11px;
   color: var(--agone-brown);

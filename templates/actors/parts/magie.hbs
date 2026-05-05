@@ -285,7 +285,9 @@
             <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0">
             /{{d.system.enduranceMax}}
           </span>
-          <span class="danseur-stat" title="Bonus d'Emprise">EMP+{{d.system.bonusEmprise}}</span>
+          <span class="danseur-stat" title="Bonus d'Emprise du danseur">EMP+{{d.system.bonusEmprise}}</span>
+          <span class="danseur-stat danseur-pot-emp" title="Potentiel d'Emprise total avec ce danseur (base + bonus danseur)">Pot.{{d.potentielEmprise}}</span>
+          <span class="danseur-stat danseur-pot-impro" title="Potentiel d'Improvisation (CRÉ + Empathie danseur + Bonus Esprit)">Impro.{{d.potentielImpro}}</span>
           <span class="danseur-stat" title="Empathie">Emp {{d.system.empathie}}</span>
 
           {{/if}}
@@ -347,7 +349,7 @@
             <button type="button" class="slot-name" data-action="rollSortDanseur"
                     data-sort-id="{{s.id}}" data-danseur-id="{{d.id}}"
                     title="Lancer {{s.name}} (End. {{../system.enduranceActuelle}}/{{../system.enduranceMax}})">{{s.name}}</button>
-            <button type="button" class="slot-remove" data-sort-id="{{s.id}}" title="Retirer">x</button>
+          <button type="button" class="slot-remove" data-sort-id="{{s.id}}" title="Retirer">x</button>
           </div>
           <div class="slot-meta">
             {{#if s.seuil}}<span>Seuil : {{s.seuil}}</span>{{/if}}
@@ -355,6 +357,12 @@
             {{#if s.duree}}<span>Durée : {{s.duree}}</span>{{/if}}
             {{#if s.danse}}<span>Incant. : {{s.danse}}</span>{{/if}}
           </div>
+          {{#if s.description}}
+          <details class="slot-details">
+            <summary>Description</summary>
+            <div class="slot-description">{{{s.description}}}</div>
+          </details>
+          {{/if}}
         </div>
         {{/each}}
         {{#unless d.isFull}}

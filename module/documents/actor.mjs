@@ -1012,7 +1012,7 @@ export class AgoneActor extends Actor {
       resultat: succes ? "✔ Succès" : "✘ Échec",
       modif:    `Bonus/Malus : ${modif}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+    }, { description: sort.system.description ?? "" });
     return roll;
   }
 
@@ -1070,7 +1070,7 @@ export class AgoneActor extends Actor {
       aptTotal:  { label: "Total Emprise",  value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",  value: modif >= 0 ? `+${modif}` : modif },
-    });
+    }, { description: sortData.description ?? "" });
 
     await danseur.update({ "system.enduranceActuelle": newEnd });
     return roll;
@@ -1363,11 +1363,16 @@ export class AgoneActor extends Actor {
     const diceLabel  = rollType === "ferme" ? "Dé (fermé)" : "Dé (ouvert)";
 
     // Convertir les détails en tableau {label, value}
-    // Les valeurs sont au format "Label : valeur" ou "texte simple"
+    // Extraire resultat et seuil pour les afficher en permanence
+    const _resultat = details.resultat ?? null;
+    const _seuil    = details.seuil    ?? null;
+    const _filtered = Object.entries(details)
+      .filter(([k]) => k !== "resultat" && k !== "seuil")
+      .map(([, v]) => v);
     const detailsArr = [
       { label: diceLabel, value: diceResult },
-      ...Object.values(details).map(v => {
-        // Accepte soit une chaîne "Label : valeur", soit un objet {label, value, tooltip?}
+      ...(_seuil    ? [typeof _seuil    === "object" ? _seuil    : { label: "Seuil",    value: _seuil    }] : []),
+      ..._filtered.map(v => {
         if (typeof v === "object" && v !== null) return v;
         const idx = v.lastIndexOf(" : ");
         return idx !== -1
@@ -1375,6 +1380,14 @@ export class AgoneActor extends Actor {
           : { label: v, value: "" };
       })
     ];
+
+    // Résultat succès/échec (affiché hors details)
+    const resultatLabel = _resultat
+      ? (typeof _resultat === "object" ? _resultat.value : _resultat)
+      : null;
+    const seuilValue = _seuil
+      ? (typeof _seuil === "object" ? _seuil.value : _seuil)
+      : null;
 
     // Détection fumble (dé = 1) et critique (dé explosé ≥ 10), jets ouverts seulement
     const firstFace  = finalRoll.dice[0]?.results?.[0]?.result ?? null;
@@ -1401,6 +1414,8 @@ export class AgoneActor extends Actor {
         total:         finalRoll.total,
         details:       detailsArr,
         rollType,
+        resultat:      resultatLabel,
+        seuil:         seuilValue,
         isFumble,
         fumblePenalty,
         fumbleTotal:   finalRoll.total - fumblePenalty,
@@ -1408,7 +1423,8 @@ export class AgoneActor extends Actor {
         isCritique,
         actorId:       this.id,
         arme:          extra.arme ?? null,
-        typeJetCombat: extra.typeJet ?? null
+        typeJetCombat: extra.typeJet ?? null,
+        description:   extra.description || null
       }
     );
 

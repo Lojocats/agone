@@ -13,10 +13,13 @@
     <span class="roll-total {{#if isFumble}}fumble-adjusted{{/if}}">
       {{#if fumbleTotal}}{{fumbleTotal}}{{else}}{{total}}{{/if}}
     </span>
+    {{#if seuil}}<span class="roll-seuil">/ {{seuil}}</span>{{/if}}
+    {{#if resultat}}<span class="roll-resultat {{#if (eq resultat "✔ Succès")}}roll-succes{{else}}roll-echec{{/if}}">{{resultat}}</span>{{/if}}
   </div>
 
   {{#if details}}
-  <div class="roll-details">
+  <details class="roll-details">
+    <summary class="roll-details-summary"><i class="fas fa-list-ul"></i> Détails du calcul</summary>
     <table class="roll-breakdown">
       <tbody>
         {{#each details as |detail|}}
@@ -27,7 +30,7 @@
         {{/each}}
       </tbody>
     </table>
-  </div>
+  </details>
   {{/if}}
 
   {{#if isFumble}}
@@ -42,5 +45,12 @@
   <div class="critique-alert">
     <i class="fas fa-star"></i> <strong>{{localize "AGONE.JetCritique"}}</strong>
   </div>
+  {{/if}}
+
+  {{#if description}}
+  <details class="roll-sort-description">
+    <summary><i class="fas fa-book-open"></i> Description du sort</summary>
+    <div class="roll-sort-desc-content">{{{description}}}</div>
+  </details>
   {{/if}}
 </div>

@@ -112,6 +112,66 @@
   color: #1a5a28;
   text-align: center;
 }
+.agone-roll-card .roll-result {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.agone-roll-card .roll-seuil {
+  font-size: 14px;
+  color: var(--agone-brown);
+  opacity: 0.75;
+}
+.agone-roll-card .roll-resultat {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.agone-roll-card .roll-succes {
+  color: #1a6b30;
+  background: rgba(20,100,40,0.1);
+}
+.agone-roll-card .roll-echec {
+  color: #8b1a1a;
+  background: rgba(139,26,26,0.1);
+}
+.agone-roll-card details {
+  margin-top: 5px;
+  border: 1px solid rgba(93,58,30,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.agone-roll-card details > summary {
+  padding: 4px 8px;
+  background: rgba(93,58,30,0.05);
+  font-size: 11px;
+  color: var(--agone-brown);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.agone-roll-card details > summary::-webkit-details-marker { display: none; }
+.agone-roll-card details > summary:hover { background: rgba(93,58,30,0.1); }
+/* Calcul */
+.agone-roll-card .roll-breakdown {
+  margin: 0;
+  border: none;
+}
+/* Description du sort */
+.agone-roll-card .roll-sort-desc-content {
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--agone-brown);
+  line-height: 1.5;
+}
+.agone-roll-card .roll-sort-desc-content p { margin: 0 0 4px; }
+.agone-roll-card .roll-sort-desc-content p:last-child { margin: 0; }
 .agone-roll-card .mega-fumble-pulse {
   animation: mega-fumble-pulse 1.2s ease-in-out infinite;
 }
