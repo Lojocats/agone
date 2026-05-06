@@ -66,13 +66,6 @@
         {{#each avantages as |don|}}
         <li class="don-row item-row" data-item-id="{{don.id}}">
           <span class="item-drag-handle col-drag"><i class="fas fa-grip-vertical"></i></span>
-          {{#if don.system.description}}
-          <button type="button" class="don-desc-toggle btn-icon" data-item-id="{{don.id}}" title="Description">
-            <i class="fas fa-chevron-right don-toggle-icon"></i>
-          </button>
-          {{else}}
-          <span class="don-desc-placeholder"></span>
-          {{/if}}
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}}">{{don._avSectionLabel}}</span>
           {{/if}}
@@ -82,8 +75,11 @@
           <a class="btn-icon item-delete" data-item-id="{{don.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
-        <li class="don-desc-expand" data-item-id="{{don.id}}" style="display:none">
-          <span class="don-desc-text">{{don.system.description}}</span>
+        <li class="don-desc-li">
+          <details class="item-details">
+            <summary>{{localize "AGONE.VoirDescription"}}</summary>
+            <div class="item-desc-content don-desc-text">{{don.system.description}}</div>
+          </details>
         </li>
         {{/if}}
         {{/each}}
@@ -111,13 +107,6 @@
         {{#each defauts as |don|}}
         <li class="don-row item-row" data-item-id="{{don.id}}">
           <span class="item-drag-handle col-drag"><i class="fas fa-grip-vertical"></i></span>
-          {{#if don.system.description}}
-          <button type="button" class="don-desc-toggle btn-icon" data-item-id="{{don.id}}" title='{{localize "AGONE.VoirDescription"}}'>
-            <i class="fas fa-chevron-right don-toggle-icon"></i>
-          </button>
-          {{else}}
-          <span class="don-desc-placeholder"></span>
-          {{/if}}
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}} av-defaut-sect">{{don._avSectionLabel}}</span>
           {{/if}}
@@ -127,8 +116,11 @@
           <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
-        <li class="don-desc-expand" data-item-id="{{don.id}}" style="display:none">
-          <span class="don-desc-text">{{don.system.description}}</span>
+        <li class="don-desc-li">
+          <details class="item-details">
+            <summary>{{localize "AGONE.VoirDescription"}}</summary>
+            <div class="item-desc-content don-desc-text">{{don.system.description}}</div>
+          </details>
         </li>
         {{/if}}
         {{/each}}

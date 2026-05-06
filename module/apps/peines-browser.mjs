@@ -20,7 +20,6 @@ export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicatio
     this._search          = "";
     this._filterCategorie = "all";
     this._filterNoir      = "all";
-    this._expanded        = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -53,7 +52,6 @@ export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicatio
       bienfait     : d.bienfait ?? "",
       description  : d.description ?? "",
       hasInActor   : actorPeineNames.has(d.name),
-      expanded     : this._expanded.has(String(idx)),
     }));
 
     // Filtres
@@ -118,25 +116,7 @@ export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicatio
       this._search          = "";
       this._filterCategorie = "all";
       this._filterNoir      = "all";
-      this._expanded.clear();
       this.render();
-    });
-
-    // Toggle description (sans re-render)
-    html.find("[data-action='togglePeineDesc']").on("click", e => {
-      const idx     = e.currentTarget.closest("[data-pn-idx]")?.dataset?.pnIdx;
-      if (idx === undefined) return;
-      const descRow = html.find(`.pnb-desc-row[data-pn-idx="${idx}"]`);
-      const icon    = e.currentTarget.querySelector("i");
-      if (this._expanded.has(idx)) {
-        this._expanded.delete(idx);
-        descRow.slideUp(120);
-        icon?.classList.replace("fa-chevron-down", "fa-chevron-right");
-      } else {
-        this._expanded.add(idx);
-        descRow.slideDown(120);
-        icon?.classList.replace("fa-chevron-right", "fa-chevron-down");
-      }
     });
 
     html.find("[data-action='addPeine']").on("click", async e => {

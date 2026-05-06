@@ -41,13 +41,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pvb-row pvb-row-{{item.categorie}} {{#if item.hasInActor}}pvb-has-item{{/if}}" data-pouvoir-idx="{{item.idx}}">
-          <td>
-            {{#if item.description}}
-            <button type="button" class="pvb-desc-toggle btn-icon" data-action="togglePouvoirDesc" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="pvb-name">{{item.name}}</td>
           <td class="pvb-cat">
             {{#if (eq item.categorie "flamme")}}
@@ -67,9 +61,14 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="pvb-desc-row" data-pouvoir-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+        <tr class="pvb-desc-row" data-pouvoir-idx="{{item.idx}}">
           <td></td>
-          <td colspan="3" class="pvb-description-cell">{{item.description}}</td>
+          <td colspan="3" class="pvb-description-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{item.description}}</div>
+            </details>
+          </td>
         </tr>
         {{/if}}
         {{/each}}

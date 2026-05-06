@@ -254,13 +254,7 @@
       <tbody>
         {{#each manoeuvres as |man|}}
         <tr class="item-row man-row" data-item-id="{{man.id}}">
-          <td class="man-col-toggle">
-            {{#if man.system.description}}
-            <button type="button" class="man-desc-toggle btn-icon" data-item-id="{{man.id}}" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas fa-chevron-right man-toggle-icon"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td class="man-col-toggle"></td>
           <td class="man-col-name">
             <div class="man-name-line">
               <span class="man-badge man-badge-{{man.system.categorie}}">
@@ -298,10 +292,17 @@
           </td>
           <td class="col-drag"><span class="item-drag-handle" title='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span></td>
         </tr>
-        <tr class="man-desc-expand" data-item-id="{{man.id}}" style="display:none">
+        {{#if man.system.description}}
+        <tr class="man-desc-row">
           <td></td>
-          <td colspan="7" class="man-desc-cell">{{man.system.description}}</td>
+          <td colspan="7" class="man-desc-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{man.system.description}}</div>
+            </details>
+          </td>
         </tr>
+        {{/if}}
         {{/each}}
       </tbody>
     </table>

@@ -46,13 +46,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="mb-row mb-row-{{item.categorie}} {{#if item.hasInActor}}mb-has-item{{/if}}" data-man-idx="{{item.idx}}">
-          <td>
-            {{#if item.description}}
-            <button type="button" class="mb-desc-toggle btn-icon" data-action="toggleManDesc" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="mb-name">{{item.name}}</td>
           <td class="mb-cat">
             {{#if (eq item.categorie "botte")}}
@@ -83,9 +77,14 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="mb-desc-row" data-man-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+        <tr class="mb-desc-row" data-man-idx="{{item.idx}}">
           <td></td>
-          <td colspan="8" class="mb-description-cell">{{item.description}}</td>
+          <td colspan="8" class="mb-description-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{item.description}}</div>
+            </details>
+          </td>
         </tr>
         {{/if}}
         {{/each}}

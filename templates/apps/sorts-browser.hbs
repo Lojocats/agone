@@ -57,13 +57,7 @@
       <tbody>
         {{#each sorts as |sort|}}
         <tr class="sb-sort-row {{#if sort.hasInActor}}sb-has-sort{{/if}}" data-sort-idx="{{sort.idx}}">
-          <td>
-            {{#if sort.description}}
-            <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDescBrowser" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if sort.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="sb-name">{{sort.name}}</td>
           <td class="sb-type">{{sort.typeMagie}}{{#if sort.instrument}} / {{sort.instrument}}{{/if}}</td>
           <td class="sb-seuil">{{sort.seuil}}</td>
@@ -83,9 +77,14 @@
           </td>
         </tr>
         {{#if sort.description}}
-        <tr class="sort-desc-row" data-sort-idx="{{sort.idx}}" {{#unless sort.expanded}}style="display:none"{{/unless}}>
+        <tr class="sort-desc-row" data-sort-idx="{{sort.idx}}">
           <td></td>
-          <td colspan="7" class="sort-description-cell">{{sort.description}}</td>
+          <td colspan="7" class="sort-description-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{sort.description}}</div>
+            </details>
+          </td>
         </tr>
         {{/if}}
         {{/each}}

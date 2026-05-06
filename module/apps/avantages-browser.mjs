@@ -28,7 +28,6 @@ export class AvantagesBrowser extends foundry.applications.api.HandlebarsApplica
     this._filterType      = options.filterType ?? "all";
     this._filterPossede   = "all";
     this._filterChargeExact = null;
-    this._expanded        = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -62,7 +61,6 @@ export class AvantagesBrowser extends foundry.applications.api.HandlebarsApplica
       prerequis  : d.prerequis ?? "",
       description: d.description ?? "",
       hasInActor : actorDonNames.has(d.name),
-      expanded   : this._expanded.has(String(idx)),
     }));
 
     // Filtres
@@ -156,25 +154,7 @@ export class AvantagesBrowser extends foundry.applications.api.HandlebarsApplica
       this._filterType       = "all";
       this._filterPossede    = "all";
       this._filterChargeExact = null;
-      this._expanded.clear();
       this.render();
-    });
-
-    // Toggle description (sans re-render)
-    html.find("[data-action='toggleAvDesc']").on("click", e => {
-      const idx = e.currentTarget.closest("[data-av-idx]")?.dataset?.avIdx;
-      if (idx === undefined) return;
-      const descRow = html.find(`.avb-desc-row[data-av-idx="${idx}"]`);
-      const icon    = e.currentTarget.querySelector("i");
-      if (this._expanded.has(idx)) {
-        this._expanded.delete(idx);
-        descRow.slideUp(120);
-        icon?.classList.replace("fa-chevron-down", "fa-chevron-right");
-      } else {
-        this._expanded.add(idx);
-        descRow.slideDown(120);
-        icon?.classList.replace("fa-chevron-right", "fa-chevron-down");
-      }
     });
 
     html.find("[data-action='addAvantage']").on("click", async e => {

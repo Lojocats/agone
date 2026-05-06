@@ -42,13 +42,7 @@
       <tbody>
         {{#each dons as |don|}}
         <tr class="db-row db-row-{{don.categorie}} {{#if don.hasInActor}}db-has-item{{/if}}" data-don-idx="{{don.idx}}">
-          <td>
-            {{#if don.description}}
-            <button type="button" class="db-desc-toggle btn-icon" data-action="toggleDonDesc" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if don.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="db-name">{{don.name}}</td>
           <td class="db-cat">
             {{#if (eq don.categorie "avantage")}}
@@ -75,9 +69,14 @@
           </td>
         </tr>
         {{#if don.description}}
-        <tr class="db-desc-row" data-don-idx="{{don.idx}}" {{#unless don.expanded}}style="display:none"{{/unless}}>
+        <tr class="db-desc-row" data-don-idx="{{don.idx}}">
           <td></td>
-          <td colspan="4" class="db-description-cell">{{don.description}}</td>
+          <td colspan="4" class="db-description-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{don.description}}</div>
+            </details>
+          </td>
         </tr>
         {{/if}}
         {{/each}}

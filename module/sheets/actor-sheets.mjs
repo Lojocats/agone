@@ -1,4 +1,27 @@
 /**
+ * Helper module : dialog de confirmation comme enfant d'une AppV2 (suit le pop-out parent).
+ */
+function confirmChildDialog(app, { title, content }) {
+  return new Promise(resolve => {
+    let settled = false;
+    const settle = (v) => { if (!settled) { settled = true; resolve(v); } };
+    const dialog = new foundry.applications.api.DialogV2({
+      window: { title },
+      content,
+      buttons: [
+        { action: "yes", icon: "fas fa-check", label: game.i18n.localize("Yes"), default: true,
+          callback: () => settle(true) },
+        { action: "no",  icon: "fas fa-times", label: game.i18n.localize("No"),
+          callback: () => settle(false) },
+      ],
+      rejectClose: false,
+    });
+    dialog.addEventListener("close", () => settle(false), { once: true });
+    app.renderChild(dialog);
+  });
+}
+
+/**
  * Feuille de Compagnon / Monture — API ApplicationV2 / ActorSheetV2
  */
 export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
@@ -57,11 +80,13 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
     super._onRender(context, options);
 
     // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
+    this._renderSignal?.abort();
+    this._renderSignal = new AbortController();
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
-    }, true);
+    }, { capture: true, signal: this._renderSignal.signal });
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
     const _actorForm = this.element.querySelector("form");
@@ -76,11 +101,13 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
                     : el.type === "number"   ? Number(el.value)
                     : el.value;
         await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
-      });
+      }, { signal: this._renderSignal.signal });
     }
 
     // Gestion des onglets
     const html = $(this.element);
+    // Réinitialiser tous les handlers .agone pour éviter l'accumulation sur le frame persistant
+    html.off(".agone");
     const activeTab = this._currentTab ?? "attributs";
     html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
@@ -88,7 +115,7 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
     html.find(".tab[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
     });
-    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+    html.on("click.agone", ".sheet-tabs .item[data-tab]", (e) => {
       const tab = e.currentTarget.dataset.tab;
       if (!tab) return;
       this._currentTab = tab;
@@ -99,10 +126,10 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
     });
 
     if (!this.isEditable) return;
-    html.find(".item-create").click(this._onItemCreate.bind(this));
-    html.find(".item-edit").click(this._onItemEdit.bind(this));
-    html.find(".item-delete").click(this._onItemDelete.bind(this));
-    html.find(".inline-edit").change(async (e) => {
+    html.on("click.agone", ".item-create", this._onItemCreate.bind(this));
+    html.on("click.agone", ".item-edit", this._onItemEdit.bind(this));
+    html.on("click.agone", ".item-delete", this._onItemDelete.bind(this));
+    html.on("change.agone", ".inline-edit", async (e) => {
       const el = e.currentTarget;
       const item = this.actor.items.get(el.dataset.itemId);
       if (item && el.dataset.field) {
@@ -110,32 +137,32 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
         await item.update({ [el.dataset.field]: val });
       }
     });
-    html.find("[data-action='rollInitiative']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollInitiative']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.dataset.itemId ??
                      e.currentTarget.closest("[data-item-id]")?.dataset.itemId ?? null;
       await this.actor.rollInitiative(armeId);
     });
-    html.find("[data-action='rollAttaque']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollAttaque']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (armeId) await this.actor.rollAttaque(armeId);
     });
-    html.find("[data-action='rollParade']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollParade']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (armeId) await this.actor.rollParade(armeId);
     });
-    html.find("[data-action='rollItemChat']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollItemChat']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.dataset.itemId;
       if (armeId) await this.actor.items.get(armeId)?.toChat();
     });
-    html.find(".arme-equipe").change(async (e) => {
+    html.on("change.agone", ".arme-equipe", async (e) => {
       const itemId = e.currentTarget.dataset.itemId;
       await this.actor.items.get(itemId)?.update({ "system.equipe": e.currentTarget.checked });
     });
-    html.find(".armure-portee").change(async (e) => {
+    html.on("change.agone", ".armure-portee", async (e) => {
       const itemId = e.currentTarget.dataset.itemId;
       const portee = e.currentTarget.checked;
       const batch = this.actor.items
@@ -143,7 +170,7 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
         .map(i => ({ _id: i.id, "system.portee": i.id === itemId ? portee : false }));
       await this.actor.updateEmbeddedDocuments("Item", batch);
     });
-    html.find(".compendium-browse").click(async (e) => {
+    html.on("click.agone", ".compendium-browse", async (e) => {
       e.preventDefault();
       const packId = e.currentTarget.dataset.pack ?? "";
       if (packId === "agone.armes") {
@@ -160,12 +187,12 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
         this._competencesBrowser.render(true);
       }
     });
-    html.find("[data-action='rollCompetence']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollCompetence']", async (e) => {
       e.preventDefault();
       const id = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (id) await this.actor.rollCompetence(id);
     });
-    html.find(".comp-search-input").on("input", (ev) => {
+    html.on("input.agone", ".comp-search-input", (ev) => {
       const q = ev.currentTarget.value.trim().toLowerCase();
       const clearBtn = html.find(".comp-search-clear")[0];
       if (clearBtn) clearBtn.style.display = q ? "" : "none";
@@ -181,7 +208,7 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
       const na = html.find(".comps-na-section")[0];
       if (na) na.style.display = "none";
     });
-    html.find(".comp-search-clear").click(() => {
+    html.on("click.agone", ".comp-search-clear", () => {
       html.find(".comp-search-input").val("").trigger("input");
     });
   }
@@ -194,14 +221,15 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
   }
   _onItemEdit(event) {
     event.preventDefault();
-    const li = event.currentTarget.closest("[data-item-id]");
-    this.actor.items.get(li.dataset.itemId)?.sheet.render(true);
+    const li   = event.currentTarget.closest("[data-item-id]");
+    const item = this.actor.items.get(li.dataset.itemId);
+    if (item) this.renderChild(item.sheet);
   }
   async _onItemDelete(event) {
     event.preventDefault();
     const li   = event.currentTarget.closest("[data-item-id]");
     const item = this.actor.items.get(li.dataset.itemId);
-    if (item && await foundry.applications.api.DialogV2.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
+    if (item && await confirmChildDialog(this, { title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
       await item.delete();
     }
   }
@@ -285,11 +313,13 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
     super._onRender(context, options);
 
     // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
+    this._renderSignal?.abort();
+    this._renderSignal = new AbortController();
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
-    }, true);
+    }, { capture: true, signal: this._renderSignal.signal });
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
     const _actorForm = this.element.querySelector("form");
@@ -304,11 +334,13 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
                     : el.type === "number"   ? Number(el.value)
                     : el.value;
         await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
-      });
+      }, { signal: this._renderSignal.signal });
     }
 
     // Gestion des onglets
     const html = $(this.element);
+    // Réinitialiser tous les handlers .agone pour éviter l'accumulation sur le frame persistant
+    html.off(".agone");
     const activeTab = this._currentTab ?? "attributs";
     html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
@@ -316,7 +348,7 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
     html.find(".tab[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
     });
-    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+    html.on("click.agone", ".sheet-tabs .item[data-tab]", (e) => {
       const tab = e.currentTarget.dataset.tab;
       if (!tab) return;
       this._currentTab = tab;
@@ -327,26 +359,27 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
     });
 
     if (!this.isEditable) return;
-    html.find(".item-create").click(async (e) => {
+    html.on("click.agone", ".item-create", async (e) => {
       e.preventDefault();
       const type = e.currentTarget.dataset.type;
       const nameKey = type === "arme" ? "AGONE.NouvelleArme" : "AGONE.NouvelPouvoir";
       await Item.create({ name: game.i18n.localize(nameKey), type }, { parent: this.actor });
     });
-    html.find(".item-edit").click((e) => {
-      e.preventDefault();
-      const li = e.currentTarget.closest("[data-item-id]");
-      this.actor.items.get(li.dataset.itemId)?.sheet.render(true);
-    });
-    html.find(".item-delete").click(async (e) => {
+    html.on("click.agone", ".item-edit", (e) => {
       e.preventDefault();
       const li   = e.currentTarget.closest("[data-item-id]");
       const item = this.actor.items.get(li.dataset.itemId);
-      if (item && await foundry.applications.api.DialogV2.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
+      if (item) this.renderChild(item.sheet);
+    });
+    html.on("click.agone", ".item-delete", async (e) => {
+      e.preventDefault();
+      const li   = e.currentTarget.closest("[data-item-id]");
+      const item = this.actor.items.get(li.dataset.itemId);
+      if (item && await confirmChildDialog(this, { title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
         await item.delete();
       }
     });
-    html.find(".inline-edit").change(async (e) => {
+    html.on("change.agone", ".inline-edit", async (e) => {
       const el = e.currentTarget;
       const item = this.actor.items.get(el.dataset.itemId);
       if (item && el.dataset.field) {
@@ -354,32 +387,32 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
         await item.update({ [el.dataset.field]: val });
       }
     });
-    html.find("[data-action='rollInitiative']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollInitiative']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.dataset.itemId ??
                      e.currentTarget.closest("[data-item-id]")?.dataset.itemId ?? null;
       await this.actor.rollInitiative(armeId);
     });
-    html.find("[data-action='rollAttaque']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollAttaque']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (armeId) await this.actor.rollAttaque(armeId);
     });
-    html.find("[data-action='rollParade']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollParade']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (armeId) await this.actor.rollParade(armeId);
     });
-    html.find("[data-action='rollItemChat']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollItemChat']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.dataset.itemId;
       if (armeId) await this.actor.items.get(armeId)?.toChat();
     });
-    html.find(".arme-equipe").change(async (e) => {
+    html.on("change.agone", ".arme-equipe", async (e) => {
       const itemId = e.currentTarget.dataset.itemId;
       await this.actor.items.get(itemId)?.update({ "system.equipe": e.currentTarget.checked });
     });
-    html.find(".compendium-browse").click(async (e) => {
+    html.on("click.agone", ".compendium-browse", async (e) => {
       e.preventDefault();
       const packId = e.currentTarget.dataset.pack ?? "";
       if (packId === "agone.armes") {
@@ -392,12 +425,12 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
         this._competencesBrowser.render(true);
       }
     });
-    html.find("[data-action='rollCompetence']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollCompetence']", async (e) => {
       e.preventDefault();
       const id = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (id) await this.actor.rollCompetence(id);
     });
-    html.find(".comp-search-input").on("input", (ev) => {
+    html.on("input.agone", ".comp-search-input", (ev) => {
       const q = ev.currentTarget.value.trim().toLowerCase();
       const clearBtn = html.find(".comp-search-clear")[0];
       if (clearBtn) clearBtn.style.display = q ? "" : "none";
@@ -413,7 +446,7 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
       const na = html.find(".comps-na-section")[0];
       if (na) na.style.display = "none";
     });
-    html.find(".comp-search-clear").click(() => {
+    html.on("click.agone", ".comp-search-clear", () => {
       html.find(".comp-search-input").val("").trigger("input");
     });
   }
@@ -557,11 +590,13 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
     super._onRender(context, options);
 
     // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
+    this._renderSignal?.abort();
+    this._renderSignal = new AbortController();
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
-    }, true);
+    }, { capture: true, signal: this._renderSignal.signal });
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────────
     const _actorForm = this.element.querySelector("form");
@@ -576,11 +611,13 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
                     : el.type === "number"   ? Number(el.value)
                     : el.value;
         await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
-      });
+      }, { signal: this._renderSignal.signal });
     }
 
     // Gestion des onglets
     const html = $(this.element);
+    // Réinitialiser tous les handlers .agone pour éviter l'accumulation sur le frame persistant
+    html.off(".agone");
     const activeTab = this._currentTab ?? "attributs";
     html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
@@ -588,7 +625,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
     html.find(".tab[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
     });
-    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+    html.on("click.agone", ".sheet-tabs .item[data-tab]", (e) => {
       const tab = e.currentTarget.dataset.tab;
       if (!tab) return;
       this._currentTab = tab;
@@ -599,26 +636,27 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
     });
 
     if (!this.isEditable) return;
-    html.find(".item-create").click(async (e) => {
+    html.on("click.agone", ".item-create", async (e) => {
       e.preventDefault();
       const type = e.currentTarget.dataset.type;
       const name = game.i18n.localize(`AGONE.Nouvel${type.charAt(0).toUpperCase() + type.slice(1)}`);
       await Item.create({ name, type }, { parent: this.actor });
     });
-    html.find(".item-edit").click((e) => {
-      e.preventDefault();
-      const li = e.currentTarget.closest("[data-item-id]");
-      this.actor.items.get(li.dataset.itemId)?.sheet.render(true);
-    });
-    html.find(".item-delete").click(async (e) => {
+    html.on("click.agone", ".item-edit", (e) => {
       e.preventDefault();
       const li   = e.currentTarget.closest("[data-item-id]");
       const item = this.actor.items.get(li.dataset.itemId);
-      if (item && await foundry.applications.api.DialogV2.confirm({ title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
+      if (item) this.renderChild(item.sheet);
+    });
+    html.on("click.agone", ".item-delete", async (e) => {
+      e.preventDefault();
+      const li   = e.currentTarget.closest("[data-item-id]");
+      const item = this.actor.items.get(li.dataset.itemId);
+      if (item && await confirmChildDialog(this, { title: game.i18n.localize("AGONE.Supprimer"), content: `<p>${item.name}</p>` })) {
         await item.delete();
       }
     });
-    html.find(".inline-edit").change(async (e) => {
+    html.on("change.agone", ".inline-edit", async (e) => {
       const el = e.currentTarget;
       const item = this.actor.items.get(el.dataset.itemId);
       if (item && el.dataset.field) {
@@ -626,40 +664,40 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         await item.update({ [el.dataset.field]: val });
       }
     });
-    html.find("[data-action='rollInitiative']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollInitiative']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.dataset.itemId ??
                      e.currentTarget.closest("[data-item-id]")?.dataset.itemId ?? null;
       await this.actor.rollInitiative(armeId);
     });
-    html.find("[data-action='rollEsquive']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollEsquive']", async (e) => {
       e.preventDefault();
       await this.actor.rollEsquive();
     });
-    html.find("[data-action='rollDefenseNaturelle']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollDefenseNaturelle']", async (e) => {
       e.preventDefault();
       await this.actor.rollDefenseNaturelle();
     });
-    html.find("[data-action='rollAttaque']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollAttaque']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (armeId) await this.actor.rollAttaque(armeId);
     });
-    html.find("[data-action='rollParade']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollParade']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (armeId) await this.actor.rollParade(armeId);
     });
-    html.find("[data-action='rollItemChat']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollItemChat']", async (e) => {
       e.preventDefault();
       const armeId = e.currentTarget.dataset.itemId;
       if (armeId) await this.actor.items.get(armeId)?.toChat();
     });
-    html.find(".arme-equipe").change(async (e) => {
+    html.on("change.agone", ".arme-equipe", async (e) => {
       const itemId = e.currentTarget.dataset.itemId;
       await this.actor.items.get(itemId)?.update({ "system.equipe": e.currentTarget.checked });
     });
-    html.find(".armure-portee").change(async (e) => {
+    html.on("change.agone", ".armure-portee", async (e) => {
       const itemId = e.currentTarget.dataset.itemId;
       const portee = e.currentTarget.checked;
       const batch = this.actor.items
@@ -679,7 +717,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         });
       }
     });
-    html.find(".compendium-browse").click(async (e) => {
+    html.on("click.agone", ".compendium-browse", async (e) => {
       e.preventDefault();
       const packId = e.currentTarget.dataset.pack ?? "";
       if (packId === "agone.armes") {
@@ -700,12 +738,12 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         this._sortsBrowser.render(true);
       }
     });
-    html.find("[data-action='rollCompetence']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollCompetence']", async (e) => {
       e.preventDefault();
       const id = e.currentTarget.closest("[data-item-id]")?.dataset.itemId;
       if (id) await this.actor.rollCompetence(id);
     });
-    html.find(".comp-search-input").on("input", (ev) => {
+    html.on("input.agone", ".comp-search-input", (ev) => {
       const q = ev.currentTarget.value.trim().toLowerCase();
       const clearBtn = html.find(".comp-search-clear")[0];
       if (clearBtn) clearBtn.style.display = q ? "" : "none";
@@ -721,22 +759,22 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
       const na = html.find(".comps-na-section")[0];
       if (na) na.style.display = "none";
     });
-    html.find(".comp-search-clear").click(() => {
+    html.on("click.agone", ".comp-search-clear", () => {
       html.find(".comp-search-input").val("").trigger("input");
     });
 
     // ── Magie ────────────────────────────────────────────────────────────────
-    html.find("[data-action='rollSort']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollSort']", async (e) => {
       e.preventDefault();
       const id = e.currentTarget.closest("[data-item-id]")?.dataset.itemId ?? e.currentTarget.dataset.itemId;
       if (id) await this.actor.rollSort(id);
     });
-    html.find("[data-action='rollSortImpro']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollSortImpro']", async (e) => {
       e.preventDefault();
       const id = e.currentTarget.closest("[data-item-id]")?.dataset.itemId ?? e.currentTarget.dataset.itemId;
       if (id) await this.actor.rollSort(id, { impro: true });
     });
-    html.find("[data-action='rollArtDomaine']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollArtDomaine']", async (e) => {
       e.preventDefault();
       const btn        = e.currentTarget;
       const domaine    = btn.dataset.domaine ?? "";
@@ -761,7 +799,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         modif: `Bonus/Malus : ${modif}`,
       });
     });
-    html.find("[data-action='rollImpArtDomaine']").click(async (e) => {
+    html.on("click.agone", "[data-action='rollImpArtDomaine']", async (e) => {
       e.preventDefault();
       const btn        = e.currentTarget;
       const domaine    = btn.dataset.domaine ?? "";
@@ -786,7 +824,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         modif: `Bonus/Malus : ${modif}`,
       });
     });
-    html.find("[data-action='toggleSortDesc']").click((e) => {
+    html.on("click.agone", "[data-action='toggleSortDesc']", (e) => {
       e.preventDefault();
       e.stopPropagation();
       const card  = e.currentTarget.closest(".sort-card");
@@ -797,7 +835,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
       e.currentTarget.querySelector("i")?.classList.toggle("fa-chevron-right", isOpen);
       e.currentTarget.querySelector("i")?.classList.toggle("fa-chevron-down", !isOpen);
     });
-    html.find(".smf-search").on("input", (ev) => {
+    html.on("input.agone", ".smf-search", (ev) => {
       const q = ev.currentTarget.value.toLowerCase().trim();
       const sortsBlock = ev.currentTarget.closest(".sorts-block");
       if (!sortsBlock) return;
@@ -812,7 +850,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         group.style.display = (!q || any) ? "" : "none";
       });
     });
-    html.find(".smf-check").on("change", (ev) => {
+    html.on("change.agone", ".smf-check", (ev) => {
       const checks      = ev.currentTarget.closest(".smf-checks")?.querySelectorAll(".smf-check");
       const activeTypes = new Set([...(checks ?? [])].filter(c => c.checked).map(c => c.value));
       const sortsBlock  = ev.currentTarget.closest(".sorts-block");
@@ -828,7 +866,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         group.style.display = (activeTypes.size === 0 || any) ? "" : "none";
       });
     });
-    html.find("[data-action='triSortsToggle']").click(async (e) => {
+    html.on("click.agone", "[data-action='triSortsToggle']", async (e) => {
       e.preventDefault();
       const cur = this.actor.getFlag("agone", "triSorts") ?? "type";
       await this.actor.setFlag("agone", "triSorts", cur === "type" ? "seuil" : "type");

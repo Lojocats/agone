@@ -14,7 +14,6 @@ export class SortsBrowser extends foundry.applications.api.HandlebarsApplication
     this._filterSeuilMax   = null;
     this._filterSeuilExact = null;
     this._filterPossede    = "all";
-    this._expanded         = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -59,7 +58,6 @@ export class SortsBrowser extends foundry.applications.api.HandlebarsApplication
       danse     : d.danse,
       description: d.description ?? "",
       hasInActor: actorSortNames.has(d.name),
-      expanded  : this._expanded.has(String(idx)),
     }));
 
     // Filtres
@@ -171,23 +169,6 @@ export class SortsBrowser extends foundry.applications.api.HandlebarsApplication
       this._filterSeuilExact = null;
       this._filterPossede    = "all";
       this.render();
-    });
-
-    // Toggle description (sans re-render)
-    html.find("[data-action='toggleSortDescBrowser']").on("click", e => {
-      const idx = e.currentTarget.closest("[data-sort-idx]")?.dataset?.sortIdx;
-      if (idx === undefined) return;
-      const descRow = html.find(`.sort-desc-row[data-sort-idx="${idx}"]`);
-      const icon    = e.currentTarget.querySelector("i");
-      if (this._expanded.has(idx)) {
-        this._expanded.delete(idx);
-        descRow.slideUp(120);
-        icon?.classList.replace("fa-chevron-down", "fa-chevron-right");
-      } else {
-        this._expanded.add(idx);
-        descRow.slideDown(120);
-        icon?.classList.replace("fa-chevron-right", "fa-chevron-down");
-      }
     });
 
     // Jet improvisé depuis le navigateur

@@ -59,13 +59,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="avb-row avb-row-{{item.type}} {{#if item.hasInActor}}avb-has-item{{/if}}" data-av-idx="{{item.idx}}">
-          <td>
-            {{#if item.description}}
-            <button type="button" class="avb-desc-toggle btn-icon" data-action="toggleAvDesc" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="avb-name">{{item.name}}</td>
           <td class="avb-section">
             <span class="avb-section-badge avb-sect-{{item.section}}">{{item.sectionLabel}}</span>
@@ -95,13 +89,18 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="avb-desc-row" data-av-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+        <tr class="avb-desc-row" data-av-idx="{{item.idx}}">
           <td></td>
           <td colspan="5" class="avb-description-cell">
-            {{#if item.prerequis}}
-            <em class="avb-prerequis">{{localize "AGONE.Prerequis"}} : {{item.prerequis}}</em>
-            {{/if}}
-            {{item.description}}
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">
+                {{#if item.prerequis}}
+                <em class="avb-prerequis">{{localize "AGONE.Prerequis"}} : {{item.prerequis}}</em>
+                {{/if}}
+                {{item.description}}
+              </div>
+            </details>
           </td>
         </tr>
         {{/if}}

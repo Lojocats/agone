@@ -11,7 +11,6 @@ export class DonsBrowser extends foundry.applications.api.HandlebarsApplicationM
     this._search        = "";
     this._filterCat     = "all";
     this._filterPossede = "all";
-    this._expanded      = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -42,7 +41,6 @@ export class DonsBrowser extends foundry.applications.api.HandlebarsApplicationM
       coutAbs    : Math.abs(d.cout),
       description: d.description ?? "",
       hasInActor : actorDonNames.has(d.name),
-      expanded   : this._expanded.has(String(idx)),
     }));
 
     // Filtres
@@ -108,25 +106,7 @@ export class DonsBrowser extends foundry.applications.api.HandlebarsApplicationM
       this._search        = "";
       this._filterCat     = "all";
       this._filterPossede = "all";
-      this._expanded.clear();
       this.render();
-    });
-
-    // Toggle description (sans re-render)
-    html.find("[data-action='toggleDonDesc']").on("click", e => {
-      const idx = e.currentTarget.closest("[data-don-idx]")?.dataset?.donIdx;
-      if (idx === undefined) return;
-      const descRow = html.find(`.db-desc-row[data-don-idx="${idx}"]`);
-      const icon    = e.currentTarget.querySelector("i");
-      if (this._expanded.has(idx)) {
-        this._expanded.delete(idx);
-        descRow.slideUp(120);
-        icon?.classList.replace("fa-chevron-down", "fa-chevron-right");
-      } else {
-        this._expanded.add(idx);
-        descRow.slideDown(120);
-        icon?.classList.replace("fa-chevron-right", "fa-chevron-down");
-      }
     });
 
     html.find("[data-action='addDon']").on("click", async e => {

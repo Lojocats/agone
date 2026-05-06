@@ -11,7 +11,6 @@ export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicati
     this.actor          = actor;
     this._search        = "";
     this._filterPossede = "all";
-    this._expanded      = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -38,7 +37,6 @@ export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicati
       taiBase     : d.taiBase ?? 0,
       description : d.description ?? "",
       isActif     : actorPeuple === d.name,
-      expanded    : this._expanded.has(String(idx)),
     }));
 
     if (this._search) {
@@ -89,25 +87,7 @@ export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicati
     html.find(".pb-clear").on("click", () => {
       this._search        = "";
       this._filterPossede = "all";
-      this._expanded.clear();
       this.render();
-    });
-
-    // Toggle description
-    html.find("[data-action='togglePeupleDesc']").on("click", e => {
-      const idx = e.currentTarget.closest("[data-peuple-idx]")?.dataset?.peupleIdx;
-      if (idx === undefined) return;
-      const descRow = html.find(`.pb-desc-row[data-peuple-idx="${idx}"]`);
-      const icon    = e.currentTarget.querySelector("i");
-      if (this._expanded.has(idx)) {
-        this._expanded.delete(idx);
-        descRow.slideUp(120);
-        icon?.classList.replace("fa-chevron-down", "fa-chevron-right");
-      } else {
-        this._expanded.add(idx);
-        descRow.slideDown(120);
-        icon?.classList.replace("fa-chevron-right", "fa-chevron-down");
-      }
     });
 
     // Appliquer un peuple

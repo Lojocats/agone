@@ -843,17 +843,47 @@
 .agone .man-col-dom     { width: 68px; text-align: center; font-size: 0.78em; white-space: nowrap; }
 .agone .man-col-actions { width: 46px; text-align: right; white-space: nowrap; }
 
-.agone .man-desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(60,35,15,0.55);
-  font-size: 0.75em;
-  line-height: 1;
-  transition: color 0.15s;
+.agone .man-has-desc, .agone .peine-has-desc {
+  font-size: 9px;
+  color: rgba(60,35,15,0.45);
 }
-.agone .man-desc-toggle:hover { color: var(--agone-gold); }
+
+/* ── <details> universels pour toutes les descriptions pliables ─────────────── */
+.agone .item-details {
+  margin: 1px 0;
+}
+.agone .item-details > summary {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--agone-brown);
+  opacity: 0.6;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  padding: 1px 4px;
+}
+.agone .item-details > summary::-webkit-details-marker { display: none; }
+.agone .item-details > summary::before { content: '\25b6\00a0'; font-size: 8px; }
+.agone .item-details[open] > summary::before { content: '\25bc\00a0'; }
+.agone .item-details > summary:hover { opacity: 1; color: var(--agone-gold); }
+.agone .item-desc-content {
+  font-size: 11px;
+  color: var(--agone-brown);
+  line-height: 1.45;
+  padding: 3px 6px;
+  border-left: 2px solid rgba(93,58,30,0.2);
+  margin-left: 4px;
+}
+.agone .item-desc-content p { margin: 0 0 3px; }
+.agone .item-desc-content p:last-child { margin: 0; }
+
+/* li description pour dons/pouvoirs */
+.agone .don-desc-li,
+.agone .pouvoir-desc-li {
+  list-style: none;
+  padding: 0 2px 2px 18px;
+  margin: 0;
+}
 
 /* Ligne nom + badge */
 .agone .man-name-line {

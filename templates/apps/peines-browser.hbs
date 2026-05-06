@@ -46,13 +46,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pnb-row {{#if item.hasInActor}}pnb-has-item{{/if}}" data-pn-idx="{{item.idx}}">
-          <td>
-            {{#if item.description}}
-            <button type="button" class="pnb-desc-toggle btn-icon" data-action="togglePeineDesc" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="pnb-name">{{item.name}}</td>
           <td class="pnb-cat">
             <span class="pnb-cat-badge pnb-cat-{{item.categorie}}">{{item.categorieLabel}}</span>
@@ -84,9 +78,14 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="pnb-desc-row" data-pn-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+        <tr class="pnb-desc-row" data-pn-idx="{{item.idx}}">
           <td></td>
-          <td colspan="5" class="pnb-description-cell">{{item.description}}</td>
+          <td colspan="5" class="pnb-description-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{item.description}}</div>
+            </details>
+          </td>
         </tr>
         {{/if}}
         {{/each}}

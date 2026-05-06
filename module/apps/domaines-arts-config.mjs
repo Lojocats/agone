@@ -92,9 +92,22 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
       const cible  = custom[idx];
       if (!cible) return;
 
-      const confirmed = await foundry.applications.api.DialogV2.confirm({
-        window:  { title: game.i18n.localize("AGONE.DomainesArts.SupprimerConfirmTitre") },
-        content: game.i18n.format("AGONE.DomainesArts.SupprimerConfirm", { nom: cible.nom }),
+      const confirmed = await new Promise(resolve => {
+        let s = false;
+        const settle = v => { if (!s) { s = true; resolve(v); } };
+        const d = new foundry.applications.api.DialogV2({
+          window:  { title: game.i18n.localize("AGONE.DomainesArts.SupprimerConfirmTitre") },
+          content: game.i18n.format("AGONE.DomainesArts.SupprimerConfirm", { nom: cible.nom }),
+          buttons: [
+            { action: "yes", icon: "fas fa-check", label: game.i18n.localize("Yes"), default: true,
+              callback: () => settle(true) },
+            { action: "no",  icon: "fas fa-times", label: game.i18n.localize("No"),
+              callback: () => settle(false) },
+          ],
+          rejectClose: false,
+        });
+        d.addEventListener("close", () => settle(false), { once: true });
+        this.renderChild(d);
       });
       if (!confirmed) return;
 

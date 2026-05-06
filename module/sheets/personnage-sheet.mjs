@@ -700,11 +700,14 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     }
 
     // Normaliser les inputs numériques vides (phase capture = avant autres handlers)
+    // AbortController : évite l'accumulation du listener sur l'élément persistant
+    this._renderSignal?.abort();
+    this._renderSignal = new AbortController();
     this.element.addEventListener("change", (ev) => {
       if (ev.target.matches("input[type='number']")) {
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
-    }, true);
+    }, { capture: true, signal: this._renderSignal.signal });
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
     const _actorForm = this.element.querySelector("form");
@@ -724,11 +727,13 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
                     : el.type === "number"   ? Number(el.value)
                     : el.value;
         await this.actor.update(foundry.utils.expandObject({ [el.name]: value }));
-      });
+      }, { signal: this._renderSignal.signal });
     }
 
     // Gestion des onglets (remplace le système Tabs de l'API v1)
     const html = $(this.element);
+    // Réinitialiser tous les handlers .agone pour éviter l'accumulation sur le frame persistant
+    html.off(".agone");
     const activeTab = this._currentTab ?? "attributs";
     html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
@@ -736,7 +741,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     html.find(".tab[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
     });
-    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+    html.on("click.agone", ".sheet-tabs .item[data-tab]", (e) => {
       const tab = e.currentTarget.dataset.tab;
       if (!tab) return;
       this._currentTab = tab;
@@ -747,69 +752,67 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     });
 
     // Sections dépliables
-    html.find(".section-toggle").click(this._onToggleSection.bind(this));
+    html.on("click.agone", ".section-toggle", this._onToggleSection.bind(this));
 
     if (!this.isEditable) return;
 
     // Items — créer / éditer / supprimer
-    html.find(".item-create").click(this._onItemCreate.bind(this));
-    html.find(".item-edit").click(this._onItemEdit.bind(this));
-    html.find(".item-delete").click(this._onItemDelete.bind(this));
-    html.find(".item-send-chat").click(this._onItemSendChat.bind(this));
+    html.on("click.agone", ".item-create", this._onItemCreate.bind(this));
+    html.on("click.agone", ".item-edit", this._onItemEdit.bind(this));
+    html.on("click.agone", ".item-delete", this._onItemDelete.bind(this));
+    html.on("click.agone", ".item-send-chat", this._onItemSendChat.bind(this));
 
     // Jets de dés — Attributs
-    html.find("[data-action='rollAttribut']").click(this._onRollAttribut.bind(this));
+    html.on("click.agone", "[data-action='rollAttribut']", this._onRollAttribut.bind(this));
 
     // Jets de dés — Compétences
-    html.find("[data-action='rollCompetence']").click(this._onRollCompetence.bind(this));
-    html.find("[data-action='rollCompetenceNA']").click(this._onRollCompetenceNA.bind(this));
-    html.find("[data-action='apprendreCompetenceNA']").click(this._onApprendreCompetenceNA.bind(this));
+    html.on("click.agone", "[data-action='rollCompetence']", this._onRollCompetence.bind(this));
+    html.on("click.agone", "[data-action='rollCompetenceNA']", this._onRollCompetenceNA.bind(this));
+    html.on("click.agone", "[data-action='apprendreCompetenceNA']", this._onApprendreCompetenceNA.bind(this));
 
     // Barre de recherche compétences
-    html.find(".comp-search-input").on("input", (ev) => this._onFilterCompetences(ev, html));
-    html.find(".comp-search-clear").click((ev) => {
+    html.on("input.agone", ".comp-search-input", (ev) => this._onFilterCompetences(ev, html));
+    html.on("click.agone", ".comp-search-clear", () => {
       html.find(".comp-search-input").val("").trigger("input");
     });
 
     // Jets de dés — Combat
-    html.find("[data-action='rollInitiative']").click(this._onRollInitiative.bind(this));
-    html.find("[data-action='rollInitiativeMagique']").click(this._onRollInitiativeMagique.bind(this));
-    html.find("[data-action='rollAttaque']").click(this._onRollAttaque.bind(this));
-    html.find("[data-action='rollParade']").click(this._onRollParade.bind(this));
-    html.find("[data-action='rollEsquive']").click(this._onRollEsquive.bind(this));
-    html.find("[data-action='rollDefenseNaturelle']").click(this._onRollDefenseNaturelle.bind(this));
-    html.find("[data-action='rollFumble']").click(this._onRollFumble.bind(this));
-    html.find("[data-action='rollBonusDe']").click(this._onRollBonusDe.bind(this));
+    html.on("click.agone", "[data-action='rollInitiative']", this._onRollInitiative.bind(this));
+    html.on("click.agone", "[data-action='rollInitiativeMagique']", this._onRollInitiativeMagique.bind(this));
+    html.on("click.agone", "[data-action='rollAttaque']", this._onRollAttaque.bind(this));
+    html.on("click.agone", "[data-action='rollParade']", this._onRollParade.bind(this));
+    html.on("click.agone", "[data-action='rollEsquive']", this._onRollEsquive.bind(this));
+    html.on("click.agone", "[data-action='rollDefenseNaturelle']", this._onRollDefenseNaturelle.bind(this));
+    html.on("click.agone", "[data-action='rollFumble']", this._onRollFumble.bind(this));
+    html.on("click.agone", "[data-action='rollBonusDe']", this._onRollBonusDe.bind(this));
 
     // Jets de dés — Sorts & Magie
-    html.find("[data-action='rollSort']").click(this._onRollSort.bind(this));
-    html.find("[data-action='rollSortImpro']").click(this._onRollSortImpro.bind(this));
-    html.find("[data-action='rollEmprise']").click(this._onRollEmprise.bind(this));
-    html.find("[data-action='rollImprovisation']").click(this._onRollImprovisation.bind(this));
+    html.on("click.agone", "[data-action='rollSort']", this._onRollSort.bind(this));
+    html.on("click.agone", "[data-action='rollSortImpro']", this._onRollSortImpro.bind(this));
+    html.on("click.agone", "[data-action='rollEmprise']", this._onRollEmprise.bind(this));
+    html.on("click.agone", "[data-action='rollImprovisation']", this._onRollImprovisation.bind(this));
 
-    // Description déroulante des sorts
-    html.find("[data-action='toggleSortDesc']").click(this._onToggleSortDesc.bind(this));
-    html.find("[data-action='rollAptitudeMagie']").click(this._onRollAptitudeMagie.bind(this));
-    html.find("[data-action='rollAptitudeConjuration']").click(this._onRollAptitudeConjuration.bind(this));
-    html.find("[data-action='rollConjurationDemonologie']").click(this._onRollConjurationDemonologie.bind(this));
-    html.find("[data-action='toggleTenebresModeManuel']").click(this._onToggleTenebresModeManuel.bind(this));
-    html.find("[data-action='togglePalierManuel']").click(this._onTogglePalierManuel.bind(this));
-    html.find("[data-action='rollArtDomaine']").click(this._onRollArtDomaine.bind(this));
-    html.find("[data-action='rollImpArtDomaine']").click(this._onRollImpArtDomaine.bind(this));
+    html.on("click.agone", "[data-action='rollAptitudeMagie']", this._onRollAptitudeMagie.bind(this));
+    html.on("click.agone", "[data-action='rollAptitudeConjuration']", this._onRollAptitudeConjuration.bind(this));
+    html.on("click.agone", "[data-action='rollConjurationDemonologie']", this._onRollConjurationDemonologie.bind(this));
+    html.on("click.agone", "[data-action='toggleTenebresModeManuel']", this._onToggleTenebresModeManuel.bind(this));
+    html.on("click.agone", "[data-action='togglePalierManuel']", this._onTogglePalierManuel.bind(this));
+    html.on("click.agone", "[data-action='rollArtDomaine']", this._onRollArtDomaine.bind(this));
+    html.on("click.agone", "[data-action='rollImpArtDomaine']", this._onRollImpArtDomaine.bind(this));
 
     // Ouvrir la config des domaines d'Arts Magiques (GM)
-    html.find("[data-action='openDomainesConfig']").click(() => {
-      new game.agone.DomainesArtsConfig().render(true);
+    html.on("click.agone", "[data-action='openDomainesConfig']", () => {
+      this._renderChildApp(new game.agone.DomainesArtsConfig());
     });
 
     // Mini-filtre sorts (onglet Magie)
-    html.find(".smf-search").on("input", this._onFiltreSorts.bind(this));
-    html.find(".smf-check").on("change", this._onFiltreTypeSorts.bind(this));
+    html.on("input.agone", ".smf-search", this._onFiltreSorts.bind(this));
+    html.on("change.agone", ".smf-check", this._onFiltreTypeSorts.bind(this));
 
     // Drag & drop sorts → danseurs (mémorisation) + réordonnancement
     // Tracking mousedown pour détecter si le drag vient bien de la poignée
-    html.find(".sort-card-drag-handle").on("mousedown", () => { this._sortDragFromHandle = true; });
-    html.find(".sort-card").on("mouseup", () => { this._sortDragFromHandle = false; });
+    html.on("mousedown.agone", ".sort-card-drag-handle", () => { this._sortDragFromHandle = true; });
+    html.on("mouseup.agone", ".sort-card", () => { this._sortDragFromHandle = false; });
     html.find(".sort-card[draggable]").each((_, el) => {
       el.addEventListener("dragstart", this._onDragSortStart.bind(this));
       el.addEventListener("dragend",   this._onDragSortEnd.bind(this));
@@ -825,8 +828,8 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       el.addEventListener("dragleave", this._onDragLeaveSortReorder.bind(this));
       el.addEventListener("drop",      this._onDropSortReorder.bind(this));
     });
-    html.find(".slot-remove").click(this._onRetireSortDanseur.bind(this));
-    html.find("[data-action='rollSortDanseur']").click(this._onRollSortDanseur.bind(this));
+    html.on("click.agone", ".slot-remove", this._onRetireSortDanseur.bind(this));
+    html.on("click.agone", "[data-action='rollSortDanseur']", this._onRollSortDanseur.bind(this));
 
     // Drag & drop pour réordonner les sorts dans les slots danseurs
     this._setupDanseurSlotsDrag(html);
@@ -840,85 +843,85 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     this._setupDragReorder(html, ".peines-table tbody .item-row", ".peines-table tbody");
 
     // Ouvrir le compendium de compétences / peuples
-    html.find(".compendium-browse").click(this._onBrowseCompendium.bind(this));
+    html.on("click.agone", ".compendium-browse", this._onBrowseCompendium.bind(this));
 
     // Retirer le peuple actuel
-    html.find(".peuple-clear").click(this._onClearPeuple.bind(this));
+    html.on("click.agone", ".peuple-clear", this._onClearPeuple.bind(this));
 
     // Envoyer un item en chat
-    html.find("[data-action='rollItemChat']").click(this._onItemSendChat.bind(this));
+    html.on("click.agone", "[data-action='rollItemChat']", this._onItemSendChat.bind(this));
 
     // Édition inline (quantité équipement, etc.)
-    html.find(".inline-edit").change(this._onInlineEdit.bind(this));
+    html.on("change.agone", ".inline-edit", this._onInlineEdit.bind(this));
 
     // Inputs "base" de scores (aspects + caracs) : pas de name= pour éviter le double-comptage
     // du bonus racial par le mécanisme de submit de FoundryVTT
-    html.find("[data-raw-input]").change(this._onRawInputChange.bind(this));
+    html.on("change.agone", "[data-raw-input]", this._onRawInputChange.bind(this));
 
     // Armure portée — clic sur checkbox d'item
-    html.find(".armure-portee").change(this._onArmureItemPorteeChange.bind(this));
+    html.on("change.agone", ".armure-portee", this._onArmureItemPorteeChange.bind(this));
 
     // Armure portée — calcul auto
-    html.find("[name='system.armure.portee']").change(this._onArmurePorteeChange.bind(this));
-    html.find("[name='system.armure.malusAgi']").change(this._onArmureMalusChange.bind(this));
-    html.find("[name='system.armure.type']").change(this._onArmureMalusChange.bind(this));
+    html.on("change.agone", "[name='system.armure.portee']", this._onArmurePorteeChange.bind(this));
+    html.on("change.agone", "[name='system.armure.malusAgi']", this._onArmureMalusChange.bind(this));
+    html.on("change.agone", "[name='system.armure.type']", this._onArmureMalusChange.bind(this));
 
     // Arme équipée (tenue en main) — boucliers : sync actor.bouclier
-    html.find(".arme-equipe").change(this._onArmeEquipeChange.bind(this));
+    html.on("change.agone", ".arme-equipe", this._onArmeEquipeChange.bind(this));
 
     // 3e blessure grave → jet de VOL Difficulté 10
-    html.find("[name='system.blessureGrave3']").change(async (e) => {
+    html.on("change.agone", "[name='system.blessureGrave3']", async (e) => {
       if (e.currentTarget.checked) {
         await this.actor.rollVolBlessure3();
       }
     });
 
     // Montée de niveau (dépense XP)
-    html.find("[data-action='levelUp']").click(this._onLevelUp.bind(this));
+    html.on("click.agone", "[data-action='levelUp']", this._onLevelUp.bind(this));
 
     // Rétrogradation (remboursement XP / pts création)
-    html.find("[data-action='levelDown']").click(this._onLevelDown.bind(this));
+    html.on("click.agone", "[data-action='levelDown']", this._onLevelDown.bind(this));
 
     // Montée de niveau danseur
-    html.find("[data-action='levelUpDanseur']").click(this._onLevelUpDanseur.bind(this));
+    html.on("click.agone", "[data-action='levelUpDanseur']", this._onLevelUpDanseur.bind(this));
 
     // Création danseur — +/- niveau par stat
-    html.find("[data-action='danseurNiveauUp']").click(ev   => this._onDanseurNiveau(ev, +1));
-    html.find("[data-action='danseurNiveauDown']").click(ev => this._onDanseurNiveau(ev, -1));
-    html.find("[data-action='danseurRollStatIndiv']").click(this._onDanseurRollStatIndiv.bind(this));
+    html.on("click.agone", "[data-action='danseurNiveauUp']", ev   => this._onDanseurNiveau(ev, +1));
+    html.on("click.agone", "[data-action='danseurNiveauDown']", ev => this._onDanseurNiveau(ev, -1));
+    html.on("click.agone", "[data-action='danseurRollStatIndiv']", this._onDanseurRollStatIndiv.bind(this));
 
     // Valider / réactiver mode création danseur
-    html.find("[data-action='validerCreationDanseur']").click(this._onValiderCreationDanseur.bind(this));
-    html.find("[data-action='reactiverCreationDanseur']").click(this._onReactiverCreationDanseur.bind(this));
+    html.on("click.agone", "[data-action='validerCreationDanseur']", this._onValiderCreationDanseur.bind(this));
+    html.on("click.agone", "[data-action='reactiverCreationDanseur']", this._onReactiverCreationDanseur.bind(this));
 
     // Édition inline des stats courantes du danseur
-    html.find(".danseur-inline-num").change(this._onDanseurStatEdit.bind(this));
+    html.on("change.agone", ".danseur-inline-num", this._onDanseurStatEdit.bind(this));
 
     // Valider / réactiver mode création démon
-    html.find("[data-action='validerCreationDemon']").click(this._onValiderCreationDemon.bind(this));
-    html.find("[data-action='reactiverCreationDemon']").click(this._onReactiverCreationDemon.bind(this));
+    html.on("click.agone", "[data-action='validerCreationDemon']", this._onValiderCreationDemon.bind(this));
+    html.on("click.agone", "[data-action='reactiverCreationDemon']", this._onReactiverCreationDemon.bind(this));
 
     // Édition inline des stats démon
-    html.find(".demon-inline-num").change(this._onDemonStatEdit.bind(this));
+    html.on("change.agone", ".demon-inline-num", this._onDemonStatEdit.bind(this));
 
     // Envoyer manœuvre/botte dans le chat
-    html.find("[data-action='rollManoeuvre']").click(this._onChatManoeuvre.bind(this));
+    html.on("click.agone", "[data-action='rollManoeuvre']", this._onChatManoeuvre.bind(this));
 
     // Envoyer pouvoir de flamme dans le chat
-    html.find("[data-action='chatPouvoir']").click(this._onChatPouvoir.bind(this));
+    html.on("click.agone", "[data-action='chatPouvoir']", this._onChatPouvoir.bind(this));
 
     // Mode niveau — toggle visibilité boutons
-    html.find("[data-action='toggleLevelUp']").click(this._onToggleLevelUp.bind(this));
+    html.on("click.agone", "[data-action='toggleLevelUp']", this._onToggleLevelUp.bind(this));
 
     // Mode création — toggle, resets locaux et validation
-    html.find("[data-action='toggleCreation']").click(this._onToggleCreation.bind(this));
-    html.find("[data-action='resetCaracs']").click(this._onResetCaracs.bind(this));
-    html.find("[data-action='resetComps']").click(this._onResetComps.bind(this));
-    html.find("[data-action='validerCreation']").click(this._onValiderCreation.bind(this));
+    html.on("click.agone", "[data-action='toggleCreation']", this._onToggleCreation.bind(this));
+    html.on("click.agone", "[data-action='resetCaracs']", this._onResetCaracs.bind(this));
+    html.on("click.agone", "[data-action='resetComps']", this._onResetComps.bind(this));
+    html.on("click.agone", "[data-action='validerCreation']", this._onValiderCreation.bind(this));
 
     // Toggle tri compétences & sorts
-    html.find("[data-action='triCompsToggle']").click(this._onTriCompsToggle.bind(this));
-    html.find("[data-action='triSortsToggle']").click(this._onTriSortsToggle.bind(this));
+    html.on("click.agone", "[data-action='triCompsToggle']", this._onTriCompsToggle.bind(this));
+    html.on("click.agone", "[data-action='triSortsToggle']", this._onTriSortsToggle.bind(this));
 
     // Drag & drop inline items
     html.find(".item-drag").each((i, li) => {
@@ -926,58 +929,18 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       li.addEventListener("dragstart", this._onDragStart.bind(this));
     });
 
-    // Toggle description manœuvres
-    html.on("click", ".man-desc-toggle", ev => {
-      const id = ev.currentTarget.dataset.itemId;
-      const row = html.find(`.man-desc-expand[data-item-id="${id}"]`);
-      const icon = ev.currentTarget.querySelector(".man-toggle-icon");
-      row.slideToggle(120);
-      icon?.classList.toggle("fa-chevron-right");
-      icon?.classList.toggle("fa-chevron-down");
-    });
-
-    // Toggle description pouvoirs de flamme
-    html.on("click", ".pouvoir-desc-toggle", ev => {
-      const id = ev.currentTarget.dataset.itemId;
-      const row = html.find(`.pouvoir-desc-expand[data-item-id="${id}"]`);
-      const icon = ev.currentTarget.querySelector(".pouvoir-toggle-icon");
-      row.slideToggle(120);
-      icon?.classList.toggle("fa-chevron-right");
-      icon?.classList.toggle("fa-chevron-down");
-    });
-
-    // Toggle description avantages/défauts
-    html.on("click", ".don-desc-toggle", ev => {
-      const id = ev.currentTarget.dataset.itemId;
-      const row = html.find(`.don-desc-expand[data-item-id="${id}"]`);
-      const icon = ev.currentTarget.querySelector(".don-toggle-icon");
-      row.slideToggle(120);
-      icon?.classList.toggle("fa-chevron-right");
-      icon?.classList.toggle("fa-chevron-down");
-    });
-
     // Bonus/malus d'attributs supplémentaires
-    html.find(".bonus-supp-add").click(this._onBonusSuppAdd.bind(this));
-    html.find(".bonus-supp-delete").click(this._onBonusSuppDelete.bind(this));
-    html.on("change", ".bonus-supp-field", this._onBonusSuppChange.bind(this));
-
-    // Toggle description peines de Perfidie
-    html.on("click", ".peine-desc-toggle", ev => {
-      const id = ev.currentTarget.dataset.itemId;
-      const row = html.find(`.peine-desc-expand[data-item-id="${id}"]`);
-      const icon = ev.currentTarget.querySelector(".peine-toggle-icon");
-      row.slideToggle(120);
-      icon?.classList.toggle("fa-chevron-right");
-      icon?.classList.toggle("fa-chevron-down");
-    });
+    html.on("click.agone", ".bonus-supp-add", this._onBonusSuppAdd.bind(this));
+    html.on("click.agone", ".bonus-supp-delete", this._onBonusSuppDelete.bind(this));
+    html.on("change.agone", ".bonus-supp-field", this._onBonusSuppChange.bind(this));
 
     // Acquérir un bienfait de Perfidie (+1 Perfidie, bienfaitAcquis = true)
-    html.on("click", "[data-action='acquerirBienfait']", async ev => {
+    html.on("click.agone", "[data-action='acquerirBienfait']", async ev => {
       ev.preventDefault();
       const itemId = ev.currentTarget.dataset.itemId;
       const peine  = this.actor.items.get(itemId);
       if (!peine) return;
-      const confirmed = await foundry.applications.api.DialogV2.confirm({
+      const confirmed = await this._confirmChild({
         title  : "Acquérir un Bienfait",
         content: `<p>Acquérir <strong>${peine.system.bienfait}</strong> et dépenser <strong>+1 Perfidie</strong> ?</p>`,
       });
@@ -988,8 +951,8 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     });
 
     // ── Compagnons ────────────────────────────────────────────────────────
-    html.find(".companion-open").click(this._onOpenCompanion.bind(this));
-    html.find(".companion-remove").click(this._onRemoveCompanion.bind(this));
+    html.on("click.agone", ".companion-open", this._onOpenCompanion.bind(this));
+    html.on("click.agone", ".companion-remove", this._onRemoveCompanion.bind(this));
     // Feedback visuel drag-over sur la zone compagnons
     html.find(".companions-drop-zone").each((_, el) => {
       el.addEventListener("dragover", (ev) => {
@@ -1003,9 +966,9 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     });
 
     // ── Démons (acteurs liés) ──────────────────────────────────────────────
-    html.find(".demon-actor-open").click(this._onOpenDemonActor.bind(this));
-    html.find(".demon-actor-remove").click(this._onRemoveDemonActor.bind(this));
-    html.find("[data-action='createDemonActor']").click(this._onCreateDemonActor.bind(this));
+    html.on("click.agone", ".demon-actor-open", this._onOpenDemonActor.bind(this));
+    html.on("click.agone", ".demon-actor-remove", this._onRemoveDemonActor.bind(this));
+    html.on("click.agone", "[data-action='createDemonActor']", this._onCreateDemonActor.bind(this));
     // Feedback visuel drag-over sur la zone démons
     html.find(".demons-drop-zone").each((_, el) => {
       el.addEventListener("dragover", (ev) => {
@@ -1019,24 +982,8 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     });
 
     // ── Visibilité des onglets (paramètres) ───────────────────────────────
-    html.find("[data-action='toggleTabVisibility']").change(this._onToggleTabVisibility.bind(this));
+    html.on("change.agone", "[data-action='toggleTabVisibility']", this._onToggleTabVisibility.bind(this));
 
-  }
-
-  // ==============================
-  // Description déroulante des sorts
-  // ==============================
-  _onToggleSortDesc(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const btn   = event.currentTarget;
-    const card  = btn.closest(".sort-card");
-    const panel = card?.querySelector(".sort-desc-panel");
-    if (!panel) return;
-    const isOpen = panel.style.display !== "none";
-    panel.style.display = isOpen ? "none" : "";
-    btn.querySelector("i")?.classList.toggle("fa-chevron-right", isOpen);
-    btn.querySelector("i")?.classList.toggle("fa-chevron-down", !isOpen);
   }
 
   // ==============================
@@ -1084,7 +1031,9 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     event.preventDefault();
     const li   = event.currentTarget.closest("[data-item-id]");
     const item = this.actor.items.get(li.dataset.itemId);
-    item?.sheet.render(true);
+    if (!item) return;
+    // renderChild : l'edit s'ouvre dans la même fenêtre (pop-out ou non)
+    this.renderChild(item.sheet);
   }
 
   async _onItemDelete(event) {
@@ -1092,7 +1041,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     const li   = event.currentTarget.closest("[data-item-id]");
     const item = this.actor.items.get(li.dataset.itemId);
     if (!item) return;
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
+    const confirmed = await this._confirmChild({
       title: game.i18n.localize("AGONE.Supprimer"),
       content: `<p>${game.i18n.format("AGONE.ConfirmationSuppression", { nom: item.name })}</p>`
     });
@@ -2035,6 +1984,38 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
   }
 
   // ==============================
+  // Helper : ouvre un navigateur comme enfant (V14 native)
+  // renderChild() rend l'app dans la même fenêtre que le parent,
+  // et la suit automatiquement si le parent est détaché (pop-out).
+  // ==============================
+  async _renderChildApp(app) {
+    await this.renderChild(app);
+  }
+
+  // ==============================
+  // Helper : dialog de confirmation comme enfant (suit le pop-out parent)
+  // ==============================
+  _confirmChild({ title, content }) {
+    return new Promise(resolve => {
+      let settled = false;
+      const settle = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const dialog = new foundry.applications.api.DialogV2({
+        window: { title },
+        content,
+        buttons: [
+          { action: "yes", icon: "fas fa-check", label: game.i18n.localize("Yes"), default: true,
+            callback: () => settle(true) },
+          { action: "no",  icon: "fas fa-times", label: game.i18n.localize("No"),
+            callback: () => settle(false) },
+        ],
+        rejectClose: false,
+      });
+      dialog.addEventListener("close", () => settle(false), { once: true });
+      this.renderChild(dialog);
+    });
+  }
+
+  // ==============================
   // Compendium
   // ==============================
   async _onBrowseCompendium(event) {
@@ -2046,7 +2027,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._sortsBrowser) {
         this._sortsBrowser = new SortsBrowser(this.actor);
       }
-      this._sortsBrowser.render(true);
+      this._renderChildApp(this._sortsBrowser);
       return;
     }
 
@@ -2055,7 +2036,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._competencesBrowser) {
         this._competencesBrowser = new CompetencesBrowser(this.actor);
       }
-      this._competencesBrowser.render(true);
+      this._renderChildApp(this._competencesBrowser);
       return;
     }
 
@@ -2064,7 +2045,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._armesBrowser) {
         this._armesBrowser = new ArmesBrowser(this.actor);
       }
-      this._armesBrowser.render(true);
+      this._renderChildApp(this._armesBrowser);
       return;
     }
 
@@ -2073,7 +2054,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._armuresBrowser) {
         this._armuresBrowser = new ArmuresBrowser(this.actor);
       }
-      this._armuresBrowser.render(true);
+      this._renderChildApp(this._armuresBrowser);
       return;
     }
 
@@ -2086,7 +2067,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
         // Si le browser est déjà instancié, appliquer le filtre demandé
         this._avantagesBrowser._filterType = filterType;
       }
-      this._avantagesBrowser.render(true);
+      this._renderChildApp(this._avantagesBrowser);
       return;
     }
 
@@ -2095,7 +2076,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._manoeuvresBrowser) {
         this._manoeuvresBrowser = new ManoeuvresBrowser(this.actor);
       }
-      this._manoeuvresBrowser.render(true);
+      this._renderChildApp(this._manoeuvresBrowser);
       return;
     }
 
@@ -2104,7 +2085,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._peuplesBrowser) {
         this._peuplesBrowser = new PeuplesBrowser(this.actor);
       }
-      this._peuplesBrowser.render(true);
+      this._renderChildApp(this._peuplesBrowser);
       return;
     }
 
@@ -2113,7 +2094,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._pouvoirsBrowser) {
         this._pouvoirsBrowser = new PouvoirsBrowser(this.actor);
       }
-      this._pouvoirsBrowser.render(true);
+      this._renderChildApp(this._pouvoirsBrowser);
       return;
     }
 
@@ -2122,7 +2103,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       if (!this._peinesBrowser) {
         this._peinesBrowser = new PeinesBrowser(this.actor);
       }
-      this._peinesBrowser.render(true);
+      this._renderChildApp(this._peinesBrowser);
       return;
     }
 
@@ -2450,7 +2431,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       }
       // Sinon, propose de verser les XP disponibles en réserve locale
       const aVerser = sd.experience.courante;
-      const confirmed = await foundry.applications.api.DialogV2.confirm({
+      const confirmed = await this._confirmChild({
         title:   game.i18n.localize("AGONE.XPInsuffisants"),
         content: `<p>${game.i18n.format("AGONE.PasAssezXPReserve", {
           cout:    xpCout,
@@ -2593,7 +2574,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       );
     }
     const label = btn.dataset.label ?? stat;
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
+    const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
       content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpDanseur", { nom: danseur.name, stat: label, cout })}</p>`
     });
@@ -2695,7 +2676,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     const danseur = this.actor.items.get(id);
     if (!danseur) return;
     const sd = danseur.system;
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
+    const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.DanseurValiderCrea"),
       content: `<p>${game.i18n.format("AGONE.DanseurValiderCreaConfirm", { nom: danseur.name })}</p>`
     });
@@ -2787,7 +2768,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
   // ==============================
   async _onResetCaracs(event) {
     event.preventDefault();
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
+    const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.ResetCreation"),
       content: `<p>${game.i18n.localize("AGONE.ResetCreationCaracConfirm")}</p>`
     });
@@ -2823,7 +2804,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
   // ==============================
   async _onResetComps(event) {
     event.preventDefault();
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
+    const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.ResetCreation"),
       content: `<p>${game.i18n.localize("AGONE.ResetCreationCompConfirm")}</p>`
     });
@@ -2843,7 +2824,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
   // ==============================
   async _onValiderCreation(event) {
     event.preventDefault();
-    const confirmed = await foundry.applications.api.DialogV2.confirm({
+    const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.ValiderCreation"),
       content: `<p>${game.i18n.localize("AGONE.ValiderCreationConfirm")}</p>`
     });
@@ -2945,7 +2926,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     event.preventDefault();
     const uuid  = event.currentTarget.dataset.uuid;
     const actor = await fromUuid(uuid).catch(() => null);
-    if (actor) actor.sheet.render(true);
+    if (actor) this.renderChild(actor.sheet);
   }
 
   async _onRemoveCompanion(event) {
@@ -2967,14 +2948,14 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     if (!newActor) return;
     const current = this.actor.getFlag("agone", "demons") ?? [];
     await this.actor.setFlag("agone", "demons", [...current, newActor.uuid]);
-    newActor.sheet.render(true);
+    this.renderChild(newActor.sheet);
   }
 
   async _onOpenDemonActor(event) {
     event.preventDefault();
     const uuid  = event.currentTarget.dataset.uuid;
     const actor = await fromUuid(uuid).catch(() => null);
-    if (actor) actor.sheet.render(true);
+    if (actor) this.renderChild(actor.sheet);
   }
 
   async _onRemoveDemonActor(event) {

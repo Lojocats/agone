@@ -90,7 +90,9 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     super._onRender(context, options);
 
     // ── Sauvegarde automatique de tous les champs nommés ─────────────────
-    // Le form est remplacé à chaque render donc ce listener ne s'accumule pas.
+    // AbortController : évite l'accumulation du listener si le form persiste
+    this._renderSignal?.abort();
+    this._renderSignal = new AbortController();
     const form = this.element.querySelector("form");
     if (form) {
       form.addEventListener("change", async (ev) => {
@@ -108,11 +110,12 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
                     : el.type === "number"   ? Number(el.value)
                     : el.value;
         await this.item.update(foundry.utils.expandObject({ [el.name]: value }));
-      });
+      }, { signal: this._renderSignal.signal });
     }
 
     // Gestion des onglets
     const html = $(this.element);
+    html.off(".agone");
     const activeTab = this._currentTab ?? "description";
     html.find(".sheet-tabs .item[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
@@ -120,7 +123,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     html.find(".tab[data-tab]").each((_, el) => {
       el.classList.toggle("active", el.dataset.tab === activeTab);
     });
-    html.find(".sheet-tabs .item[data-tab]").on("click", (e) => {
+    html.on("click.agone", ".sheet-tabs .item[data-tab]", (e) => {
       const tab = e.currentTarget.dataset.tab;
       if (!tab) return;
       this._currentTab = tab;
@@ -131,7 +134,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     });
 
     // Bouton "envoyer en chat"
-    html.find("[data-action='toChat']").click(async (e) => {
+    html.on("click.agone", "[data-action='toChat']", async (e) => {
       e.preventDefault();
       await this.item.toChat();
     });

@@ -36,13 +36,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pb-row {{#if item.isActif}}pb-row-actif{{/if}}" data-peuple-idx="{{item.idx}}">
-          <td>
-            {{#if item.description}}
-            <button type="button" class="pb-desc-toggle btn-icon" data-action="togglePeupleDesc" title='{{localize "AGONE.VoirDescription"}}'>
-              <i class="fas {{#if item.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
-            </button>
-            {{/if}}
-          </td>
+          <td></td>
           <td class="pb-name">
             {{item.name}}
             {{#if item.isActif}}<span class="pb-badge-actif">{{localize "AGONE.Actif"}}</span>{{/if}}
@@ -59,9 +53,14 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="pb-desc-row" data-peuple-idx="{{item.idx}}" {{#unless item.expanded}}style="display:none"{{/unless}}>
+        <tr class="pb-desc-row" data-peuple-idx="{{item.idx}}">
           <td></td>
-          <td colspan="3" class="pb-description-cell">{{item.description}}</td>
+          <td colspan="3" class="pb-description-cell">
+            <details class="item-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{item.description}}</div>
+            </details>
+          </td>
         </tr>
         {{/if}}
         {{/each}}

@@ -11,7 +11,6 @@ export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicat
     this._search        = "";
     this._filterCat     = "all";
     this._filterPossede = "all";
-    this._expanded      = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -40,7 +39,6 @@ export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicat
       categorie   : d.categorie,
       description : d.description ?? "",
       hasInActor  : actorPouvoirNames.has(d.name),
-      expanded    : this._expanded.has(String(idx)),
     }));
 
     if (this._search) {
@@ -104,25 +102,7 @@ export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicat
       this._search        = "";
       this._filterCat     = "all";
       this._filterPossede = "all";
-      this._expanded.clear();
       this.render();
-    });
-
-    // Toggle description
-    html.find("[data-action='togglePouvoirDesc']").on("click", e => {
-      const idx = e.currentTarget.closest("[data-pouvoir-idx]")?.dataset?.pouvoirIdx;
-      if (idx === undefined) return;
-      const descRow = html.find(`.pvb-desc-row[data-pouvoir-idx="${idx}"]`);
-      const icon    = e.currentTarget.querySelector("i");
-      if (this._expanded.has(idx)) {
-        this._expanded.delete(idx);
-        descRow.slideUp(120);
-        icon?.classList.replace("fa-chevron-down", "fa-chevron-right");
-      } else {
-        this._expanded.add(idx);
-        descRow.slideDown(120);
-        icon?.classList.replace("fa-chevron-right", "fa-chevron-down");
-      }
     });
 
     html.find("[data-action='addPouvoir']").on("click", async e => {

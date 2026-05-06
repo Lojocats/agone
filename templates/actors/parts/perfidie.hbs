@@ -51,13 +51,7 @@
           {{#each peines as |peine|}}
           <tr class="peine-row item-row" data-item-id="{{peine.id}}">
             <td class="item-drag-handle"><i class="fas fa-grip-vertical"></i></td>
-            <td>
-              {{#if peine.system.description}}
-              <button type="button" class="peine-desc-toggle btn-icon" data-item-id="{{peine.id}}" title='{{localize "AGONE.VoirDescription"}}'>
-                <i class="fas fa-chevron-right peine-toggle-icon"></i>
-              </button>
-              {{/if}}
-            </td>
+            <td></td>
             <td class="peine-name">{{peine.name}}</td>
             <td class="peine-noir">
               {{#if (eq peine.system.noirEffect "corps")}}
@@ -96,11 +90,18 @@
               {{/if}}
             </td>
           </tr>
-          <tr class="peine-desc-expand" data-item-id="{{peine.id}}" style="display:none">
+          {{#if peine.system.description}}
+          <tr class="peine-desc-row">
             <td></td>
             <td></td>
-            <td colspan="4" class="peine-desc-cell">{{{peine.system.description}}}</td>
+            <td colspan="4" class="peine-desc-cell">
+              <details class="item-details">
+                <summary>{{localize "AGONE.VoirDescription"}}</summary>
+                <div class="item-desc-content">{{{peine.system.description}}}</div>
+              </details>
+            </td>
           </tr>
+          {{/if}}
           {{/each}}
         </tbody>
       </table>

@@ -218,12 +218,6 @@
           {{#each group.sorts as |sort|}}
           <div class="sort-card item-row" data-item-id="{{sort.id}}" draggable="true">
             <div class="sort-card-top">
-              {{#if sort.system.description}}
-              <button type="button" class="sort-desc-toggle btn-icon" data-action="toggleSortDesc"
-                      data-item-id="{{sort.id}}" title="Description">
-                <i class="fas fa-chevron-right sort-toggle-icon"></i>
-              </button>
-              {{/if}}
               <button type="button" class="roll-btn sort-card-name item-name" data-action="rollSort"
                       data-item-id="{{sort.id}}">{{sort.name}}</button>
             </div>
@@ -238,7 +232,10 @@
               {{#if sort.system.danse}}<span class="sort-stat"><em>Lancer</em> {{sort.system.danse}}</span>{{/if}}
             </div>
             {{#if sort.system.description}}
-            <div class="sort-desc-panel" style="display:none">{{{sort.system.description}}}</div>
+            <details class="item-details sort-card-details">
+              <summary>{{localize "AGONE.VoirDescription"}}</summary>
+              <div class="item-desc-content">{{{sort.system.description}}}</div>
+            </details>
             {{/if}}
             <div class="sort-card-actions">
               <a class="item-edit" data-item-id="{{sort.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
@@ -393,20 +390,18 @@
     <ul class="pouvoirs-list">
       {{#each pouvoirs as |pouvoir|}}
       <li class="pouvoir-row item-row" data-item-id="{{pouvoir.id}}">
-        {{#if pouvoir.system.description}}
-        <button type="button" class="pouvoir-desc-toggle btn-icon" data-item-id="{{pouvoir.id}}" title="Description">
-          <i class="fas fa-chevron-right pouvoir-toggle-icon"></i>
-        </button>
-        {{else}}
-        <span style="width:14px;display:inline-block"></span>
-        {{/if}}
         <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
         <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" title='Envoyer dans le chat'>{{pouvoir.name}}</button>
         <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
         <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
       </li>
       {{#if pouvoir.system.description}}
-      <li class="pouvoir-desc-expand" data-item-id="{{pouvoir.id}}">{{pouvoir.system.description}}</li>
+      <li class="pouvoir-desc-li">
+        <details class="item-details">
+          <summary>{{localize "AGONE.VoirDescription"}}</summary>
+          <div class="item-desc-content">{{pouvoir.system.description}}</div>
+        </details>
+      </li>
       {{/if}}
       {{/each}}
     </ul>

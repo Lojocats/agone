@@ -1161,6 +1161,30 @@ export class AgoneActor extends Actor {
   }
 
   /**
+   * Ouvre un DialogV2 comme enfant de la fiche active (suit le pop-out parent).
+   * Fallback sur DialogV2.wait si aucune fiche rendue.
+   */
+  async _renderChildDialog(options) {
+    const sheet = Object.values(this.apps || {}).find(a => a.rendered);
+    if (!sheet) return foundry.applications.api.DialogV2.wait(options);
+    return new Promise(resolve => {
+      let settled = false;
+      const settle = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const buttons = (options.buttons ?? []).map(btn => ({
+        ...btn,
+        callback: (event, button, dialog) => {
+          const result = btn.callback?.(event, button, dialog) ?? btn.action;
+          settle(result);
+          return result;
+        },
+      }));
+      const dialog = new foundry.applications.api.DialogV2({ ...options, buttons });
+      dialog.addEventListener("close", () => settle(null), { once: true });
+      sheet.renderChild(dialog);
+    });
+  }
+
+  /**
    * Affiche un dialog spécialisé pour le lancer de sort avec bonus/malus et augmentation du seuil.
    * @param {string} label     - Titre du dialog
    * @param {number} seuilBase - Seuil de base du sort (affiché à titre indicatif)
@@ -1172,7 +1196,7 @@ export class AgoneActor extends Actor {
       ? `${seuilBase} × 2 = ${seuilBase * 2} (improvisé)`
       : `${seuilBase}`;
 
-    const result = await foundry.applications.api.DialogV2.wait({
+    const result = await this._renderChildDialog({
       window:  { title: label },
       content: `
         <form>
@@ -1231,7 +1255,7 @@ export class AgoneActor extends Actor {
                 <label for="bonusSpe">${game.i18n.localize("AGONE.BonusSpecialite")} <em>${specialite}</em> (+1)</label>
               </div>` : "";
 
-    const result = await foundry.applications.api.DialogV2.wait({
+    const result = await this._renderChildDialog({
       window:  { title: label },
       content: `
         <form>
