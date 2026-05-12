@@ -230,7 +230,7 @@
       </div>
 
       <div class="cstat-item cstat-emprise" title="{{tooltipsDerives.emprise}}">
-        <span class="cstat-roll cstat-passive"><i class="fas fa-fire"></i></span>
+        <button type="button" class="cstat-roll" data-action="rollEmpriseAttr" title='{{localize "AGONE.JeterEmprise"}}'><i class="fas fa-fire"></i></button>
         <span class="cstat-score">{{system.emprise}}</span>
         {{#if bonusDonEmprise}}<span class="racial-bonus-badge {{#if (lt bonusDonEmprise 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonEmprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonEmprise 0)}}+{{/if}}{{bonusDonEmprise}}</span>{{/if}}
         {{#if bonusDeriveSupp.emprise}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.emprise 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.emprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.emprise 0)}}+{{/if}}{{bonusDeriveSupp.emprise}}</span>{{/if}}

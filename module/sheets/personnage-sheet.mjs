@@ -790,6 +790,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     html.on("click.agone", "[data-action='rollSort']", this._onRollSort.bind(this));
     html.on("click.agone", "[data-action='rollSortImpro']", this._onRollSortImpro.bind(this));
     html.on("click.agone", "[data-action='rollEmprise']", this._onRollEmprise.bind(this));
+    html.on("click.agone", "[data-action='rollEmpriseAttr']", this._onRollEmpriseAttr.bind(this));
     html.on("click.agone", "[data-action='rollImprovisation']", this._onRollImprovisation.bind(this));
 
     html.on("click.agone", "[data-action='rollAptitudeMagie']", this._onRollAptitudeMagie.bind(this));
@@ -1303,6 +1304,39 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
       aptTotal:  { label: "Total Emprise",           value: aptitude },
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",           value: modif >= 0 ? `+${modif}` : modif },
+    });
+  }
+
+  async _onRollEmpriseAttr(event) {
+    event.preventDefault();
+    const sd    = this.actor.system;
+    const label = game.i18n.localize("AGONE.JeterEmprise");
+
+    // Source EMP selon obédience magique (sd.emprise est déjà calculé)
+    const empSourceLabel = sd.typeMage === "jorniste"      ? `INT (${sd.intelligence?.score ?? 0}) — Jorniste`
+                         : sd.typeMage === "obscurantiste" ? `VOL (${sd.volonte?.score ?? 0}) — Obscurantiste`
+                         : `(INT ${sd.intelligence?.score ?? 0} + VOL ${sd.volonte?.score ?? 0}) / 2 — Éclipsiste`;
+
+    // Compétence de Résonance
+    const compResonance = this.actor.items.find(i =>
+      i.type === "competence" && i.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes("resonance")
+    );
+    const scoreResonance = compResonance?.system.score ?? 0;
+    const bonusEsprit    = sd.bonusEsprit ?? 0;
+    const empriseBase    = sd.emprise ?? 0;
+
+    const modif = await this.actor._dialogModificateur(label);
+    if (modif === null) return;
+
+    const roll = new Roll("1d10x10 + @emp + @res + @modif", {
+      emp: empriseBase, res: scoreResonance, modif
+    });
+    await roll.evaluate();
+    await this.actor._sendRollToChat(roll, label, {
+      empBase:   { label: "Emprise (base)",                          value: empriseBase, tooltip: empSourceLabel },
+      resonance: { label: compResonance?.name ?? "Résonance",        value: `+${scoreResonance}` },
+      ...(bonusEsprit ? { esprit: { label: "Bonus Esprit", value: `+${bonusEsprit}` } } : {}),
+      modif:     { label: "Bonus / Malus",                           value: modif >= 0 ? `+${modif}` : modif },
     });
   }
 
