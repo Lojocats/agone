@@ -46,26 +46,58 @@ export class AgoneItem extends Item {
    */
   async toChat() {
     const sd = this.system;
-    // Carte générique d'item pour le chat
-    let details = "";
+    const descHTML = sd.description
+      ? await foundry.applications.ux.TextEditor.implementation.enrichHTML(sd.description, { async: true })
+      : "";
+
+    // ── Arme ─────────────────────────────────────────────────────────
     if (this.type === "arme") {
-      details = `<em>${sd.type ?? ""} · ${sd.style ?? ""}</em><br>Dom : ${sd.dommages ?? "-"} | ATT : ${sd.attackTotal ?? sd.attackBonus ?? 0} | DEF : ${sd.defenseTotal ?? sd.defenseBonus ?? 0}`;
-    } else if (this.type === "armure") {
+      const STYLE_LABELS = { melee: "Mêlée", jet: "Jet", trait: "Trait", bouclier: "Bouclier" };
+      const content = await foundry.applications.handlebars.renderTemplate(
+        "systems/agone/templates/chat/item-card.hbs",
+        {
+          item:       this,
+          actor:      this.actor ?? null,
+          typeLabel:  STYLE_LABELS[sd.style] ?? sd.style,
+          styleLabel: STYLE_LABELS[sd.style] ?? sd.style,
+          bd:         this.actor?.system.bd ?? 0,
+          reqStr:     sd.reqFor > 0 || sd.reqAgi > 0,
+          descHTML,
+        }
+      );
+      return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.actor }), content });
+    }
+
+    // ── Manœuvre / Botte ─────────────────────────────────────────────
+    if (this.type === "manoeuvre") {
+      const catLabel  = sd.categorie === "botte" ? "Botte secrète" : "Manœuvre";
+      const fmtMod = (v) => v === null || v === undefined ? "—" : (v >= 0 ? `+${v}` : `${v}`);
+      const content = await foundry.applications.handlebars.renderTemplate(
+        "systems/agone/templates/chat/item-card.hbs",
+        {
+          item:      this,
+          actor:     this.actor ?? null,
+          typeLabel: catLabel,
+          hasMods:   sd.ini !== null || sd.att !== null || sd.def !== null || sd.dom !== "0",
+          iniLabel:  fmtMod(sd.ini),
+          attLabel:  fmtMod(sd.att),
+          defLabel:  fmtMod(sd.def),
+          descHTML,
+        }
+      );
+      return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.actor }), content });
+    }
+
+    // ── Autres types (sort, armure, pouvoir, don…) ───────────────────
+    let details = "";
+    if (this.type === "armure") {
       details = `PRO : ${sd.protection ?? 0} | -AGI : ${sd.malusAgi ?? 0}`;
     } else if (this.type === "sort") {
       details = `Seuil : ${sd.seuil ?? 0} | Portée : ${sd.portee ?? "-"} | Durée : ${sd.duree ?? "-"}`;
     } else if (this.type === "pouvoir") {
       const catLabel = sd.categorie === "saisonin" ? "Saisonin" : "Pouvoir de Flamme";
       details = `<em>${catLabel}</em>`;
-    } else if (this.type === "manoeuvre") {
-      const catLabel = sd.categorie === "botte" ? "Botte secrète" : "Manœuvre";
-      const parts = [`<em>${catLabel}</em>`];
-      if (sd.score) parts.push(`Score : ${sd.score}`);
-      if (sd.malus) parts.push(`Malus : ${sd.malus}`);
-      details = parts.join(" · ");
     }
-    const descHTML = sd.description ? await foundry.applications.ux.TextEditor.implementation.enrichHTML(sd.description, { async: true }) : "";
-
     const content = `
       <div class="agone chat-item-card">
         <div class="card-header">
@@ -75,9 +107,6 @@ export class AgoneItem extends Item {
         ${details ? `<p class="card-details">${details}</p>` : ""}
         ${descHTML ? `<div class="card-desc">${descHTML}</div>` : ""}
       </div>`;
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-      content
-    });
+    return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.actor }), content });
   }
 }

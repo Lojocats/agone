@@ -225,6 +225,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/items/danseur-sheet.hbs",
     // Chat
     "systems/agone/templates/chat/roll-result.hbs",
+    "systems/agone/templates/chat/item-card.hbs",
     // Apps
     "systems/agone/templates/apps/sorts-browser.hbs",
     "systems/agone/templates/apps/armes-browser.hbs",

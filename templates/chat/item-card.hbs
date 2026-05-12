@@ -1,0 +1,67 @@
+{{! Carte d'item envoyée dans le chat }}
+<div class="agone-item-card agone-item-type-{{item.type}}">
+  <div class="item-card-header">
+    <img src="{{item.img}}" class="item-card-img" alt="{{item.name}}" />
+    <div class="item-card-title">
+      <h3 class="item-card-name">{{item.name}}</h3>
+      {{#if typeLabel}}<span class="item-card-typelabel">{{typeLabel}}</span>{{/if}}
+    </div>
+  </div>
+
+  {{! ── ARME ── }}
+  {{#if (eq item.type "arme")}}
+  <div class="item-card-stats">
+    <div class="item-stat-row">
+      <span class="item-stat-badge item-stat-style">{{styleLabel}}</span>
+      <span class="item-stat-badge item-stat-type">{{item.system.type}}</span>
+      {{#if item.system.portee}}<span class="item-stat-badge"><i class="fas fa-location-arrow"></i> {{item.system.portee}}</span>{{/if}}
+    </div>
+    <table class="item-stat-table">
+      <thead><tr>
+        <th>{{localize "AGONE.InitiativeAbr"}}</th>
+        <th>{{localize "AGONE.AttaqueAbr"}}</th>
+        <th>{{localize "AGONE.ParadeAbr"}}</th>
+        <th>{{localize "AGONE.DommagesAbr"}}</th>
+      </tr></thead>
+      <tbody><tr>
+        <td>{{#if item.system.initBonus}}{{#if (gte item.system.initBonus 0)}}+{{/if}}{{item.system.initBonus}}{{else}}—{{/if}}</td>
+        <td>{{#if actor}}{{item.system.attackTotal}}{{else}}{{#if (gte item.system.attackBonus 0)}}+{{/if}}{{item.system.attackBonus}}{{/if}}</td>
+        <td>{{#if actor}}{{item.system.defenseTotal}}{{else}}{{#if (gte item.system.defenseBonus 0)}}+{{/if}}{{item.system.defenseBonus}}{{/if}}</td>
+        <td>{{item.system.dommages}}{{#if actor}} <span class="item-stat-dim">(+{{bd}})</span>{{/if}}</td>
+      </tr></tbody>
+    </table>
+    {{#if reqStr}}<p class="item-card-req">{{localize "AGONE.Req"}} : FOR {{item.system.reqFor}}{{#if item.system.reqAgi}} / AGI {{item.system.reqAgi}}{{/if}}</p>{{/if}}
+  </div>
+  {{/if}}
+
+  {{! ── MANŒUVRE / BOTTE ── }}
+  {{#if (eq item.type "manoeuvre")}}
+  <div class="item-card-stats">
+    {{#if hasMods}}
+    <table class="item-stat-table">
+      <thead><tr>
+        <th>{{localize "AGONE.InitiativeAbr"}}</th>
+        <th>{{localize "AGONE.AttaqueAbr"}}</th>
+        <th>{{localize "AGONE.DefenseAbr"}}</th>
+        <th>{{localize "AGONE.DommagesAbr"}}</th>
+      </tr></thead>
+      <tbody><tr>
+        <td>{{iniLabel}}</td>
+        <td>{{attLabel}}</td>
+        <td>{{defLabel}}</td>
+        <td>{{item.system.dom}}</td>
+      </tr></tbody>
+    </table>
+    {{/if}}
+    {{#if item.system.condition}}<p class="item-card-condition"><i class="fas fa-exclamation-circle"></i> {{item.system.condition}}</p>{{/if}}
+  </div>
+  {{/if}}
+
+  {{! ── DESCRIPTION ── }}
+  {{#if descHTML}}
+  <details class="item-card-desc-details" open>
+    <summary><i class="fas fa-book-open"></i> {{localize "AGONE.Description"}}</summary>
+    <div class="item-card-desc">{{{descHTML}}}</div>
+  </details>
+  {{/if}}
+</div>

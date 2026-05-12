@@ -56,9 +56,20 @@
   </div>
   {{/if}}
 
+  {{#if armeMeta}}
+  <div class="roll-sort-meta">
+    {{#if (eq armeMeta.style "trait")}}<span class="sort-meta-badge sort-type"><i class="fas fa-bow-arrow"></i> Trait</span>
+    {{else if (eq armeMeta.style "jet")}}<span class="sort-meta-badge sort-type"><i class="fas fa-khanda"></i> Jet</span>
+    {{else if (eq armeMeta.style "bouclier")}}<span class="sort-meta-badge sort-type"><i class="fas fa-shield-alt"></i> Bouclier</span>
+    {{else}}<span class="sort-meta-badge sort-type"><i class="fas fa-sword"></i> Mêlée</span>{{/if}}
+    {{#if armeMeta.portee}}<span class="sort-meta-badge"><i class="fas fa-location-arrow"></i> {{armeMeta.portee}}</span>{{/if}}
+    {{#if armeMeta.dommages}}<span class="sort-meta-badge"><i class="fas fa-tint"></i> Dom : {{armeMeta.dommages}}{{#if armeMeta.dommagesTotal}} (tot. {{armeMeta.dommagesTotal}}){{/if}}</span>{{/if}}
+  </div>
+  {{/if}}
+
   {{#if description}}
   <details class="roll-sort-description">
-    <summary><i class="fas fa-book-open"></i> Description du sort</summary>
+    <summary><i class="fas fa-book-open"></i> {{#if sortMeta}}Description du sort{{else}}Description{{/if}}</summary>
     <div class="roll-sort-desc-content">{{{description}}}</div>
   </details>
   {{/if}}

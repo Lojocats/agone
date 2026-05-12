@@ -619,11 +619,13 @@ export class AgoneActor extends Actor {
     let base = sd.initiative ?? 0;
     let label = game.i18n.localize("AGONE.Initiative");
 
+    let armeInit = null;
     if (armeId) {
       const arme = this.items.get(armeId);
       if (arme) {
         base += arme.system.initBonus ?? 0;
         label += ` (${arme.name})`;
+        armeInit = arme;
       }
     }
 
@@ -641,7 +643,17 @@ export class AgoneActor extends Actor {
       base:  `Initiative : ${base}`,
       modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+    }, armeInit ? {
+      arme:        armeInit,
+      typeJet:     "initiative",
+      description: armeInit.system.description ?? "",
+      armeMeta: {
+        dommages:      armeInit.system.dommages ?? "",
+        dommagesTotal: armeInit.system.dommagesTotal ?? null,
+        portee:        armeInit.system.portee || null,
+        style:         armeInit.system.style ?? "melee",
+      }
+    } : {});
 
     // Mettre à jour le tracker de combat
     await this._setInitiativeInCombat(Math.max(0, roll.total));
@@ -718,7 +730,17 @@ export class AgoneActor extends Actor {
       aspect:    `Bonus Corps : ${bonusCorps}`,
       modif:     `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    }, { arme, typeJet: "attaque" });
+    }, {
+      arme,
+      typeJet: "attaque",
+      description: arme.system.description ?? "",
+      armeMeta: {
+        dommages:      arme.system.dommages ?? "",
+        dommagesTotal: arme.system.dommagesTotal ?? null,
+        portee:        arme.system.portee || null,
+        style:         style,
+      }
+    });
     return roll;
   }
 
@@ -761,7 +783,17 @@ export class AgoneActor extends Actor {
       aspect:    `Bonus Corps : ${bonusCorps}`,
       modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    }, { arme, typeJet: "parade" });
+    }, {
+      arme,
+      typeJet: "parade",
+      description: arme.system.description ?? "",
+      armeMeta: {
+        dommages:      arme.system.dommages ?? "",
+        dommagesTotal: arme.system.dommagesTotal ?? null,
+        portee:        arme.system.portee || null,
+        style:         arme.system.style ?? "melee",
+      }
+    });
     return roll;
   }
 
@@ -1474,7 +1506,8 @@ export class AgoneActor extends Actor {
         arme:          extra.arme ?? null,
         typeJetCombat: extra.typeJet ?? null,
         description:   extra.description || null,
-        sortMeta:      extra.sortMeta     || null
+        sortMeta:      extra.sortMeta     || null,
+        armeMeta:      extra.armeMeta     || null
       }
     );
 

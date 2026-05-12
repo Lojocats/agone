@@ -32,7 +32,7 @@ for (const p of PEUPLES_DATA) {
 
 
 // Multiplicateurs XP pour la montée de niveau (après création)
-AGONE.xpMultipliers = { aspect: 7, carac: 5, competence: 5, avantage: 10, defaut: 5 };
+AGONE.xpMultipliers = { aspect: 7, carac: 5, competence: 3, avantage: 10, defaut: 5 };
 
 // Table d'achat à la création (coûts cumulatifs, niveau 0-10)
 // Coût incrémental de N→N+1 : table[N+1] - table[N]

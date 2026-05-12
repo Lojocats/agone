@@ -1466,3 +1466,150 @@
   border-color: var(--agone-gold, #c9a227);
   color: var(--agone-brown-dark, #3b1e0a);
 }
+
+/* ── Chat : cartes d'items (armes, manœuvres, bottes) ────── */
+.agone-item-card {
+  background: var(--agone-parchment, #f4e8c1);
+  border: 1px solid var(--agone-border, #7d5a2a);
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: var(--agone-dark-text, #2a1a08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  max-width: 320px;
+}
+.agone-item-card .item-card-header {
+  background: var(--agone-brown, #5c3a1e);
+  color: var(--agone-parchment, #f4e8c1);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone-item-card .item-card-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.3);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.agone-item-card .item-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.agone-item-card .item-card-name {
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agone-item-card .item-card-typelabel {
+  font-size: 10px;
+  opacity: 0.75;
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+.agone-item-card .item-card-stats {
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.agone-item-card .item-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+.agone-item-card .item-stat-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(93,58,30,0.1);
+  border: 1px solid rgba(93,58,30,0.2);
+  color: var(--agone-brown);
+  white-space: nowrap;
+}
+.agone-item-card .item-stat-badge.item-stat-style {
+  background: rgba(201,162,39,0.15);
+  border-color: rgba(201,162,39,0.4);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.agone-item-card .item-stat-badge.item-stat-type {
+  background: rgba(93,58,30,0.07);
+  font-size: 10px;
+}
+.agone-item-card .item-stat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.agone-item-card .item-stat-table th {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.7;
+  text-align: center;
+  padding: 2px 4px;
+  border-bottom: 1px solid rgba(92,58,30,0.15);
+}
+.agone-item-card .item-stat-table td {
+  text-align: center;
+  padding: 3px 4px;
+  font-weight: 600;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-item-card .item-stat-dim {
+  font-size: 10px;
+  opacity: 0.6;
+  font-weight: normal;
+}
+.agone-item-card .item-card-req {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.75;
+  margin: 2px 0 0;
+  text-align: right;
+}
+.agone-item-card .item-card-condition {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  border-left: 2px solid rgba(93,58,30,0.3);
+  padding-left: 6px;
+  margin: 0;
+}
+.agone-item-card .item-card-desc-details {
+  border-top: 1px solid rgba(93,58,30,0.15);
+  margin: 0;
+}
+.agone-item-card .item-card-desc-details > summary {
+  padding: 4px 10px;
+  background: rgba(93,58,30,0.05);
+  font-size: 11px;
+  color: var(--agone-brown);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.agone-item-card .item-card-desc-details > summary::-webkit-details-marker { display: none; }
+.agone-item-card .item-card-desc-details > summary:hover { background: rgba(93,58,30,0.1); }
+.agone-item-card .item-card-desc {
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone-item-card .item-card-desc p { margin: 0 0 4px; }
+.agone-item-card .item-card-desc p:last-child { margin: 0; }
