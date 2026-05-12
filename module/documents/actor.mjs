@@ -1013,6 +1013,7 @@ export class AgoneActor extends Actor {
       modif:    `Bonus/Malus : ${modif}`,
       ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
     }, {
+      seuilNumeric: seuilFinal,
       description: sort.system.description ?? "",
       sortMeta: {
         typeMagie: sort.system.typeMagie ?? "",
@@ -1079,6 +1080,7 @@ export class AgoneActor extends Actor {
       bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
       modif:     { label: "Bonus / Malus",  value: modif >= 0 ? `+${modif}` : modif },
     }, {
+      seuilNumeric: seuil,
       description: sortData.description ?? "",
       sortMeta: {
         typeMagie: sortData.typeMagie ?? "",
@@ -1445,6 +1447,13 @@ export class AgoneActor extends Actor {
       if (isMegaFumble) Hooks.callAll("agone.megaFumble", { actor: this, roll: finalRoll, fumbleRoll });
     }
 
+    // Si fumble et seuil numérique fourni, recalculer le résultat sur le total ajusté
+    let finalResultat = resultatLabel;
+    if (isFumble && extra.seuilNumeric !== undefined && resultatLabel !== null) {
+      const adjustedTotal = finalRoll.total - fumblePenalty;
+      finalResultat = adjustedTotal >= extra.seuilNumeric ? "✔ Succès" : "✘ Échec";
+    }
+
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/agone/templates/chat/roll-result.hbs",
       {
@@ -1454,7 +1463,7 @@ export class AgoneActor extends Actor {
         total:         finalRoll.total,
         details:       detailsArr,
         rollType,
-        resultat:      resultatLabel,
+        resultat:      finalResultat,
         seuil:         seuilValue,
         isFumble,
         fumblePenalty,
