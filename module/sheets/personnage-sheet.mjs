@@ -675,13 +675,15 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
 
   /**
    * @override
-   * Sauvegarde le nom du champ focalisé AVANT le re-render pour le restaurer après.
+   * Sauvegarde le nom du champ focalisé ET la position de scroll AVANT le re-render.
    */
   async _renderHTML(context, options) {
     const focused = document.activeElement;
     const isOurInput = this.element?.contains(focused) &&
       ["INPUT", "SELECT", "TEXTAREA"].includes(focused?.tagName ?? "");
     this._pendingFocusName = isOurInput ? (focused.name || null) : null;
+    const scrollEl = this.element?.querySelector(".sheet-body");
+    this._pendingScrollTop = scrollEl ? scrollEl.scrollTop : 0;
     return super._renderHTML(context, options);
   }
 
@@ -689,13 +691,21 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Restaurer le focus après re-render
+    // Restaurer le focus et le scroll après re-render
     if (this._pendingFocusName) {
       const name = this._pendingFocusName;
       this._pendingFocusName = null;
       requestAnimationFrame(() => {
         const el = this.element.querySelector(`[name="${CSS.escape(name)}"]`);
         if (el) el.focus();
+      });
+    }
+    if (this._pendingScrollTop > 0) {
+      const st = this._pendingScrollTop;
+      this._pendingScrollTop = 0;
+      requestAnimationFrame(() => {
+        const scrollEl = this.element?.querySelector(".sheet-body");
+        if (scrollEl) scrollEl.scrollTop = st;
       });
     }
 
@@ -2251,7 +2261,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     if (compRaciales.length) {
       const VALID_ATTRS = ["agilite","force","perception","resistance","intelligence","volonte","charisma","creativite","melee","tir"];
       const itemsData = compRaciales.map(c => ({
-        name:   c.specialite ? `${c.nom} (${c.specialite})` : c.nom,
+        name:   c.nom,
         type:   "competence",
         system: {
           nom:         c.nom,
