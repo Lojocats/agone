@@ -65,7 +65,10 @@ export class AgoneItem extends Item {
           descHTML,
         }
       );
-      return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.actor }), content });
+      return ChatMessage.create(ChatMessage.applyRollMode(
+        { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
+        game.settings.get("core", "rollMode")
+      ));
     }
 
     // ── Manœuvre / Botte ─────────────────────────────────────────────
@@ -85,7 +88,10 @@ export class AgoneItem extends Item {
           descHTML,
         }
       );
-      return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.actor }), content });
+      return ChatMessage.create(ChatMessage.applyRollMode(
+        { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
+        game.settings.get("core", "rollMode")
+      ));
     }
 
     // ── Autres types (sort, armure, pouvoir, don…) ───────────────────
@@ -107,6 +113,9 @@ export class AgoneItem extends Item {
         ${details ? `<p class="card-details">${details}</p>` : ""}
         ${descHTML ? `<div class="card-desc">${descHTML}</div>` : ""}
       </div>`;
-    return ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: this.actor }), content });
+    return ChatMessage.create(ChatMessage.applyRollMode(
+      { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
+      game.settings.get("core", "rollMode")
+    ));
   }
 }

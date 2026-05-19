@@ -907,11 +907,10 @@ export class AgoneActor extends Actor {
       }
     );
 
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      content,
-      rolls: [roll]
-    });
+    await ChatMessage.create(ChatMessage.applyRollMode(
+      { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [roll] },
+      game.settings.get("core", "rollMode")
+    ));
     return roll;
   }
 
@@ -1511,11 +1510,10 @@ export class AgoneActor extends Actor {
       }
     );
 
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      content,
-      rolls: [finalRoll]
-    });
+    await ChatMessage.create(ChatMessage.applyRollMode(
+      { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [finalRoll] },
+      game.settings.get("core", "rollMode")
+    ));
     return finalRoll;
   }
 }
