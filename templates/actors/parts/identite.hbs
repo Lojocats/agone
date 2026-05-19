@@ -123,13 +123,14 @@
     <div class="section-header">
       <h3 class="section-title">{{localize "AGONE.Historique"}}</h3>
     </div>
-    <div class="editor prosemirror">
-      <div class="editor-menu"></div>
-      <div class="editor-content identite-editor" data-edit="system.historique">{{{historiqueHTML}}}</div>
-    </div>
+    {{#if editable}}
+      <prose-mirror name="system.historique" value="{{system.historique}}" document-uuid="{{actor.uuid}}"></prose-mirror>
+    {{else}}
+      <div class="editor-content">{{{historiqueHTML}}}</div>
+    {{/if}}
   </div>
 
-  <!-- ── Description (si renseignée) ── -->
+  {{!-- <!-- ── Description (si renseignée) ── -->
   {{#if system.description}}
   <div class="identite-notes-zone">
     <div class="section-header">
@@ -137,6 +138,6 @@
     </div>
     <div class="editor-content">{{{descriptionHTML}}}</div>
   </div>
-  {{/if}}
+  {{/if}} --}}
 
 </div>

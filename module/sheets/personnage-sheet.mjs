@@ -39,6 +39,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     context.system    = system;
     context.actor     = actor;
     context.isOwner   = actor.isOwner;
+    context.editable  = this.isEditable;
     context.isGM      = game.user.isGM;
 
     // Tri des items par type
@@ -718,6 +719,14 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, { capture: true, signal: this._renderSignal.signal });
+
+    // ── Auto-save prose-mirror sur perte de focus ──────────────────────────
+    for (const pm of this.element.querySelectorAll("prose-mirror[name]")) {
+      pm.addEventListener("focusout", (ev) => {
+        if (pm.contains(ev.relatedTarget)) return; // focus resté dans l'éditeur
+        pm.dispatchEvent(new Event("change", { bubbles: true }));
+      }, { signal: this._renderSignal.signal });
+    }
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
     const _actorForm = this.element.querySelector("form");
