@@ -149,6 +149,11 @@ export class DanseurData extends foundry.abstract.TypeDataModel {
       empriseBonus:      new fields.NumberField({ initial: 0, integer: true }),
       empathieBonus:     new fields.NumberField({ initial: 0, integer: true }),
       enduranceBonus:    new fields.NumberField({ initial: 0, integer: true }),
+      // Réserves XP par stat (XP déposés en attente de la prochaine montée)
+      memoireExp:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      empriseExp:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      empathieExp:       new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      enduranceExp:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       saison:            new fields.StringField({ initial: "" }),
       // Valeurs courantes (état actuel)
       memoireActuelle:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),

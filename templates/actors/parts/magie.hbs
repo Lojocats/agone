@@ -336,6 +336,33 @@
         </div>
       </div>
       {{else}}
+      {{#if ../showLevelUp}}
+      <div class="danseur-levelup-section">
+        {{#each d.levelUpStats as |lu|}}
+        <div class="danseur-levelup-row">
+          <span class="danseur-levelup-label">{{lu.label}} <em class="danseur-niv-badge">niv.{{lu.niv}}</em></span>
+          <input type="number" class="danseur-inline-num danseur-exp-stat-input" min="0"
+                 data-item-id="{{../id}}" data-field="{{lu.expField}}"
+                 value="{{lu.localExp}}"
+                 title="XP en réserve pour {{lu.label}}">
+          <button type="button" class="leveldown-btn" data-action="levelDownDanseur"
+                  data-item-id="{{../id}}" data-stat="{{lu.nivField}}" data-exp-field="{{lu.expField}}"
+                  data-cout-down="{{lu.coutDown}}" data-label="{{lu.label}}"
+                  {{#unless lu.canDown}}disabled{{/unless}}
+                  title="Rétrograder {{lu.label}} (remboursement {{lu.coutDown}} XP)">
+            <i class="fas fa-arrow-down"></i> {{lu.coutDown}} XP
+          </button>
+          <button type="button" class="levelup-btn" data-action="levelUpDanseur"
+                  data-item-id="{{../id}}" data-stat="{{lu.nivField}}" data-exp-field="{{lu.expField}}"
+                  data-cout="{{lu.cout}}" data-label="{{lu.label}}"
+                  {{#unless lu.canUp}}disabled{{/unless}}
+                  title="Monter {{lu.label}} (coût : {{lu.cout}} XP)">
+            <i class="fas fa-arrow-up"></i> {{lu.cout}} XP
+          </button>
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
       {{/if}}
 
       <!-- SORTS mémorisés (toujours visible) -->

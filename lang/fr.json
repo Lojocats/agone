@@ -332,6 +332,7 @@
     "DanseurReactiverCrea":     "Retour en mode création",
     "MonterNiveauDanseur":         "Montée de niveau — Danseur",
     "ConfirmerLevelUpDanseur":     "Dépenser {cout} XP pour améliorer {stat} de {nom} de +1 ?",
+    "ConfirmerLevelDownDanseur":   "Rétrograder {stat} de {nom} de -1 et récupérer {cout} XP ?",
     "PasAssezXPDanseur":           "XP insuffisants pour {nom} : il faut {cout} XP (disponibles : {actuel}).",
 
     "Demons":             "Démons intérieurs",

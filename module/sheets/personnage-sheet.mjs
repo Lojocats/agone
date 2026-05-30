@@ -134,6 +134,21 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
         nextNiv: x.niv < 7 ? x.niv + 1 : null,
       }));
 
+      // Données de montée de niveau (mode XP) : coût = (niveauSuivant) × 3
+      const MULT_DANSEUR = 3;
+      const levelUpStats = [
+        { stat: "memoire",   nivField: "memoireNiveau",   expField: "memoireExp",   label: "Mémoire",   niv: sd.memoireNiveau   ?? 1, localExp: sd.memoireExp   ?? 0 },
+        { stat: "emprise",   nivField: "empriseNiveau",   expField: "empriseExp",   label: "Emprise",   niv: sd.empriseNiveau   ?? 1, localExp: sd.empriseExp   ?? 0 },
+        { stat: "empathie",  nivField: "empathieNiveau",  expField: "empathieExp",  label: "Empathie",  niv: sd.empathieNiveau  ?? 1, localExp: sd.empathieExp  ?? 0 },
+        { stat: "endurance", nivField: "enduranceNiveau", expField: "enduranceExp", label: "Endurance", niv: sd.enduranceNiveau ?? 1, localExp: sd.enduranceExp ?? 0 },
+      ].map(x => ({
+        ...x,
+        cout:     (x.niv + 1) * MULT_DANSEUR,
+        coutDown: x.niv * MULT_DANSEUR,
+        canUp:    x.niv < 7,
+        canDown:  x.niv > 1,
+      }));
+
       return {
         id: d.id, name: d.name, img: d.img,
         system: d.system,
@@ -142,6 +157,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
         memoireUtilisee: assignedSorts.reduce((sum, s) => sum + (s.seuil ?? 0), 0),
         isFull: (assignedSorts.reduce((sum, s) => sum + (s.seuil ?? 0), 0)) >= (sd.capaciteSeuil ?? sd.memoireMax * 5),
         creaNiveaux,
+        levelUpStats,
         ptsDepense, ptsRestants, ptsBudget,
         capaciteSeuil: sd.capaciteSeuil ?? (sd.memoireMax * 5),
         potentielEmprise: (context.system.aptitudeEmprise ?? 0) + (sd.bonusEmprise ?? 0),
@@ -904,6 +920,7 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
 
     // Montée de niveau danseur
     html.on("click.agone", "[data-action='levelUpDanseur']", this._onLevelUpDanseur.bind(this));
+    html.on("click.agone", "[data-action='levelDownDanseur']", this._onLevelDownDanseur.bind(this));
 
     // Création danseur — +/- niveau par stat
     html.on("click.agone", "[data-action='danseurNiveauUp']", ev   => this._onDanseurNiveau(ev, +1));
@@ -2609,34 +2626,99 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
   }
 
   // ==============================
-  // Montée de niveau d'un Danseur (dépense XP danseur)
+  // Montée de niveau d'un Danseur (dépense XP personnage + réserve locale)
   // ==============================
   async _onLevelUpDanseur(event) {
     event.preventDefault();
-    const btn    = event.currentTarget;
-    const itemId = btn.dataset.itemId;
-    const stat   = btn.dataset.stat;
-    const cout   = Number(btn.dataset.cout);
+    const btn     = event.currentTarget;
+    const itemId  = btn.dataset.itemId;
+    const stat    = btn.dataset.stat;
+    const cout    = Number(btn.dataset.cout);
+    const label   = btn.dataset.label ?? stat;
     const danseur = this.actor.items.get(itemId);
     if (!danseur) return;
 
-    const xpActuel = danseur.system.experience ?? 0;
-    if (xpActuel < cout) {
-      return ui.notifications.error(
-        game.i18n.format("AGONE.PasAssezXPDanseur", { cout, actuel: xpActuel, nom: danseur.name })
-      );
+    const sd        = this.actor.system;
+    const expField  = stat.replace("Niveau", "Exp");    // ex. "memoireNiveau" → "memoireExp"
+    const localExp  = danseur.system[expField] ?? 0;    // réserve par stat
+    const fromLocal = Math.min(localExp, cout);
+    const fromGeneral = cout - fromLocal;
+
+    // XP du personnage insuffisants
+    if (fromGeneral > (sd.experience?.courante ?? 0)) {
+      const totalDispo = localExp + (sd.experience?.courante ?? 0);
+      // Aucun XP du tout → erreur directe
+      if ((sd.experience?.courante ?? 0) === 0) {
+        return ui.notifications.error(
+          game.i18n.format("AGONE.PasAssezXP", { cout, actuel: totalDispo })
+        );
+      }
+      // Propose de verser les XP disponibles en réserve de cette stat
+      const aVerser    = sd.experience.courante;
+      const confirmed  = await this._confirmChild({
+        title:   game.i18n.localize("AGONE.XPInsuffisants"),
+        content: `<p>${game.i18n.format("AGONE.PasAssezXPReserve", {
+          cout,
+          actuel:  totalDispo,
+          reserve: aVerser
+        })}</p>`
+      });
+      if (!confirmed) return;
+      await Promise.all([
+        danseur.update({ [`system.${expField}`]: localExp + aVerser }),
+        this.actor.update({ "system.experience.courante": 0 }),
+      ]);
+      return;
     }
-    const label = btn.dataset.label ?? stat;
+
     const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
       content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpDanseur", { nom: danseur.name, stat: label, cout })}</p>`
     });
     if (!confirmed) return;
 
-    await danseur.update({
-      [`system.${stat}`]:       (danseur.system[stat] ?? 0) + 1,
-      "system.experience":      xpActuel - cout,
+    await Promise.all([
+      danseur.update({
+        [`system.${stat}`]:       (danseur.system[stat] ?? 0) + 1,
+        ...(fromLocal > 0 ? { [`system.${expField}`]: localExp - fromLocal } : {}),
+      }),
+      this.actor.update({
+        ...(fromGeneral > 0 ? { "system.experience.courante": (sd.experience?.courante ?? 0) - fromGeneral } : {}),
+        "system.experience.totale": (sd.experience?.totale ?? 0) + cout,
+      }),
+    ]);
+  }
+
+  // ==============================
+  // Rétrogradation d'un Danseur (remboursement XP vers pool général)
+  // ==============================
+  async _onLevelDownDanseur(event) {
+    event.preventDefault();
+    const btn      = event.currentTarget;
+    const itemId   = btn.dataset.itemId;
+    const stat     = btn.dataset.stat;
+    const coutDown = Number(btn.dataset.coutDown);
+    const danseur  = this.actor.items.get(itemId);
+    if (!danseur) return;
+
+    const nivActuel = danseur.system[stat] ?? 1;
+    if (nivActuel <= 1) return;
+
+    const label  = btn.dataset.label ?? stat;
+    const sd     = this.actor.system;
+    const confirmed = await this._confirmChild({
+      title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
+      content: `<p>${game.i18n.format("AGONE.ConfirmerLevelDownDanseur", { nom: danseur.name, stat: label, cout: coutDown })}</p>`
     });
+    if (!confirmed) return;
+
+    await Promise.all([
+      danseur.update({ [`system.${stat}`]: nivActuel - 1 }),
+      this.actor.update({
+        "system.experience.courante": (sd.experience?.courante ?? 0) + coutDown,
+        "system.experience.totale":   Math.max(0, (sd.experience?.totale ?? 0) - coutDown),
+      }),
+    ]);
   }
 
   // ==============================

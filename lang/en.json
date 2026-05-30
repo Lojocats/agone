@@ -331,6 +331,7 @@
     "DanseurReactiverCrea":     "Return to creation mode",
     "MonterNiveauDanseur":         "Level up \u2014 Dancer",
     "ConfirmerLevelUpDanseur":     "Spend {cout} XP to improve {stat} of {nom} by +1?",
+    "ConfirmerLevelDownDanseur":   "Downgrade {stat} of {nom} by -1 and recover {cout} XP?",
     "PasAssezXPDanseur":           "Insufficient XP for {nom}: need {cout} XP ({actuel} available).",
 
     "Demons":             "Inner Demons",
