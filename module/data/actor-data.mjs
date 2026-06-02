@@ -458,6 +458,18 @@ export class DemonData extends foundry.abstract.TypeDataModel {
       charisma:    new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       creativite:  new fields.NumberField({ initial: 1, integer: true, min: 0 }),
 
+      // XP et amélioration
+      experience:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      modeLevelUp:     new fields.BooleanField({ initial: false }),
+      // XP buffers par caractéristique (pour capitalisation partielle)
+      agiliteExp:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      forceExp:        new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      perceptionExp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      intelligenceExp: new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      volonteExp:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      charismaExp:     new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+      creativiteExp:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
+
       // Stats physiques
       tai:         new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       mv:          new fields.NumberField({ initial: 3, integer: true, min: 0 }),

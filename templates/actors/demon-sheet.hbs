@@ -58,36 +58,40 @@
         <!-- Colonne gauche : caractéristiques + stats dérivées -->
         <div class="npc-left-col">
           <div class="combat-card">
-            <h3 class="combat-card-title"><i class="fas fa-fist-raised"></i> {{localize "AGONE.Caracteristiques"}}</h3>
+            <h3 class="combat-card-title" style="display:flex;align-items:center;gap:6px;">
+              <span style="flex:1"><i class="fas fa-fist-raised"></i> {{localize "AGONE.Caracteristiques"}}</span>
+              <label style="font-size:0.8em;font-weight:normal;">{{localize "AGONE.Exp"}}</label>
+              <input type="number" name="system.experience" value="{{system.experience}}" class="stat-num" min="0" style="width:42px;" />
+              <button type="button" class="btn-icon{{#if showLevelUp}} active{{/if}}" data-action="toggleLevelUpDemon"
+                      title='{{localize "AGONE.ToggleLevelUpDemon"}}'>
+                <i class="fas fa-star"></i>
+              </button>
+            </h3>
             <div class="carac-grid npc-carac-grid">
+              {{#each levelUpCaracs as |c|}}
               <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Agilite"}}</label>
-                <input type="number" name="system.agilite" value="{{system.agilite}}" class="stat-num" />
+                <label>{{localize c.labelKey}}</label>
+                <input type="number" name="system.{{c.key}}" value="{{c.score}}" class="stat-num" />
+                {{#if ../showLevelUp}}
+                <input type="number" name="system.{{c.expField}}" value="{{c.localExp}}" class="stat-num" min="0"
+                       style="width:32px;" title='{{c.shortLabel}} — {{localize "AGONE.ExpReservee"}}' />
+                <button type="button" class="leveldown-btn" data-action="levelDownCaracDemon"
+                        data-key="{{c.key}}" data-exp-field="{{c.expField}}"
+                        data-cout="{{c.coutDown}}" data-label="{{c.shortLabel}}"
+                        {{#unless c.canDown}}disabled{{/unless}}
+                        title="{{c.shortLabel}} -1 (remb. {{c.coutDown}} XP)">
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+                <button type="button" class="levelup-btn" data-action="levelUpCaracDemon"
+                        data-key="{{c.key}}" data-exp-field="{{c.expField}}"
+                        data-cout="{{c.cout}}" data-label="{{c.shortLabel}}"
+                        {{#unless c.canUp}}disabled{{/unless}}
+                        title="{{c.shortLabel}} +1 ({{c.cout}} XP)">
+                  <i class="fas fa-arrow-up"></i> {{c.cout}}
+                </button>
+                {{/if}}
               </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Force"}}</label>
-                <input type="number" name="system.force" value="{{system.force}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Perception"}}</label>
-                <input type="number" name="system.perception" value="{{system.perception}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Intelligence"}}</label>
-                <input type="number" name="system.intelligence" value="{{system.intelligence}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Volonte"}}</label>
-                <input type="number" name="system.volonte" value="{{system.volonte}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Charisma"}}</label>
-                <input type="number" name="system.charisma" value="{{system.charisma}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Creativite"}}</label>
-                <input type="number" name="system.creativite" value="{{system.creativite}}" class="stat-num" />
-              </div>
+              {{/each}}
             </div>
           </div>
 
@@ -378,14 +382,22 @@
       {{> systems/agone/templates/actors/parts/competences.hbs}}
     </div>
     <!-- ══ NOTES ════════════════════════════════════════════════════════════ -->
-    <div class="tab" data-group="primary" data-tab="notes">
-      <div class="editor-container">
+    <div class="tab" data-group="primary" data-tab="notes" style="display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
+      <div class="editor-container" style="flex:1;">
         <h3>{{localize "AGONE.Connivances"}}</h3>
-        {{editor connivancesHTML target="system.connivances" button=true editable=owner}}
+        {{#if editable}}
+          <prose-mirror name="system.connivances" value="{{system.connivances}}" document-uuid="{{actor.uuid}}"></prose-mirror>
+        {{else}}
+          <div class="editor-content">{{{connivancesHTML}}}</div>
+        {{/if}}
       </div>
-      <div class="editor-container" style="margin-top:12px;">
+      <div class="editor-container" style="flex:1;">
         <h3>{{localize "AGONE.Notes"}}</h3>
-        {{editor notesHTML target="system.notes" button=true editable=owner}}
+        {{#if editable}}
+          <prose-mirror name="system.notes" value="{{system.notes}}" document-uuid="{{actor.uuid}}"></prose-mirror>
+        {{else}}
+          <div class="editor-content">{{{notesHTML}}}</div>
+        {{/if}}
       </div>
     </div>
 

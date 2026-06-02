@@ -326,7 +326,11 @@
     <!-- NOTES -->
     <div class="tab" data-group="primary" data-tab="notes">
       <div class="editor-container">
-        {{editor descriptionHTML target="system.description" button=true editable=owner}}
+        {{#if editable}}
+          <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}"></prose-mirror>
+        {{else}}
+          <div class="editor-content">{{{descriptionHTML}}}</div>
+        {{/if}}
       </div>
     </div>
 

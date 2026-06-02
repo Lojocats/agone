@@ -1008,9 +1008,17 @@
   background: rgba(255,255,255,0.35);
   min-height: 80px;
   padding: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.agone .editor-container prose-mirror {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 60px;
 }
 .agone .editor-container .ProseMirror {
-  min-height: 80px;
+  min-height: 60px;
   outline: none;
   font-size: 13px;
   line-height: 1.5;

@@ -23,7 +23,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
   /** @override — template dynamique selon le type d'item */
   async _renderHTML(context, options) {
     const template = `systems/agone/templates/items/${this.item.type}-sheet.hbs`;
-    const html = await renderTemplate(template, context);
+    const html = await foundry.applications.handlebars.renderTemplate(template, context);
     const el = document.createElement("div");
     el.innerHTML = html;
     const partNode = el.firstElementChild ?? el;

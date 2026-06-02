@@ -334,6 +334,12 @@
     "ConfirmerLevelUpDanseur":     "Dépenser {cout} XP pour améliorer {stat} de {nom} de +1 ?",
     "ConfirmerLevelDownDanseur":   "Rétrograder {stat} de {nom} de -1 et récupérer {cout} XP ?",
     "PasAssezXPDanseur":           "XP insuffisants pour {nom} : il faut {cout} XP (disponibles : {actuel}).",
+    "LevelUpDemon":                 "Amélioration — Diablotin",
+    "ToggleLevelUpDemon":           "Mode amélioration (Diab.)",
+    "ConfirmerLevelUpCaracDemon":   "Dépenser {cout} XP pour améliorer {stat} de {nom} de +1 ?",
+    "ConfirmerLevelDownCaracDemon": "Rétrograder {stat} de {nom} de -1 et récupérer {cout} XP ?",
+    "ConfirmerLevelUpCompDemon":    "Dépenser {cout} XP pour améliorer {nom} de +1 ?",
+    "ConfirmerLevelDownCompDemon":  "Rétrograder {nom} de -1 et récupérer {cout} XP ?",
 
     "Demons":             "Démons intérieurs",
     "NouveauDemon":       "Nouveau démon",
@@ -540,7 +546,7 @@
     "Empathie":  "Empathie",
     "Memoire":   "Mémoire",
     "Endurance": "Endurance",
-    "Connivances": "Connivances",
+    "Connivances": "Connivences",
 
     "Mort":        "Mort",
     "Inconscient": "Inconscient",

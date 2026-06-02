@@ -439,7 +439,11 @@
       <div class="npc-notes-block">
         <h3 class="npc-notes-title">{{localize "AGONE.Notes"}}</h3>
         <div class="editor-container">
-          {{editor descriptionHTML target="system.description" button=true editable=owner}}
+          {{#if editable}}
+            <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}"></prose-mirror>
+          {{else}}
+            <div class="editor-content">{{{descriptionHTML}}}</div>
+          {{/if}}
         </div>
       </div>
       <div class="npc-notes-block">

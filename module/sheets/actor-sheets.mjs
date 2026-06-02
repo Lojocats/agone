@@ -69,9 +69,10 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
     context.showLevelUp = false;
     context.showLevelUpComp = false;
     context.showLevelUpAspect = false;
-    context.descriptionHTML = await TextEditor.enrichHTML(
+    context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       system.description ?? "", { async: true, secrets: this.actor.isOwner }
     );
+    context.editable = this.isEditable;
     return context;
   }
 
@@ -87,6 +88,14 @@ export class CompagnonSheet extends foundry.applications.api.HandlebarsApplicati
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, { capture: true, signal: this._renderSignal.signal });
+
+    // ── Auto-save prose-mirror sur perte de focus ──────────────────────────
+    for (const pm of this.element.querySelectorAll("prose-mirror[name]")) {
+      pm.addEventListener("focusout", (ev) => {
+        if (pm.contains(ev.relatedTarget)) return;
+        pm.dispatchEvent(new Event("change", { bubbles: true }));
+      }, { signal: this._renderSignal.signal });
+    }
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
     const _actorForm = this.element.querySelector("form");
@@ -276,9 +285,39 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
       .map(([score, comps]) => ({ label: `Niveau ${score}`, className: `score-${score}`, comps }));
     context.competencesNonAcquises = [];
     context.triCompsEstFamille = false;
-    context.showLevelUp = false;
-    context.showLevelUpComp = false;
-    context.showLevelUpAspect = false;
+    const _luActive = !!this.actor.system.modeLevelUp;
+    context.showLevelUp      = _luActive;
+    context.showLevelUpComp  = _luActive;
+    context.showLevelUpAspect = _luActive;
+    // Caractéristiques avec données de level-up
+    const _DEMON_CARACS = [
+      { key: "agilite",      labelKey: "AGONE.Attribut.Agilite",      shortLabel: "AGI" },
+      { key: "force",        labelKey: "AGONE.Attribut.Force",        shortLabel: "FOR" },
+      { key: "perception",   labelKey: "AGONE.Attribut.Perception",   shortLabel: "PER" },
+      { key: "intelligence", labelKey: "AGONE.Attribut.Intelligence", shortLabel: "INT" },
+      { key: "volonte",      labelKey: "AGONE.Attribut.Volonte",      shortLabel: "VOL" },
+      { key: "charisma",     labelKey: "AGONE.Attribut.Charisma",     shortLabel: "CHA" },
+      { key: "creativite",   labelKey: "AGONE.Attribut.Creativite",   shortLabel: "CRÉ" },
+    ];
+    context.levelUpCaracs = _DEMON_CARACS.map(c => ({
+      key:        c.key,
+      expField:   `${c.key}Exp`,
+      labelKey:   c.labelKey,
+      shortLabel: c.shortLabel,
+      score:      this.actor.system[c.key] ?? 0,
+      localExp:   this.actor.system[`${c.key}Exp`] ?? 0,
+      cout:       2,
+      coutDown:   2,
+      canDown:    (this.actor.system[c.key] ?? 0) > 0,
+      canUp:      (this.actor.system[c.key] ?? 0) < 5,
+    }));
+    // Coût XP fixe 1 pour les compétences du Diablotin (+1 carac = 2 XP, +1 comp = 1 XP)
+    for (const c of context.competences) {
+      c.xpCout          = 1;
+      c.creaCout        = 1;
+      c.coutAffiche     = "1 XP";
+      c.coutAfficheDown = "1 XP";
+    }
     // Sélecteur d'origine : types chromatiques + types de palier démoniaques
     const origineChoices = [
       { value: "",                label: "—" },
@@ -296,15 +335,17 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
       { value: "siamoisTenebres", label: game.i18n.localize("AGONE.Peine.siamoisTenebres") },
     ];
     context.origineOptions = origineChoices.map(o => ({ ...o, selected: this.actor.system.origine === o.value }));
-    context.descriptionHTML = await TextEditor.enrichHTML(
+    context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.actor.system.description ?? "", { async: true, secrets: this.actor.isOwner }
     );
-    context.connivancesHTML = await TextEditor.enrichHTML(
+    context.connivancesHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.actor.system.connivances ?? "", { async: true, secrets: this.actor.isOwner }
     );
-    context.notesHTML = await TextEditor.enrichHTML(
+    context.notesHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       this.actor.system.notes ?? "", { async: true, secrets: this.actor.isOwner }
     );
+    context.actor    = this.actor;
+    context.editable = this.isEditable;
     return context;
   }
 
@@ -320,6 +361,14 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, { capture: true, signal: this._renderSignal.signal });
+
+    // ── Auto-save prose-mirror sur perte de focus ──────────────────────────
+    for (const pm of this.element.querySelectorAll("prose-mirror[name]")) {
+      pm.addEventListener("focusout", (ev) => {
+        if (pm.contains(ev.relatedTarget)) return;
+        pm.dispatchEvent(new Event("change", { bubbles: true }));
+      }, { signal: this._renderSignal.signal });
+    }
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────
     const _actorForm = this.element.querySelector("form");
@@ -448,6 +497,127 @@ export class DemonSheet extends foundry.applications.api.HandlebarsApplicationMi
     });
     html.on("click.agone", ".comp-search-clear", () => {
       html.find(".comp-search-input").val("").trigger("input");
+    });
+
+    // ── Level-up Diablotin ────────────────────────────────────────────────
+    html.on("click.agone", "[data-action='toggleLevelUpDemon']", async (e) => {
+      e.preventDefault();
+      await this.actor.update({ "system.modeLevelUp": !this.actor.system.modeLevelUp });
+    });
+
+    html.on("click.agone", "[data-action='levelUpCaracDemon']", async (e) => {
+      e.preventDefault();
+      const btn      = e.currentTarget;
+      const key      = btn.dataset.key;
+      const expField = btn.dataset.expField;
+      const cout     = Number(btn.dataset.cout); // 2
+      const label    = btn.dataset.label ?? key;
+      const sd       = this.actor.system;
+      const localExp  = sd[expField] ?? 0;
+      const fromLocal = Math.min(localExp, cout);
+      const fromExp   = cout - fromLocal;
+      if (fromExp > (sd.experience ?? 0)) {
+        const totalDispo = localExp + (sd.experience ?? 0);
+        if ((sd.experience ?? 0) === 0) {
+          return ui.notifications.error(game.i18n.format("AGONE.PasAssezXP", { cout, actuel: totalDispo }));
+        }
+        const aVerser   = sd.experience;
+        const confirmed = await confirmChildDialog(this, {
+          title:   game.i18n.localize("AGONE.XPInsuffisants"),
+          content: `<p>${game.i18n.format("AGONE.PasAssezXPReserve", { cout, actuel: totalDispo, reserve: aVerser })}</p>`,
+        });
+        if (!confirmed) return;
+        await this.actor.update({ [`system.${expField}`]: localExp + aVerser, "system.experience": 0 });
+        return;
+      }
+      const confirmed = await confirmChildDialog(this, {
+        title:   game.i18n.localize("AGONE.LevelUpDemon"),
+        content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpCaracDemon", { stat: label, nom: this.actor.name, cout })}</p>`,
+      });
+      if (!confirmed) return;
+      const updates = { [`system.${key}`]: (sd[key] ?? 0) + 1 };
+      if (fromLocal > 0) updates[`system.${expField}`]  = localExp - fromLocal;
+      if (fromExp   > 0) updates["system.experience"]   = (sd.experience ?? 0) - fromExp;
+      await this.actor.update(updates);
+    });
+
+    html.on("click.agone", "[data-action='levelDownCaracDemon']", async (e) => {
+      e.preventDefault();
+      const btn    = e.currentTarget;
+      const key    = btn.dataset.key;
+      const cout   = Number(btn.dataset.cout); // 2
+      const label  = btn.dataset.label ?? key;
+      const sd     = this.actor.system;
+      if ((sd[key] ?? 0) <= 0) return;
+      const confirmed = await confirmChildDialog(this, {
+        title:   game.i18n.localize("AGONE.LevelUpDemon"),
+        content: `<p>${game.i18n.format("AGONE.ConfirmerLevelDownCaracDemon", { stat: label, nom: this.actor.name, cout })}</p>`,
+      });
+      if (!confirmed) return;
+      await this.actor.update({
+        [`system.${key}`]:   (sd[key] ?? 0) - 1,
+        "system.experience": (sd.experience ?? 0) + cout,
+      });
+    });
+
+    // Level-up compétence Diablotin (coût fixe 1 XP par niveau)
+    html.on("click.agone", "[data-action='levelUp'][data-type='competence']", async (e) => {
+      e.preventDefault();
+      const btn      = e.currentTarget;
+      const itemId   = btn.dataset.itemId;
+      const cout     = Number(btn.dataset.cout); // 1
+      const item     = this.actor.items.get(itemId);
+      if (!item) return;
+      const sd       = this.actor.system;
+      const localExp  = item.system.exp ?? 0;
+      const fromLocal = Math.min(localExp, cout);
+      const fromExp   = cout - fromLocal;
+      if (fromExp > (sd.experience ?? 0)) {
+        const totalDispo = localExp + (sd.experience ?? 0);
+        if ((sd.experience ?? 0) === 0) {
+          return ui.notifications.error(game.i18n.format("AGONE.PasAssezXP", { cout, actuel: totalDispo }));
+        }
+        const aVerser   = sd.experience;
+        const confirmed = await confirmChildDialog(this, {
+          title:   game.i18n.localize("AGONE.XPInsuffisants"),
+          content: `<p>${game.i18n.format("AGONE.PasAssezXPReserve", { cout, actuel: totalDispo, reserve: aVerser })}</p>`,
+        });
+        if (!confirmed) return;
+        await Promise.all([
+          item.update({ "system.exp": localExp + aVerser }),
+          this.actor.update({ "system.experience": 0 }),
+        ]);
+        return;
+      }
+      const confirmed = await confirmChildDialog(this, {
+        title:   game.i18n.localize("AGONE.LevelUpDemon"),
+        content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpCompDemon", { nom: item.name, cout })}</p>`,
+      });
+      if (!confirmed) return;
+      const itemUpdates = { "system.score": (item.system.score ?? 0) + 1 };
+      if (fromLocal > 0) itemUpdates["system.exp"] = localExp - fromLocal;
+      await Promise.all([
+        item.update(itemUpdates),
+        ...(fromExp > 0 ? [this.actor.update({ "system.experience": (sd.experience ?? 0) - fromExp })] : []),
+      ]);
+    });
+
+    html.on("click.agone", "[data-action='levelDown'][data-type='competence']", async (e) => {
+      e.preventDefault();
+      const btn    = e.currentTarget;
+      const itemId = btn.dataset.itemId;
+      const item   = this.actor.items.get(itemId);
+      if (!item || (item.system.score ?? 0) <= 0) return;
+      const sd = this.actor.system;
+      const confirmed = await confirmChildDialog(this, {
+        title:   game.i18n.localize("AGONE.LevelUpDemon"),
+        content: `<p>${game.i18n.format("AGONE.ConfirmerLevelDownCompDemon", { nom: item.name, cout: 1 })}</p>`,
+      });
+      if (!confirmed) return;
+      await Promise.all([
+        item.update({ "system.score": (item.system.score ?? 0) - 1 }),
+        this.actor.update({ "system.experience": (sd.experience ?? 0) + 1 }),
+      ]);
     });
   }
 }
@@ -579,9 +749,10 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
     }
     context.danseurs = [];
 
-    context.descriptionHTML = await TextEditor.enrichHTML(
+    context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       system.description ?? "", { async: true, secrets: this.actor.isOwner }
     );
+    context.editable = this.isEditable;
     return context;
   }
 
@@ -597,6 +768,14 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         if (ev.target.value === "" || isNaN(Number(ev.target.value))) ev.target.value = "0";
       }
     }, { capture: true, signal: this._renderSignal.signal });
+
+    // ── Auto-save prose-mirror sur perte de focus ──────────────────────────
+    for (const pm of this.element.querySelectorAll("prose-mirror[name]")) {
+      pm.addEventListener("focusout", (ev) => {
+        if (pm.contains(ev.relatedTarget)) return;
+        pm.dispatchEvent(new Event("change", { bubbles: true }));
+      }, { signal: this._renderSignal.signal });
+    }
 
     // ── Sauvegarde automatique des champs nommés (acteur) ─────────────────────
     const _actorForm = this.element.querySelector("form");

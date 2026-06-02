@@ -332,6 +332,12 @@
     "MonterNiveauDanseur":         "Level up \u2014 Dancer",
     "ConfirmerLevelUpDanseur":     "Spend {cout} XP to improve {stat} of {nom} by +1?",
     "ConfirmerLevelDownDanseur":   "Downgrade {stat} of {nom} by -1 and recover {cout} XP?",
+    "LevelUpDemon":                 "Improvement — Diablotin",
+    "ToggleLevelUpDemon":           "Improvement mode (Diab.)",
+    "ConfirmerLevelUpCaracDemon":   "Spend {cout} XP to improve {stat} of {nom} by +1?",
+    "ConfirmerLevelDownCaracDemon": "Downgrade {stat} of {nom} by -1 and recover {cout} XP?",
+    "ConfirmerLevelUpCompDemon":    "Spend {cout} XP to improve {nom} by +1?",
+    "ConfirmerLevelDownCompDemon":  "Downgrade {nom} by -1 and recover {cout} XP?",
     "PasAssezXPDanseur":           "Insufficient XP for {nom}: need {cout} XP ({actuel} available).",
 
     "Demons":             "Inner Demons",
@@ -539,7 +545,7 @@
     "Empathie":  "Empathy",
     "Memoire":   "Memory",
     "Endurance": "Endurance",
-    "Connivances": "Connivances",
+    "Connivances": "Connivences",
 
     "Mort":        "Dead",
     "Inconscient": "Unconscious",

@@ -46,7 +46,7 @@ export class CalendrierWidget {
   // ── Rendu ────────────────────────────────────────────────────
   async render(_force = false) {
     const data = this.getData();
-    const html = await renderTemplate(
+    const html = await foundry.applications.handlebars.renderTemplate(
       "systems/agone/templates/apps/calendrier-widget.hbs",
       data
     );
