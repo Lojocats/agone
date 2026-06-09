@@ -100,7 +100,9 @@ AGONE.attributs = {
   intelligence:{ label: "AGONE.Attribut.Intelligence",abbr: "INT", aspect: "esprit" },
   volonte:     { label: "AGONE.Attribut.Volonte",     abbr: "VOL", aspect: "esprit" },
   charisma:    { label: "AGONE.Attribut.Charisma",    abbr: "CHA", aspect: "ame" },
-  creativite:  { label: "AGONE.Attribut.Creativite",  abbr: "CRE", aspect: "ame" }
+  creativite:  { label: "AGONE.Attribut.Creativite",  abbr: "CRE", aspect: "ame" },
+  melee:       { label: "AGONE.Attribut.Melee",       abbr: "MÊL", aspect: "corps" },
+  tir:         { label: "AGONE.Attribut.Tir",         abbr: "TIR", aspect: "corps" },
 };
 
 // Malus de blessures graves [0 BG, 1 BG, 2 BG, 3 BG]

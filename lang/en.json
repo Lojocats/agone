@@ -474,6 +474,12 @@
     "Parade":        "Parry",
     "Esquive":       "Dodge",
     "EsquiveDistance": "Ranged dodge",
+    "InitiativeAbr":  "Initiative",
+    "AttaqueAbr":     "Attack",
+    "ParadeAbr":      "Parry",
+    "DommagesAbr":     "Damage",
+    "Req":            "Required",
+
 
     "ResultatJet":   "Result",
     "Detail":        "Detail",
@@ -519,7 +525,9 @@
       "Intelligence": "Intelligence",
       "Volonte":      "Willpower",
       "Charisma":     "Charisma",
-      "Creativite":   "Creativity"
+      "Creativite":   "Creativity",
+      "Melee":        "Melee",
+      "Tir":          "Ranged"
     },
 
     "Arme": {

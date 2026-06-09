@@ -475,6 +475,11 @@
     "Parade":        "Parade",
     "Esquive":       "Esquive",
     "EsquiveDistance": "Esquive à distance",
+    "InitiativeAbr":  "Initiative",
+    "AttaqueAbr":     "Attaque",
+    "ParadeAbr":      "Parade",
+    "DommagesAbr":     "Dommages",
+    "Req":            "Requis",
 
     "ResultatJet":   "Résultat",
     "Detail":        "Détail",
@@ -520,7 +525,9 @@
       "Intelligence": "Intelligence",
       "Volonte":      "Volonté",
       "Charisma":     "Charisme",
-      "Creativite":   "Créativité"
+      "Creativite":   "Créativité",
+      "Melee":        "Mêlée",
+      "Tir":          "Tir"
     },
 
     "Arme": {
