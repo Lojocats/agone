@@ -698,15 +698,27 @@ export class AgoneActor extends Actor {
     if (!arme) return;
 
     const style = arme.system.style ?? "melee";
-    let baseAttack = style === "trait" ? (sd.tir ?? 0) : (sd.melee ?? 0);
 
     // Compétence liée
     const nomComp = arme.system.competence;
     let scoreComp = 0;
+    let comp = null;
     if (nomComp) {
-      const comp = this.items.find(i => i.type === "competence" && i.system.domaine === nomComp);
+      comp = this.items.find(i => i.type === "competence" && i.system.domaine === nomComp);
       scoreComp = comp?.system.score ?? 0;
     }
+
+    // Caractéristique de base : attributLie de la compétence, sinon fallback sur le style de l'arme
+    const attributLie = comp?.system.attributLie ?? (style === "trait" ? "tir" : "melee");
+    let baseAttack;
+    if (attributLie === "melee") {
+      baseAttack = sd.melee ?? 0;
+    } else if (attributLie === "tir") {
+      baseAttack = sd.tir ?? 0;
+    } else {
+      baseAttack = sd[attributLie]?.score ?? 0;
+    }
+    const baseAttackLabel = attributLie === "tir" ? "TIR" : attributLie === "melee" ? "MÊL" : attributLie.toUpperCase();
 
     const attackBonus = arme.system.attackBonus ?? 0;
     const bonusCorps  = sd.bonusCorps ?? 0;
@@ -724,7 +736,7 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      style:     `${style === "trait" ? "TIR" : "MÊL"} : ${baseAttack}`,
+      style:     `${baseAttackLabel} : ${baseAttack}`,
       competence:`Compétence : ${scoreComp}`,
       arme:      `Bonus arme : ${attackBonus}`,
       aspect:    `Bonus Corps : ${bonusCorps}`,
