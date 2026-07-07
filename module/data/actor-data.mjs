@@ -312,6 +312,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     // Alias FVTT : la barre token cherche .value et .min, le schéma utilise .valeur
     this.pdv.value = this.pdv.valeur;
     this.pdv.min   = 0;
+    // Alias de compatibilité modules (Health Estimate, etc.) qui cherchent attributes.hp
+    this.attributes = { hp: { value: this.pdv.valeur, min: 0, max: this.pdv.max } };
     this.bd  = taiTables.lookupBd(this.force.score, this.tai);
     this.modPoids = taiTables.lookupTai(taiTables.taiToModPoids, this.tai);
     this.chargeMax = (this.force.score + this.resistance.score) * this.modPoids;
@@ -432,6 +434,10 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
     this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    // Alias de compatibilité modules (Health Estimate, etc.) qui cherchent attributes.hp
+    this.pdv.value = this.pdv.valeur;
+    this.pdv.min   = 0;
+    this.attributes = { hp: { value: this.pdv.valeur, min: 0, max: this.pdv.max } };
   }
 }
 
@@ -520,6 +526,8 @@ export class DemonData extends foundry.abstract.TypeDataModel {
     // Alias token bar
     this.densite.value = this.densite.valeur;
     this.densite.min   = 0;
+    // Alias de compatibilité modules (Health Estimate, etc.) qui cherchent attributes.hp
+    this.attributes = { hp: { value: this.densite.valeur, min: 0, max: this.densite.max } };
   }
 }
 
@@ -584,5 +592,9 @@ export class PnjData extends foundry.abstract.TypeDataModel {
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
     this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    // Alias de compatibilité modules (Health Estimate, etc.) qui cherchent attributes.hp
+    this.pdv.value = this.pdv.valeur;
+    this.pdv.min   = 0;
+    this.attributes = { hp: { value: this.pdv.valeur, min: 0, max: this.pdv.max } };
   }
 }

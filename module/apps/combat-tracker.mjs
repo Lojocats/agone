@@ -213,7 +213,7 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
         if (effect) {
           const existing = actor.effects.find(ef => ef.statuses.has(statusId));
           if (existing) await existing.delete();
-          else await ActiveEffect.create({ name: effect.label, icon: effect.icon, statuses: [statusId] }, { parent: actor });
+          else await ActiveEffect.create({ name: effect.name, img: effect.img, statuses: [statusId] }, { parent: actor });
         }
       }
     });

@@ -249,15 +249,16 @@ Hooks.once("init", () => {
 
   // ── Modificateur de status d'effets ────────────────────────────────────
   CONFIG.statusEffects = [
-    { id: "mort",        label: "AGONE.Mort",        icon: "icons/svg/skull.svg" },
-    { id: "inconscient", label: "AGONE.Inconscient",  icon: "icons/svg/unconscious.svg" },
-    { id: "blesse",      label: "AGONE.Blesse",       icon: "icons/svg/blood.svg" },
-    { id: "epuise",      label: "AGONE.Epuise",       icon: "icons/svg/degen.svg" },
-    { id: "immobilise",  label: "AGONE.Immobilise",   icon: "icons/svg/net.svg" },
-    { id: "contraint",   label: "AGONE.Contraint",    icon: "icons/svg/padlock.svg" },
-    { id: "aveugle",     label: "AGONE.Aveugle",      icon: "icons/svg/blind.svg" },
-    { id: "sourd",       label: "AGONE.Sourd",        icon: "icons/svg/deaf.svg" },
-    { id: "entenebrement", label: "AGONE.Entenebrement", icon: "icons/svg/eye.svg" },
+    { id: "mort",          name: "AGONE.Mort",          img: "icons/svg/skull.svg" },
+    { id: "inconscient",   name: "AGONE.Inconscient",   img: "icons/svg/unconscious.svg" },
+    { id: "blesse",        name: "AGONE.Blesse",        img: "icons/svg/blood.svg" },
+    { id: "epuise",        name: "AGONE.Epuise",        img: "icons/svg/degen.svg" },
+    { id: "immobilise",    name: "AGONE.Immobilise",    img: "icons/svg/net.svg" },
+    { id: "contraint",     name: "AGONE.Contraint",     img: "icons/svg/padlock.svg" },
+    { id: "aveugle",       name: "AGONE.Aveugle",       img: "icons/svg/blind.svg" },
+    { id: "sourd",         name: "AGONE.Sourd",         img: "icons/svg/deaf.svg" },
+    { id: "entenebrement", name: "AGONE.Entenebrement", img: "icons/svg/eye.svg" },
+    { id: "ralentissement", name: "AGONE.Ralentissement", img: "icons/svg/sleep.svg" },
   ];
 
   console.log("Agone | Initialisation terminée");

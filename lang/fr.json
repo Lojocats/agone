@@ -563,6 +563,7 @@
     "Contraint":   "Contraint",
     "Aveugle":     "Aveugle",
     "Sourd":       "Sourd",
+    "Ralentissement": "Ralentissement",
 
     "SanteLabelSection": "Textes de santé (survol token)",
     "SanteLabel100":     "Palier 100 % (pleine santé)",

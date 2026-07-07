@@ -563,6 +563,7 @@
     "Contraint":   "Restrained",
     "Aveugle":     "Blind",
     "Sourd":       "Deaf",
+    "Ralentissement": "Slowed",
 
     "SanteLabelSection": "Health texts (token hover)",
     "SanteLabel100":     "100% threshold (full health)",
