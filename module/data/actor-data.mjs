@@ -377,19 +377,7 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     const malusTable = [0, -2, -6, -12];
     this.malusBlessureGrave = malusTable[this.blessuresGraves];
 
-    // Malus armure selon type (Partielle: malusPer = malusAgi/2, Complète: malusPer = malusAgi)
-    if (this.armure.portee) {
-      if (this.armure.type === "1") {
-        this.armure.malusPer = Math.floor(this.armure.malusAgi / 2);
-      } else if (this.armure.type === "2") {
-        this.armure.malusPer = this.armure.malusAgi;
-      } else {
-        this.armure.malusPer = 0;
-      }
-    } else {
-      this.armure.malusPer = 0;
-      this.armure._malusAgiActif = 0;
-    }
+    // malusPer stocké directement sur l'item (0 / 1 / 3 selon couverture), pas dérivé ici
     this.armure._malusAgiActif = this.armure.portee ? -this.armure.malusAgi : 0;
     this.armure._malusPerActif  = this.armure.portee ? -this.armure.malusPer : 0;
 

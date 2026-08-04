@@ -31,16 +31,18 @@
           <th class="arb-col-type">{{localize "AGONE.Browser.Couverture"}}</th>
           <th class="arb-col-prot" title='{{localize "AGONE.Protection"}}'>{{localize "AGONE.Combat.Pro"}}</th>
           <th class="arb-col-malus" title='{{localize "AGONE.MalusAgi"}}'>{{localize "AGONE.Combat.MalusAgi"}}</th>
+          <th class="arb-col-malus" title='{{localize "AGONE.MalusPer"}}'>{{localize "AGONE.Combat.MalusPer"}}</th>
           <th class="arb-col-action"></th>
         </tr>
       </thead>
       <tbody>
         {{#each items as |item|}}
         <tr class="arb-row {{#if item.hasInActor}}arb-has-item{{/if}}" data-armure-idx="{{item.idx}}">
-          <td class="arb-name">{{item.name}}</td>
+          <td class="arb-name">{{item.label}}</td>
           <td class="arb-type">{{item.typeLabel}}</td>
           <td class="arb-prot"><strong>{{item.protection}}</strong></td>
           <td class="arb-malus">{{#if item.malusAgi}}-{{item.malusAgi}}{{else}}0{{/if}}</td>
+          <td class="arb-malus">{{#if item.malusPer}}-{{item.malusPer}}{{else}}0{{/if}}</td>
           <td class="arb-action">
             {{#if item.hasInActor}}
             <i class="fas fa-check arb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>

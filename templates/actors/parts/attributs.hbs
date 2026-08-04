@@ -261,9 +261,10 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
         <input type="number" data-field="system.agilite.score" data-raw-input="agilite" value="{{rawCaracVal.agilite}}" class="stat-num"
                {{#if caracBelowMin.agilite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <span class="derived-val carac-total-val">{{system.agilite.score}}</span>
+        <span class="derived-val carac-total-val">{{agiliteEffectif}}</span>
         {{#if bonusRacialCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.agilite 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.agilite 0)}}+{{/if}}{{bonusRacialCarac.agilite}}</span>{{/if}}
         {{#if bonusAvantageCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.agilite 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.agilite 0)}}+{{/if}}{{bonusAvantageCarac.agilite}}</span>{{/if}}
+        {{#if malusArmureAgi}}<span class="racial-bonus-badge racial-neg" title='{{localize "AGONE.MalusAgi"}} ({{system.armure.nom}})'>{{malusArmureAgi}}</span>{{/if}}
         {{#if showLevelUpAspect}}<input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.agilite}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.agilite}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.agilite}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.agilite}}</span>{{/if}}{{/if}}
@@ -311,9 +312,10 @@
                 title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
         <input type="number" data-field="system.perception.score" data-raw-input="perception" value="{{rawCaracVal.perception}}" class="stat-num"
                {{#if caracBelowMin.perception}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
-        <span class="derived-val carac-total-val">{{system.perception.score}}</span>
+        <span class="derived-val carac-total-val">{{perceptionEffectif}}</span>
         {{#if bonusRacialCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.perception 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.perception 0)}}+{{/if}}{{bonusRacialCarac.perception}}</span>{{/if}}
         {{#if bonusAvantageCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.perception 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.perception 0)}}+{{/if}}{{bonusAvantageCarac.perception}}</span>{{/if}}
+        {{#if malusArmurePer}}<span class="racial-bonus-badge racial-neg" title='{{localize "AGONE.MalusPer"}} ({{system.armure.nom}})'>{{malusArmurePer}}</span>{{/if}}
         {{#if showLevelUpAspect}}<input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title="Exp." />{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMax.perception}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.perception}}</span>{{/if}}{{/if}}
         {{#if modeCreation}}{{#if caracEffectiveMin.perception}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.perception}}</span>{{/if}}{{/if}}

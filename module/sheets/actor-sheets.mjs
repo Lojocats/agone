@@ -888,11 +888,13 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
         await this.actor.update({
           "system.armure.protection": item.system.protection,
           "system.armure.malusAgi":   item.system.malusAgi,
+          "system.armure.malusPer":   item.system.malusPer ?? 0,
         });
       } else if (!portee) {
         await this.actor.update({
           "system.armure.protection": 0,
           "system.armure.malusAgi":   0,
+          "system.armure.malusPer":   0,
         });
       }
     });

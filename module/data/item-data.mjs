@@ -69,13 +69,10 @@ export class ArmureData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
-    if (this.type === "1") {
-      this.malusPer = Math.floor(this.malusAgi / 2);
-    } else if (this.type === "2") {
-      this.malusPer = this.malusAgi;
-    } else {
-      this.malusPer = 0;
-    }
+    // malusPer est fixe par couverture : 0 veste / 1 partielle / 3 complète
+    if (this.type === "1")      this.malusPer = 1;
+    else if (this.type === "2") this.malusPer = 3;
+    else                        this.malusPer = 0;
   }
 }
 

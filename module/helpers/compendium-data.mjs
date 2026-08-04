@@ -109,35 +109,36 @@ export const BOUCLIERS_DATA = [
 // ── ARMURES ──────────────────────────────────────────────────────────────────
 // type "0" = Veste seule | "1" = Partielle | "2" = Complète
 // malusAgi stocké en valeur positive
+// malusPer stocké en valeur positive
 export const ARMURES_DATA = [
   // Vêtements lourds
-  { name:"Vêtements lourds (Veste seule)",  type:"0", protection: 1, malusAgi: 0 },
-  { name:"Vêtements lourds (Partielle)",    type:"1", protection: 1, malusAgi: 0 },
-  { name:"Vêtements lourds (Complète)",     type:"2", protection: 2, malusAgi: 0 },
+  { name:"Vêtements lourds (Veste seule)",  type:"0", protection: 1, malusAgi: 0,  malusPer:  0 },
+  { name:"Vêtements lourds (Partielle)",    type:"1", protection: 1, malusAgi: 0,  malusPer: 1 },
+  { name:"Vêtements lourds (Complète)",     type:"2", protection: 2, malusAgi: 0,  malusPer: 3 },
   // Cuir
-  { name:"Cuir (Veste seule)",              type:"0", protection: 2, malusAgi: 1 },
-  { name:"Cuir (Partielle)",               type:"1", protection: 3, malusAgi: 1 },
-  { name:"Cuir (Complète)",                type:"2", protection: 4, malusAgi: 2 },
+  { name:"Cuir (Veste seule)",              type:"0", protection: 2, malusAgi: 1,  malusPer:  0 },
+  { name:"Cuir (Partielle)",                type:"1", protection: 3, malusAgi: 1,  malusPer: 1 },
+  { name:"Cuir (Complète)",                 type:"2", protection: 4, malusAgi: 2,  malusPer: 3 },
   // Cuir et métal
-  { name:"Cuir et métal (Veste seule)",     type:"0", protection: 3, malusAgi: 1 },
-  { name:"Cuir et métal (Partielle)",      type:"1", protection: 5, malusAgi: 2 },
-  { name:"Cuir et métal (Complète)",       type:"2", protection: 6, malusAgi: 4 },
+  { name:"Cuir et métal (Veste seule)",     type:"0", protection: 3, malusAgi: 1,  malusPer:  0 },
+  { name:"Cuir et métal (Partielle)",       type:"1", protection: 5, malusAgi: 2,  malusPer: 1 },
+  { name:"Cuir et métal (Complète)",        type:"2", protection: 6, malusAgi: 4,  malusPer: 3 },
   // Écailles
-  { name:"Écailles (Veste seule)",          type:"0", protection: 4, malusAgi: 2 },
-  { name:"Écailles (Partielle)",           type:"1", protection: 7, malusAgi: 4 },
-  { name:"Écailles (Complète)",            type:"2", protection: 8, malusAgi: 6 },
+  { name:"Écailles (Veste seule)",          type:"0", protection: 4, malusAgi: 2,  malusPer:  0 },
+  { name:"Écailles (Partielle)",            type:"1", protection: 7, malusAgi: 4,  malusPer: 1 },
+  { name:"Écailles (Complète)",             type:"2", protection: 8, malusAgi: 6,  malusPer: 3 },
   // Lamelles
-  { name:"Lamelles (Veste seule)",          type:"0", protection: 5, malusAgi: 3 },
-  { name:"Lamelles (Partielle)",           type:"1", protection: 9, malusAgi: 6 },
-  { name:"Lamelles (Complète)",            type:"2", protection:10, malusAgi:10 },
+  { name:"Lamelles (Veste seule)",          type:"0", protection: 5, malusAgi: 3,  malusPer:  0 },
+  { name:"Lamelles (Partielle)",            type:"1", protection: 9, malusAgi: 6,  malusPer: 1 },
+  { name:"Lamelles (Complète)",             type:"2", protection:10, malusAgi:10,  malusPer: 3 },
   // Cotte de mailles
-  { name:"Cotte de mailles (Veste seule)", type:"0", protection: 6, malusAgi: 4 },
-  { name:"Cotte de mailles (Partielle)",   type:"1", protection:11, malusAgi: 8 },
-  { name:"Cotte de mailles (Complète)",    type:"2", protection:12, malusAgi:12 },
+  { name:"Cotte de mailles (Veste seule)",  type:"0", protection: 6, malusAgi: 4,  malusPer:  0 },
+  { name:"Cotte de mailles (Partielle)",    type:"1", protection:11, malusAgi: 8,  malusPer: 1 },
+  { name:"Cotte de mailles (Complète)",     type:"2", protection:12, malusAgi:12,  malusPer: 3 },
   // Plaques
-  { name:"Plaques (Veste seule)",          type:"0", protection: 7, malusAgi: 5 },
-  { name:"Plaques (Partielle)",            type:"1", protection:13, malusAgi:10 },
-  { name:"Plaques (Complète)",             type:"2", protection:14, malusAgi:14 },
+  { name:"Plaques (Veste seule)",           type:"0", protection: 7, malusAgi: 5,  malusPer:  0 },
+  { name:"Plaques (Partielle)",             type:"1", protection:13, malusAgi:10,  malusPer: 1 },
+  { name:"Plaques (Complète)",              type:"2", protection:14, malusAgi:14,  malusPer: 3 },
 ];
 
 // ── Sorts & Œuvres ────────────────────────────────────────────────────────────

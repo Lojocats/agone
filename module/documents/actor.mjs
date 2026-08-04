@@ -426,8 +426,9 @@ export class AgoneActor extends Actor {
     if (modif === null) return;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const malusArmure = (attributKey === "agilite" || attributKey === "perception")
-      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0) : 0;
+    const malusArmure = attributKey === "agilite"
+      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
+      : attributKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
@@ -472,8 +473,9 @@ export class AgoneActor extends Actor {
     const bonusSaisonin = this._getBonusSaisonin();
     const bonusSpe    = this._lastBonusSpe ?? 0;
     const malusComp0  = compScore === 0 ? -3 : 0;
-    const malusArmure = (attrKey === "agilite" || attrKey === "perception")
-      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0) : 0;
+    const malusArmure = attrKey === "agilite"
+      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
+      : attrKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
@@ -571,8 +573,9 @@ export class AgoneActor extends Actor {
     if (chosenCfg.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const malusArmure = (chosenKey === "agilite" || chosenKey === "perception")
-      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0) : 0;
+    const malusArmure = chosenKey === "agilite"
+      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
+      : chosenKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(

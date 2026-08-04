@@ -40,10 +40,11 @@ export class ArmuresBrowser extends foundry.applications.api.HandlebarsApplicati
 
     let items = ARMURES_DATA.map((d, idx) => ({
       idx       : `a${idx}`,
-      name      : d.name,
+      label     : d.name,
       typeLabel : TYPE_LABELS[d.type] ?? d.type,
       protection: d.protection,
       malusAgi  : d.malusAgi ?? 0,
+      malusPer  : d.malusPer ?? 0,
       hasInActor: actorArmureNames.has(d.name),
       raw        : d,
     }));
@@ -51,7 +52,7 @@ export class ArmuresBrowser extends foundry.applications.api.HandlebarsApplicati
     // Filtres
     if (this._search) {
       const s = this._search.toLowerCase();
-      items = items.filter(e => e.name.toLowerCase().includes(s));
+      items = items.filter(e => e.label.toLowerCase().includes(s));
     }
     if (this._filterPossede === "oui") {
       items = items.filter(e => e.hasInActor);
@@ -59,7 +60,7 @@ export class ArmuresBrowser extends foundry.applications.api.HandlebarsApplicati
       items = items.filter(e => !e.hasInActor);
     }
 
-    items.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    items.sort((a, b) => (a.label ?? "").localeCompare(b.label ?? "", "fr"));
 
     return {
       items,

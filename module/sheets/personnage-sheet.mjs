@@ -341,6 +341,13 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     context.bonusDonInitiative = system.avantageInitiativeBonus ?? 0;
     context.bonusDonEmprise    = system.avantageEmpriseBonus    ?? 0;
 
+    // Malus d'armure et bouclier sur AGI et PER (badges dans l'onglet attributs)
+    context.malusArmureAgi = (system.armure?._malusAgiActif ?? 0) + (system.bouclier?._malusAgiActif ?? 0);
+    context.malusArmurePer = system.armure?._malusPerActif ?? 0;
+    // Valeurs effectives (score + malus armure) affichées dans le total
+    context.agiliteEffectif    = (system.agilite?.score    ?? 0) + context.malusArmureAgi;
+    context.perceptionEffectif = (system.perception?.score ?? 0) + context.malusArmurePer;
+
     context.xpCout = {
       corps:        (system.corps.score        + 1) * m.aspect,
       esprit:       (system.esprit.score       + 1) * m.aspect,
