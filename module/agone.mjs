@@ -108,6 +108,22 @@ Hooks.once("init", () => {
     type: Boolean,
     default: true,
   });
+  game.settings.register("agone", "meteoApplyColor", {
+    name: "AGONE.MeteoApplyColor",
+    hint: "AGONE.MeteoApplyColorHint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+  });
+  game.settings.register("agone", "meteoApplyParticles", {
+    name: "AGONE.MeteoApplyParticles",
+    hint: "AGONE.MeteoApplyParticlesHint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+  });
 
   // ── Thème visuel (clair / sombre, par joueur) ─────────────────────────────
   game.settings.register("agone", "agoneTheme", {
@@ -303,6 +319,22 @@ Hooks.once("ready", async () => {
   // IDs des effets FXMaster actuellement actifs (pour les arrêter avant d'en appliquer de nouveaux)
   let _agoneWeatherFxIds = null;
 
+  async function _clearFXMasterEffects() {
+    if (_agoneWeatherFxIds !== null) {
+      try { await FXMASTER.api.effects.stop(_agoneWeatherFxIds); } catch {}
+      _agoneWeatherFxIds = null;
+    }
+    // Nettoyage de secours : vider les flags FXMaster de la scène active
+    try {
+      const sc = canvas.scene;
+      if (sc) {
+        const flags = sc.flags?.fxmaster ?? {};
+        if (Object.keys(flags).length > 0)
+          await sc.update({ "flags.fxmaster": null });
+      }
+    } catch {}
+  }
+
   async function _applyWeatherToScene() {
     if (!game.user.isGM) return;
     if (!game.settings.get("agone", "meteoAutoApply")) return;
@@ -334,13 +366,11 @@ Hooks.once("ready", async () => {
     const hasFXMaster = game.modules.get("fxmaster")?.active && typeof FXMASTER !== "undefined";
 
     if (hasFXMaster) {
-      // Arrêter les effets précédents proprement
-      if (_agoneWeatherFxIds) {
-        try {
-          await FXMASTER.api.effects.stop({ ..._agoneWeatherFxIds, skipFading: false });
-        } catch { /* ignore si déjà disparu */ }
-        _agoneWeatherFxIds = null;
-      }
+      // Arrêter TOUS les effets précédents avant d'en appliquer de nouveaux
+      await _clearFXMasterEffects();
+
+      const applyColor     = game.settings.get("agone", "meteoApplyColor");
+      const applyParticles = game.settings.get("agone", "meteoApplyParticles");
 
       // Définition des effets FXMaster par météo
       // Particules disponibles : autumnleaves, bats, birds, bubbles, clouds, crows,
@@ -402,8 +432,12 @@ Hooks.once("ready", async () => {
         ],
       };
 
-      const fxEffects = METEO_FX[meteoId];
-      if (fxEffects?.length) {
+      let fxEffects = METEO_FX[meteoId] ?? [];
+      // Filtrer selon les préférences du MJ
+      if (!applyColor)     fxEffects = fxEffects.filter(e => !(e.kind === "filter" && e.type === "color"));
+      if (!applyParticles) fxEffects = fxEffects.filter(e => e.kind !== "particle");
+
+      if (fxEffects.length) {
         try {
           _agoneWeatherFxIds = await FXMASTER.api.effects.play({ effects: fxEffects });
         } catch (e) {

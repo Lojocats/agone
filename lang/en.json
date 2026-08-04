@@ -579,8 +579,12 @@
     "SanteLabel0":       "Dead threshold (0 HP)",
     "SanteLabel0Hint":   "Hover text when the character is at 0 HP.",
 
-    "MeteoAutoApply":     "Apply weather to scene",
-    "MeteoAutoApplyHint": "If enabled, every weather or hour change in the calendar automatically applies visual effects (particles, filters, luminosity) to the active scene.",
+    "MeteoAutoApply":          "Apply weather to scene",
+    "MeteoAutoApplyHint":      "If enabled, every weather or hour change in the calendar automatically applies visual effects (particles, filters, luminosity) to the active scene.",
+    "MeteoApplyColor":         "Apply color filters",
+    "MeteoApplyColorHint":     "Applies color/tint filters matching the weather to the active scene.",
+    "MeteoApplyParticles":     "Apply particle effects",
+    "MeteoApplyParticlesHint": "Applies particle effects (rain, snow, leaves, fog…) matching the weather to the active scene.",
 
     "SaisonMonde":      "World Season",
     "SaisonMondeHint":  "The current season of Harmonde. Characters whose season matches gain +1 to all their rolls.",
