@@ -175,6 +175,18 @@
   flex-direction: column;
   gap: 3px;
 }
+.agone.item .comp-score-preview {
+  font-size: 11px;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.8;
+  font-style: italic;
+  padding: 1px 0;
+}
+.agone.item .comp-score-preview.comp-manquante {
+  color: #b94040;
+  opacity: 1;
+}
+
 .agone.item .form-group.full-width { grid-column: 1 / -1; }
 .agone.item .form-group > label {
   font-size: 11px;

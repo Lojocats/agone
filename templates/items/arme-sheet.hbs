@@ -60,7 +60,27 @@
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.CompetenceLiee"}}</label>
-        <input type="text" name="system.competence" value="{{system.competence}}" placeholder='{{localize "AGONE.DomaineCompetence"}}' />
+        {{#if isEmbedded}}
+        <select name="system.competence">
+          <option value="">— aucune —</option>
+          {{#each actorCompetences as |c|}}
+          <option value="{{c.domaine}}" {{#if c.selected}}selected{{/if}}>{{c.label}}</option>
+          {{/each}}
+        </select>
+        {{#if linkedComp}}
+        <span class="comp-score-preview">{{linkedComp.name}} ({{linkedComp.domaine}}) · {{linkedComp.score}}</span>
+        {{else if system.competence}}
+        <span class="comp-score-preview comp-manquante">⚠ "{{system.competence}}" introuvable</span>
+        {{/if}}
+        {{else}}
+        <input type="text" name="system.competence" value="{{system.competence}}"
+               list="agone-comp-domaines" placeholder='{{localize "AGONE.DomaineCompetence"}}' />
+        <datalist id="agone-comp-domaines">
+          {{#each worldCompDomaines as |d|}}
+          <option value="{{d}}"></option>
+          {{/each}}
+        </datalist>
+        {{/if}}
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.Poids"}}</label>

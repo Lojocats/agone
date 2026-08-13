@@ -94,6 +94,41 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
       context.resonanceDomainOptions = ["jorniste", "eclipsiste", "obscurantiste"];
     }
 
+    if (this.item.type === "arme") {
+      const actor = this.item.actor;
+      context.isEmbedded = !!actor;
+      if (actor) {
+        // Compétences de combat uniquement (attributLie melee ou tir, cohérent avec rollAttaque)
+        const comps = [...actor.items.filter(i =>
+          i.type === "competence" &&
+          (i.system.attributLie === "melee" || i.system.attributLie === "tir")
+        )].sort((a, b) => (a.system.domaine || a.name).localeCompare(b.system.domaine || b.name, "fr"));
+        context.actorCompetences = comps.map(c => ({
+          domaine: c.system.domaine || "",
+          label:   c.system.domaine
+            ? `${c.name} (${c.system.domaine}) · ${c.system.score}`
+            : `${c.name} · ${c.system.score}`,
+          selected: c.system.domaine === (this.item.system.competence ?? ""),
+        }));
+        // Score de la compétence actuellement liée
+        const linked = actor.items.find(
+          i => i.type === "competence" && i.system.domaine === this.item.system.competence
+        );
+        context.linkedComp = linked
+          ? { name: linked.name, domaine: linked.system.domaine, score: linked.system.score }
+          : null;
+      } else {
+        // Item monde : datalist des domaines connus
+        const worldComps = [
+          ...game.items.filter(i => i.type === "competence"),
+          ...[...game.actors].flatMap(a => [...a.items.filter(i => i.type === "competence")]),
+        ];
+        context.worldCompDomaines = [...new Set(
+          worldComps.map(i => i.system?.domaine ?? "").filter(Boolean)
+        )].sort((a, b) => a.localeCompare(b, "fr"));
+      }
+    }
+
     return context;
   }
 
