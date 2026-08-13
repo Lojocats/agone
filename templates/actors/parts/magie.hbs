@@ -30,9 +30,9 @@
         <tr class="item-row {{#unless d.comp}}arts-absent{{/unless}}" {{#if d.comp}}data-item-id="{{d.comp.id}}"{{/if}}>
           <td>
             {{#if d.comp}}
-            <span class="roll-btn item-name" data-action="rollCompetence" data-item-id="{{d.comp.id}}">{{d.domaine}}</span>
+            <span class="roll-btn item-name" data-action="rollCompetence" data-item-id="{{d.comp.id}}">{{d.displayLabel}}</span>
             {{else}}
-            <span class="arts-domaine-absent">{{d.domaine}}</span>
+            <span class="arts-domaine-absent">{{d.displayLabel}}</span>
             {{/if}}
           </td>
           <td class="col-score">

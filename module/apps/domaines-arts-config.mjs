@@ -29,7 +29,7 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
   /** Domaines standards intégrés au système (non éditables). */
   static get STANDARD_DOMAINES() {
     return [
-      { nom: "Accord",  compLiee: "Musique",   readonly: true },
+      { nom: "Accord",  compLiee: "",          readonly: true },
       { nom: "Cyse",    compLiee: "Sculpture",  readonly: true },
       { nom: "Décorum", compLiee: "Peinture",   readonly: true },
       { nom: "Geste",   compLiee: "Poésie",     readonly: true },

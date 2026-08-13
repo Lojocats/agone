@@ -71,6 +71,29 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
       ...existingMagicTypes,
     ])].sort((a, b) => a.localeCompare(b, "fr"));
 
+    if (this.item.type === "competence") {
+      // Toutes les compétences connues (monde + acteurs) — game.actors est une Collection, pas un Array
+      const allComps = [
+        ...game.items.filter(i => i.type === "competence"),
+        ...[...game.actors].flatMap(a => [...a.items.filter(i => i.type === "competence")]),
+      ];
+
+      // Domaines des compétences "Arts Magiques"
+      const existingArtsDomaines = allComps
+        .filter(i => i.name === "Arts Magiques")
+        .map(i => i.system?.domaine ?? "").filter(Boolean);
+      const customArtsDomaines = (game.settings.get("agone", "domainesArtsCustom") ?? []).map(d => d.nom);
+      context.artsDomainOptions = [...new Set([
+        "Accord", "Cyse", "Décorum", "Geste",
+        ...customArtsDomaines,
+        ...existingArtsDomaines,
+      ])].sort((a, b) => a.localeCompare(b, "fr"));
+
+      context.musicDomainOptions    = ["harpe", "flute", "viole", "tambour", "cistre"];
+      context.saisonDomainOptions   = ["printemps", "ete", "automne", "hiver"];
+      context.resonanceDomainOptions = ["jorniste", "eclipsiste", "obscurantiste"];
+    }
+
     return context;
   }
 

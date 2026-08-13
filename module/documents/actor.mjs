@@ -1025,6 +1025,32 @@ export class AgoneActor extends Actor {
       }
     }
 
+    // Accord : contraindre par la compétence dont le domaine correspond à l'instrument du sort
+    const instrument = (typeMagieResolved === "accord" && !compAltNom)
+      ? (sort.system.instrument?.trim().toLowerCase() ?? "")
+      : "";
+    let compInstrumentLabel = "";
+    if (instrument) {
+      const compInstrument = this.items.find(i =>
+        i.type === "competence" && i.system.domaine?.trim().toLowerCase() === instrument
+      );
+      if (!compInstrument) {
+        ui.notifications.warn(`${this.name} ne possède pas la compétence pour l'instrument "${sort.system.instrument}" (Accord).`);
+        return null;
+      }
+      const attrInstrKey   = compInstrument.system.attributLie || "charisma";
+      const attrInstrScore = sd[attrInstrKey]?.score ?? 0;
+      const attrInstrCfg   = CONFIG.AGONE.attributs[attrInstrKey] ?? {};
+      let bonusInstr = 0;
+      if (attrInstrCfg.aspect === "corps")  bonusInstr = sd.bonusCorps  ?? 0;
+      if (attrInstrCfg.aspect === "esprit") bonusInstr = sd.bonusEsprit ?? 0;
+      if (attrInstrCfg.aspect === "ame")    bonusInstr = sd.bonusAme    ?? 0;
+      const instrAptitude = compInstrument.system.score + attrInstrScore + bonusInstr;
+      aptitude = Math.min(aptitude, instrAptitude);
+      compInstrumentLabel = compInstrument.name
+        + (compInstrument.system.domaine ? ` (${compInstrument.system.domaine})` : "");
+    }
+
     const label = impro ? `${sort.name} (improvisé)` : sort.name;
     const dialogResult = await this._dialogSort(label, seuilBase, impro);
     if (dialogResult === null) return;
@@ -1042,7 +1068,9 @@ export class AgoneActor extends Actor {
     const succes = roll.total >= seuilFinal;
     const aptitudeLabel = compAltNom
       ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compAltNom}) : ${aptitude}`
-      : aptitudeDomainLabel;
+      : compInstrumentLabel
+        ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compInstrumentLabel}) : ${aptitude}`
+        : aptitudeDomainLabel;
     let seuilLabel;
     if (impro && seuilBonus > 0)
       seuilLabel = `Seuil : ${seuilFinal} ((${seuilBase} + ${seuilBonus}) x 2, improvisé)`;

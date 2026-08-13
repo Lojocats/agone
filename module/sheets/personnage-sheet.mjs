@@ -435,9 +435,9 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
 
     // Compétences Arts Magiques par domaine (Accord, Décorum, Geste, Cyse + custom)
     // POT = Art + min(score_artsMag, score_compLiée) + bonusÂme
-    // Accord → Musique | Cyse → Sculpture | Décorum → Peinture | Geste → Poésie
+    // Accord → une entrée par instrument connu | Cyse → Sculpture | Décorum → Peinture | Geste → Poésie
     const DOMAINES_ARTS_STD = [
-      { nom: "Accord",  compLiee: "Musique"   },
+      // Accord traité séparément (par instrument, cf. ci-dessous)
       { nom: "Décorum", compLiee: "Peinture"  },
       { nom: "Geste",   compLiee: "Poésie"    },
       { nom: "Cyse",    compLiee: "Sculpture" },
@@ -449,32 +449,92 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     ];
     const ARTS_COMP_LIEE = Object.fromEntries(TOUS_DOMAINES.map(d => [d.nom, d.compLiee]));
 
-    context.artsMagiquesByDomaine = TOUS_DOMAINES.map(({ nom: domaine }) => {
-      const comp = context.competences.find(c =>
-        c.name === "Arts Magiques" && c.system.domaine === domaine
-      );
-      const score        = comp ? (comp.system.score ?? 0) : 0;
-      const specialite   = comp?.system.specialite ?? "";
+    // Accord : une ligne par instrument (compétence dont le domaine = nom de l'instrument)
+    const ACCORD_INSTRUMENTS = ["harpe", "flute", "viole", "tambour", "cistre"];
+    const accordComp = context.competences.find(c =>
+      c.name === "Arts Magiques" && c.system.domaine === "Accord"
+    );
+    const accordEntries = [];
+    if (accordComp) {
+      const scoreArts  = accordComp.system.score ?? 0;
+      const specialite = accordComp.system.specialite ?? "";
+      for (const instrument of ACCORD_INSTRUMENTS) {
+        const compLiee = context.competences.find(c =>
+          c.system.domaine?.toLowerCase() === instrument
+        );
+        if (!compLiee) continue;
+        const scoreCompLiee = compLiee.system.score ?? 0;
+        const scoreEffectif = Math.min(scoreArts, scoreCompLiee);
+        accordEntries.push({
+          domaine:       "Accord",
+          displayLabel:  `Accord (${instrument})`,
+          instrument,
+          comp:          accordComp,
+          potentiel:     (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          impro:         (system.creativite?.score ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          specialite,
+          nomCompLiee:   `${compLiee.name} (${compLiee.system.domaine})`,
+          compLiee,
+          scoreCompLiee,
+          scoreArtsMag:  scoreArts,
+          scoreEffectif,
+          artVal:        system.art ?? 0,
+          creVal:        system.creativite?.score ?? 0,
+          bonusAmeVal:   system.bonusAme ?? 0,
+        });
+      }
+      if (accordEntries.length === 0) {
+        // Aucun instrument connu : afficher Accord sans contrainte d'instrument
+        const scoreEffectif = scoreArts;
+        accordEntries.push({
+          domaine:       "Accord",
+          displayLabel:  "Accord",
+          instrument:    "",
+          comp:          accordComp,
+          potentiel:     (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          impro:         (system.creativite?.score ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          specialite,
+          nomCompLiee:   "",
+          compLiee:      null,
+          scoreCompLiee: 0,
+          scoreArtsMag:  scoreArts,
+          scoreEffectif,
+          artVal:        system.art ?? 0,
+          creVal:        system.creativite?.score ?? 0,
+          bonusAmeVal:   system.bonusAme ?? 0,
+        });
+      }
+    }
 
-      // Compétence mondaine liée
-      const nomCompLiee  = ARTS_COMP_LIEE[domaine] ?? "";
-      const compLiee     = context.competences.find(c => c.name === nomCompLiee);
-      const scoreCompLiee = compLiee ? (compLiee.system.score ?? 0) : 0;
-
-      // Potentiel limité par la plus faible des deux compétences
-      const scoreEffectif = comp ? Math.min(score, scoreCompLiee) : 0;
-      const potentiel     = comp ? (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
-      // Arts Improvisés = CRÉ + min(Arts Magiques, art profane) + bonusAme
-      const impro         = comp ? (system.creativite?.score ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
-      return {
-        domaine, comp, potentiel, impro, specialite, nomCompLiee, compLiee, scoreCompLiee,
-        // Composantes de formule exposées pour les tooltips de chat
-        scoreArtsMag: score, scoreEffectif,
-        artVal:     system.art ?? 0,
-        creVal:     system.creativite?.score ?? 0,
-        bonusAmeVal: system.bonusAme ?? 0,
-      };
-    });
+    context.artsMagiquesByDomaine = [
+      ...accordEntries,
+      ...TOUS_DOMAINES.map(({ nom: domaine }) => {
+        const comp = context.competences.find(c =>
+          c.name === "Arts Magiques" && c.system.domaine === domaine
+        );
+        const score        = comp ? (comp.system.score ?? 0) : 0;
+        const specialite   = comp?.system.specialite ?? "";
+        const nomCompLiee  = ARTS_COMP_LIEE[domaine] ?? "";
+        const compLiee     = context.competences.find(c => c.name === nomCompLiee);
+        const scoreCompLiee = compLiee ? (compLiee.system.score ?? 0) : 0;
+        // Si pas de compLiee définie, utiliser le score Arts Magiques directement
+        const scoreEffectif = comp
+          ? (nomCompLiee ? Math.min(score, scoreCompLiee) : score)
+          : 0;
+        const potentiel    = comp ? (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
+        const impro        = comp ? (system.creativite?.score ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
+        return {
+          domaine,
+          displayLabel:  domaine,
+          instrument:    "",
+          comp, potentiel, impro, specialite, nomCompLiee, compLiee, scoreCompLiee,
+          scoreArtsMag: score, scoreEffectif,
+          artVal:     system.art ?? 0,
+          creVal:     system.creativite?.score ?? 0,
+          bonusAmeVal: system.bonusAme ?? 0,
+        };
+      }),
+    ];
 
     // Points de création restants (valeur décroissante)
     context.ptsCreationCaracRestant = system.ptsCreationCarac.max - system.ptsCreationCarac.depense;
@@ -1926,7 +1986,9 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     const roll = new Roll("1d10x10 + @total + @modif", { total, modif });
     await roll.evaluate();
     // Formule détaillée visible dans le chat
-    const formule = `ART(${artVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
+    const formule = nomComp
+      ? `ART(${artVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`
+      : `ART(${artVal}) + Arts:${scoreArts} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
     await this.actor._sendRollToChat(roll, label, {
       aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
       modif: `Bonus/Malus : ${modif}`
@@ -1954,7 +2016,9 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     const roll = new Roll("1d10x10 + @total + @modif", { total, modif });
     await roll.evaluate();
     // Formule détaillée visible dans le chat
-    const formule = `CRÉ(${creVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
+    const formule = nomComp
+      ? `CRÉ(${creVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`
+      : `CRÉ(${creVal}) + Arts:${scoreArts} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
     await this.actor._sendRollToChat(roll, label, {
       aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
       modif: `Bonus/Malus : ${modif}`

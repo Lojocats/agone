@@ -686,7 +686,7 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
 
     // ── Magie : artsMagiquesByDomaine ────────────────────────────────────────
     const DOMAINES_ARTS_STD_PNJ = [
-      { nom: "Accord",  compLiee: "Musique"   },
+      // Accord traité séparément (par instrument, cf. ci-dessous)
       { nom: "Décorum", compLiee: "Peinture"  },
       { nom: "Geste",   compLiee: "Poésie"    },
       { nom: "Cyse",    compLiee: "Sculpture" },
@@ -696,24 +696,85 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
       ...DOMAINES_ARTS_STD_PNJ,
       ...domainesCustomPnj.map(d => ({ nom: d.nom, compLiee: d.compLiee ?? "" })),
     ];
-    context.artsMagiquesByDomaine = TOUS_DOMAINES_PNJ.map(({ nom: domaine, compLiee: nomCompLiee }) => {
-      const comp          = _pnjComps.find(c => c.name === "Arts Magiques" && c.system.domaine === domaine);
-      const score         = comp ? (comp.system.score ?? 0) : 0;
-      const specialite    = comp?.system.specialite ?? "";
-      const compLiee      = _pnjComps.find(c => c.name === nomCompLiee);
-      const scoreCompLiee = compLiee ? (compLiee.system.score ?? 0) : 0;
-      const scoreEffectif = comp ? Math.min(score, scoreCompLiee) : 0;
-      // PNJ : system.art est un nombre (dérivé), system.creativite est un nombre simple
-      const potentiel     = comp ? (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
-      const impro         = comp ? (system.creativite ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
-      return {
-        domaine, comp, potentiel, impro, specialite, nomCompLiee, compLiee, scoreCompLiee,
-        scoreArtsMag: score, scoreEffectif,
-        artVal:      system.art ?? 0,
-        creVal:      system.creativite ?? 0,
-        bonusAmeVal: system.bonusAme ?? 0,
-      };
-    });
+
+    // Accord : une ligne par instrument (compétence dont le domaine = nom de l'instrument)
+    const ACCORD_INSTRUMENTS_PNJ = ["harpe", "flute", "viole", "tambour", "cistre"];
+    const accordCompPnj = _pnjComps.find(c => c.name === "Arts Magiques" && c.system.domaine === "Accord");
+    const accordEntriesPnj = [];
+    if (accordCompPnj) {
+      const scoreArts  = accordCompPnj.system.score ?? 0;
+      const specialite = accordCompPnj.system.specialite ?? "";
+      for (const instrument of ACCORD_INSTRUMENTS_PNJ) {
+        const compLiee = _pnjComps.find(c => c.system.domaine?.toLowerCase() === instrument);
+        if (!compLiee) continue;
+        const scoreCompLiee = compLiee.system.score ?? 0;
+        const scoreEffectif = Math.min(scoreArts, scoreCompLiee);
+        accordEntriesPnj.push({
+          domaine:       "Accord",
+          displayLabel:  `Accord (${instrument})`,
+          instrument,
+          comp:          accordCompPnj,
+          potentiel:     (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          impro:         (system.creativite ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          specialite,
+          nomCompLiee:   `${compLiee.name} (${compLiee.system.domaine})`,
+          compLiee,
+          scoreCompLiee,
+          scoreArtsMag:  scoreArts,
+          scoreEffectif,
+          artVal:        system.art ?? 0,
+          creVal:        system.creativite ?? 0,
+          bonusAmeVal:   system.bonusAme ?? 0,
+        });
+      }
+      if (accordEntriesPnj.length === 0) {
+        const scoreEffectif = scoreArts;
+        accordEntriesPnj.push({
+          domaine:       "Accord",
+          displayLabel:  "Accord",
+          instrument:    "",
+          comp:          accordCompPnj,
+          potentiel:     (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          impro:         (system.creativite ?? 0) + scoreEffectif + (system.bonusAme ?? 0),
+          specialite,
+          nomCompLiee:   "",
+          compLiee:      null,
+          scoreCompLiee: 0,
+          scoreArtsMag:  scoreArts,
+          scoreEffectif,
+          artVal:        system.art ?? 0,
+          creVal:        system.creativite ?? 0,
+          bonusAmeVal:   system.bonusAme ?? 0,
+        });
+      }
+    }
+
+    context.artsMagiquesByDomaine = [
+      ...accordEntriesPnj,
+      ...TOUS_DOMAINES_PNJ.map(({ nom: domaine, compLiee: nomCompLiee }) => {
+        const comp          = _pnjComps.find(c => c.name === "Arts Magiques" && c.system.domaine === domaine);
+        const score         = comp ? (comp.system.score ?? 0) : 0;
+        const specialite    = comp?.system.specialite ?? "";
+        const compLiee      = _pnjComps.find(c => c.name === nomCompLiee);
+        const scoreCompLiee = compLiee ? (compLiee.system.score ?? 0) : 0;
+        const scoreEffectif = comp
+          ? (nomCompLiee ? Math.min(score, scoreCompLiee) : score)
+          : 0;
+        // PNJ : system.art est un nombre (dérivé), system.creativite est un nombre simple
+        const potentiel     = comp ? (system.art ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
+        const impro         = comp ? (system.creativite ?? 0) + scoreEffectif + (system.bonusAme ?? 0) : null;
+        return {
+          domaine,
+          displayLabel:  domaine,
+          instrument:    "",
+          comp, potentiel, impro, specialite, nomCompLiee, compLiee, scoreCompLiee,
+          scoreArtsMag: score, scoreEffectif,
+          artVal:      system.art ?? 0,
+          creVal:      system.creativite ?? 0,
+          bonusAmeVal: system.bonusAme ?? 0,
+        };
+      }),
+    ];
 
     // ── Sorts : groupes et types pour le partial magie ───────────────────────
     const TYPE_LABELS_MAGIE_PNJ = {
@@ -974,7 +1035,9 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
       const total      = apt + bonusSpe;
       const roll = new Roll("1d10x10 + @total + @modif", { total, modif });
       await roll.evaluate();
-      const formule = `ART(${artVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
+      const formule = nomComp
+        ? `ART(${artVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`
+        : `ART(${artVal}) + Arts:${scoreArts} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
       await this.actor._sendRollToChat(roll, label, {
         aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
         modif: `Bonus/Malus : ${modif}`,
@@ -999,7 +1062,9 @@ export class PnjSheet extends foundry.applications.api.HandlebarsApplicationMixi
       const total      = apt + bonusSpe;
       const roll = new Roll("1d10x10 + @total + @modif", { total, modif });
       await roll.evaluate();
-      const formule = `CRÉ(${creVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
+      const formule = nomComp
+        ? `CRÉ(${creVal}) + min(Arts:${scoreArts}, ${nomComp}:${scoreComp})→${scoreEff} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`
+        : `CRÉ(${creVal}) + Arts:${scoreArts} + BonusÂme(${bonusAme})${bonusSpe ? ` + Spé(+${bonusSpe})` : ""}`;
       await this.actor._sendRollToChat(roll, label, {
         aptitude: `${formule} : ${apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
         modif: `Bonus/Malus : ${modif}`,

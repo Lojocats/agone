@@ -9,7 +9,41 @@
     <div class="item-form-grid">
       <div class="form-group">
         <label>{{localize "AGONE.Domaine"}}</label>
+        {{#if (eq item.name "Arts Magiques")}}
+        <input type="text" name="system.domaine" value="{{system.domaine}}"
+               list="agone-arts-domaines" placeholder="ex: Accord" />
+        <datalist id="agone-arts-domaines">
+          {{#each artsDomainOptions as |opt|}}
+          <option value="{{opt}}"></option>
+          {{/each}}
+        </datalist>
+        {{else if (eq item.name "Musique")}}
+        <input type="text" name="system.domaine" value="{{system.domaine}}"
+               list="agone-music-domaines" placeholder="ex: harpe" />
+        <datalist id="agone-music-domaines">
+          {{#each musicDomainOptions as |opt|}}
+          <option value="{{opt}}"></option>
+          {{/each}}
+        </datalist>
+        {{else if (eq item.name "Saisons")}}
+        <input type="text" name="system.domaine" value="{{system.domaine}}"
+               list="agone-saison-domaines" placeholder="ex: printemps" />
+        <datalist id="agone-saison-domaines">
+          {{#each saisonDomainOptions as |opt|}}
+          <option value="{{opt}}"></option>
+          {{/each}}
+        </datalist>
+        {{else if (eq item.name "Résonance")}}
+        <input type="text" name="system.domaine" value="{{system.domaine}}"
+               list="agone-resonance-domaines" placeholder="ex: jorniste" />
+        <datalist id="agone-resonance-domaines">
+          {{#each resonanceDomainOptions as |opt|}}
+          <option value="{{opt}}"></option>
+          {{/each}}
+        </datalist>
+        {{else}}
         <input type="text" name="system.domaine" value="{{system.domaine}}" />
+        {{/if}}
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.Specialite"}}</label>
