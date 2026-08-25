@@ -751,7 +751,8 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     // ── Ténèbres : mode manuel des paliers ────────────────────────────
     context.tenebresModeManuel = this.actor.getFlag("agone", "tenebresModeManuel") ?? false;
     if (context.tenebresModeManuel) {
-      context.paliersManuels = this.actor.getFlag("agone", "paliersManuels") ?? {};
+      context.paliersManuels  = this.actor.getFlag("agone", "paliersManuels")  ?? {};
+      context.bienfaitsManuels = this.actor.getFlag("agone", "bienfaitsManuels") ?? {};
     }
 
     return context;
@@ -899,7 +900,8 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     html.on("click.agone", "[data-action='rollAptitudeConjuration']", this._onRollAptitudeConjuration.bind(this));
     html.on("click.agone", "[data-action='rollConjurationDemonologie']", this._onRollConjurationDemonologie.bind(this));
     html.on("click.agone", "[data-action='toggleTenebresModeManuel']", this._onToggleTenebresModeManuel.bind(this));
-    html.on("click.agone", "[data-action='togglePalierManuel']", this._onTogglePalierManuel.bind(this));
+    html.on("click.agone", "[data-action='togglePalierManuel']",   this._onTogglePalierManuel.bind(this));
+    html.on("click.agone", "[data-action='toggleBienfaitManuel']", this._onToggleBienfaitManuel.bind(this));
     html.on("click.agone", "[data-action='rollArtDomaine']", this._onRollArtDomaine.bind(this));
     html.on("click.agone", "[data-action='rollImpArtDomaine']", this._onRollImpArtDomaine.bind(this));
 
@@ -1916,16 +1918,27 @@ export class PersonnageSheet extends foundry.applications.api.HandlebarsApplicat
     const activating = !cur;
 
     if (activating) {
-      // Passage auto → manuel : initialiser paliersManuels depuis la valeur de ténèbres
-      // actuelle, pour que l'état de départ soit identique au mode auto.
+      // Passage auto → manuel : initialiser paliersManuels et bienfaitsManuels depuis la valeur courante.
       const ten = this.actor.system.tenebres ?? 0;
       const SEUILS = [10, 20, 30, 40, 50, 55, 60, 65, 70, 75, 78, 81, 84, 87, 90, 92, 94, 96, 98, 99, 100];
       const paliers = {};
       for (const s of SEUILS) paliers[String(s)] = ten >= s;
       await this.actor.setFlag("agone", "paliersManuels", paliers);
+      const SEUILS_BIENFAITS = [10, 20, 30, 70, 75, 78, 81, 92, 98, 99];
+      const bienfaits = {};
+      for (const s of SEUILS_BIENFAITS) bienfaits[String(s)] = ten >= s;
+      await this.actor.setFlag("agone", "bienfaitsManuels", bienfaits);
     }
 
     await this.actor.setFlag("agone", "tenebresModeManuel", activating);
+  }
+
+  async _onToggleBienfaitManuel(event) {
+    event.preventDefault();
+    const seuil    = event.currentTarget.dataset.seuil;
+    const bienfaits = foundry.utils.deepClone(this.actor.getFlag("agone", "bienfaitsManuels") ?? {});
+    bienfaits[seuil] = !bienfaits[seuil];
+    await this.actor.setFlag("agone", "bienfaitsManuels", bienfaits);
   }
 
   async _onTogglePalierManuel(event) {

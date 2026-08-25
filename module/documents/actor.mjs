@@ -362,8 +362,8 @@ export class AgoneActor extends Actor {
         const cout = don.system.cout ?? 0;
         if (don.system.categorie === "avantage") {
           let coutEff = cout;
-          if (b.charges_double && don.name !== "Jeune")     coutEff *= 2;
-          if (b.charges_reduction > 0 && don.name !== "Vieillard") coutEff = Math.max(1, coutEff - b.charges_reduction);
+          if (b.charges_double && don.name !== "Jeune" && don.system.typeCharge === "charge")     coutEff *= 2;
+          if (b.charges_reduction > 0 && don.name !== "Vieillard" && don.system.typeCharge === "charge") coutEff = Math.max(1, coutEff - b.charges_reduction);
           depense += Math.max(0, coutEff);
         } else {
           // défauts : cout stocké négatif → on prend la valeur absolue

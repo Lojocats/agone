@@ -91,7 +91,12 @@
   border-bottom: 1px solid rgba(26,26,46,0.07);
   vertical-align: middle;
 }
-.agone .paliers-table .palier-row:not(.palier-reached) { opacity: 0.40; }
+/* Dimming ciblé par cellule — évite l'héritage non-annulable de opacity */
+.agone .paliers-table .palier-row:not(.palier-reached) .col-check,
+.agone .paliers-table .palier-row:not(.palier-reached) .col-palier { opacity: 0.35; }
+.agone .paliers-table .palier-row:not(.palier-reached) .col-peine { color: rgba(26,26,46,0.35); }
+.agone .paliers-table .palier-row:not(.palier-reached) .peine-dot { border-color: rgba(26,26,46,0.10); }
+.agone .paliers-table .palier-row:not(.palier-reached) .col-bienfait { color: rgba(26,26,46,0.35); }
 .agone .paliers-table .palier-reached { background: rgba(26,26,46,0.05); }
 .agone .paliers-table .palier-reached .col-palier {
   color: var(--agone-noir);
@@ -99,9 +104,7 @@
   font-size: 13px;
 }
 .agone .paliers-table .col-peine {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  /* display:flex sur un <td> sort du contexte table et crée un chevauchement */
 }
 .agone .paliers-table .peine-dot {
   display: inline-block;
@@ -110,7 +113,8 @@
   border-radius: 50%;
   background: transparent;
   border: 1px solid rgba(26,26,46,0.25);
-  flex-shrink: 0;
+  vertical-align: middle;
+  margin-right: 4px;
   transition: background 0.2s, border-color 0.2s;
 }
 .agone .paliers-table .palier-reached .peine-dot {
@@ -122,6 +126,17 @@
   font-style: italic;
   font-size: 11px;
 }
+.agone .paliers-table .bienfait-check-btn {
+  background: none;
+  border: none;
+  padding: 0 2px 0 0;
+  cursor: pointer;
+  font-size: 11px;
+  vertical-align: middle;
+  line-height: 1;
+  color: inherit;
+}
+.agone .paliers-table .bienfait-check-btn.checked { color: var(--agone-brown); }
 .agone .peines-hint {
   font-size: 11px;
   font-style: italic;
