@@ -55,6 +55,7 @@ export const ARMES_DATA = [
   { name:"Tronc d'arbre",    style:"melee", initBonus: 3, attackBonus: 1, defenseBonus: 0, dommages: 6, type:"C",  tai: 2, reqFor:12, reqAgi: 1, description:"Arme improvisée équivalente à une massue pour les géants." },
   { name:"Maillet géant",    style:"melee", initBonus: 2, attackBonus: 1, defenseBonus:-1, dommages:12, type:"C",  tai: 3, reqFor:17, reqAgi: 1 },
   { name:"Pique géante",     style:"melee", initBonus:10, attackBonus: 0, defenseBonus:-1, dommages: 6, type:"P",  tai: 3, reqFor:15, reqAgi: 2 },
+  { name: "Corne",           style:"melee", initBonus:-1, attackBonus: 1, defenseBonus: 0, dommages: 3, type:"P",  tai: 0, reqFor: 0, reqAgi: 0 },
 
   // ── TRAIT ────────────────────────────────────────────────────────────────
   { name:"Arbalète farfadine",  style:"trait", initBonus:5, attackBonus:0, defenseBonus:0, dommages: 4, type:"P", portee:"40 m",   tai:-2, reqFor: 3, reqAgi: 3, description:"Les farfadets ont compensé leur faible taille par une grande ingéniosité. Cette arbalète de 30 à 50 cm d'envergure compense sa petite taille par un arc métallique très dur, que l'on remonte à l'aide d'un ingénieux système d'engrenages." },
