@@ -1054,9 +1054,10 @@ export class AgoneActor extends Actor {
     const label = impro ? `${sort.name} (improvisé)` : sort.name;
     const dialogResult = await this._dialogSort(label, seuilBase, impro);
     if (dialogResult === null) return;
-    const { modif, seuilBonus } = dialogResult;
+    const { modif, seuilBonus, instantane } = dialogResult;
 
-    const seuilFinal = impro ? (seuilBase + seuilBonus) * 2 : seuilBase + seuilBonus;
+    const seuilEffectif = instantane ? seuilBase * 2 : seuilBase;
+    const seuilFinal = impro ? (seuilEffectif + seuilBonus) * 2 : seuilEffectif + seuilBonus;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const roll = new Roll(
@@ -1072,7 +1073,15 @@ export class AgoneActor extends Actor {
         ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compInstrumentLabel}) : ${aptitude}`
         : aptitudeDomainLabel;
     let seuilLabel;
-    if (impro && seuilBonus > 0)
+    if (impro && instantane && seuilBonus > 0)
+      seuilLabel = `Seuil : ${seuilFinal} ((${seuilBase} × 2 + ${seuilBonus}) × 2, instantané + improvisé)`;
+    else if (impro && instantane)
+      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} × 2 × 2, instantané + improvisé)`;
+    else if (instantane && seuilBonus > 0)
+      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} × 2 + ${seuilBonus}, instantané)`;
+    else if (instantane)
+      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} × 2, instantané)`;
+    else if (impro && seuilBonus > 0)
       seuilLabel = `Seuil : ${seuilFinal} ((${seuilBase} + ${seuilBonus}) x 2, improvisé)`;
     else if (impro)
       seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} x 2, improvisé)`;
@@ -1287,6 +1296,10 @@ export class AgoneActor extends Actor {
               <input type="number" id="seuilBonus" name="seuilBonus" value="0" min="0"/>
             </div>
             <div class="form-group form-check">
+              <input type="checkbox" id="sortInstantane" name="sortInstantane" />
+              <label for="sortInstantane">${game.i18n.localize("AGONE.SortInstantane")}</label>
+            </div>
+            <div class="form-group form-check">
               <input type="checkbox" id="typeJet" name="typeJet" checked />
               <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
             </div>
@@ -1300,9 +1313,10 @@ export class AgoneActor extends Actor {
           label:    game.i18n.localize("AGONE.Lancer"),
           default:  true,
           callback: (event, button) => ({
-            modif:      parseInt(button.form.elements.modif.value)      || 0,
-            seuilBonus: parseInt(button.form.elements.seuilBonus.value) || 0,
-            type:       button.form.elements.typeJet.checked ? "ouvert" : "ferme",
+            modif:       parseInt(button.form.elements.modif.value)      || 0,
+            seuilBonus:  parseInt(button.form.elements.seuilBonus.value) || 0,
+            type:        button.form.elements.typeJet.checked ? "ouvert" : "ferme",
+            instantane:  button.form.elements.sortInstantane.checked,
           })
         },
         {
@@ -1317,7 +1331,7 @@ export class AgoneActor extends Actor {
     if (!result || typeof result === "string") return null;
     this._lastRollType = result.type;
     this._lastBonusSpe = 0;
-    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus) };
+    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus), instantane: !!result.instantane };
   }
 
   /**

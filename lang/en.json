@@ -461,6 +461,7 @@
     "Malus2":        "Penalty",
     "TypeJet":       "Roll type",
     "JetOuvert":     "Open Roll (explosive 1d10)",
+    "SortInstantane": "Instant Spell (base threshold × 2)",
     "JetFerme":      "Closed Roll (1d10)",
     "JetOuvertLabel": "Open Roll",
     "JetFermeLabel":  "Closed Roll",

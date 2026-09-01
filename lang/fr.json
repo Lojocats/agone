@@ -462,6 +462,7 @@
     "Malus2":        "Malus",
     "TypeJet":       "Type de jet",
     "JetOuvert":     "Jet Ouvert (1d10 explosif)",
+    "SortInstantane": "Sort instantané (seuil de base × 2)",
     "JetFerme":      "Jet Fermé (1d10)",
     "JetOuvertLabel": "Jet Ouvert",
     "JetFermeLabel":  "Jet Fermé",
