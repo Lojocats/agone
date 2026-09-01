@@ -451,7 +451,8 @@
     "JeterAttaque":         "Roll attack",
     "JeterParade":          "Roll parry",
     "JeterEsquive":         "Roll dodge",
-    "JeterDefenseNat":      "Roll natural defense",
+    "JeterDefenseNat":          "Roll natural defense",
+    "JeterDefenseNaturelle":    "Roll natural defense",
     "JeterCompetence":      "Roll skill",
     "JeterAptitudeMagie":   "Roll magical aptitude",
     "JeterAptitudeConj":    "Roll conjuration",
@@ -479,6 +480,7 @@
     "AttaqueAbr":     "Attack",
     "ParadeAbr":      "Parry",
     "DommagesAbr":     "Damage",
+    "DefenseAbr":      "Defense",
     "Req":            "Required",
 
 

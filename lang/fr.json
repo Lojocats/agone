@@ -452,7 +452,8 @@
     "JeterAttaque":         "Jeter l'attaque",
     "JeterParade":          "Jeter la parade",
     "JeterEsquive":         "Jeter l'esquive",
-    "JeterDefenseNat":      "Jeter la défense naturelle",
+    "JeterDefenseNat":          "Jeter la défense naturelle",
+    "JeterDefenseNaturelle":    "Jeter la défense naturelle",
     "JeterCompetence":      "Jeter la compétence",
     "JeterAptitudeMagie":   "Jeter l'aptitude magique",
     "JeterAptitudeConj":    "Jeter la conjuration",
@@ -480,6 +481,7 @@
     "AttaqueAbr":     "Attaque",
     "ParadeAbr":      "Parade",
     "DommagesAbr":     "Dommages",
+    "DefenseAbr":      "Défense",
     "Req":            "Requis",
 
     "ResultatJet":   "Résultat",
