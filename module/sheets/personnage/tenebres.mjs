@@ -1,6 +1,25 @@
 import { descriptionBienfaitPeine } from "../../helpers/compendium-data.mjs";
 import { lireChange } from "../../helpers/effets.mjs";
 
+/** Seuils du tableau des paliers de Ténèbres, dans l'ordre d'affichage. */
+const SEUILS_TENEBRES = [10, 20, 30, 40, 50, 55, 60, 65, 70, 75, 78, 81, 84, 87, 90, 92, 94, 96, 98, 99, 100];
+/** Seuils accordant un bienfait. */
+const SEUILS_BIENFAITS = [10, 20, 30, 70, 75, 78, 81, 92, 98, 99];
+
+/** Suffixe AGONE.Peine.* du nom de la peine de chaque palier. */
+const PALIERS_PEINES = {
+  10: "diablotin", 20: "cauchemars", 30: "demonFacetieux", 40: "somnambule", 50: "insomniaque",
+  55: "mepris", 60: "devianceSexuelle", 65: "scarificationsLunaires", 70: "jumeauDemoniaque",
+  75: "obsessionOmbre", 78: "presenceOppressante", 81: "alterationSens", 84: "sangNoir",
+  87: "apparenceDemoniaque", 90: "ombrePerfidie", 92: "siamoisTenebres", 94: "malediction",
+  96: "ombreVivante", 98: "portailInterieur", 99: "marqueHautsDiables", 100: "dechu",
+};
+/** Suffixe AGONE.Bienfait.* du nom du bienfait de chaque palier qui en accorde un. */
+const PALIERS_BIENFAITS = {
+  10: "cercle1", 20: "diablotin2", 30: "cercle2", 70: "cercle3", 75: "nyctalopie",
+  78: "parlerMorts", 81: "detecterDemons", 92: "cercle4", 98: "cercle5", 99: "detecterTenebres",
+};
+
 /** Libellés lisibles des effets automatisés propres à une peine (hors effets de son bienfait). */
 function effetsLisiblesPeine(peine) {
   const libelles = [];
@@ -85,10 +104,27 @@ export const TenebresMixin = Base => class extends Base {
 
     // ── Ténèbres : mode manuel des paliers ────────────────────────────
     context.tenebresModeManuel = this.actor.getFlag("agone", "tenebresModeManuel") ?? false;
+    const paliersManuels   = context.tenebresModeManuel ? (this.actor.getFlag("agone", "paliersManuels")   ?? {}) : {};
+    const bienfaitsManuels = context.tenebresModeManuel ? (this.actor.getFlag("agone", "bienfaitsManuels") ?? {}) : {};
     if (context.tenebresModeManuel) {
-      context.paliersManuels  = this.actor.getFlag("agone", "paliersManuels")  ?? {};
-      context.bienfaitsManuels = this.actor.getFlag("agone", "bienfaitsManuels") ?? {};
+      context.paliersManuels   = paliersManuels;
+      context.bienfaitsManuels = bienfaitsManuels;
     }
+
+    // Tableau des Paliers / Peines / Bienfaits
+    const tenebresScore = actor.system.tenebres ?? 0;
+    context.tableauPaliers = SEUILS_TENEBRES.map(seuil => {
+      const bienfaitCle = PALIERS_BIENFAITS[seuil] ?? "";
+      return {
+        seuil,
+        peineNom     : game.i18n.localize(`AGONE.Peine.${PALIERS_PEINES[seuil]}`),
+        bienfaitNom  : bienfaitCle ? game.i18n.localize(`AGONE.Bienfait.${bienfaitCle}`) : "",
+        tooltipPeine   : game.i18n.localize(`AGONE.TenebresPalierTooltip${seuil}`),
+        tooltipBienfait: bienfaitCle ? game.i18n.localize(`AGONE.TenebresBienfaitTooltip${seuil}`) : "",
+        atteint      : context.tenebresModeManuel ? !!paliersManuels[String(seuil)] : tenebresScore >= seuil,
+        bienfaitCoche: !!bienfaitsManuels[String(seuil)],
+      };
+    });
   }
 
   /** Écouteurs délégués de l'onglet (voir PersonnageSheet#_onRender). */
@@ -144,11 +180,9 @@ export const TenebresMixin = Base => class extends Base {
     if (activating) {
       // Passage auto → manuel : initialiser paliersManuels et bienfaitsManuels depuis la valeur courante.
       const ten = this.actor.system.tenebres ?? 0;
-      const SEUILS = [10, 20, 30, 40, 50, 55, 60, 65, 70, 75, 78, 81, 84, 87, 90, 92, 94, 96, 98, 99, 100];
       const paliers = {};
-      for (const s of SEUILS) paliers[String(s)] = ten >= s;
+      for (const s of SEUILS_TENEBRES) paliers[String(s)] = ten >= s;
       await this.actor.setFlag("agone", "paliersManuels", paliers);
-      const SEUILS_BIENFAITS = [10, 20, 30, 70, 75, 78, 81, 92, 98, 99];
       const bienfaits = {};
       for (const s of SEUILS_BIENFAITS) bienfaits[String(s)] = ten >= s;
       await this.actor.setFlag("agone", "bienfaitsManuels", bienfaits);

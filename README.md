@@ -45,7 +45,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - **Peines de Perfidie** : effets de la peine (actifs dès qu'elle est possédée) et effets de son **bienfait**, suspendus tant que le bienfait n'est pas acquis ; description du bienfait modifiable (le texte du livre sert par défaut) ; dans l'onglet Perfidie et le navigateur, la description dépliable d'une peine détaille son texte, son effet et son bienfait
 
 ### Ténèbres & Paliers
-- Tableau interactif des 20 paliers avec peines et bienfaits
+- Tableau interactif des paliers avec peines et bienfaits ; chaque palier se déplie pour lire la description de sa peine et de son bienfait
 - **Mode automatique** : les paliers s'activent selon la valeur de Ténèbres
 - **Mode manuel** : bascule par bouton, paliers cochés individuellement ; initialisé depuis la valeur de Ténèbres courante
 - En mode manuel, la modification de la valeur de Ténèbres n'affecte plus les paliers

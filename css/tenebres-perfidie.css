@@ -86,6 +86,7 @@
 .agone .paliers-table thead .col-palier { text-align: center; }
 .agone .paliers-table .col-palier { width: 48px; text-align: center; }
 .agone .paliers-table .col-bienfait { width: 150px; }
+.agone .paliers-table .col-chevron { width: 22px; text-align: center; padding: 3px 0 !important; }
 .agone .paliers-table .palier-row td {
   padding: 3px 8px;
   border-bottom: 1px solid rgba(var(--agone-noir-rgb, 26,26,46), 0.07);
@@ -320,6 +321,7 @@
   font-style: italic;
   color: rgba(var(--agone-noir-rgb, 26,26,46), 0.35);
 }
+.agone .peine-details-texte { margin: 0; font-size: 11px; color: var(--agone-brown); }
 
 /* Bienfaits acquis */
 .agone .bienfaits-perfidie-list {

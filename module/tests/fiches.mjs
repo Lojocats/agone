@@ -242,6 +242,71 @@ export function fichesBatch({ describe, it, assert, before, after }) {
         await sheet.close({ animate: false });
       }
     });
+
+    it("tableau des paliers de Ténèbres : un chevron par palier, description dépliable avec peine et bienfait", async () => {
+      const actor = await tests.acteur("personnage", { ...PERSO, tenebres: 35 });
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="tenebres"]').click();
+        const table = sheet.element.querySelector(".paliers-table");
+        assert.ok(table, "tableau des paliers");
+        const chevrons = [...table.querySelectorAll('.desc-bascule[data-desc^="palier:"]')];
+        assert.equal(chevrons.length, 21, "un chevron par palier");
+
+        const chevron10 = table.querySelector('.desc-bascule[data-desc="palier:10"]');
+        const desc10 = table.querySelector('[data-desc-de="palier:10"]');
+        assert.ok(desc10.hidden, "masquée par défaut");
+        chevron10.click();
+        assert.notOk(desc10.hidden, "ouverte au clic");
+        assert.include(desc10.textContent, game.i18n.localize("AGONE.Peine.diablotin"), "nom de la peine");
+        assert.include(desc10.textContent, game.i18n.localize("AGONE.TenebresPalierTooltip10"), "texte de la peine");
+        assert.include(desc10.textContent, game.i18n.localize("AGONE.Bienfait.cercle1"), "nom du bienfait");
+        assert.include(desc10.textContent, game.i18n.localize("AGONE.TenebresBienfaitTooltip10"), "texte du bienfait");
+
+        const desc40 = table.querySelector('[data-desc-de="palier:40"]');
+        table.querySelector('.desc-bascule[data-desc="palier:40"]').click();
+        assert.include(desc40.textContent, game.i18n.localize("AGONE.PerfidieAucunBienfait"), "palier 40 : aucun bienfait");
+
+        const tout = table.querySelector(".desc-bascule-tout");
+        tout.click();
+        assert.ok([...table.querySelectorAll(".desc-pliable")].every(d => !d.hidden), "tout ouvrir");
+        tout.click();
+        assert.ok([...table.querySelectorAll(".desc-pliable")].every(d => d.hidden), "tout refermer");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("tableau des paliers : mode manuel garde les boutons de coche et élargit le colspan de la description", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      await actor.setFlag("agone", "tenebresModeManuel", true);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="tenebres"]').click();
+        const table = sheet.element.querySelector(".paliers-table");
+        assert.ok(table.querySelector('[data-action="togglePalierManuel"][data-seuil="10"]'), "bouton togglePalierManuel toujours présent");
+        const ligneDesc = table.querySelector('[data-desc-de="palier:10"]');
+        assert.equal(ligneDesc.querySelectorAll("td").length, 3, "une cellule de plus pour la colonne de coche");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("tableau des paliers : palier atteint selon le score de Ténèbres (non-régression du refactor)", async () => {
+      const actor = await tests.acteur("personnage", { ...PERSO, tenebres: 35 });
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="tenebres"]').click();
+        const table = sheet.element.querySelector(".paliers-table");
+        const ligne = seuil => table.querySelector(`.desc-bascule[data-desc="palier:${seuil}"]`).closest(".palier-row");
+        assert.ok(ligne(10).classList.contains("palier-reached"), "palier 10 atteint");
+        assert.ok(ligne(20).classList.contains("palier-reached"), "palier 20 atteint");
+        assert.ok(ligne(30).classList.contains("palier-reached"), "palier 30 atteint");
+        assert.notOk(ligne(40).classList.contains("palier-reached"), "palier 40 non atteint");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
   });
 
   describe("Fiche personnage : sauvegarde automatique", function () {
