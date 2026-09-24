@@ -1,34 +1,41 @@
 <div class="cb-app">
 
   <!-- Filtres -->
-  <div class="cb-filters">
-    <div class="cb-search-wrap">
-      <i class="fas fa-search cb-search-icon"></i>
-      <input type="text" class="cb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}" />
-      {{#if search}}<button type="button" class="cb-search-clear" title='{{localize "AGONE.Browser.Effacer"}}'>✕</button>{{/if}}
-    </div>
+  <div class="agone-filtres cb-filters">
+    {{> systems/agone/templates/apps/parts/browser-filtres-tete.hbs p="cb" search=search compte=competences.length libelle="AGONE.Browser.ResultatsCount"}}
 
-    <div class="cb-filter-row">
-      <!-- Domaines -->
-      <div class="cb-dom-filters">
-        <label>
-          <input type="checkbox" class="cb-all-check" {{#if allFamillesSelected}}checked{{/if}} />
-          {{localize "AGONE.Browser.Tous"}}
-        </label>
-        {{#each allFamilles as |f|}}
-        <label>
-          <input type="checkbox" class="cb-fam-check" value="{{f.value}}" {{#if f.active}}checked{{/if}} />
-          <span class="cb-fam-badge fam-{{f.value}}">{{f.label}}</span>
-        </label>
-        {{/each}}
+    <div class="agone-filtres-corps">
+      <!-- Familles -->
+      <div class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Famille"}}</span>
+        <div class="agone-chips">
+          <label class="agone-chip"><input type="checkbox" class="cb-all-check" {{#if allFamillesSelected}}checked{{/if}}><span>{{localize "AGONE.Browser.Tous"}}</span></label>
+          {{#each allFamilles as |f|}}
+          <label class="agone-chip"><input type="checkbox" class="cb-fam-check" value="{{f.value}}" {{#if f.active}}checked{{/if}}><span>{{f.label}}</span></label>
+          {{/each}}
+        </div>
       </div>
 
+      <!-- Attribut lié -->
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.AttributLie"}}</span>
+        <select class="cb-attribut-filter">
+          <option value="all" {{#if (eq filterAttribut "all")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.TousAttributs"}}</option>
+          {{#each allAttributs as |a|}}
+          <option value="{{a.value}}" {{#if (eq ../filterAttribut a.value)}}selected{{/if}}>{{a.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+
       <!-- Possédées -->
-      <select class="cb-possede-select">
-        <option value="all"  {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
-        <option value="oui"  {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.Possedees"}}</option>
-        <option value="non"  {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
-      </select>
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.Possession"}}</span>
+        <select class="cb-possede-select">
+          <option value="all"  {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
+          <option value="oui"  {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.Possedees"}}</option>
+          <option value="non"  {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
+        </select>
+      </label>
     </div>
   </div>
 
@@ -51,7 +58,7 @@
             {{#if c.count}}<span class="cb-count-badge" title='{{localize "AGONE.Ui.PossedeeNFois" n=c.count}}'>x{{c.count}}</span>{{/if}}
           </td>
           <td><span class="cb-fam-badge fam-{{c.famille}}">{{c.famille}}</span></td>
-          <td class="cb-attr">{{c.attributLie}}</td>
+          <td class="cb-attr">{{c.attributLabel}}</td>
           <td>
             <button type="button" class="cb-add-btn" data-action="addCompetence"
                     data-name="{{c.name}}" data-attribut-lie="{{c.attributLie}}"

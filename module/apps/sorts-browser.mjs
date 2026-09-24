@@ -1,4 +1,5 @@
 import { SORTS_DATA } from "../helpers/compendium-data.mjs";
+import { familleSort, instrumentsSorts, cleInstrument } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
@@ -12,6 +13,8 @@ export class SortsBrowser extends AgoneBrowser {
   static FILTER_DEFAULTS = {
     _search          : "",
     _filterTypes     : new Set(),
+    _filterFamille   : "all",   // "all" | "emprise" | "arts"
+    _filterInstrument: "all",   // instrument (Accord) ou saison (Décorum…) du sort
     _filterSeuilMax  : null,
     _filterSeuilExact: null,
     _filterPossede   : "all",
@@ -21,6 +24,8 @@ export class SortsBrowser extends AgoneBrowser {
     ".sb-search"         : { kind: "text",   prop: "_search" },
     ".sb-all-check"      : { kind: "setAll", prop: "_filterTypes" },
     ".sb-type-check"     : { kind: "set",    prop: "_filterTypes" },
+    ".sb-famille-filter" : { kind: "select", prop: "_filterFamille" },
+    ".sb-instrument-filter": { kind: "select", prop: "_filterInstrument" },
     // Seuil exact et seuil max sont exclusifs
     ".sb-seuil-exact"    : { kind: "number", prop: "_filterSeuilExact",
                              onChange(v) { if (v !== null) this._filterSeuilMax = null; } },
@@ -77,21 +82,20 @@ export class SortsBrowser extends AgoneBrowser {
       hasInActor: actorSortNames.has(cleSort(d.name, d.typeMagie)),
     }));
 
-    // Filtres
+    // Filtres — type et famille : communs à la liste et aux instruments proposés
+    const typeRetenu = e => (this._filterTypes.size === 0 || this._filterTypes.has(e.typeMagie))
+      && (this._filterFamille === "all" || familleSort(e.typeMagie) === this._filterFamille);
     sorts = this._applySearch(sorts, ["name", "typeMagie", "description"]);
-    if (this._filterTypes.size > 0) {
-      sorts = sorts.filter(e => this._filterTypes.has(e.typeMagie));
+    sorts = sorts.filter(typeRetenu);
+    if (this._filterInstrument !== "all") {
+      sorts = sorts.filter(e => (e.instrument ?? "") === this._filterInstrument);
     }
     if (this._filterSeuilExact !== null) {
       sorts = sorts.filter(e => e.seuil === this._filterSeuilExact);
     } else if (this._filterSeuilMax !== null) {
       sorts = sorts.filter(e => e.seuil <= this._filterSeuilMax);
     }
-    if (this._filterPossede === "oui") {
-      sorts = sorts.filter(e => e.hasInActor);
-    } else if (this._filterPossede === "non") {
-      sorts = sorts.filter(e => !e.hasInActor);
-    }
+    sorts = this._applyPossede(sorts);
 
     this._trier(sorts, (a, b) => a.name.localeCompare(b.name, "fr"));
 
@@ -102,10 +106,23 @@ export class SortsBrowser extends AgoneBrowser {
     const allSeuils = [...new Set(SORTS_DATA.map(d => d.seuil).filter(v => v != null))]
       .sort((a, b) => a - b);
 
+    // Instruments / saisons des sorts des types retenus (le choix courant reste proposé)
+    const instruments = instrumentsSorts(SORTS_DATA.filter(typeRetenu));
+    if (this._filterInstrument !== "all" && !instruments.includes(this._filterInstrument)) {
+      instruments.push(this._filterInstrument);
+    }
+    const allInstruments = instruments.map(v => {
+      const cle = cleInstrument(v);
+      return { value: v, label: game.i18n.has(cle) ? game.i18n.localize(cle) : v };
+    });
+
     return {
       sorts,
       allTypes,
       allSeuils,
+      allInstruments,
+      filterFamille   : this._filterFamille,
+      filterInstrument: this._filterInstrument,
       search          : this._search,
       filterSeuilMax  : this._filterSeuilMax ?? "",
       filterSeuilExact: this._filterSeuilExact,

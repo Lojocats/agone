@@ -1,4 +1,5 @@
-import { MANOEUVRES_DATA } from "../helpers/compendium-data.mjs";
+import { MANOEUVRES_DATA, PEUPLES_DATA } from "../helpers/compendium-data.mjs";
+import { conditionManoeuvreCorrespond } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
@@ -11,12 +12,14 @@ export class ManoeuvresBrowser extends AgoneBrowser {
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterCat    : "all",
+    _filterCondition: "all",   // "all" | "sans" | "reaction" | "peuple" | "autre"
     _filterPossede: "all",
   };
 
   static FILTERS = {
     ".mb-search"         : { kind: "text",   prop: "_search" },
     ".mb-cat-filter"     : { kind: "select", prop: "_filterCat" },
+    ".mb-condition-filter": { kind: "select", prop: "_filterCondition" },
     ".mb-possede-filter" : { kind: "select", prop: "_filterPossede" },
     ".mb-clear"          : { kind: "reset" },
   };
@@ -59,11 +62,12 @@ export class ManoeuvresBrowser extends AgoneBrowser {
     if (this._filterCat !== "all") {
       items = items.filter(e => e.categorie === this._filterCat);
     }
-    if (this._filterPossede === "oui") {
-      items = items.filter(e => e.hasInActor);
-    } else if (this._filterPossede === "non") {
-      items = items.filter(e => !e.hasInActor);
+    if (this._filterCondition !== "all") {
+      // Noms de peuples reconnus en tête de condition (« Ogre, réaction »)
+      const peuples = PEUPLES_DATA.map(p => p.name);
+      items = items.filter(e => conditionManoeuvreCorrespond(e.condition, this._filterCondition, peuples));
     }
+    items = this._applyPossede(items);
 
     // Manœuvres d'abord, puis bottes ; alphabétique dans chaque groupe
     this._trier(items, (a, b) => {
@@ -75,6 +79,7 @@ export class ManoeuvresBrowser extends AgoneBrowser {
       items,
       search        : this._search,
       filterCat     : this._filterCat,
+      filterCondition: this._filterCondition,
       filterPossede : this._filterPossede,
     };
   }

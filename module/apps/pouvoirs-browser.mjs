@@ -53,11 +53,7 @@ export class PouvoirsBrowser extends AgoneBrowser {
     if (this._filterCat !== "all") {
       items = items.filter(e => e.categorie === this._filterCat);
     }
-    if (this._filterPossede === "oui") {
-      items = items.filter(e => e.hasInActor);
-    } else if (this._filterPossede === "non") {
-      items = items.filter(e => !e.hasInActor);
-    }
+    items = this._applyPossede(items);
 
     this._trier(items, (a, b) => {
       if (a.categorie !== b.categorie) return a.categorie === "flamme" ? -1 : 1;

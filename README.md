@@ -100,8 +100,8 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 ### Applications
 - **Navigateurs** : armes, armures, compétences, sorts, pouvoirs, manœuvres, peuples, avantages, peines
   - **Recherche** sans accent ni majuscule, plusieurs mots dans n'importe quel ordre, `"expression exacte"`, `-mot` pour exclure, `nom:mot` pour ne chercher que dans le nom ; une faute de frappe par mot est tolérée ; résultats classés par pertinence, correspondances surlignées
-  - Filtres, **tri en cliquant sur les colonnes**, Échap pour effacer la recherche
-  - Section **Objets personnalisés** : les objets du même type créés dans le monde ou dans vos compendiums, avec leurs effets, ajoutés en un clic
+  - Filtres propres à chaque type (dommages, portée, couverture, prérequis, condition, saison, famille de magie, instrument…), **tri en cliquant sur les colonnes**, Échap pour effacer la recherche
+  - Section **Objets personnalisés** : les objets du même type créés dans le monde ou dans vos compendiums, avec leurs effets, ajoutés en un clic ; le bouton **Créer un objet personnalisé** (marteau) de la barre d'outils Agone en crée un directement
 - **Calendrier d'Harmonde** : suivi du jour/mois/année, phases de lune, notes journalières, heure par quarts
 - **Météo dynamique** : un bouton par météo dans le calendrier, appliquée automatiquement à la scène active (effets de particules + filtres + luminosité selon l'heure)
 - **Tracker de combat** : initiative et ordre du tour custom, passage de round, gestion de l'état des combattants

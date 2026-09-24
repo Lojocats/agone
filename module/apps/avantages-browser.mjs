@@ -1,5 +1,6 @@
 import { AVANTAGES_DATA, AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
 import { effetsDepuisTable } from "../helpers/effets.mjs";
+import { avecSans } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 // Libellés lisibles des catégories
@@ -35,6 +36,8 @@ export class AvantagesBrowser extends AgoneBrowser {
     _filterType       : "all",
     _filterPossede    : "all",
     _filterChargeExact: null,
+    _filterPrerequis  : "all",   // "all" | "avec" | "sans"
+    _filterEffet      : "all",   // effet automatisé (AVANTAGES_EFFETS) : "all" | "avec" | "sans"
   };
 
   static FILTERS = {
@@ -42,6 +45,8 @@ export class AvantagesBrowser extends AgoneBrowser {
     ".avb-section-filter" : { kind: "select", prop: "_filterSection" },
     ".avb-type-filter"    : { kind: "select", prop: "_filterType" },
     ".avb-charge-filter"  : { kind: "number", prop: "_filterChargeExact" },
+    ".avb-prerequis-filter": { kind: "select", prop: "_filterPrerequis" },
+    ".avb-effet-filter"   : { kind: "select", prop: "_filterEffet" },
     ".avb-possede-filter" : { kind: "select", prop: "_filterPossede" },
     ".avb-clear"          : { kind: "reset" },
   };
@@ -75,6 +80,7 @@ export class AvantagesBrowser extends AgoneBrowser {
       charge     : d.charge,
       chargeAbs  : Math.abs(d.charge),
       prerequis  : d.prerequis ?? "",
+      effetAuto  : (AVANTAGES_EFFETS[d.name]?.length ?? 0) > 0,
       description: d.description ?? "",
       hasInActor : actorDonNames.has(d.name),
     }));
@@ -87,11 +93,9 @@ export class AvantagesBrowser extends AgoneBrowser {
     if (this._filterType !== "all") {
       items = items.filter(e => e.type === this._filterType);
     }
-    if (this._filterPossede === "oui") {
-      items = items.filter(e => e.hasInActor);
-    } else if (this._filterPossede === "non") {
-      items = items.filter(e => !e.hasInActor);
-    }
+    items = items.filter(e => avecSans(e.prerequis.trim(), this._filterPrerequis)
+      && avecSans(e.effetAuto, this._filterEffet));
+    items = this._applyPossede(items);
     if (this._filterChargeExact !== null) {
       items = items.filter(e => e.charge === this._filterChargeExact);
     }
@@ -113,6 +117,8 @@ export class AvantagesBrowser extends AgoneBrowser {
       filterType        : this._filterType,
       filterPossede     : this._filterPossede,
       filterChargeExact : this._filterChargeExact,
+      filterPrerequis   : this._filterPrerequis,
+      filterEffet       : this._filterEffet,
       allCharges,
       sections          : Object.entries(_buildCatLabels()).map(([k, v]) => ({ key: k, label: v })),
     };

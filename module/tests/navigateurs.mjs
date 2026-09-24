@@ -1,4 +1,10 @@
 import { attendre, bac, DELAI, PERSO } from "./outils.mjs";
+import {
+  ARMURES_DATA, AVANTAGES_DATA, AVANTAGES_EFFETS, PEINES_PERFIDIE_DATA, PEUPLES_DATA, SORTS_DATA,
+} from "../helpers/compendium-data.mjs";
+import {
+  porteeArme, conditionManoeuvreCorrespond, estVolant, TYPES_EMPRISE, TYPES_ARTS, instrumentsSorts,
+} from "../helpers/filtres-navigateurs.mjs";
 
 /** Navigateurs : [fichier, classe, action d'ajout (null = pas d'ajout direct testé)] */
 const NAVIGATEURS = [
@@ -16,6 +22,108 @@ const NAVIGATEURS = [
 /** Lignes principales du tableau (hors descriptions, hors ligne « aucun résultat »). */
 const lignes = app => [...app.element.querySelectorAll("table:not(.browser-perso-table) tbody tr")]
   .filter(tr => !/-desc-row\b/.test(tr.className) && !tr.querySelector("td[colspan]"));
+
+/** Texte (première ligne) d'une cellule d'une ligne. */
+const cellule = (tr, selecteur) => tr.querySelector(selecteur)?.textContent.trim().split("\n")[0].trim() ?? "";
+
+const NOMS_PEUPLES = PEUPLES_DATA.map(p => p.name);
+
+/**
+ * Nouveaux filtres de chaque navigateur : propriétés posées sur l'application, et vérification
+ * des lignes affichées (`verifier(lignes, total, app)`). `auMoinsUne` : la sélection n'est pas vide
+ * avec les données du livre de base. `preparer(app)` : mise en place préalable (items de l'acteur,
+ * supprimés avec lui par le bac). Ces cas tournent avant le test d'ajout d'une entrée à l'acteur.
+ */
+const FILTRES = {
+  armes: [
+    { nom: "dommages minimum", filtres: { _filterDomMin: 8 }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(Number(cellule(tr, ".ab-dom")) >= 8, cellule(tr, ".ab-name"))) },
+    { nom: "Agilité requise maximale", filtres: { _filterReqAgi: 2 }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(Number(cellule(tr, ".ab-req").split("/")[1]) <= 2, cellule(tr, ".ab-name"))) },
+    { nom: "portée : à distance", filtres: { _filterPortee: "distance" }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(porteeArme(cellule(tr, ".ab-portee")) === "distance", cellule(tr, ".ab-name"))) },
+    { nom: "portée : contact", filtres: { _filterPortee: "contact" }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(porteeArme(cellule(tr, ".ab-portee")) === "contact", cellule(tr, ".ab-name"))) },
+  ],
+  armures: [
+    { nom: "couverture (Set)", filtres: () => ({ _filterCouv: new Set(["1"]) }), auMoinsUne: true,
+      verifier: ls => exiger(ls.length === ARMURES_DATA.filter(d => String(d.type ?? "0") === "1").length, "nombre d'armures de couverture 1") },
+    { nom: "protection minimum", filtres: { _filterProtMin: 7 }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(Number(cellule(tr, ".arb-prot")) >= 7, cellule(tr, ".arb-name"))) },
+    { nom: "malus d'Agilité maximal", filtres: { _filterMalusAgiMax: 2 }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(Math.abs(Number(cellule(tr, ".arb-malus"))) <= 2, cellule(tr, ".arb-name"))) },
+  ],
+  avantages: [
+    { nom: "avec prérequis", filtres: { _filterPrerequis: "avec" }, auMoinsUne: true,
+      verifier: ls => exiger(memesNoms(ls, ".avb-name", AVANTAGES_DATA.filter(d => (d.prerequis ?? "").trim())),
+        "avantages avec prérequis") },
+    { nom: "sans prérequis", filtres: { _filterPrerequis: "sans" }, auMoinsUne: true },
+    { nom: "avec effet automatisé", filtres: { _filterEffet: "avec" }, auMoinsUne: true,
+      verifier: ls => exiger(memesNoms(ls, ".avb-name", AVANTAGES_DATA.filter(d => (AVANTAGES_EFFETS[d.name]?.length ?? 0) > 0)),
+        "avantages à effet automatisé") },
+    { nom: "sans effet automatisé", filtres: { _filterEffet: "sans" }, auMoinsUne: true },
+  ],
+  competences: [
+    { nom: "attribut lié", filtres: () => ({ _filterAttribut: CONFIG.AGONE.competences[0].attributLie }), auMoinsUne: true,
+      verifier: ls => {
+        const label = game.i18n.localize(CONFIG.AGONE.attributs[CONFIG.AGONE.competences[0].attributLie].label);
+        ls.forEach(tr => exiger(cellule(tr, ".cb-attr") === label, cellule(tr, ".cb-name")));
+      } },
+  ],
+  manoeuvres: ["sans", "reaction", "peuple", "autre"].map(cat => ({
+    nom: `condition : ${cat}`, filtres: { _filterCondition: cat }, auMoinsUne: true,
+    verifier: ls => ls.forEach(tr => exiger(
+      conditionManoeuvreCorrespond(cellule(tr, ".mb-condition"), cat, NOMS_PEUPLES), cellule(tr, ".mb-name"))),
+  })),
+  peines: [
+    { nom: "possédées : la seule peine du personnage", filtres: { _filterPossede: "oui" }, preparer: peinePossedee,
+      verifier: ls => exiger(ls.length === 1 && cellule(ls[0], ".pnb-name") === PEINES_PERFIDIE_DATA[0].name,
+        `seule « ${PEINES_PERFIDIE_DATA[0].name} » listée`) },
+    { nom: "non possédées : toutes sauf une", filtres: { _filterPossede: "non" }, preparer: peinePossedee, auMoinsUne: true,
+      verifier: (ls, total) => exiger(ls.length === total - 1
+        && !ls.some(tr => cellule(tr, ".pnb-name") === PEINES_PERFIDIE_DATA[0].name), "toutes les peines sauf la possédée") },
+  ],
+  peuples: [
+    { nom: "saison", filtres: { _filterSaison: "hiver" }, auMoinsUne: true,
+      verifier: ls => exiger(
+        ls.map(tr => cellule(tr, ".pb-name")).sort().join("|")
+          === PEUPLES_DATA.filter(p => p.saisonDefaut === "hiver").map(p => p.name).sort().join("|"),
+        "peuples d'hiver") },
+    { nom: "volants", filtres: { _filterVol: "oui" }, auMoinsUne: true,
+      verifier: ls => exiger(
+        ls.map(tr => cellule(tr, ".pb-name")).sort().join("|")
+          === PEUPLES_DATA.filter(p => estVolant(p.mvVolBase)).map(p => p.name).sort().join("|"),
+        "peuples volants") },
+    { nom: "non volants", filtres: { _filterVol: "non" }, auMoinsUne: true,
+      verifier: ls => exiger(ls.length === PEUPLES_DATA.filter(p => !estVolant(p.mvVolBase)).length, "peuples non volants") },
+  ],
+  sorts: [
+    { nom: "famille Emprise", filtres: { _filterFamille: "emprise" }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(TYPES_EMPRISE.includes(cellule(tr, ".sb-type").split("/")[0].trim().toLowerCase()), cellule(tr, ".sb-name"))) },
+    { nom: "famille Arts magiques", filtres: { _filterFamille: "arts" }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(TYPES_ARTS.includes(cellule(tr, ".sb-type").split("/")[0].trim().toLowerCase()), cellule(tr, ".sb-name"))) },
+    { nom: "instrument", filtres: { _filterInstrument: "harpe" }, auMoinsUne: true,
+      verifier: ls => ls.forEach(tr => exiger(cellule(tr, ".sb-type").split("/")[1]?.trim() === "harpe", cellule(tr, ".sb-name"))) },
+  ],
+};
+
+/** Vrai si les noms affichés (cellule `selecteur`) sont exactement ceux des entrées `attendues`. */
+function memesNoms(ls, selecteur, attendues) {
+  const affiches = ls.map(tr => cellule(tr, selecteur)).sort().join("|");
+  return affiches === attendues.map(d => d.name).sort().join("|");
+}
+
+/** Donne au personnage de test la première peine du livre de base (une seule fois). */
+async function peinePossedee(app) {
+  const nom = PEINES_PERFIDIE_DATA[0].name;
+  if (app.actor.items.some(i => i.type === "peine" && i.name === nom)) return;
+  await Item.create({ name: nom, type: "peine" }, { parent: app.actor });
+}
+
+/** Vérification d'une ligne filtrée (cas déclarés hors du batch, sans l'`assert` de Quench). */
+function exiger(condition, message) {
+  if (!condition) throw new Error(`Ligne hors filtre : ${message}`);
+}
 
 /**
  * Navigateurs de compendium : affichage, recherche, réinitialisation, tri, ajout à l'acteur,
@@ -97,6 +205,197 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
         th.click();
         assert.ok(th.classList.contains("tri-desc"));
       });
+
+      it("chaque contrôle de filtre déclaré est présent dans la barre", () => {
+        for (const selecteur of Object.keys(app.constructor.FILTERS)) {
+          assert.ok(app.element.querySelector(selecteur), selecteur);
+        }
+        assert.ok(app.element.querySelector(".agone-filtres-tete"), "tête de filtres partagée");
+      });
+
+      for (const cas of FILTRES[fichier] ?? []) {
+        it(`filtre ${cas.nom}`, async () => {
+          await cas.preparer?.(app);
+          app._resetFilters();
+          await app.render();
+          const total = lignes(app).length;
+          Object.assign(app, typeof cas.filtres === "function" ? cas.filtres() : cas.filtres);
+          await app.render();
+          const filtrees = lignes(app);
+          assert.isAtMost(filtrees.length, total);
+          if (cas.auMoinsUne) {
+            assert.isAbove(filtrees.length, 0, "au moins une entrée");
+            assert.isBelow(filtrees.length, total, "le filtre écarte des entrées");
+          }
+          cas.verifier?.(filtrees, total, app);
+          app._resetFilters();
+          await app.render();
+          assert.equal(lignes(app).length, total, "réinitialisation");
+        });
+      }
+
+      it("la réinitialisation remet chaque filtre à sa valeur initiale (Set recopié)", async () => {
+        app._resetFilters();
+        await app.render();
+        const total = lignes(app).length;
+        for (const cas of FILTRES[fichier] ?? []) {
+          Object.assign(app, typeof cas.filtres === "function" ? cas.filtres() : cas.filtres);
+        }
+        await app.render();
+        app._resetFilters();
+        const defauts = app.constructor.FILTER_DEFAULTS;
+        for (const [cle, valeur] of Object.entries(defauts)) {
+          if (valeur instanceof Set) {
+            assert.instanceOf(app[cle], Set, cle);
+            assert.equal(app[cle].size, 0, cle);
+            assert.notStrictEqual(app[cle], valeur, `${cle} : copie du Set par défaut`);
+          } else {
+            assert.strictEqual(app[cle], valeur, cle);
+          }
+        }
+        await app.render();
+        assert.equal(lignes(app).length, total);
+      });
+
+      if (fichier === "armures") {
+        it("un clic sur une puce de couverture bascule le Set", async () => {
+          app._resetFilters();
+          await app.render();
+          const total = lignes(app).length;
+          const attendu = ARMURES_DATA.filter(d => String(d.type ?? "0") === "1").length;
+          const puce = () => app.element.querySelector(".arb-couv-check[value='1']");
+          assert.equal(puce().closest(".agone-chip")?.querySelector("input[type='checkbox']"), puce(), "case réelle dans la puce");
+
+          puce().closest(".agone-chip").click();
+          await attendre(() => app._filterCouv.has("1") && lignes(app).length === attendu, "couverture cochée");
+          assert.ok(puce().checked, "case cochée après rendu");
+          assert.notOk(app.element.querySelector(".arb-all-couv").checked, "« Tous » décoché");
+
+          puce().closest(".agone-chip").click();
+          await attendre(() => !app._filterCouv.has("1") && lignes(app).length === total, "couverture décochée");
+
+          puce().closest(".agone-chip").click();
+          await attendre(() => app._filterCouv.size === 1, "couverture recochée");
+          app.element.querySelector(".arb-all-couv").closest(".agone-chip").click();
+          await attendre(() => app._filterCouv.size === 0 && lignes(app).length === total, "« Tous » vide le Set");
+          assert.ok(app.element.querySelector(".arb-all-couv").checked);
+        });
+      }
+
+      if (fichier === "avantages") {
+        it("prérequis et effet automatisé : « avec » et « sans » partagent la liste", async () => {
+          app._resetFilters();
+          await app.render();
+          const total = lignes(app).length;
+          for (const prop of ["_filterPrerequis", "_filterEffet"]) {
+            const compte = {};
+            for (const v of ["avec", "sans"]) {
+              app._resetFilters();
+              app[prop] = v;
+              await app.render();
+              compte[v] = lignes(app).length;
+            }
+            assert.equal(compte.avec + compte.sans, total, prop);
+          }
+          app._resetFilters();
+          await app.render();
+        });
+      }
+
+      if (fichier === "competences") {
+        it("le bouton d'effacement réinitialise recherche et filtres", async () => {
+          app._resetFilters();
+          await app.render();
+          const total = lignes(app).length;
+          assert.notOk(app.element.querySelector(".cb-search-clear"), "ancien bouton retiré");
+          app._search = "zzzz-aucun-resultat";
+          app._filterAttribut = CONFIG.AGONE.competences[0].attributLie;
+          app._filterPossede = "oui";
+          await app.render();
+          app.element.querySelector(".cb-clear").click();
+          await attendre(() => app._search === "" && app._filterAttribut === "all" && app._filterPossede === "all"
+            && lignes(app).length === total, "filtres effacés");
+        });
+
+        it("le sélecteur d'attribut ne propose que des attributs liés à une compétence", () => {
+          const utilises = new Set(CONFIG.AGONE.competences.map(c => c.attributLie));
+          const options = [...app.element.querySelectorAll(".cb-attribut-filter option")].map(o => o.value);
+          assert.equal(options[0], "all");
+          assert.isAbove(options.length, 1);
+          for (const v of options.slice(1)) assert.ok(utilises.has(v), v);
+        });
+      }
+
+      if (fichier === "sorts") {
+        it("seuil maximal et seuil exact sont exclusifs", async () => {
+          app._resetFilters();
+          await app.render();
+          const saisirMax = valeur => {
+            const input = app.element.querySelector(".sb-seuil-max");
+            input.value = valeur;
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+          };
+          const choisirExact = valeur => {
+            const select = app.element.querySelector(".sb-seuil-exact");
+            select.value = valeur;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+          };
+
+          saisirMax("3");
+          await attendre(() => app._filterSeuilMax === 3, "seuil max saisi", 3000);
+          await attendre(() => lignes(app).every(tr => Number(cellule(tr, ".sb-seuil")) <= 3), "liste au seuil max");
+          assert.isAbove(lignes(app).length, 0);
+
+          const exact = [...app.element.querySelectorAll(".sb-seuil-exact option")].map(o => o.value).find(v => v !== "");
+          choisirExact(exact);
+          await attendre(() => app._filterSeuilExact === Number(exact), "seuil exact choisi");
+          assert.isNull(app._filterSeuilMax, "seuil max effacé");
+          await attendre(() => app.element.querySelector(".sb-seuil-max")?.value === "", "champ seuil max vidé");
+          await attendre(() => lignes(app).length > 0
+            && lignes(app).every(tr => Number(cellule(tr, ".sb-seuil")) === Number(exact)), "liste au seuil exact");
+
+          saisirMax("5");
+          await attendre(() => app._filterSeuilMax === 5, "seuil max ressaisi", 3000);
+          assert.isNull(app._filterSeuilExact, "seuil exact effacé");
+          await attendre(() => app.element.querySelector(".sb-seuil-exact")?.value === "", "sélecteur seuil exact vidé");
+
+          app._resetFilters();
+          await app.render();
+        });
+
+        it("les instruments proposés suivent le filtre de type", async () => {
+          const options = () => [...app.element.querySelectorAll(".sb-instrument-filter option")]
+            .map(o => o.value).filter(v => v !== "all");
+
+          app._resetFilters();
+          app._filterTypes = new Set(["accord"]);
+          await app.render();
+          assert.deepEqual(options(), instrumentsSorts(SORTS_DATA.filter(s => s.typeMagie === "accord")));
+
+          app._resetFilters();
+          app._filterFamille = "emprise";
+          await app.render();
+          const emprise = instrumentsSorts(SORTS_DATA.filter(s => TYPES_EMPRISE.includes(s.typeMagie)));
+          if (emprise.length) assert.deepEqual(options(), emprise);
+          else assert.notOk(app.element.querySelector(".sb-instrument-filter"), "aucun instrument pour l'Emprise");
+
+          app._resetFilters();
+          await app.render();
+          assert.deepEqual(options(), instrumentsSorts(SORTS_DATA));
+        });
+
+        it("l'instrument choisi reste proposé quand le type ne l'utilise plus", async () => {
+          app._resetFilters();
+          app._filterInstrument = "harpe";
+          app._filterFamille = "emprise";
+          await app.render();
+          const select = app.element.querySelector(".sb-instrument-filter");
+          assert.ok(select, "sélecteur présent");
+          assert.equal(select.value, "harpe");
+          app._resetFilters();
+          await app.render();
+        });
+      }
 
       if (action) {
         it("ajouter une entrée à l'acteur", async () => {

@@ -1,45 +1,65 @@
 <div class="avantages-browser-app">
 
   <!-- Barre de filtres -->
-  <div class="avb-filters">
-    <div class="avb-filter-row">
-      <div class="avb-search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" class="avb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
-      </div>
-      <button type="button" class="avb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
-        <i class="fas fa-eraser"></i>
-      </button>
-    </div>
+  <div class="agone-filtres avb-filters">
+    {{> systems/agone/templates/apps/parts/browser-filtres-tete.hbs p="avb" search=search compte=items.length libelle="AGONE.Browser.ResultatsCount"}}
 
-    <div class="avb-filter-row2">
-      <select class="avb-section-filter">
-        <option value="all" {{#if (eq filterSection "all")}}selected{{/if}}>{{localize "AGONE.Browser.ToutesCategories"}}</option>
-        {{#each sections as |s|}}
-        <option value="{{s.key}}" {{#if (eq ../filterSection s.key)}}selected{{/if}}>{{s.label}}</option>
-        {{/each}}
-      </select>
+    <div class="agone-filtres-corps">
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Categorie"}}</span>
+        <select class="avb-section-filter">
+          <option value="all" {{#if (eq filterSection "all")}}selected{{/if}}>{{localize "AGONE.Browser.ToutesCategories"}}</option>
+          {{#each sections as |s|}}
+          <option value="{{s.key}}" {{#if (eq ../filterSection s.key)}}selected{{/if}}>{{s.label}}</option>
+          {{/each}}
+        </select>
+      </label>
 
-      <select class="avb-type-filter">
-        <option value="all"      {{#if (eq filterType "all")}}selected{{/if}}>{{localize "AGONE.Browser.AvantagesDefauts"}}</option>
-        <option value="avantage" {{#if (eq filterType "avantage")}}selected{{/if}}>{{localize "AGONE.Browser.AvantagesUniquement"}}</option>
-        <option value="defaut"   {{#if (eq filterType "defaut")}}selected{{/if}}>{{localize "AGONE.Browser.DefautsUniquement"}}</option>
-      </select>
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Type"}}</span>
+        <select class="avb-type-filter">
+          <option value="all"      {{#if (eq filterType "all")}}selected{{/if}}>{{localize "AGONE.Browser.AvantagesDefauts"}}</option>
+          <option value="avantage" {{#if (eq filterType "avantage")}}selected{{/if}}>{{localize "AGONE.Browser.AvantagesUniquement"}}</option>
+          <option value="defaut"   {{#if (eq filterType "defaut")}}selected{{/if}}>{{localize "AGONE.Browser.DefautsUniquement"}}</option>
+        </select>
+      </label>
 
-      <select class="avb-charge-filter" title='{{localize "AGONE.Ui.FiltrerChargeExacte"}}'>
-        <option value="">{{localize "AGONE.Browser.ToutesCharges"}}</option>
-        {{#each allCharges}}
-        <option value="{{this}}" {{#if (eq ../filterChargeExact this)}}selected{{/if}}>{{#if (gt this 0)}}+{{/if}}{{this}}</option>
-        {{/each}}
-      </select>
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Charge"}}</span>
+        <select class="avb-charge-filter" title='{{localize "AGONE.Ui.FiltrerChargeExacte"}}'>
+          <option value="">{{localize "AGONE.Browser.ToutesCharges"}}</option>
+          {{#each allCharges}}
+          <option value="{{this}}" {{#if (eq ../filterChargeExact this)}}selected{{/if}}>{{#if (gt this 0)}}+{{/if}}{{this}}</option>
+          {{/each}}
+        </select>
+      </label>
 
-      <select class="avb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
-      </select>
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Prerequis"}}</span>
+        <select class="avb-prerequis-filter">
+          <option value="all"  {{#if (eq filterPrerequis "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+          <option value="avec" {{#if (eq filterPrerequis "avec")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.AvecPrerequis"}}</option>
+          <option value="sans" {{#if (eq filterPrerequis "sans")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.SansPrerequis"}}</option>
+        </select>
+      </label>
 
-      <span class="avb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.EffetAuto"}}</span>
+        <select class="avb-effet-filter" title='{{localize "AGONE.Browser.Filtres.EffetAutoAide"}}'>
+          <option value="all"  {{#if (eq filterEffet "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+          <option value="avec" {{#if (eq filterEffet "avec")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.AvecEffet"}}</option>
+          <option value="sans" {{#if (eq filterEffet "sans")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.SansEffet"}}</option>
+        </select>
+      </label>
+
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.Possession"}}</span>
+        <select class="avb-possede-filter">
+          <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+          <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+          <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
+        </select>
+      </label>
     </div>
   </div>
 

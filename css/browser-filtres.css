@@ -1,0 +1,191 @@
+/* ============================================================
+   AGONE – Barre de filtres commune des navigateurs
+   Structure (templates/apps/*-browser.hbs) :
+     .agone-filtres
+       .agone-filtres-tete   (partiel browser-filtres-tete.hbs)
+         .agone-filtre-recherche > i + input   · .agone-filtre-effacer · .agone-filtre-compte
+       .agone-filtres-corps
+         .agone-filtre-groupe > .agone-filtre-label + contrôle
+           (.agone-chips > .agone-chip, select, .agone-filtre-nombre > input)
+   Les classes propres à chaque navigateur (.ab-search, .sb-type-check…) restent sur
+   les contrôles : FILTERS les cible. Couleurs : jetons de thème avec repli clair.
+   ============================================================ */
+
+.agone-browser .agone-filtres {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  border-radius: var(--radius, 4px);
+  font-size: 12px;
+}
+
+/* ── Ligne de tête : recherche + effacer + compte ─────────── */
+.agone-browser .agone-filtres-tete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone-browser .agone-filtre-recherche {
+  flex: 1;
+  min-width: 140px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.55);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border-radius: var(--radius, 4px);
+}
+.agone-browser .agone-filtre-recherche:focus-within {
+  border-color: var(--agone-gold, #c9a227);
+}
+.agone-browser .agone-filtre-recherche i {
+  font-size: 11px;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+.agone-browser .agone-filtre-recherche input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  font-size: 12px;
+  color: inherit;
+}
+.agone-browser .agone-filtre-effacer {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border-radius: var(--radius, 4px);
+  color: var(--agone-brown, #5c3a1e);
+  font-size: 12px;
+  cursor: pointer;
+}
+.agone-browser .agone-filtre-effacer:hover {
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.18);
+  border-color: var(--agone-gold, #c9a227);
+}
+.agone-browser .agone-filtre-effacer i { margin: 0; }
+.agone-browser .agone-filtre-compte {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
+  color: var(--agone-brown, #5c3a1e);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Corps : groupes de filtres en ligne, avec retour ─────── */
+.agone-browser .agone-filtres-corps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+.agone-browser .agone-filtre-groupe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  min-width: 0;
+}
+.agone-browser .agone-filtre-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.65);
+  white-space: nowrap;
+}
+.agone-browser .agone-filtre-groupe select {
+  height: 22px;
+  width: auto;
+  max-width: 190px;
+  padding: 0 4px;
+  font-size: 11px;
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border-radius: 3px;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.55);
+  color: inherit;
+}
+
+/* Champ numérique court, libellé sur la même ligne */
+.agone-browser .agone-filtre-nombre input[type="number"] {
+  width: 4em;
+  height: 22px;
+  padding: 0 3px;
+  text-align: center;
+  font-size: 11px;
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border-radius: 3px;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.55);
+  color: inherit;
+}
+
+/* ── Pastilles (cases à cocher) ───────────────────────────── */
+.agone-browser .agone-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.agone-browser .agone-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 1px 9px;
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border-radius: 10px;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
+  color: var(--agone-brown, #5c3a1e);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+/* La case reste un vrai contrôle (liaisons set / setAll), masquée visuellement */
+.agone-browser .agone-chip input[type="checkbox"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+}
+.agone-browser .agone-chip:hover {
+  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+}
+.agone-browser .agone-chip:has(input:checked) {
+  background: var(--agone-brown, #5c3a1e);
+  border-color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-parchment, #f4e8c1);
+}
+.agone-browser .agone-chip:has(input:focus-visible) {
+  outline: 2px solid var(--agone-gold, #c9a227);
+  outline-offset: 1px;
+}

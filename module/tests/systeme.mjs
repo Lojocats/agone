@@ -1,5 +1,6 @@
 import { CalendrierAgone, etatCalendrier } from "../apps/calendrier.mjs";
 import { AgoreCombatTracker } from "../apps/combat-tracker.mjs";
+import { creerObjetPersonnalise } from "../apps/objet-personnalise.mjs";
 
 /**
  * Intégration du système dans Foundry : manifeste, fiches enregistrées, compendiums,
@@ -125,6 +126,118 @@ export function systemeBatch({ describe, it, assert }) {
         assert.ok(app.element.querySelector(attendu), attendu);
       } finally {
         if (!dejaOuvert) await app.close();
+      }
+    });
+  });
+
+  describe("Barre d'outils Agone", function () {
+    this.timeout(15000);
+
+    it("le bouton « Créer un objet personnalisé » est déclaré entre le tracker et le mode sombre", () => {
+      const controls = {};
+      Hooks.callAll("getSceneControlButtons", controls);
+      const outils = controls.agone?.tools;
+      assert.ok(outils, "contrôle agone");
+      const outil = outils.creerObjet;
+      assert.ok(outil, "outil creerObjet");
+      assert.equal(outil.name, "creerObjet");
+      assert.isTrue(outil.button);
+      assert.isFunction(outil.onChange);
+      assert.equal(outil.order, 3);
+      assert.equal(outil.title, game.i18n.localize("AGONE.CreerObjetPersonnalise"));
+      assert.equal(outil.visible, game.user.can("ITEM_CREATE"));
+      assert.equal(outils.combatTracker.order, 2);
+      assert.equal(outils.darkMode.order, 4);
+      const ordres = Object.values(outils).map(o => o.order);
+      assert.equal(new Set(ordres).size, ordres.length, "ordres distincts");
+    });
+
+    /** Remplace temporairement Item.implementation.createDialog (capture des arguments, annulation). */
+    async function avecDialogueStub(fn) {
+      const cls = Item.implementation;
+      const propre = Object.hasOwn(cls, "createDialog");
+      const original = cls.createDialog;
+      const appels = [];
+      cls.createDialog = async (...args) => { appels.push(args); return null; };
+      try {
+        return await fn(appels);
+      } finally {
+        if (propre) cls.createDialog = original;
+        else delete cls.createDialog;
+      }
+    }
+
+    it("sans le droit de créer des items, aucun dialogue ne s'ouvre", async () => {
+      await avecDialogueStub(async appels => {
+        game.user.can = () => false;
+        try {
+          assert.isNull(await creerObjetPersonnalise());
+        } finally {
+          delete game.user.can;
+        }
+        assert.lengthOf(appels, 0);
+      });
+    });
+
+    /** Dossiers d'items racine du système : marqué par le drapeau, sinon par son nom (ordre de recherche). */
+    const racinesItems = () => game.folders.filter(f => f.type === "Item" && !f.folder);
+    const dossierAttendu = () => {
+      const nom = game.i18n.localize("AGONE.Browser.Personnalises");
+      return racinesItems().find(f => f.getFlag("agone", "objetsPersonnalises"))
+        ?? racinesItems().find(f => f.name === nom) ?? null;
+    };
+
+    it("ouvre le dialogue de création dans le dossier « Objets personnalisés », créé une seule fois et marqué", async function () {
+      if (!game.user.isGM) this.skip();
+      const nom = game.i18n.localize("AGONE.Browser.Personnalises");
+      const existant = dossierAttendu();
+      const avant = racinesItems().length;
+      let cree = null;
+      try {
+        await avecDialogueStub(async appels => {
+          assert.isNull(await creerObjetPersonnalise(), "dialogue annulé → null");
+          const dossier = dossierAttendu();
+          assert.ok(dossier, "dossier trouvé");
+          if (existant) {
+            assert.equal(dossier.id, existant.id, "dossier existant réutilisé");
+            assert.equal(racinesItems().length, avant, "aucun dossier créé");
+          } else {
+            cree = dossier;
+            assert.equal(racinesItems().length, avant + 1, "un dossier créé");
+            assert.equal(dossier.name, nom);
+            assert.isTrue(dossier.getFlag("agone", "objetsPersonnalises"), "drapeau objetsPersonnalises");
+          }
+          assert.lengthOf(appels, 1);
+          const [data, options] = appels[0];
+          assert.deepEqual(data, { folder: dossier.id });
+          assert.isTrue(options?.renderSheet);
+
+          assert.isNull(await creerObjetPersonnalise());
+          assert.equal(racinesItems().length, existant ? avant : avant + 1, "pas de second dossier");
+          assert.lengthOf(appels, 2);
+          assert.equal(appels[1][0].folder, dossier.id);
+        });
+      } finally {
+        await cree?.delete();
+      }
+    });
+
+    it("le dossier marqué est retrouvé même renommé", async function () {
+      if (!game.user.isGM) this.skip();
+      // Ne pas perturber un dossier marqué déjà présent dans le monde
+      if (racinesItems().some(f => f.getFlag("agone", "objetsPersonnalises"))) this.skip();
+      const marque = await Folder.implementation.create({
+        name: "Agone — dossier marqué (test)", type: "Item", flags: { agone: { objetsPersonnalises: true } },
+      });
+      try {
+        await avecDialogueStub(async appels => {
+          const avant = racinesItems().length;
+          assert.isNull(await creerObjetPersonnalise());
+          assert.equal(racinesItems().length, avant, "aucun dossier créé");
+          assert.equal(appels[0][0].folder, marque.id, "le drapeau prime sur le nom");
+        });
+      } finally {
+        await marque.delete();
       }
     });
   });

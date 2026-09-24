@@ -1,42 +1,68 @@
 <div class="sorts-browser-app">
 
   <!-- Barre de filtres -->
-  <div class="sb-filters">
-    <div class="sb-filter-row">
-      <div class="sb-search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" class="sb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
+  <div class="agone-filtres sb-filters">
+    {{> systems/agone/templates/apps/parts/browser-filtres-tete.hbs p="sb" search=search compte=sorts.length libelle="AGONE.Browser.SortsCount"}}
+
+    <div class="agone-filtres-corps">
+      <!-- Types de magie -->
+      <div class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Type"}}</span>
+        <div class="agone-chips">
+          <label class="agone-chip"><input type="checkbox" class="sb-all-check" {{#if allTypesSelected}}checked{{/if}}><span>{{localize "AGONE.Browser.Tous"}}</span></label>
+          {{#each allTypes}}
+          <label class="agone-chip"><input type="checkbox" class="sb-type-check" value="{{this.value}}" {{#if this.active}}checked{{/if}}><span>{{this.label}}</span></label>
+          {{/each}}
+        </div>
       </div>
-      <button type="button" class="sb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
-        <i class="fas fa-eraser"></i>
-      </button>
-    </div>
-    <!-- Filtres de type (checkboxes compactes) -->
-    <div class="sb-type-checks">
-      <label class="sb-type-lbl">
-        <input type="checkbox" class="sb-all-check" {{#if allTypesSelected}}checked{{/if}}> {{localize "AGONE.Browser.Tous"}}
+
+      <!-- Famille (Emprise / Arts magiques) -->
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Famille"}}</span>
+        <select class="sb-famille-filter">
+          <option value="all"     {{#if (eq filterFamille "all")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.ToutesFamilles"}}</option>
+          <option value="emprise" {{#if (eq filterFamille "emprise")}}selected{{/if}}>{{localize "AGONE.Emprise"}}</option>
+          <option value="arts"    {{#if (eq filterFamille "arts")}}selected{{/if}}>{{localize "AGONE.ArtsMagiques"}}</option>
+        </select>
       </label>
-      {{#each allTypes}}
-      <label class="sb-type-lbl">
-        <input type="checkbox" class="sb-type-check" value="{{this.value}}" {{#if this.active}}checked{{/if}}> {{this.label}}
+
+      <!-- Instrument / saison (selon les types filtrés) -->
+      {{#if allInstruments.length}}
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.InstrumentSaison"}}</span>
+        <select class="sb-instrument-filter">
+          <option value="all" {{#if (eq filterInstrument "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+          {{#each allInstruments as |i|}}
+          <option value="{{i.value}}" {{#if (eq ../filterInstrument i.value)}}selected{{/if}}>{{i.label}}</option>
+          {{/each}}
+        </select>
       </label>
-      {{/each}}
+      {{/if}}
+
+      <!-- Seuil exact ou maximal (exclusifs) -->
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Seuil"}}</span>
+        <select class="sb-seuil-exact" title='{{localize "AGONE.Ui.FiltrerSeuilExact"}}'>
+          <option value="">{{localize "AGONE.Browser.TousSeuils"}}</option>
+          {{#each allSeuils}}
+          <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>{{localize "AGONE.Browser.SeuilEgal"}} {{this}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label class="agone-filtre-groupe agone-filtre-nombre">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.SeuilMax"}}</span>
+        <input type="number" class="sb-seuil-max" value="{{filterSeuilMax}}" placeholder="—" min="0" max="40">
+      </label>
+
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.Possession"}}</span>
+        <select class="sb-possede-filter">
+          <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousSorts"}}</option>
+          <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+          <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
+        </select>
+      </label>
     </div>
-    <!-- Filtres secondaires -->
-    <div class="sb-filter-row2">
-      <select class="sb-seuil-exact" title='{{localize "AGONE.Ui.FiltrerSeuilExact"}}'>
-        <option value="">{{localize "AGONE.Browser.TousSeuils"}}</option>
-        {{#each allSeuils}}
-        <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>{{localize "AGONE.Browser.SeuilEgal"}} {{this}}</option>
-        {{/each}}
-      </select>
-      <select class="sb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousSorts"}}</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
-      </select>
-    </div>
-    <div class="sb-count">{{sorts.length}} {{localize "AGONE.Browser.SortsCount"}}</div>
   </div>
 
   <!-- Liste -->

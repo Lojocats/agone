@@ -1,24 +1,38 @@
 <div class="armures-browser-app">
 
   <!-- Barre de filtres -->
-  <div class="arb-filters">
-    <div class="arb-filter-row">
-      <div class="arb-search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" class="arb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
-      </div>
-      <button type="button" class="arb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
-        <i class="fas fa-eraser"></i>
-      </button>
-    </div>
+  <div class="agone-filtres arb-filters">
+    {{> systems/agone/templates/apps/parts/browser-filtres-tete.hbs p="arb" search=search compte=items.length libelle="AGONE.Browser.ArmuresCount"}}
 
-    <div class="arb-filter-row2">
-      <select class="arb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
-      </select>
-      <span class="arb-count">{{items.length}} {{localize "AGONE.Browser.ArmuresCount"}}</span>
+    <div class="agone-filtres-corps">
+      <!-- Couverture -->
+      <div class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Couverture"}}</span>
+        <div class="agone-chips">
+          <label class="agone-chip"><input type="checkbox" class="arb-all-couv" {{#if allCouvSelected}}checked{{/if}}><span>{{localize "AGONE.Browser.Tous"}}</span></label>
+          {{#each allCouv}}
+          <label class="agone-chip"><input type="checkbox" class="arb-couv-check" value="{{this.value}}" {{#if this.active}}checked{{/if}}><span>{{this.label}}</span></label>
+          {{/each}}
+        </div>
+      </div>
+
+      <label class="agone-filtre-groupe agone-filtre-nombre">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.ProtMin"}}</span>
+        <input type="number" class="arb-prot-min" value="{{filterProtMin}}" placeholder="—" min="0" max="20">
+      </label>
+      <label class="agone-filtre-groupe agone-filtre-nombre">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.MalusAgiMax"}}</span>
+        <input type="number" class="arb-malus-agi-max" value="{{filterMalusAgiMax}}" placeholder="—" min="0" max="20">
+      </label>
+
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.Possession"}}</span>
+        <select class="arb-possede-filter">
+          <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
+          <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+          <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
+        </select>
+      </label>
     </div>
   </div>
 

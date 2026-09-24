@@ -254,15 +254,10 @@ body.agone-dark .peines-browser-app .window-content {
   background: #1c1208 !important;
   color: #d4b896;
 }
-body.agone-dark .sorts-browser .sb-search-wrap,
-body.agone-dark .armes-browser .ab-search-wrap,
-body.agone-dark .armures-browser .arb-search-wrap,
-body.agone-dark .avantages-browser .avb-search-wrap,
-body.agone-dark .manoeuvres-browser .mb-search-wrap,
-body.agone-dark .competences-browser .cb-search-wrap,
-body.agone-dark .peuples-browser .pb-search-wrap,
-body.agone-dark .pouvoirs-browser .pvb-search-wrap {
-  background: rgba(255,255,255,0.05) !important;
+/* Barre de filtres commune (browser-filtres.css) : le champ de recherche reste transparent
+   dans son cadre, malgré la règle générale des inputs (section 3) */
+body.agone-dark .agone-browser .agone-filtre-recherche input {
+  background: transparent !important;
 }
 body.agone-dark .peuples-browser .pb-card {
   background: rgba(255,255,255,0.04) !important;
@@ -416,8 +411,6 @@ body.agone-dark .pouvoirs-browser .pvb-badge-saisonin { color: #6ecf7a !importan
 /* Avantages browser : ligne prérequis et badge brun foncé */
 body.agone-dark .avantages-browser .avb-table .avb-prerequis-row td { color: #c9a060 !important; background: rgba(201,162,39,0.08) !important; }
 /* Browsers : labels texte rgba(60,35,15,...) */
-body.agone-dark .sorts-browser .sb-filter-sep,
-body.agone-dark .sorts-browser .sb-lbl,
 body.agone-dark .armes-browser,
 body.agone-dark .armures-browser,
 body.agone-dark .avantages-browser,
@@ -465,7 +458,6 @@ body.agone-dark .peines-browser-app .pnb-noir-none,
 body.agone-dark .peines-browser-app .pnb-bienfait-none { color: rgba(180,140,80,0.4) !important; }
 body.agone-dark .peines-browser-app .pnb-empty { color: rgba(180,140,80,0.45) !important; }
 body.agone-dark .agone .perf-browser-btn { color: #c9a060 !important; border-color: rgba(201,160,96,0.35) !important; background: rgba(92,58,30,0.12) !important; }
-body.agone-dark .peines-browser-app .pnb-filters { background: rgba(255,255,255,0.04) !important; border-color: rgba(144,144,200,0.15) !important; }
 
 /* ── 20. Select emprise (hardcoded #f5ede0) ──────────────── */
 body.agone-dark .agone .emprise-type-select { background: rgba(255,255,255,0.08) !important; color: #d4b896 !important; border-color: rgba(180,130,60,0.35) !important; }

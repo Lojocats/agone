@@ -1,0 +1,13 @@
+{{!-- Ligne de tête des filtres d'un navigateur : recherche, bouton d'effacement et nombre de résultats.
+      Paramètres : p (préfixe des classes : p-search, p-clear, liées par FILTERS), search,
+      compte (nombre de résultats), libelle (clé i18n du libellé du compte). --}}
+<div class="agone-filtres-tete">
+  <div class="agone-filtre-recherche">
+    <i class="fas fa-search"></i>
+    <input type="text" class="{{p}}-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
+  </div>
+  <button type="button" class="agone-filtre-effacer {{p}}-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
+    <i class="fas fa-eraser"></i>
+  </button>
+  <span class="agone-filtre-compte {{p}}-count">{{compte}} {{localize libelle}}</span>
+</div>

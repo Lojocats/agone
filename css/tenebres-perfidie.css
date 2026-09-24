@@ -330,56 +330,8 @@
   font-family: var(--font-primary);
   font-size: 13px;
 }
-.peines-browser-app .pnb-filters {
-  flex-shrink: 0;
-  padding: 10px 14px 6px;
-  background: rgba(var(--agone-noir-rgb, 26,26,46), 0.05);
-  border-bottom: 1px solid rgba(var(--agone-noir-rgb, 26,26,46), 0.12);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.peines-browser-app .pnb-filter-row,
-.peines-browser-app .pnb-filter-row2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.peines-browser-app .pnb-search-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  min-width: 160px;
-}
-.peines-browser-app .pnb-search {
-  flex: 1;
-  height: 26px;
-  border: 1px solid rgba(var(--agone-noir-rgb, 26,26,46), 0.2);
-  border-radius: var(--radius);
-  padding: 0 8px;
-}
-.peines-browser-app .pnb-clear {
-  background: transparent;
-  border: 1px solid rgba(var(--agone-noir-rgb, 26,26,46), 0.25);
-  border-radius: var(--radius);
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-.peines-browser-app .pnb-count {
-  font-size: 11px;
-  color: rgba(var(--agone-noir-rgb, 26,26,46), 0.5);
-  white-space: nowrap;
-  margin-left: auto;
-}
+/* Barre de filtres commune (browser-filtres.css) : fenêtre sans marge intérieure */
+.peines-browser-app .agone-filtres { margin: 8px 10px; }
 .peines-browser-app .pnb-list-wrapper {
   flex: 1;
   overflow-y: auto;

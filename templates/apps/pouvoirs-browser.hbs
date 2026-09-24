@@ -1,29 +1,27 @@
 <div class="pouvoirs-browser-app">
 
   <!-- Barre de filtres -->
-  <div class="pvb-filters">
-    <div class="pvb-filter-row">
-      <div class="pvb-search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" class="pvb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
-      </div>
-      <button type="button" class="pvb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
-        <i class="fas fa-eraser"></i>
-      </button>
-    </div>
+  <div class="agone-filtres pvb-filters">
+    {{> systems/agone/templates/apps/parts/browser-filtres-tete.hbs p="pvb" search=search compte=items.length libelle="AGONE.Browser.ResultatsCount"}}
 
-    <div class="pvb-filter-row2">
-      <select class="pvb-cat-filter">
-        <option value="all"     {{#if (eq filterCat "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousLesPouvoirs"}}</option>
-        <option value="flamme"  {{#if (eq filterCat "flamme")}}selected{{/if}}>{{localize "AGONE.Browser.PouvoirsFlamme"}}</option>
-        <option value="saisonin" {{#if (eq filterCat "saisonin")}}selected{{/if}}>{{localize "AGONE.Browser.PouvoirsSaisonins"}}</option>
-      </select>
-      <select class="pvb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
-      </select>
-      <span class="pvb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
+    <div class="agone-filtres-corps">
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Categorie"}}</span>
+        <select class="pvb-cat-filter">
+          <option value="all"     {{#if (eq filterCat "all")}}selected{{/if}}>{{localize "AGONE.Browser.TousLesPouvoirs"}}</option>
+          <option value="flamme"  {{#if (eq filterCat "flamme")}}selected{{/if}}>{{localize "AGONE.Browser.PouvoirsFlamme"}}</option>
+          <option value="saisonin" {{#if (eq filterCat "saisonin")}}selected{{/if}}>{{localize "AGONE.Browser.PouvoirsSaisonins"}}</option>
+        </select>
+      </label>
+
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.Possession"}}</span>
+        <select class="pvb-possede-filter">
+          <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
+          <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaPosse"}}</option>
+          <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonPosse"}}</option>
+        </select>
+      </label>
     </div>
   </div>
 

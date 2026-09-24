@@ -1,4 +1,5 @@
 import { ARMES_DATA, BOUCLIERS_DATA } from "../helpers/compendium-data.mjs";
+import { auMoins, auPlus, porteeArme } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 const _ALL_ARMES_DATA = [...ARMES_DATA, ...BOUCLIERS_DATA];
@@ -15,6 +16,9 @@ export class ArmesBrowser extends AgoneBrowser {
     _filterStyles : new Set(),
     _filterTypes  : new Set(),
     _filterReqFor : null,
+    _filterReqAgi : null,
+    _filterDomMin : null,
+    _filterPortee : "all",   // "all" | "distance" | "contact"
     _filterPossede: "all",
   };
 
@@ -25,6 +29,9 @@ export class ArmesBrowser extends AgoneBrowser {
     ".ab-all-type"       : { kind: "setAll", prop: "_filterTypes" },
     ".ab-type-check"     : { kind: "set",    prop: "_filterTypes" },
     ".ab-req-for"        : { kind: "number", prop: "_filterReqFor", debounce: 300 },
+    ".ab-req-agi"        : { kind: "number", prop: "_filterReqAgi", debounce: 300 },
+    ".ab-dom-min"        : { kind: "number", prop: "_filterDomMin", debounce: 300 },
+    ".ab-portee-filter"  : { kind: "select", prop: "_filterPortee" },
     ".ab-possede-filter" : { kind: "select", prop: "_filterPossede" },
     ".ab-clear"          : { kind: "reset" },
   };
@@ -70,6 +77,7 @@ export class ArmesBrowser extends AgoneBrowser {
       style      : d.style,
       styleLabel : STYLE_LABELS[d.style] ?? d.style,
       type       : d.type,
+      typeLabel  : TYPE_LABELS[d.type] ?? d.type,
       tai        : d.tai,
       initBonus  : d.initBonus,
       attackBonus: d.attackBonus,
@@ -92,14 +100,13 @@ export class ArmesBrowser extends AgoneBrowser {
     if (this._filterTypes.size > 0) {
       armes = armes.filter(e => this._filterTypes.has(e.type));
     }
-    if (this._filterReqFor !== null) {
-      armes = armes.filter(e => e.reqFor <= this._filterReqFor);
+    armes = armes.filter(e => auPlus(e.reqFor, this._filterReqFor)
+      && auPlus(e.reqAgi, this._filterReqAgi)
+      && auMoins(e.dommages, this._filterDomMin));
+    if (this._filterPortee !== "all") {
+      armes = armes.filter(e => porteeArme(e.portee) === this._filterPortee);
     }
-    if (this._filterPossede === "oui") {
-      armes = armes.filter(e => e.hasInActor);
-    } else if (this._filterPossede === "non") {
-      armes = armes.filter(e => !e.hasInActor);
-    }
+    armes = this._applyPossede(armes);
 
     this._trier(armes, (a, b) => a.name.localeCompare(b.name, "fr"));
 
@@ -115,6 +122,9 @@ export class ArmesBrowser extends AgoneBrowser {
       allTypes,
       search          : this._search,
       filterReqFor    : this._filterReqFor ?? "",
+      filterReqAgi    : this._filterReqAgi ?? "",
+      filterDomMin    : this._filterDomMin ?? "",
+      filterPortee    : this._filterPortee,
       filterPossede   : this._filterPossede,
       allStylesSelected: this._filterStyles.size === 0,
       allTypesSelected : this._filterTypes.size === 0,

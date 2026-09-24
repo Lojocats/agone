@@ -12,14 +12,17 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les ve
 - Calendrier : la météo se choisit avec un bouton par type de météo (au lieu d'une liste déroulante).
 - Instructions pour les messages de commit générés par Copilot (`.github/copilot-instructions.md`).
 - **Tag et release automatiques** : quand la version de `system.json` change sur `main`, une GitHub Action lance le lint et les tests, crée le tag `vX.Y.Z` puis publie la release (`agone.zip`). Pousser un tag à la main fonctionne toujours.
+- **Nouveaux filtres des navigateurs de compendium** : armes (dommages minimum, AGI requise maximum, à distance / sans portée), armures (couverture, protection minimum, malus d'AGI maximum), avantages (avec / sans prérequis, avec / sans effet automatisé), compétences (caractéristique liée), manœuvres (sans condition, réaction, réservée à un peuple, autre condition), peines (possédées ou non), peuples (saison, volants), sorts (Emprise / Arts magiques, instrument ou saison selon le type, seuil maximum).
+- **Bouton « Créer un objet personnalisé »** (marteau) dans la barre d'outils Agone : crée un objet du monde de n'importe quel type, rangé dans le dossier « Objets personnalisés », qui apparaît ensuite dans le navigateur correspondant.
 
 ### Corrigé
 - Fiches en lecture seule (permission « Observateur ») : les champs restaient modifiables et une modification provoquait une erreur de permission, parce que les champs des templates échappaient à la désactivation automatique de Foundry. Champs et jets sont désormais désactivés ; ouvrir un objet (en lecture), l'envoyer au chat, la recherche de compétences et les filtres de sorts restent disponibles.
 - Fiches d'objet en lecture seule (objet d'un acteur observé, compendium verrouillé) : mêmes corrections.
 
 ### Modifié
+- **Barre de filtres des navigateurs repensée** : recherche, effacement et nombre de résultats sur une seule ligne, filtres regroupés et étiquetés, cases à cocher en pastilles. Le bouton d'effacement des compétences remet désormais tous les filtres à zéro ; la colonne Caractéristique des compétences est traduite.
 - README : permissions des fiches, peines et bienfaits, syntaxe de recherche des navigateurs.
-- Tests : moteur de recherche (tests unitaires), vue limitée et lecture seule de chaque fiche, effets de bienfait, recherche des navigateurs (Quench).
+- Tests : moteur de recherche (tests unitaires), vue limitée et lecture seule de chaque fiche, effets de bienfait, recherche des navigateurs (Quench) ; filtres des navigateurs (tests unitaires et Quench), bouton de création d'objet personnalisé (Quench).
 
 ### Supprimé
 - Template inutilisé `templates/actors/creature-sheet.hbs`.

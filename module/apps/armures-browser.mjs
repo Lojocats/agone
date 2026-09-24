@@ -1,4 +1,5 @@
 import { ARMURES_DATA } from "../helpers/compendium-data.mjs";
+import { auMoins, malusAuPlus } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
@@ -9,12 +10,19 @@ export class ArmuresBrowser extends AgoneBrowser {
   static ITEM_TYPE = "armure";
 
   static FILTER_DEFAULTS = {
-    _search       : "",
-    _filterPossede: "all",
+    _search           : "",
+    _filterCouv       : new Set(),   // couvertures "0" | "1" | "2" (vide = toutes)
+    _filterProtMin    : null,
+    _filterMalusAgiMax: null,        // malus d'Agilité au plus X (valeur absolue)
+    _filterPossede    : "all",
   };
 
   static FILTERS = {
     ".arb-search"         : { kind: "text",   prop: "_search" },
+    ".arb-all-couv"       : { kind: "setAll", prop: "_filterCouv" },
+    ".arb-couv-check"     : { kind: "set",    prop: "_filterCouv" },
+    ".arb-prot-min"       : { kind: "number", prop: "_filterProtMin", debounce: 300 },
+    ".arb-malus-agi-max"  : { kind: "number", prop: "_filterMalusAgiMax", debounce: 300 },
     ".arb-possede-filter" : { kind: "select", prop: "_filterPossede" },
     ".arb-clear"          : { kind: "reset" },
   };
@@ -48,6 +56,7 @@ export class ArmuresBrowser extends AgoneBrowser {
     let items = ARMURES_DATA.map((d, idx) => ({
       idx       : `a${idx}`,
       label     : d.name,
+      type      : String(d.type ?? "0"),
       typeLabel : TYPE_LABELS[d.type] ?? d.type,
       protection: d.protection,
       malusAgi  : d.malusAgi ?? 0,
@@ -58,11 +67,12 @@ export class ArmuresBrowser extends AgoneBrowser {
 
     // Filtres
     items = this._applySearch(items, ["label", "typeLabel"]);
-    if (this._filterPossede === "oui") {
-      items = items.filter(e => e.hasInActor);
-    } else if (this._filterPossede === "non") {
-      items = items.filter(e => !e.hasInActor);
+    if (this._filterCouv.size > 0) {
+      items = items.filter(e => this._filterCouv.has(e.type));
     }
+    items = items.filter(e => auMoins(e.protection, this._filterProtMin)
+      && malusAuPlus(e.malusAgi, this._filterMalusAgiMax));
+    items = this._applyPossede(items);
 
     this._trier(items, (a, b) => (a.label ?? "").localeCompare(b.label ?? "", "fr"));
 
@@ -70,6 +80,12 @@ export class ArmuresBrowser extends AgoneBrowser {
       items,
       search          : this._search,
       filterPossede   : this._filterPossede,
+      filterProtMin   : this._filterProtMin ?? "",
+      filterMalusAgiMax: this._filterMalusAgiMax ?? "",
+      allCouv         : Object.entries(TYPE_LABELS).map(([value, label]) => ({
+        value, label, active: this._filterCouv.has(value),
+      })),
+      allCouvSelected : this._filterCouv.size === 0,
     };
   }
 

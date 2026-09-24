@@ -6,7 +6,9 @@
   "scripts": {
     "lint": "eslint module tests",
     "lint:fix": "eslint module tests --fix",
-    "test": "node --test \"tests/unit/*.test.mjs\""
+    "lint:court": "eslint module tests --quiet",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:court": "node --test --test-reporter=dot \"tests/unit/*.test.mjs\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

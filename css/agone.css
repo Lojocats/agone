@@ -10,6 +10,7 @@
      tenebres-perfidie.css – Ténèbres, Perfidie, Peines
      magic.css           – Sorts, Danseurs, Démons, Arts, Pouvoirs
      browsers.css        – Tous les navigateurs (fenêtres flottantes)
+     browser-filtres.css – Barre de filtres commune des navigateurs
      identity.css        – Identité, fiche Peuple, fiche Item
      apps.css            – Chat, Calendrier, PNJ, Compagnons, Paramètres
    ============================================================ */
@@ -22,5 +23,6 @@
 @import 'tenebres-perfidie.css';
 @import 'magic.css';
 @import 'browsers.css';
+@import 'browser-filtres.css';
 @import 'identity.css';
 @import 'apps.css';

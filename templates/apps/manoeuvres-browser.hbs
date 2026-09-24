@@ -1,29 +1,38 @@
 <div class="manoeuvres-browser-app">
 
   <!-- Barre de filtres -->
-  <div class="mb-filters">
-    <div class="mb-filter-row">
-      <div class="mb-search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" class="mb-search" placeholder='{{localize "AGONE.Browser.Rechercher"}}' value="{{search}}">
-      </div>
-      <button type="button" class="mb-clear" title='{{localize "AGONE.Browser.EffacerFiltres"}}'>
-        <i class="fas fa-eraser"></i>
-      </button>
-    </div>
+  <div class="agone-filtres mb-filters">
+    {{> systems/agone/templates/apps/parts/browser-filtres-tete.hbs p="mb" search=search compte=items.length libelle="AGONE.Browser.ResultatsCount"}}
 
-    <div class="mb-filter-row2">
-      <select class="mb-cat-filter">
-        <option value="all"       {{#if (eq filterCat "all")}}selected{{/if}}>{{localize "AGONE.Browser.ManoeuvresBottes"}}</option>
-        <option value="manoeuvre" {{#if (eq filterCat "manoeuvre")}}selected{{/if}}>{{localize "AGONE.Browser.ManoeuvresUniquement"}}</option>
-        <option value="botte"     {{#if (eq filterCat "botte")}}selected{{/if}}>{{localize "AGONE.Browser.BottesUniquement"}}</option>
-      </select>
-      <select class="mb-possede-filter">
-        <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
-        <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaApprises"}}</option>
-        <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonApprises"}}</option>
-      </select>
-      <span class="mb-count">{{items.length}} {{localize "AGONE.Browser.ResultatsCount"}}</span>
+    <div class="agone-filtres-corps">
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Categorie"}}</span>
+        <select class="mb-cat-filter">
+          <option value="all"       {{#if (eq filterCat "all")}}selected{{/if}}>{{localize "AGONE.Browser.ManoeuvresBottes"}}</option>
+          <option value="manoeuvre" {{#if (eq filterCat "manoeuvre")}}selected{{/if}}>{{localize "AGONE.Browser.ManoeuvresUniquement"}}</option>
+          <option value="botte"     {{#if (eq filterCat "botte")}}selected{{/if}}>{{localize "AGONE.Browser.BottesUniquement"}}</option>
+        </select>
+      </label>
+
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.ManCondition"}}</span>
+        <select class="mb-condition-filter">
+          <option value="all"      {{#if (eq filterCondition "all")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.ConditionToutes"}}</option>
+          <option value="sans"     {{#if (eq filterCondition "sans")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.SansCondition"}}</option>
+          <option value="reaction" {{#if (eq filterCondition "reaction")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.Reaction"}}</option>
+          <option value="peuple"   {{#if (eq filterCondition "peuple")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.ReserveePeuple"}}</option>
+          <option value="autre"    {{#if (eq filterCondition "autre")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.AutreCondition"}}</option>
+        </select>
+      </label>
+
+      <label class="agone-filtre-groupe">
+        <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.Possession"}}</span>
+        <select class="mb-possede-filter">
+          <option value="all" {{#if (eq filterPossede "all")}}selected{{/if}}>{{localize "AGONE.Browser.Toutes"}}</option>
+          <option value="oui" {{#if (eq filterPossede "oui")}}selected{{/if}}>{{localize "AGONE.Browser.DejaApprises"}}</option>
+          <option value="non" {{#if (eq filterPossede "non")}}selected{{/if}}>{{localize "AGONE.Browser.NonApprises"}}</option>
+        </select>
+      </label>
     </div>
   </div>
 

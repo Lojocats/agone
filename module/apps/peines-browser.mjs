@@ -21,12 +21,14 @@ export class PeinesBrowser extends AgoneBrowser {
     _search         : "",
     _filterCategorie: "all",
     _filterNoir     : "all",
+    _filterPossede  : "all",
   };
 
   static FILTERS = {
     ".pnb-search"     : { kind: "text",   prop: "_search" },
     ".pnb-cat-filter" : { kind: "select", prop: "_filterCategorie" },
     ".pnb-noir-filter": { kind: "select", prop: "_filterNoir" },
+    ".pnb-possede-filter": { kind: "select", prop: "_filterPossede" },
     ".pnb-clear"      : { kind: "reset" },
   };
 
@@ -71,6 +73,7 @@ export class PeinesBrowser extends AgoneBrowser {
     if (this._filterNoir !== "all") {
       items = items.filter(e => e.noirEffect === this._filterNoir);
     }
+    items = this._applyPossede(items);
 
     this._trier(items, (a, b) => {
       if (a.categorie !== b.categorie) return a.categorie.localeCompare(b.categorie, "fr");
@@ -82,6 +85,7 @@ export class PeinesBrowser extends AgoneBrowser {
       search          : this._search,
       filterCategorie : this._filterCategorie,
       filterNoir      : this._filterNoir,
+      filterPossede   : this._filterPossede,
       categories      : Object.entries(_buildCatLabels()).map(([k, v]) => ({ key: k, label: v })),
     };
   }

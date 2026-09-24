@@ -34,6 +34,7 @@ import { CalendrierAgone }     from "./apps/calendrier.mjs";
 import { CalendrierWidget }    from "./apps/calendrier-widget.mjs";
 import { DomainesArtsConfig }  from "./apps/domaines-arts-config.mjs";
 import { AgoreCombatTracker }  from "./apps/combat-tracker.mjs";
+import { creerObjetPersonnalise } from "./apps/objet-personnalise.mjs";
 import { CompagnonSheet } from "./sheets/compagnon-sheet.mjs";
 import { DemonSheet }     from "./sheets/demon-sheet.mjs";
 import { PnjSheet }       from "./sheets/pnj-sheet.mjs";
@@ -272,6 +273,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/calendrier-widget.hbs",
     "systems/agone/templates/apps/combat-tracker.hbs",
     "systems/agone/templates/apps/parts/browser-personnalises.hbs",
+    "systems/agone/templates/apps/parts/browser-filtres-tete.hbs",
   ];
   foundry.applications.handlebars.loadTemplates(templates);
 
@@ -684,11 +686,24 @@ Hooks.on("getSceneControlButtons", (controls) => {
         visible: game.user?.isGM ?? false,
         onChange: () => AgoreCombatTracker.ouvrir(),
       },
+      // Objet personnalisé : repris par les navigateurs (section « Objets personnalisés »)
+      creerObjet: {
+        name: "creerObjet",
+        title: game.i18n.localize("AGONE.CreerObjetPersonnalise"),
+        icon: "fas fa-hammer",
+        order: 3,
+        button: true,
+        visible: game.user?.can("ITEM_CREATE") ?? false,
+        onChange: () => creerObjetPersonnalise().catch(err => {
+          console.error(err);
+          ui.notifications.error(game.i18n.localize("AGONE.CreerObjetErreur"));
+        }),
+      },
       darkMode: {
         name: "darkMode",
         title: game.i18n.localize("AGONE.ModeSombre"),
         icon: "fas fa-moon",
-        order: 3,
+        order: 4,
         toggle: true,
         active: _agoneThemeEffectif() === "dark",
         onChange: (_event, active) => {
