@@ -103,11 +103,15 @@ export function jetsBatch({ describe, it, assert, before, after }) {
     });
 
     it("sort = Art + Arts Magiques du domaine + bonus Âme", async () => {
-      const [, sort] = await actor.createEmbeddedDocuments("Item", [
+      // L'ordre des documents renvoyés n'est pas garanti : on retrouve le sort par son type.
+      const crees = await actor.createEmbeddedDocuments("Item", [
         { name: "Arts Magiques", type: "competence", system: { domaine: "Geste", score: 4, attributLie: "creativite" } },
         { name: "Sort de test", type: "sort", system: { typeMagie: "geste", seuil: 10 } },
       ]);
+      const sort = crees.find(i => i.type === "sort");
+      assert.ok(actor.items.get(sort?.id), "sort présent dans l'inventaire");
       const roll = await actor.rollSort(sort.id, FF);
+      assert.ok(roll, "jet de sort lancé");
       assert.equal(horsDes(roll), actor.system.art + 4 + actor.system.bonusAme + saisonin);
     });
 

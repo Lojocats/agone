@@ -391,11 +391,17 @@ export function fichesBatch({ describe, it, assert, before, after }) {
     });
 
     it("choisir la statistique et la valeur", async () => {
+      // Le champ « value » existe déjà avant ce changement : attendre sa seule présence ne garantit
+      // pas que le nouveau rendu (déclenché par le changement de statistique) a eu lieu. On attend
+      // que le rendu suivant se soit produit (`_renderSignal` renouvelé par `_onRender`) avant
+      // d'interagir avec ce champ, sans quoi l'événement « change » peut partir d'un nœud détaché.
+      const renduAvant = sheet._renderSignal;
       changer("[data-effet-champ='stat']", "force");
       await attendre(() => item.effects.contents[0].changes[0]?.key === "flags.agone.effets.force", "statistique");
-      await attendre(() => el("[data-effet-champ='value']"), "rendu");
+      await attendre(() => sheet._renderSignal !== renduAvant, "rendu");
       changer("[data-effet-champ='value']", "3");
-      await attendre(() => item.effects.contents[0].changes[0]?.value === "3", "valeur");
+      // v14 convertit la valeur saisie (JSON.parse) : "3" en v13, 3 en v14
+      await attendre(() => String(item.effects.contents[0].changes[0]?.value) === "3", "valeur");
     });
 
     it("ajouter puis supprimer un modificateur", async () => {
@@ -408,9 +414,12 @@ export function fichesBatch({ describe, it, assert, before, after }) {
 
     it("renommer et désactiver l'effet", async () => {
       await attendre(() => el("[data-effet-champ='name']"), "rendu");
+      // Même précaution que pour stat/value : attendre le rendu déclenché par le renommage avant
+      // de toucher au champ « actif », déjà présent dans le DOM précédent.
+      const renduAvant = sheet._renderSignal;
       changer("[data-effet-champ='name']", "Tranchant béni");
       await attendre(() => item.effects.contents[0].name === "Tranchant béni", "nom");
-      await attendre(() => el("[data-effet-champ='actif']"), "rendu");
+      await attendre(() => sheet._renderSignal !== renduAvant, "rendu");
       changer("[data-effet-champ='actif']", false);
       await attendre(() => item.effects.contents[0].disabled, "désactivé");
     });

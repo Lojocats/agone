@@ -958,7 +958,7 @@ export class AgoneActor extends Actor {
     let sort;
     if (typeof itemIdOrData === "string") {
       sort = this.items.get(itemIdOrData);
-      if (!sort || sort.type !== "sort") return;
+      if (!sort || sort.type !== "sort") return null;
     } else {
       // Données brutes depuis le navigateur de sorts (SORTS_DATA)
       sort = { name: itemIdOrData.name, system: {
@@ -1074,7 +1074,7 @@ export class AgoneActor extends Actor {
 
     const label = impro ? _L("SortImprovise", { sort: sort.name }) : sort.name;
     const jet = await this._dialogSort(label, seuilBase, impro, options);
-    if (!jet) return;
+    if (!jet) return null;
     const { modif, seuilBonus, instantane } = jet;
 
     const seuilEffectif = instantane ? seuilBase * 2 : seuilBase;

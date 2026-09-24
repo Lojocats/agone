@@ -3,6 +3,12 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.6] — 2026-09-24
+
+### Corrigé
+- Jet de sort : quand le sort est introuvable, `rollSort` renvoie `null` comme ses autres sorties (au lieu de `undefined`).
+- Tests : 16 tests Quench remis à jour. Dans les navigateurs, la recherche lit la colonne du nom (la première colonne est désormais le chevron), et le chevron des descriptions pliables est retrouvé après chaque rendu. Le seuil maximal des sorts est testé sur un seuil existant. Le test des puces de couverture des armures et celui de l'éditeur d'effets attendent la fin du rendu, et l'éditeur d'effets accepte la valeur numérique qu'enregistre Foundry v14. Le jet de sort retrouve le sort créé par son type (Quench).
+
 ## [1.9.5] — 2026-09-24
 
 ### Ajouté

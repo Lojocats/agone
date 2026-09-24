@@ -27,6 +27,7 @@ const lignes = app => [...app.element.querySelectorAll("table:not(.browser-perso
 const cellule = (tr, selecteur) => tr.querySelector(selecteur)?.textContent.trim().split("\n")[0].trim() ?? "";
 
 const NOMS_PEUPLES = PEUPLES_DATA.map(p => p.name);
+const SEUIL_MIN_SORT = Math.min(...SORTS_DATA.map(s => s.seuil));
 
 /**
  * Nouveaux filtres de chaque navigateur : propriétés posées sur l'application, et vérification
@@ -162,7 +163,8 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
 
       it("la recherche tapée filtre la liste", async () => {
         const [selecteur] = Object.entries(app.constructor.FILTERS).find(([, s]) => s.kind === "text");
-        const premier = lignes(app)[0].cells[0].textContent.trim().split("\n")[0].trim();
+        const premier = cellule(lignes(app)[0], "td[class$='-name']");
+        assert.ok(premier, "nom de la première entrée");
         const input = app.element.querySelector(selecteur);
         input.value = premier;
         input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -199,17 +201,19 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
 
       it("descriptions pliables : chevron, clic sur la ligne, état conservé, tout ouvrir", async () => {
         const table = () => app.element.querySelector("table:not(.browser-perso-table)");
-        const chevron = table().querySelector(".desc-bascule[data-desc]");
-        if (!chevron) return;  // navigateur sans description dépliable
-        const cle = chevron.dataset.desc;
+        const premierChevron = table().querySelector(".desc-bascule[data-desc]");
+        if (!premierChevron) return;  // navigateur sans description dépliable
+        const cle = premierChevron.dataset.desc;
+        // Re-requêté à chaque usage : un `app.render()` remplace le DOM, l'ancien nœud est détaché.
+        const chevron = () => table().querySelector(`.desc-bascule[data-desc="${CSS.escape(cle)}"]`);
         const desc = () => table().querySelector(`[data-desc-de="${CSS.escape(cle)}"]`);
         assert.ok(desc().hidden, "description masquée par défaut");
-        chevron.click();
+        chevron().click();
         assert.notOk(desc().hidden, "ouverte au clic sur le chevron");
-        assert.equal(chevron.getAttribute("aria-expanded"), "true");
+        assert.equal(chevron().getAttribute("aria-expanded"), "true");
         await app.render();
         assert.notOk(desc().hidden, "toujours ouverte après un rendu");
-        chevron.closest("tr").querySelector("td[class$='-name']").click();
+        chevron().closest("tr").querySelector("td[class$='-name']").click();
         await app.render();
         assert.ok(desc().hidden, "refermée au clic sur la ligne");
 
@@ -300,10 +304,11 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
           await attendre(() => !app._filterCouv.has("1") && lignes(app).length === total, "couverture décochée");
 
           puce().closest(".agone-chip").click();
-          await attendre(() => app._filterCouv.size === 1, "couverture recochée");
+          await attendre(() => app._filterCouv.size === 1 && lignes(app).length === attendu && puce().checked,
+            "couverture recochée");
           app.element.querySelector(".arb-all-couv").closest(".agone-chip").click();
-          await attendre(() => app._filterCouv.size === 0 && lignes(app).length === total, "« Tous » vide le Set");
-          assert.ok(app.element.querySelector(".arb-all-couv").checked);
+          await attendre(() => app._filterCouv.size === 0 && lignes(app).length === total
+            && app.element.querySelector(".arb-all-couv").checked, "« Tous » vide le Set");
         });
       }
 
@@ -366,9 +371,9 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
             select.dispatchEvent(new Event("change", { bubbles: true }));
           };
 
-          saisirMax("3");
-          await attendre(() => app._filterSeuilMax === 3, "seuil max saisi", 3000);
-          await attendre(() => lignes(app).every(tr => Number(cellule(tr, ".sb-seuil")) <= 3), "liste au seuil max");
+          saisirMax(String(SEUIL_MIN_SORT));
+          await attendre(() => app._filterSeuilMax === SEUIL_MIN_SORT, "seuil max saisi", 3000);
+          await attendre(() => lignes(app).every(tr => Number(cellule(tr, ".sb-seuil")) <= SEUIL_MIN_SORT), "liste au seuil max");
           assert.isAbove(lignes(app).length, 0);
 
           const exact = [...app.element.querySelectorAll(".sb-seuil-exact option")].map(o => o.value).find(v => v !== "");
