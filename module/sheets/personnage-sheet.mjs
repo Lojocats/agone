@@ -29,6 +29,8 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     names  : ["system.armure.portee", "system.armure.malusAgi", "system.armure.type"],
   };
 
+  static RECHERCHE_NON_ACQUISES = true;
+
   static PARTS = {
     form: {
       template: "systems/agone/templates/actors/personnage-sheet.hbs",
@@ -170,6 +172,7 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
 
   /** @override */
   _bindViewListeners(on, root) {
+    super._bindViewListeners(on, root);
     // Sections dépliables
     on("click", ".section-toggle", this._onToggleSection.bind(this));
   }

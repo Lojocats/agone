@@ -28,16 +28,20 @@
 
   <!-- Météo -->
   <div class="cal-meteo-row">
-    <span class="cal-meteo-titre"><i class="fas fa-cloud-sun-rain"></i> {{localize "AGONE.Calendrier.Meteo"}}</span>
-    <span class="cal-meteo-icon">{{meteoIcon}}</span>
-    {{#if isGM}}
-      <select class="cal-meteo-select" name="meteo">
-        {{#each meteoTypes}}
-          <option value="{{id}}" {{#if (eq id ../meteoId)}}selected{{/if}}>{{icon}} {{localize label}}</option>
-        {{/each}}
-      </select>
-    {{else}}
+    <div class="cal-meteo-courante">
+      <span class="cal-meteo-titre"><i class="fas fa-cloud-sun-rain"></i> {{localize "AGONE.Calendrier.Meteo"}}</span>
+      <span class="cal-meteo-icon">{{meteoIcon}}</span>
       <span class="cal-meteo-label">{{meteoLabel}}</span>
+    </div>
+    {{#if isGM}}
+    <div class="cal-meteo-choix">
+      {{#each meteoTypes as |m|}}
+      <button type="button" class="cal-meteo-btn{{#if (eq m.id @root.meteoId)}} actif{{/if}}" data-meteo="{{m.id}}"
+              title="{{#if m.id}}{{localize m.label}}{{else}}{{localize "AGONE.Calendrier.SansMeteo"}}{{/if}}">
+        {{#if m.id}}{{m.icon}}{{else}}<i class="fas fa-ban"></i>{{/if}}
+      </button>
+      {{/each}}
+    </div>
     {{/if}}
   </div>
 

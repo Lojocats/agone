@@ -57,10 +57,7 @@ export class CompetencesBrowser extends AgoneBrowser {
     }));
 
     // Filtres
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      competences = competences.filter(c => c.name.toLowerCase().includes(s));
-    }
+    competences = this._applySearch(competences, ["name", "famille"]);
     if (this._filterFams.size > 0) {
       competences = competences.filter(c => this._filterFams.has(c.famille));
     }
@@ -70,7 +67,7 @@ export class CompetencesBrowser extends AgoneBrowser {
       competences = competences.filter(c => c.count === 0);
     }
 
-    competences.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    this._trier(competences, (a, b) => a.name.localeCompare(b.name, "fr"));
 
     const allFamilles = FAMILLES.map(f => ({
       value : f,

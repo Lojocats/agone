@@ -1,9 +1,18 @@
 name: Create Release
 
+# Déclenchée par un tag v* poussé à la main, ou appelée par auto-tag.yml après un changement
+# de version de system.json.
+
 on:
   push:
     tags:
       - 'v*'
+  workflow_call:
+    inputs:
+      tag:
+        description: Tag de la release (vX.Y.Z)
+        required: true
+        type: string
 
 jobs:
   create-release:
@@ -13,10 +22,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Get tag name
         id: tag
-        run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: echo "version=${{ inputs.tag || github.ref_name }}" >> $GITHUB_OUTPUT
 
       - name: Create archive
         run: |
@@ -31,12 +42,13 @@ jobs:
             -x "*.git*" "*.gitignore" "_*.py"
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.version }}
           files: agone.zip
           body: |
             Système Agone ${{ steps.tag.outputs.version }}
-            
+
             Pour installer : téléchargez `agone.zip` et extrayez-le dans votre dossier FoundryVTT/Data/systems/agone
           draft: false
           prerelease: false

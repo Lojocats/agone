@@ -1,16 +1,20 @@
 {{!-- Éditeur des effets actifs d'un item : bonus / malus transférés à l'acteur qui le possède.
-      Contexte : effets (AgoneItemSheet#_prepareEffets), editable. --}}
-<div class="agone-effets">
+      Contexte : groupesEffets (AgoneItemSheet#_prepareGroupesEffets), editable.
+      Une peine a deux groupes : ses effets et ceux de son bienfait (actifs une fois acquis). --}}
+{{#each groupesEffets as |g|}}
+<div class="agone-effets{{#if g.bienfait}} agone-effets-bienfait{{/if}}{{#if g.suspendu}} effets-suspendus{{/if}}">
   <div class="section-header">
-    <h3>{{localize "AGONE.Effets.Titre"}}</h3>
-    {{#if editable}}
-    <button type="button" class="btn-icon" data-action="effetCreer" title='{{localize "AGONE.Effets.Nouveau"}}'>
+    <h3>{{#if g.bienfait}}<i class="fas fa-star"></i> {{/if}}{{localize g.titre}}</h3>
+    {{#if @root.editable}}
+    <button type="button" class="btn-icon" data-action="effetCreer"{{#if g.bienfait}} data-bienfait="1"{{/if}}
+            title='{{localize "AGONE.Effets.Nouveau"}}'>
       <i class="fas fa-plus"></i>
     </button>
     {{/if}}
   </div>
+  {{#if g.aide}}<p class="effet-aide">{{localize g.aide}}</p>{{/if}}
 
-  {{#each effets as |fx|}}
+  {{#each g.effets as |fx|}}
   <div class="effet-bloc{{#if fx.disabled}} effet-inactif{{/if}}" data-effect-id="{{fx.id}}">
     <div class="effet-entete">
       <img class="effet-icone" src="{{fx.img}}" alt="" />
@@ -57,6 +61,7 @@
     {{/if}}
   </div>
   {{else}}
-  <p class="empty-list">{{localize "AGONE.Effets.Aucun"}}</p>
+  <p class="empty-list">{{localize g.vide}}</p>
   {{/each}}
 </div>
+{{/each}}

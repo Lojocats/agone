@@ -417,6 +417,17 @@
     "Entenebrement":     "Ténèbres",
 
     "Peine": {
+      "Modifier":               "Ouvrir la fiche de la peine (effets, bienfait)",
+      "DescriptionBienfait":    "Description du bienfait",
+      "TexteLivreAide":         "Texte du livre, utilisé tant que la description ci-dessous est vide.",
+      "ReprendreTexteLivre":    "Reprendre ce texte pour le modifier",
+      "EffetsPeine":            "Effets de la peine",
+      "EffetsPeineAide":        "Appliqués dès que le personnage possède la peine.",
+      "AucunEffetPeine":        "Aucun effet de peine.",
+      "EffetsBienfait":         "Effets du bienfait",
+      "EffetsBienfaitActifs":   "Bienfait acquis : ces effets sont appliqués.",
+      "EffetsBienfaitSuspendus":"Suspendus tant que le bienfait n'est pas acquis (+1 Perfidie).",
+      "AucunEffetBienfait":     "Aucun effet de bienfait.",
       "diablotin":              "Diablotin",
       "cauchemars":             "Cauchemars",
       "demonFacetieux":         "Démon facétieux",
@@ -888,6 +899,7 @@
       "NoteAuto":         "(enregistrée automatiquement)",
       "NotesDuMois":      "Notes du mois",
       "AllerAuJour":      "Aller à ce jour",
+      "SansMeteo":        "Aucune météo",
       "Periode": {
         "Aube":      "Aube",
         "Matin":     "Matin",
@@ -900,6 +912,8 @@
 
     "Browser": {
       "Personnalises": "Objets personnalisés",
+      "RechercheAide": "Recherche sans accent ni majuscule, plusieurs mots dans n'importe quel ordre.\n\"expression exacte\" · -mot pour exclure · nom:mot pour ne chercher que dans le nom.\nUne faute de frappe par mot est tolérée si rien ne correspond exactement.",
+      "RechercheApprochante": "Aucun résultat exact pour « {requete} » : résultats approchants.",
       "PersonnalisesAide": "Aucun objet personnalisé de ce type. Créez-en dans le monde ou dans un compendium : ils apparaîtront ici, avec leurs effets.",
       "SourceMonde": "Monde",
       "OuvrirFiche": "Ouvrir la fiche",
@@ -1014,6 +1028,11 @@
       "GibbeuseDecroissante": "Lune gibbeuse décroissante",
       "DernierQuartier":      "Dernier quartier",
       "DernierCroissant":     "Dernier croissant"
+    },
+
+    "Limitee": {
+      "AucuneDescription": "Aucune description publique.",
+      "Aide":              "Accès limité : seule l'identité publique est visible."
     },
 
     "Effets": {

@@ -80,14 +80,7 @@ export class AvantagesBrowser extends AgoneBrowser {
     }));
 
     // Filtres
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      items = items.filter(e =>
-        e.name.toLowerCase().includes(s) ||
-        e.description.toLowerCase().includes(s) ||
-        e.prerequis.toLowerCase().includes(s)
-      );
-    }
+    items = this._applySearch(items, ["name", "description", "prerequis"]);
     if (this._filterSection !== "all") {
       items = items.filter(e => e.section === this._filterSection);
     }
@@ -103,7 +96,7 @@ export class AvantagesBrowser extends AgoneBrowser {
       items = items.filter(e => e.charge === this._filterChargeExact);
     }
 
-    items.sort((a, b) => {
+    this._trier(items, (a, b) => {
       // Avantages avant défauts, puis par section, puis par nom
       if (a.type !== b.type) return a.type === "avantage" ? -1 : 1;
       if (a.section !== b.section) return a.section.localeCompare(b.section, "fr");

@@ -23,19 +23,48 @@
           {{/each}}
         </select>
       </div>
-      <div class="form-group">
-        <label>{{localize "AGONE.BienfaitNom"}}</label>
-        <input type="text" name="system.bienfait" value="{{system.bienfait}}" />
-      </div>
-      <div class="form-group">
-        <label>{{localize "AGONE.BienfaitAcquis"}}</label>
-        <input type="checkbox" name="system.bienfaitAcquis" {{#if system.bienfaitAcquis}}checked{{/if}} />
-      </div>
     </div>
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>
       {{> systems/agone/templates/items/parts/editeur.hbs champ="description"}}
     </div>
+
+    <!-- Bienfait lié : nom, acquisition, description propre (sinon texte du livre) -->
+    <fieldset class="peine-bienfait-bloc{{#if system.bienfaitAcquis}} bienfait-acquis{{/if}}">
+      <legend><i class="fas fa-star"></i> {{localize "AGONE.BienfaitLabel"}}</legend>
+      <div class="item-form-grid">
+        <div class="form-group">
+          <label>{{localize "AGONE.BienfaitNom"}}</label>
+          <input type="text" name="system.bienfait" value="{{system.bienfait}}" list="bienfaits-{{item.id}}"
+                 placeholder='{{localize "AGONE.Aucun"}}' />
+          <datalist id="bienfaits-{{item.id}}">
+            {{#each bienfaitsConnus as |nom|}}<option value="{{nom}}"></option>{{/each}}
+          </datalist>
+        </div>
+        <div class="form-group">
+          <label>{{localize "AGONE.BienfaitAcquis"}}</label>
+          <input type="checkbox" name="system.bienfaitAcquis" {{#if system.bienfaitAcquis}}checked{{/if}} />
+        </div>
+      </div>
+      <div class="form-group description-group">
+        <label>{{localize "AGONE.Peine.DescriptionBienfait"}}</label>
+        {{#unless bienfaitPersonnalise}}
+          {{#if bienfaitTexteLivre}}
+          <div class="bienfait-texte-livre">
+            <p><em>{{bienfaitTexteLivre}}</em></p>
+            <span class="bienfait-texte-livre-aide">{{localize "AGONE.Peine.TexteLivreAide"}}</span>
+            {{#if editable}}
+            <button type="button" class="btn-agone-small" data-action="bienfaitTexteLivre">
+              <i class="fas fa-pen"></i> {{localize "AGONE.Peine.ReprendreTexteLivre"}}
+            </button>
+            {{/if}}
+          </div>
+          {{/if}}
+        {{/unless}}
+        {{> systems/agone/templates/items/parts/editeur.hbs champ="bienfaitDescription"}}
+      </div>
+    </fieldset>
+
     {{> systems/agone/templates/items/parts/effets.hbs}}
   </section>
 </form>

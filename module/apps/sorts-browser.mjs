@@ -78,13 +78,7 @@ export class SortsBrowser extends AgoneBrowser {
     }));
 
     // Filtres
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      sorts = sorts.filter(e =>
-        e.name.toLowerCase().includes(s) ||
-        e.description.toLowerCase().includes(s)
-      );
-    }
+    sorts = this._applySearch(sorts, ["name", "typeMagie", "description"]);
     if (this._filterTypes.size > 0) {
       sorts = sorts.filter(e => this._filterTypes.has(e.typeMagie));
     }
@@ -99,7 +93,7 @@ export class SortsBrowser extends AgoneBrowser {
       sorts = sorts.filter(e => !e.hasInActor);
     }
 
-    sorts.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    this._trier(sorts, (a, b) => a.name.localeCompare(b.name, "fr"));
 
     const allTypes = [...new Set(SORTS_DATA.map(d => d.typeMagie).filter(Boolean))]
       .sort()

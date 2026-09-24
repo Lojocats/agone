@@ -200,9 +200,10 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
       if (jour) await game.settings.set("agone", "calendrierDate", { ...dateCalendrier(), jour });
     });
 
-    // Changement météo via select (GM)
-    listen(root, ".cal-meteo-select", "change", async (e) => {
-      await game.settings.set("agone", "calendrierMeteo", e.currentTarget.value);
+    // Changement météo : un bouton par type (MJ)
+    listen(root, "[data-meteo]", "click", async (e) => {
+      const meteo = e.currentTarget.dataset.meteo;
+      if (meteo !== game.settings.get("agone", "calendrierMeteo")) await game.settings.set("agone", "calendrierMeteo", meteo);
     });
 
     // Note du jour : enregistrée en quittant le champ

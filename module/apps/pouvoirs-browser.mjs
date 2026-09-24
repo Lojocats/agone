@@ -49,13 +49,7 @@ export class PouvoirsBrowser extends AgoneBrowser {
       hasInActor  : actorPouvoirNames.has(d.name),
     }));
 
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      items = items.filter(e =>
-        e.name.toLowerCase().includes(s) ||
-        e.description.toLowerCase().includes(s)
-      );
-    }
+    items = this._applySearch(items, ["name", "description"]);
     if (this._filterCat !== "all") {
       items = items.filter(e => e.categorie === this._filterCat);
     }
@@ -65,7 +59,7 @@ export class PouvoirsBrowser extends AgoneBrowser {
       items = items.filter(e => !e.hasInActor);
     }
 
-    items.sort((a, b) => {
+    this._trier(items, (a, b) => {
       if (a.categorie !== b.categorie) return a.categorie === "flamme" ? -1 : 1;
       return a.name.localeCompare(b.name, "fr");
     });

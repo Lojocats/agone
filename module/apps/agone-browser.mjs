@@ -1,3 +1,5 @@
+import { rechercher, comparerPertinence, plagesSurlignage } from "../helpers/recherche.mjs";
+
 /**
  * Base commune des navigateurs Agone (armes, sorts, compétences, peuples…).
  *
@@ -5,7 +7,8 @@
  *  - FILTER_DEFAULTS : valeurs initiales de ses filtres (propriétés de l'instance) ;
  *  - FILTERS         : liaison entre les contrôles du template et ces propriétés ;
  *  - DEFAULT_OPTIONS.actions : les boutons d'ajout (data-action dans le template).
- * La base gère la recherche avec debounce, la conservation du focus entre deux rendus,
+ * La base gère la recherche (helpers/recherche.mjs : sans accent, plusieurs mots, exclusions,
+ * fautes de frappe, pertinence, surlignage) avec debounce, la conservation du focus entre deux rendus,
  * les filtres select / nombre / cases à cocher et la réinitialisation, le tri par colonne,
  * et la section « objets personnalisés » (items du type ITEM_TYPE créés dans le monde ou
  * dans des compendiums autres que ceux du système, avec leurs effets actifs).
@@ -61,11 +64,29 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
 
   // ── Aides de filtrage pour _prepareContext ────────────────────────────────
 
-  /** Filtre `items` sur la recherche courante, appliquée aux champs texte donnés. */
-  _applySearch(items, fields = ["name"]) {
-    if (!this._search) return items;
-    const s = this._search.toLowerCase();
-    return items.filter(e => fields.some(f => String(e[f] ?? "").toLowerCase().includes(s)));
+  /**
+   * Filtre `items` sur la recherche courante, appliquée aux champs texte donnés (le premier est le nom).
+   * Retient la pertinence de chaque résultat pour `_trier`. La liste principale (`principale`)
+   * indique si les résultats sont approchants (faute de frappe tolérée).
+   */
+  _applySearch(items, fields = ["name"], { principale = true } = {}) {
+    const r = rechercher(items, this._search, fields);
+    this._pertinence ??= new Map();
+    for (const [e, s] of r.scores) this._pertinence.set(e, s);
+    if (principale) this._rechercheApprox = r.approximatif;
+    return r.resultats;
+  }
+
+  /** Trie `items` : par pertinence si une recherche est active, puis selon `ordre`. */
+  _trier(items, ordre) {
+    return items.sort(comparerPertinence(this._pertinence, ordre));
+  }
+
+  /** @override — pertinences recalculées à chaque rendu (avant _prepareContext des sous-classes) */
+  _configureRenderOptions(options) {
+    super._configureRenderOptions(options);
+    this._pertinence = new Map();
+    this._rechercheApprox = false;
   }
 
   /** Filtre `items` selon `_filterPossede` ("all" | "oui" | "non") et le prédicat `owned`. */
@@ -127,9 +148,9 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     }
 
     let liste = entrees.map(e => ({ ...e, possede: possedes.has(e.name), hasInActor: possedes.has(e.name) }));
-    liste = this._applySearch(liste, ["name", "description"]);
+    liste = this._applySearch(liste, ["name", "description"], { principale: false });
     liste = this._applyPossede(liste);
-    return liste.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    return this._trier(liste, (a, b) => a.name.localeCompare(b.name, "fr"));
   }
 
   /** Ajoute l'objet personnalisé à l'acteur, avec ses effets actifs. */
@@ -163,6 +184,25 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     }
     this._bindTri();
     this._bindClavier(options);
+    this._afficherRecherche();
+  }
+
+  /**
+   * Retour visuel de la recherche : correspondances surlignées dans les noms,
+   * bandeau quand les résultats sont approchants (faute de frappe tolérée).
+   */
+  _afficherRecherche() {
+    if (!this._search) return;
+    for (const cellule of this.element.querySelectorAll("td[class$='-name'], .browser-perso-nom")) {
+      surligner(cellule, this._search);
+    }
+    const table = this.element.querySelector("table:not(.browser-perso-table)");
+    if (this._rechercheApprox && table) {
+      const bandeau = document.createElement("div");
+      bandeau.className = "browser-recherche-approx";
+      bandeau.innerHTML = `<i class="fas fa-spell-check"></i> ${game.i18n.format("AGONE.Browser.RechercheApprochante", { requete: foundry.utils.escapeHTML(this._search) })}`;
+      table.before(bandeau);
+    }
   }
 
   /**
@@ -216,6 +256,7 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     const [selecteur] = Object.entries(this.constructor.FILTERS).find(([, spec]) => spec.kind === "text") ?? [];
     const recherche = selecteur ? this.element.querySelector(selecteur) : null;
     if (!recherche) return;
+    recherche.title = game.i18n.localize("AGONE.Browser.RechercheAide");
     if (options.isFirstRender) requestAnimationFrame(() => recherche.focus());
     recherche.addEventListener("keydown", ev => {
       if (ev.key !== "Escape" || !recherche.value) return;
@@ -284,5 +325,32 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
         });
         break;
     }
+  }
+}
+
+/**
+ * Entoure de <mark> les correspondances de la recherche dans les nœuds texte d'un élément
+ * (le texte d'origine est conservé : accents, casse).
+ */
+function surligner(element, requete) {
+  const marcheur = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  const noeuds = [];
+  while (marcheur.nextNode()) noeuds.push(marcheur.currentNode);
+  for (const noeud of noeuds) {
+    const texte = noeud.nodeValue;
+    const plages = plagesSurlignage(texte, requete);
+    if (!plages.length) continue;
+    const fragment = document.createDocumentFragment();
+    let pos = 0;
+    for (const [debut, fin] of plages) {
+      if (debut > pos) fragment.append(texte.slice(pos, debut));
+      const mark = document.createElement("mark");
+      mark.className = "agone-surligne";
+      mark.textContent = texte.slice(debut, fin);
+      fragment.append(mark);
+      pos = fin;
+    }
+    if (pos < texte.length) fragment.append(texte.slice(pos));
+    noeud.replaceWith(fragment);
   }
 }

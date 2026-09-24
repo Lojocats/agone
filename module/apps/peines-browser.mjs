@@ -64,14 +64,7 @@ export class PeinesBrowser extends AgoneBrowser {
     }));
 
     // Filtres
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      items = items.filter(e =>
-        e.name.toLowerCase().includes(s) ||
-        e.description.toLowerCase().includes(s) ||
-        (e.bienfait ?? "").toLowerCase().includes(s)
-      );
-    }
+    items = this._applySearch(items, ["name", "bienfait", "description"]);
     if (this._filterCategorie !== "all") {
       items = items.filter(e => e.categorie === this._filterCategorie);
     }
@@ -79,7 +72,7 @@ export class PeinesBrowser extends AgoneBrowser {
       items = items.filter(e => e.noirEffect === this._filterNoir);
     }
 
-    items.sort((a, b) => {
+    this._trier(items, (a, b) => {
       if (a.categorie !== b.categorie) return a.categorie.localeCompare(b.categorie, "fr");
       return a.name.localeCompare(b.name, "fr");
     });

@@ -56,6 +56,21 @@ describe("Données des compendiums (compendium-data.mjs)", () => {
     assert.equal(data.descriptionBienfait(undefined), "");
   });
 
+  test("descriptionBienfaitPeine : texte du livre, sinon description propre de la peine", () => {
+    const livre = data.descriptionBienfaitPeine({ system: { bienfait: "Hargne", bienfaitDescription: "" } });
+    assert.equal(livre.texte, data.descriptionBienfait("Hargne"));
+    assert.ok(livre.html.startsWith("<p>"));
+    assert.equal(livre.personnalisee, false);
+
+    const propre = data.descriptionBienfaitPeine({ system: { bienfait: "Hargne", bienfaitDescription: "<p>Texte <strong>maison</strong></p>" } });
+    assert.equal(propre.html, "<p>Texte <strong>maison</strong></p>");
+    assert.equal(propre.texte, "Texte maison");
+    assert.equal(propre.personnalisee, true);
+
+    const aucun = data.descriptionBienfaitPeine({ system: { bienfait: "", bienfaitDescription: "" } });
+    assert.deepEqual(aucun, { html: "", texte: "", personnalisee: false });
+  });
+
   test("compétences du système : nom, famille et caractéristique liée connue", () => {
     for (const c of AGONE.competences) {
       assert.ok(c.name, JSON.stringify(c));

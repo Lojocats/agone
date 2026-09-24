@@ -46,6 +46,42 @@ export function fichesBatch({ describe, it, assert, before, after }) {
         assert.ok(sheet.element.querySelector(`.tab[data-tab="${dernier.dataset.tab}"]`).classList.contains("active"));
       });
 
+      it("lecture seule (observateur) : champs et jets désactivés, consultation active", async () => {
+        Object.defineProperty(sheet, "isEditable", { configurable: true, get: () => false });
+        try {
+          await sheet.render();
+          const el = sheet.element;
+          assert.ok(el.classList.contains("agone-lecture-seule"));
+          const champs = [...el.querySelectorAll(".window-content input[name^='system.']")];
+          assert.isAbove(champs.length, 0);
+          assert.ok(champs.every(c => c.disabled), "tous les champs désactivés");
+          const jets = [...el.querySelectorAll("button[data-action^='roll']:not([data-action='rollItemChat'])")];
+          assert.ok(jets.every(b => b.disabled), "jets désactivés");
+          for (const c of el.querySelectorAll(".comp-search-input, .smf-search")) assert.notOk(c.disabled, "recherche active");
+        } finally {
+          delete sheet.isEditable;
+          await sheet.render();
+        }
+        assert.notOk(sheet.element.classList.contains("agone-lecture-seule"));
+        assert.notOk(sheet.element.querySelector(".window-content input[name^='system.']").disabled);
+      });
+
+      it("vue limitée : identité et description seulement", async () => {
+        Object.defineProperty(sheet, "vueLimitee", { configurable: true, get: () => true });
+        try {
+          await sheet.render();
+          const el = sheet.element;
+          assert.ok(el.querySelector(".agone-limitee-wrap"), "vue limitée");
+          assert.notOk(el.querySelector(".sheet-tabs"), "pas d'onglets");
+          assert.equal(el.querySelector(".limitee-nom").textContent.trim(), actor.name);
+          assert.notOk(el.querySelector("input[name^='system.']"), "aucun champ");
+        } finally {
+          delete sheet.vueLimitee;
+          await sheet.render();
+        }
+        assert.ok(sheet.element.querySelector(".sheet-tabs"), "fiche complète restaurée");
+      });
+
       if (type !== "personnage") {
         it("chaque caractéristique a un bouton de jet", () => {
           const boutons = sheet.element.querySelectorAll("[data-action='rollAttribut'][data-carac]");
@@ -104,6 +140,22 @@ export function fichesBatch({ describe, it, assert, before, after }) {
       await item.update({ "system.description": "<p><strong>Gras</strong></p>" });
       assert.include(item.system.description, "<strong>");
       await sheet.close({ animate: false });
+    });
+
+    it("lecture seule : champs désactivés, envoi au chat actif", async () => {
+      const sheet = await ouvrir(items.arme.sheet);
+      Object.defineProperty(sheet, "isEditable", { configurable: true, get: () => false });
+      try {
+        await sheet.render();
+        const champs = [...sheet.element.querySelectorAll(".window-content input[name]")];
+        assert.isAbove(champs.length, 0);
+        assert.ok(champs.every(c => c.disabled), "champs désactivés");
+        const chat = sheet.element.querySelector("[data-action='toChat']");
+        if (chat) assert.notOk(chat.disabled, "envoi au chat actif");
+      } finally {
+        delete sheet.isEditable;
+        await sheet.close({ animate: false });
+      }
     });
   });
 

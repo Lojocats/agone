@@ -85,10 +85,7 @@ export class ArmesBrowser extends AgoneBrowser {
     }));
 
     // Filtres
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      armes = armes.filter(e => e.name.toLowerCase().includes(s));
-    }
+    armes = this._applySearch(armes, ["name", "styleLabel", "type"]);
     if (this._filterStyles.size > 0) {
       armes = armes.filter(e => this._filterStyles.has(e.style));
     }
@@ -104,7 +101,7 @@ export class ArmesBrowser extends AgoneBrowser {
       armes = armes.filter(e => !e.hasInActor);
     }
 
-    armes.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    this._trier(armes, (a, b) => a.name.localeCompare(b.name, "fr"));
 
     const allStyles = ["melee","trait","jet","bouclier"].map(s => ({
       value: s, label: STYLE_LABELS[s] ?? s, active: this._filterStyles.has(s)

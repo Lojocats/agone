@@ -1423,3 +1423,19 @@ export const BIENFAITS_PERFIDIE_DATA = [
 export function descriptionBienfait(nom) {
   return BIENFAITS_PERFIDIE_DATA.find(b => b.name === nom)?.description ?? "";
 }
+
+/**
+ * Description du bienfait d'une peine : texte saisi sur la peine (modifiable), sinon texte du livre.
+ * @returns {{ html: string, texte: string, personnalisee: boolean }}  HTML pour l'affichage,
+ *          texte brut pour les infobulles
+ */
+export function descriptionBienfaitPeine(peine) {
+  const propre = (peine?.system?.bienfaitDescription ?? "").trim();
+  if (propre) {
+    const texte = propre.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+    return { html: propre, texte, personnalisee: true };
+  }
+  const livre = descriptionBienfait(peine?.system?.bienfait);
+  const html  = livre ? `<p>${livre.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>` : "";
+  return { html, texte: livre, personnalisee: false };
+}

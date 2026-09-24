@@ -46,20 +46,14 @@ export class PeuplesBrowser extends AgoneBrowser {
       isActif     : actorPeuple === d.name,
     }));
 
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      items = items.filter(e =>
-        e.name.toLowerCase().includes(s) ||
-        e.description.toLowerCase().includes(s)
-      );
-    }
+    items = this._applySearch(items, ["name", "description"]);
     if (this._filterPossede === "oui") {
       items = items.filter(e => e.isActif);
     } else if (this._filterPossede === "non") {
       items = items.filter(e => !e.isActif);
     }
 
-    items.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    this._trier(items, (a, b) => a.name.localeCompare(b.name, "fr"));
 
     return {
       items,

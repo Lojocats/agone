@@ -24,6 +24,7 @@ import {
 // ── Documents ─────────────────────────────────────────────────────────────────
 import { AgoneActor }       from "./documents/actor.mjs";
 import { AgoneItem }        from "./documents/item.mjs";
+import { AgoneActiveEffect } from "./documents/active-effect.mjs";
 
 // ── Sheets ────────────────────────────────────────────────────────────────────
 import { PersonnageSheet }   from "./sheets/personnage-sheet.mjs";
@@ -158,6 +159,7 @@ Hooks.once("init", () => {
   // ── Documents personnalisés ─────────────────────────────────────────────
   CONFIG.Actor.documentClass = AgoneActor;
   CONFIG.Item.documentClass  = AgoneItem;
+  CONFIG.ActiveEffect.documentClass = AgoneActiveEffect;
 
   // ── DataModels ──────────────────────────────────────────────────────────
   CONFIG.Actor.dataModels = {
@@ -223,6 +225,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/actors/compagnon-sheet.hbs",
     "systems/agone/templates/actors/demon-sheet.hbs",
     "systems/agone/templates/actors/pnj-sheet.hbs",
+    "systems/agone/templates/actors/limitee-sheet.hbs",
     // Partials acteurs
     "systems/agone/templates/actors/parts/attributs.hbs",
     "systems/agone/templates/actors/parts/competences.hbs",

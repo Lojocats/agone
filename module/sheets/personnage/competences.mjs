@@ -1,4 +1,3 @@
-import { bindCompetenceSearch } from "../sheet-helpers.mjs";
 import { competencesParScore } from "../actor-context.mjs";
 
 /**
@@ -63,8 +62,7 @@ export const CompetencesMixin = Base => class extends Base {
     on("click", "[data-action='rollCompetenceNA']", this._onRollCompetenceNA.bind(this));
     on("click", "[data-action='apprendreCompetenceNA']", this._onApprendreCompetenceNA.bind(this));
 
-    // Barre de recherche compétences
-    bindCompetenceSearch(root, on, { nonAcquises: true });
+    // La barre de recherche est active aussi en lecture seule (AgoneActorSheet#_bindViewListeners)
     on("click", "[data-action='triCompsToggle']", this._onTriCompsToggle.bind(this));
   }
 

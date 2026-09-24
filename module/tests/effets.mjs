@@ -194,4 +194,41 @@ export function effetsBatch({ describe, it, assert, before, after }) {
       assert.equal(actor.system.resistance, 2 + 1);
     });
   });
+
+  describe("Peine de Perfidie : effets de la peine et du bienfait", function () {
+    this.timeout(DELAI);
+    let actor, peine;
+    before(async () => {
+      actor = await tests.acteur("personnage", PERSO);
+      [peine] = await actor.createEmbeddedDocuments("Item", [{
+        name: "Peine test", type: "peine", system: { bienfait: "Fulgurance", bienfaitAcquis: false },
+        effects: [
+          { name: "Peine", transfer: true, changes: [changeEffet("force", -1)] },
+          { name: "Bienfait", transfer: true, changes: [changeEffet("agilite", 2)], flags: { agone: { bienfait: true } } },
+        ],
+      }]);
+    });
+
+    it("l'effet de la peine s'applique, celui du bienfait est suspendu", () => {
+      assert.equal(actor.system.force.score, PERSO.force.score - 1);
+      assert.equal(actor.system.agilite.score, PERSO.agilite.score);
+      assert.ok(peine.effects.find(e => e.name === "Bienfait").isSuppressed);
+    });
+
+    it("acquérir le bienfait active ses effets", async () => {
+      await peine.update({ "system.bienfaitAcquis": true });
+      assert.equal(actor.system.agilite.score, PERSO.agilite.score + 2);
+      assert.notOk(peine.effects.find(e => e.name === "Bienfait").isSuppressed);
+    });
+
+    it("renoncer au bienfait les suspend à nouveau", async () => {
+      await peine.update({ "system.bienfaitAcquis": false });
+      assert.equal(actor.system.agilite.score, PERSO.agilite.score);
+    });
+
+    it("la description propre du bienfait remplace le texte du livre", async () => {
+      await peine.update({ "system.bienfaitDescription": "<p>Version maison</p>" });
+      assert.equal(peine.system.bienfaitDescription, "<p>Version maison</p>");
+    });
+  });
 }

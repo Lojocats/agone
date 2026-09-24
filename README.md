@@ -42,6 +42,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - Fonctionne aussi dans les **compendiums** : créez vos propres objets avec leurs effets, ils les conservent en passant sur une fiche
 - S'applique à tous les types d'acteur : personnages, compagnons, démons et PNJ
 - Les avantages du livre de base reçoivent automatiquement leurs effets
+- **Peines de Perfidie** : effets de la peine (actifs dès qu'elle est possédée) et effets de son **bienfait**, suspendus tant que le bienfait n'est pas acquis ; description du bienfait modifiable (le texte du livre sert par défaut)
 
 ### Ténèbres & Paliers
 - Tableau interactif des 20 paliers avec peines et bienfaits
@@ -87,16 +88,22 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - Onglet Magie des PNJ (sorts, Arts Magiques, filtres et tri)
 - Liés à la fiche personnage (onglet Compagnons)
 
+### Permissions des fiches
+- **Limité** : portrait, nom, peuple (ou espèce, origine, race) et description publique seulement
+- **Observateur** : fiche complète en lecture seule ; les objets s'ouvrent (en lecture), s'envoient au chat, la recherche et les filtres fonctionnent
+- **Propriétaire** : fiche modifiable et jets de dés ; les blocs secrets des descriptions ne sont visibles que du propriétaire
+
 ### Objets
-- Fiche pour chaque type d'objet, dont les peines de Perfidie et les démons
+- Fiche pour chaque type d'objet, dont les peines de Perfidie (avec leur bienfait) et les démons
 - **Descriptions en texte riche** : mise en forme (gras, listes, liens, tableaux…) rendue dans les fiches, les navigateurs et le chat
 
 ### Applications
 - **Navigateurs** : armes, armures, compétences, sorts, pouvoirs, manœuvres, peuples, avantages, peines
-  - Recherche et filtres, **tri en cliquant sur les colonnes**, Échap pour effacer la recherche
+  - **Recherche** sans accent ni majuscule, plusieurs mots dans n'importe quel ordre, `"expression exacte"`, `-mot` pour exclure, `nom:mot` pour ne chercher que dans le nom ; une faute de frappe par mot est tolérée ; résultats classés par pertinence, correspondances surlignées
+  - Filtres, **tri en cliquant sur les colonnes**, Échap pour effacer la recherche
   - Section **Objets personnalisés** : les objets du même type créés dans le monde ou dans vos compendiums, avec leurs effets, ajoutés en un clic
 - **Calendrier d'Harmonde** : suivi du jour/mois/année, phases de lune, notes journalières, heure par quarts
-- **Météo dynamique** : sélection via le calendrier, appliquée automatiquement à la scène active (effets de particules + filtres + luminosité selon l'heure)
+- **Météo dynamique** : un bouton par météo dans le calendrier, appliquée automatiquement à la scène active (effets de particules + filtres + luminosité selon l'heure)
 - **Tracker de combat** : initiative et ordre du tour custom, passage de round, gestion de l'état des combattants
 - **Mode sombre** : par défaut, le thème Agone suit le thème des applications Foundry ; le bouton 🌙 de la barre d'outils Agone fixe un choix clair ou sombre, mémorisé par joueur. Les cartes de jet du chat et les widgets suivent le même thème.
 

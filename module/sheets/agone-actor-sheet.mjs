@@ -8,7 +8,10 @@ import { PeuplesBrowser }    from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser }   from "../apps/pouvoirs-browser.mjs";
 import { PeinesBrowser }     from "../apps/peines-browser.mjs";
 import { delegate } from "../helpers/dom.mjs";
-import { bindTabs, bindCompetenceSearch } from "./sheet-helpers.mjs";
+import { bindTabs, bindCompetenceSearch, appliquerLectureSeule } from "./sheet-helpers.mjs";
+
+/** Template de la vue limitée, commun à tous les types d'acteur. */
+const TEMPLATE_LIMITEE = "systems/agone/templates/actors/limitee-sheet.hbs";
 
 /** Navigateur ouvert par un bouton `.compendium-browse` selon son `data-pack`. */
 const BROWSERS = {
@@ -31,6 +34,11 @@ const BROWSERS = {
  *  - `_bindViewListeners(on, root)` : écouteurs actifs même en lecture seule ;
  *  - `_bindListeners(on, root)`     : écouteurs d'édition (fiche modifiable uniquement).
  * Fournit les gestionnaires communs (items, jets, navigateurs, sorts et Arts Magiques).
+ *
+ * Niveaux de permission :
+ *  - Limité       : vue limitée (portrait, nom, peuple ou espèce, description publique) ;
+ *  - Observateur  : fiche complète en lecture seule, consultation des objets, recherche et filtres ;
+ *  - Propriétaire : fiche complète modifiable, jets.
  */
 export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
 
@@ -52,9 +60,58 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
   /** Onglet affiché à la première ouverture. */
   static DEFAULT_TAB = "attributs";
 
+  /** La recherche de compétences parcourt aussi les compétences non acquises (fiche personnage). */
+  static RECHERCHE_NON_ACQUISES = false;
+
+  /** L'utilisateur n'a qu'un accès limité à l'acteur (jamais le MJ) : vue réduite. */
+  get vueLimitee() {
+    return this.document.limited;
+  }
+
+  /** @override — fenêtre compacte pour la vue limitée */
+  _initializeApplicationOptions(options) {
+    options = super._initializeApplicationOptions(options);
+    if (options.document?.limited) {
+      options.position = { ...options.position, width: 460, height: "auto" };
+      options.classes.push("agone-limitee");
+    }
+    return options;
+  }
+
+  /** @override — la vue limitée remplace le template de la fiche */
+  _configureRenderParts(options) {
+    const parts = super._configureRenderParts(options);
+    if (this.vueLimitee) parts.form = { ...parts.form, template: TEMPLATE_LIMITEE, scrollable: [".limitee-description"] };
+    return parts;
+  }
+
+  /** @override */
+  async _preparePartContext(partId, context, options) {
+    context = await super._preparePartContext(partId, context, options);
+    if (this.vueLimitee) context.limitee = await this._prepareLimiteeContext();
+    return context;
+  }
+
+  /** Contexte de la vue limitée : identité publique et description (sans les blocs secrets). */
+  async _prepareLimiteeContext() {
+    const actor = this.actor;
+    const s = actor.system;
+    const sousTitre = { personnage: s.peuple, compagnon: s.espece, demon: s.origine, pnj: s.race }[actor.type] ?? "";
+    return {
+      nom      : actor.name,
+      img      : actor.img,
+      type     : game.i18n.localize(`TYPES.Actor.${actor.type}`),
+      sousTitre,
+      description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        s.description ?? "", { secrets: false, relativeTo: actor }),
+    };
+  }
+
   /** @override */
   _onRender(context, options) {
     super._onRender(context, options);
+    this.element.classList.toggle("agone-limitee", this.vueLimitee);
+    if (this.vueLimitee) return;
 
     // AbortController : retire les écouteurs du rendu précédent (l'élément racine persiste)
     this._renderSignal?.abort();
@@ -79,7 +136,7 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     // Sauvegarde automatique des champs nommés de l'acteur
     this.element.querySelector("form")?.addEventListener("change", async (ev) => {
       const el = ev.target;
-      if (!el.name || this._skipAutosave(el)) return;
+      if (!this.isEditable || !el.name || this._skipAutosave(el)) return;
       const value = el.type === "checkbox" ? el.checked
                   : el.type === "number"   ? Number(el.value)
                   : el.value;
@@ -91,8 +148,8 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     bindTabs(this, root, on, this.constructor.DEFAULT_TAB);
     this._bindViewListeners(on, root);
 
-    if (!this.isEditable) return;
-    this._bindListeners(on, root);
+    appliquerLectureSeule(root, !this.isEditable);
+    if (this.isEditable) this._bindListeners(on, root);
   }
 
   /** Le champ a-t-il un gestionnaire dédié (et doit échapper à la sauvegarde automatique) ? */
@@ -101,8 +158,18 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     return classes.some(c => el.classList.contains(c)) || names.includes(el.name);
   }
 
-  /** Écouteurs actifs même en lecture seule. */
-  _bindViewListeners(on, root) {}
+  /**
+   * Écouteurs actifs même en lecture seule (observateur) : consultation sans modification.
+   * Les contrôles concernés sont listés dans CONTROLES_CONSULTATION (sheet-helpers.mjs).
+   */
+  _bindViewListeners(on, root) {
+    on("click", ".item-edit", this._onItemEdit.bind(this));
+    on("click", ".item-send-chat", this._onItemSendChat.bind(this));
+    on("click", "[data-action='rollItemChat']", this._onItemSendChat.bind(this));
+    bindCompetenceSearch(root, on, { nonAcquises: this.constructor.RECHERCHE_NON_ACQUISES });
+    on("input", ".smf-search", this._onFiltreSorts.bind(this));
+    on("change", ".smf-check", this._onFiltreTypeSorts.bind(this));
+  }
 
   /** Écouteurs d'édition par défaut : items, jets de combat et compétences. */
   _bindListeners(on, root) {
@@ -116,29 +183,23 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     on("change", ".arme-equipe", this._onArmeEquipeChange.bind(this));
     on("change", ".armure-portee", this._onArmureItemPorteeChange.bind(this));
     on("click", "[data-action='rollCompetence']", this._onRollCompetence.bind(this));
-    bindCompetenceSearch(root, on);
   }
 
-  /** Items : créer, éditer, supprimer, édition inline, envoi en chat, navigateurs. */
+  /** Items : créer, supprimer, édition inline, navigateurs (ouverture et chat : _bindViewListeners). */
   _bindItemListeners(on) {
     on("click", ".item-create", this._onItemCreate.bind(this));
-    on("click", ".item-edit", this._onItemEdit.bind(this));
     on("click", ".item-delete", this._onItemDelete.bind(this));
-    on("click", ".item-send-chat", this._onItemSendChat.bind(this));
-    on("click", "[data-action='rollItemChat']", this._onItemSendChat.bind(this));
     on("change", ".inline-edit", this._onInlineEdit.bind(this));
     on("click", ".compendium-browse", this._onBrowseCompendium.bind(this));
   }
 
-  /** Onglet Magie (partial magie.hbs) : sorts, Arts Magiques, mini-filtre, tri. */
+  /** Onglet Magie (partial magie.hbs) : sorts, Arts Magiques, tri (mini-filtre : _bindViewListeners). */
   _bindSortsListeners(on) {
     on("click", "[data-action='rollSort']", this._onRollSort.bind(this));
     on("click", "[data-action='rollSortImpro']", this._onRollSortImpro.bind(this));
     on("click", "[data-action='rollArtDomaine']", ev => this._onRollArtDomaine(ev, false));
     on("click", "[data-action='rollImpArtDomaine']", ev => this._onRollArtDomaine(ev, true));
     on("click", "[data-action='openDomainesConfig']", () => this._renderChildApp(new game.agone.DomainesArtsConfig()));
-    on("input", ".smf-search", this._onFiltreSorts.bind(this));
-    on("change", ".smf-check", this._onFiltreTypeSorts.bind(this));
     on("click", "[data-action='triSortsToggle']", this._onTriSortsToggle.bind(this));
   }
 

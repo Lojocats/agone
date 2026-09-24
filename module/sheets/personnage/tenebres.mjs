@@ -1,4 +1,4 @@
-import { descriptionBienfait } from "../../helpers/compendium-data.mjs";
+import { descriptionBienfaitPeine } from "../../helpers/compendium-data.mjs";
 
 /**
  * Onglets Ténèbres & Perfidie : paliers (auto / manuel), bienfaits, conjuration, démons (items et acteurs liés).
@@ -12,15 +12,19 @@ export const TenebresMixin = Base => class extends Base {
     const bySort = (a, b) => (a.sort ?? 0) - (b.sort ?? 0);
     // Peines de Perfidie
     context.peines = actor.items.filter(i => i.type === "peine").sort(bySort);
-    // Description du bienfait, consultable avant de l'acquérir (+1 Perfidie)
-    for (const peine of context.peines) peine._bienfaitDescription = descriptionBienfait(peine.system.bienfait);
+    // Description du bienfait (propre à la peine, sinon texte du livre), consultable avant de l'acquérir
+    for (const peine of context.peines) {
+      const { html, texte } = descriptionBienfaitPeine(peine);
+      peine._bienfaitDescription = texte;
+      peine._bienfaitHTML        = html;
+    }
     // Bienfaits actifs : peines avec bienfaitAcquis=true, dedupliqué par nom de bienfait
     const bienfaitsMap = new Map();
     for (const peine of context.peines) {
       if (peine.system.bienfaitAcquis && peine.system.bienfait) {
         const key = peine.system.bienfait;
         if (!bienfaitsMap.has(key)) {
-          bienfaitsMap.set(key, { name: key, sources: [] });
+          bienfaitsMap.set(key, { name: key, sources: [], description: peine._bienfaitHTML });
         }
         bienfaitsMap.get(key).sources.push(peine.name);
       }
@@ -29,7 +33,6 @@ export const TenebresMixin = Base => class extends Base {
       return {
         ...b,
         sourceNames : b.sources.join(", "),
-        description : descriptionBienfait(b.name),
       };
     });
 
@@ -239,11 +242,11 @@ export const TenebresMixin = Base => class extends Base {
     const itemId = ev.currentTarget.dataset.itemId;
     const peine  = this.actor.items.get(itemId);
     if (!peine) return;
-    const description = descriptionBienfait(peine.system.bienfait);
+    const { html: description } = descriptionBienfaitPeine(peine);
     const confirmed = await this._confirmChild({
       title  : game.i18n.localize("AGONE.AcquerirBienfait"),
       content: `<p>${game.i18n.format("AGONE.AcquerirBienfaitConfirm", { bienfait: `<strong>${peine.system.bienfait}</strong>` })}</p>`
-             + (description ? `<p class="bienfait-perfidie-desc"><em>${description}</em></p>` : ""),
+             + (description ? `<div class="bienfait-perfidie-desc"><em>${description}</em></div>` : ""),
     });
     if (!confirmed) return;
     await peine.update({ "system.bienfaitAcquis": true });

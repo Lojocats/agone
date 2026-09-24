@@ -1,9 +1,10 @@
 import { delegate } from "../helpers/dom.mjs";
 import { changeEffet, lireChange } from "../helpers/effets.mjs";
-import { bindTabs } from "./sheet-helpers.mjs";
+import { bindTabs, appliquerLectureSeule } from "./sheet-helpers.mjs";
+import { BIENFAITS_PERFIDIE_DATA, descriptionBienfait } from "../helpers/compendium-data.mjs";
 
 /** Champs de texte riche (HTML) des items, rendus par parts/editeur.hbs. */
-const CHAMPS_HTML = ["description", "notes", "connivances"];
+const CHAMPS_HTML = ["description", "notes", "connivances", "bienfaitDescription"];
 
 /** Types d'item qui peuvent porter des effets actifs (bonus / malus transférés au porteur). */
 const TYPES_AVEC_EFFETS = ["don", "arme", "armure", "equipement", "pouvoir", "peine"];
@@ -24,6 +25,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     actions : {
       toChat         : AgoneItemSheet.#onToChat,
       effetCreer     : AgoneItemSheet.#onEffetCreer,
+      bienfaitTexteLivre: AgoneItemSheet.#onBienfaitTexteLivre,
       effetEditer    : AgoneItemSheet.#onEffetEditer,
       effetSupprimer : AgoneItemSheet.#onEffetSupprimer,
       modifAjouter   : AgoneItemSheet.#onModifAjouter,
@@ -68,7 +70,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     }
     const type = item.type.charAt(0).toUpperCase() + item.type.slice(1);
     await this[`_prepare${type}Context`]?.(context);
-    if (TYPES_AVEC_EFFETS.includes(item.type)) context.effets = this._prepareEffets();
+    if (TYPES_AVEC_EFFETS.includes(item.type)) context.groupesEffets = this._prepareGroupesEffets();
     return context;
   }
 
@@ -145,14 +147,36 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
       { value: "ame",   label: "AGONE.Ame" },
       { value: "",      label: "AGONE.Aucun" },
     ];
+    // Bienfait : noms connus (suggestions), texte du livre repris si la description propre est vide
+    const system = this.item.system;
+    context.bienfaitsConnus = BIENFAITS_PERFIDIE_DATA.map(b => b.name);
+    context.bienfaitTexteLivre = descriptionBienfait(system.bienfait);
+    context.bienfaitPersonnalise = !!(system.bienfaitDescription ?? "").trim();
   }
 
   // ── Effets actifs ──────────────────────────────────────────────────────
 
-  /** Effets de l'item et leurs modificateurs, pour parts/effets.hbs. */
+  /**
+   * Groupes d'effets affichés par parts/effets.hbs. Une peine en a deux : ses propres effets
+   * (actifs dès qu'elle est possédée) et ceux de son bienfait (actifs une fois le bienfait acquis).
+   */
+  _prepareGroupesEffets() {
+    const effets = this._prepareEffets();
+    if (this.item.type !== "peine") return [{ titre: "AGONE.Effets.Titre", bienfait: false, effets, vide: "AGONE.Effets.Aucun" }];
+    const acquis = !!this.item.system.bienfaitAcquis;
+    return [
+      { titre: "AGONE.Peine.EffetsPeine", aide: "AGONE.Peine.EffetsPeineAide", bienfait: false,
+        effets: effets.filter(e => !e.bienfait), vide: "AGONE.Peine.AucunEffetPeine" },
+      { titre: "AGONE.Peine.EffetsBienfait", aide: acquis ? "AGONE.Peine.EffetsBienfaitActifs" : "AGONE.Peine.EffetsBienfaitSuspendus",
+        bienfait: true, suspendu: !acquis, effets: effets.filter(e => e.bienfait), vide: "AGONE.Peine.AucunEffetBienfait" },
+    ];
+  }
+
+  /** Effets de l'item et leurs modificateurs. */
   _prepareEffets() {
     const stats = Object.entries(CONFIG.AGONE.effets).map(([value, def]) => ({ value, label: game.i18n.localize(def.label) }));
     return this.item.effects.map(effect => ({
+      bienfait: !!effect.getFlag("agone", "bienfait"),
       id      : effect.id,
       name    : effect.name,
       img     : effect.img,
@@ -172,13 +196,22 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     return this.item.effects.get(target.closest("[data-effect-id]")?.dataset.effectId);
   }
 
+  /** Nouvel effet ; `data-bienfait` sur le bouton : effet du bienfait de la peine. */
   static async #onEffetCreer(event, target) {
+    const bienfait = !!target.dataset.bienfait;
     await this.item.createEmbeddedDocuments("ActiveEffect", [{
-      name    : this.item.name,
+      name    : bienfait ? (this.item.system.bienfait || this.item.name) : this.item.name,
       img     : this.item.img,
       transfer: true,
       changes : [changeEffet("agilite", 1)],
+      flags   : bienfait ? { agone: { bienfait: true } } : {},
     }]);
+  }
+
+  /** Peine : reprend le texte du livre comme description modifiable du bienfait. */
+  static async #onBienfaitTexteLivre(event, target) {
+    const texte = descriptionBienfait(this.item.system.bienfait);
+    if (texte) await this.item.update({ "system.bienfaitDescription": `<p>${foundry.utils.escapeHTML(texte)}</p>` });
   }
 
   static #onEffetEditer(event, target) {
@@ -247,7 +280,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     // Sauvegarde automatique des champs nommés
     this.element.querySelector("form")?.addEventListener("change", async (ev) => {
       const el = ev.target;
-      if (!el.name) return;
+      if (!this.isEditable || !el.name) return;
       if (el.type === "number" && (el.value === "" || isNaN(Number(el.value)))) el.value = "0";
       if (el.name === "system.typeMagie") el.value = el.value.trim().toLowerCase();
       const value = el.type === "checkbox" ? el.checked
@@ -267,6 +300,8 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     const root = this.element;
     const on   = (type, selector, handler) => delegate(root, type, selector, handler, { signal });
     bindTabs(this, root, on, "description");
+    appliquerLectureSeule(root, !this.isEditable);
+    if (!this.isEditable) return;
     on("change", "[data-effet-champ]", (ev, input) => this._onEffetChamp(ev, input));
   }
 }

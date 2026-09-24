@@ -3,7 +3,28 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
-## [1.9.3] — non publiée
+## [1.9.4] — non publiée
+
+### Ajouté
+- **Vue limitée des fiches d'acteur** : avec la permission « Limité », un joueur ne voit plus que le portrait, le nom, le peuple (ou l'espèce, l'origine, la race) et la description publique, au lieu de la fiche complète.
+- **Peines et bienfaits modifiables** : la fiche de peine sépare les effets de la peine (appliqués dès qu'elle est possédée) et les **effets du bienfait**, suspendus tant que le bienfait n'est pas acquis puis appliqués automatiquement. La description du bienfait est modifiable (le texte du livre sert par défaut et peut être repris pour être adapté), avec suggestions de noms de bienfaits. L'onglet Perfidie affiche cette description et ouvre la fiche de la peine d'un clic sur son nom.
+- **Recherche des navigateurs de compendium** : sans accent ni majuscule, plusieurs mots dans n'importe quel ordre et n'importe quel champ, `"expression exacte"`, `-mot` pour exclure, `nom:mot` pour ne chercher que dans le nom. Sans résultat exact, une faute de frappe par mot est tolérée (bandeau « résultats approchants »). Résultats classés par pertinence, correspondances surlignées dans les noms, aide au survol du champ. Les armes se cherchent aussi par style et type, les armures par type, les compétences par famille, les sorts par type de magie.
+- Calendrier : la météo se choisit avec un bouton par type de météo (au lieu d'une liste déroulante).
+- Instructions pour les messages de commit générés par Copilot (`.github/copilot-instructions.md`).
+- **Tag et release automatiques** : quand la version de `system.json` change sur `main`, une GitHub Action lance le lint et les tests, crée le tag `vX.Y.Z` puis publie la release (`agone.zip`). Pousser un tag à la main fonctionne toujours.
+
+### Corrigé
+- Fiches en lecture seule (permission « Observateur ») : les champs restaient modifiables et une modification provoquait une erreur de permission, parce que les champs des templates échappaient à la désactivation automatique de Foundry. Champs et jets sont désormais désactivés ; ouvrir un objet (en lecture), l'envoyer au chat, la recherche de compétences et les filtres de sorts restent disponibles.
+- Fiches d'objet en lecture seule (objet d'un acteur observé, compendium verrouillé) : mêmes corrections.
+
+### Modifié
+- README : permissions des fiches, peines et bienfaits, syntaxe de recherche des navigateurs.
+- Tests : moteur de recherche (tests unitaires), vue limitée et lecture seule de chaque fiche, effets de bienfait, recherche des navigateurs (Quench).
+
+### Supprimé
+- Template inutilisé `templates/actors/creature-sheet.hbs`.
+
+## [1.9.3] — 2026-09-24
 
 ### Ajouté
 - **Description des bienfaits de Perfidie avant acquisition** : icône d'information (infobulle) à côté de chaque bienfait dans l'onglet Perfidie et dans le navigateur des peines, texte complet dans « Voir description » de la peine, et rappel dans la confirmation d'acquisition (+1 Perfidie).

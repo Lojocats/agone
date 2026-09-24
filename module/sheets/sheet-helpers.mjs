@@ -21,6 +21,32 @@ export function bindTabs(sheet, root, on, defaultTab = "attributs") {
 }
 
 /**
+ * Contrôles qui restent actifs sur une fiche en lecture seule : consultation sans modification
+ * (sections, ouverture et envoi au chat des objets, recherche et filtres).
+ */
+export const CONTROLES_CONSULTATION = [
+  ".section-toggle", ".item-edit", ".item-send-chat", "[data-action='rollItemChat']", "[data-action='toChat']",
+  ".comp-search-input", ".comp-search-clear", ".smf-search", ".smf-check",
+].join(", ");
+
+/**
+ * Fiche en lecture seule (observateur) : désactive les champs et les boutons de modification ou de jet.
+ * Les templates ont leur propre `<form>`, imbriqué dans celui de la fiche : les champs appartiennent
+ * au formulaire interne et la désactivation automatique de DocumentSheetV2 ne les atteint pas.
+ * @param {HTMLElement} root         Élément de la fiche (conservé d'un rendu à l'autre)
+ * @param {boolean} lectureSeule     La fiche n'est pas modifiable par l'utilisateur
+ */
+export function appliquerLectureSeule(root, lectureSeule) {
+  root.classList.toggle("agone-lecture-seule", lectureSeule);
+  if (!lectureSeule) return;
+  const champs = root.querySelectorAll(
+    ".window-content :is(input, select, textarea, button, prose-mirror)");
+  for (const el of champs) {
+    if (!el.matches(CONTROLES_CONSULTATION)) el.disabled = true;
+  }
+}
+
+/**
  * Recherche dans la liste des compétences (.comp-search-input / .comp-search-clear).
  * @param {boolean} [nonAcquises=false]  Chercher aussi dans la section des compétences non acquises
  */

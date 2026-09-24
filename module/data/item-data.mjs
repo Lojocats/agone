@@ -268,6 +268,8 @@ export class PeineData extends foundry.abstract.TypeDataModel {
       bienfait: new fields.StringField({ initial: "" }),
       // Le personnage a-t-il payé le Bienfait (+1 Perfidie) ?
       bienfaitAcquis: new fields.BooleanField({ initial: false }),
+      // Description propre du Bienfait (vide : texte du livre, voir descriptionBienfaitPeine)
+      bienfaitDescription: new fields.HTMLField({ initial: "" }),
       description: new fields.HTMLField({ initial: "" }),
     };
   }

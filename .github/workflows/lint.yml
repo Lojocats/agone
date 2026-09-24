@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:  # appelé par auto-tag.yml avant de créer le tag d'une nouvelle version
 
 jobs:
   eslint:

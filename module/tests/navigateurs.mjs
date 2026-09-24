@@ -64,6 +64,31 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
         await app.render();
       });
 
+      it("recherche sans accent ni casse : l'entrée arrive en tête, surlignée", async () => {
+        const nom = lignes(app)[0].querySelector("td[class$='-name']")?.textContent.trim().split("\n")[0].trim();
+        assert.ok(nom, "nom de la première entrée");
+        app._search = nom.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        await app.render();
+        const premiere = lignes(app)[0];
+        assert.ok(premiere, "au moins un résultat");
+        assert.include(premiere.textContent, nom);
+        assert.ok(premiere.querySelector("mark.agone-surligne"), "correspondance surlignée");
+        app._resetFilters();
+        await app.render();
+      });
+
+      it("une faute de frappe donne des résultats approchants", async () => {
+        const nom = lignes(app).map(tr => tr.querySelector("td[class$='-name']")?.textContent.trim().split("\n")[0].trim())
+          .find(n => n && /^[a-z]{6,}$/i.test(n));
+        if (!nom) return;  // aucun nom d'un seul mot assez long dans ce navigateur
+        app._search = nom.slice(0, -1) + (nom.endsWith("z") ? "y" : "z");
+        await app.render();
+        assert.isAbove(lignes(app).length, 0);
+        assert.ok(app.element.querySelector(".browser-recherche-approx"), "bandeau résultats approchants");
+        app._resetFilters();
+        await app.render();
+      });
+
       it("tri par colonne (clic sur l'en-tête)", async () => {
         const th = app.element.querySelector("table:not(.browser-perso-table) th.browser-triable");
         assert.ok(th, "colonne triable");

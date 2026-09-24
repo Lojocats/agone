@@ -417,6 +417,17 @@
     "Entenebrement":     "Darkness",
 
     "Peine": {
+      "Modifier":               "Open the pain's sheet (effects, boon)",
+      "DescriptionBienfait":    "Boon description",
+      "TexteLivreAide":         "Rulebook text, used while the description below is empty.",
+      "ReprendreTexteLivre":    "Copy this text to edit it",
+      "EffetsPeine":            "Pain effects",
+      "EffetsPeineAide":        "Applied as soon as the character has the pain.",
+      "AucunEffetPeine":        "No pain effect.",
+      "EffetsBienfait":         "Boon effects",
+      "EffetsBienfaitActifs":   "Boon acquired: these effects are applied.",
+      "EffetsBienfaitSuspendus":"Suspended until the boon is acquired (+1 Perfidy).",
+      "AucunEffetBienfait":     "No boon effect.",
       "diablotin":              "Imp",
       "cauchemars":             "Nightmares",
       "demonFacetieux":         "Mischievous Demon",
@@ -889,6 +900,7 @@
       "NoteAuto":        "(saved automatically)",
       "NotesDuMois":     "Notes this month",
       "AllerAuJour":     "Go to this day",
+      "SansMeteo":       "No weather",
       "Periode": {
         "Aube":      "Dawn",
         "Matin":     "Morning",
@@ -901,6 +913,8 @@
 
     "Browser": {
       "Personnalises": "Custom items",
+      "RechercheAide": "Accent- and case-insensitive search, several words in any order.\n\"exact phrase\" · -word to exclude · nom:word to search the name only.\nOne typo per word is tolerated when nothing matches exactly.",
+      "RechercheApprochante": "No exact match for “{requete}”: showing close matches.",
       "PersonnalisesAide": "No custom item of this type. Create some in the world or in a compendium: they will show up here, with their effects.",
       "SourceMonde": "World",
       "OuvrirFiche": "Open sheet",
@@ -1015,6 +1029,11 @@
       "GibbeuseDecroissante": "Waning gibbous",
       "DernierQuartier":      "Last quarter",
       "DernierCroissant":     "Waning crescent"
+    },
+
+    "Limitee": {
+      "AucuneDescription": "No public description.",
+      "Aide":              "Limited access: only the public identity is visible."
     },
 
     "Effets": {

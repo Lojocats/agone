@@ -57,17 +57,14 @@ export class ArmuresBrowser extends AgoneBrowser {
     }));
 
     // Filtres
-    if (this._search) {
-      const s = this._search.toLowerCase();
-      items = items.filter(e => e.label.toLowerCase().includes(s));
-    }
+    items = this._applySearch(items, ["label", "typeLabel"]);
     if (this._filterPossede === "oui") {
       items = items.filter(e => e.hasInActor);
     } else if (this._filterPossede === "non") {
       items = items.filter(e => !e.hasInActor);
     }
 
-    items.sort((a, b) => (a.label ?? "").localeCompare(b.label ?? "", "fr"));
+    this._trier(items, (a, b) => (a.label ?? "").localeCompare(b.label ?? "", "fr"));
 
     return {
       items,

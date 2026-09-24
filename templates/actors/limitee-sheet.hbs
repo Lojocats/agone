@@ -1,0 +1,25 @@
+{{!-- Vue limitée d'un acteur (permission « Limité ») : identité publique et description.
+      Contexte : limitee (AgoneActorSheet#_prepareLimiteeContext). --}}
+<div class="agone-limitee-wrap">
+  <header class="limitee-entete">
+    <img class="limitee-portrait" src="{{limitee.img}}" alt="{{limitee.nom}}" />
+    <div class="limitee-identite">
+      <h1 class="limitee-nom">{{limitee.nom}}</h1>
+      <div class="limitee-type">
+        {{limitee.type}}{{#if limitee.sousTitre}} · {{limitee.sousTitre}}{{/if}}
+      </div>
+    </div>
+  </header>
+
+  <section class="limitee-description">
+    {{#if limitee.description}}
+      {{{limitee.description}}}
+    {{else}}
+      <p class="limitee-vide">{{localize "AGONE.Limitee.AucuneDescription"}}</p>
+    {{/if}}
+  </section>
+
+  <footer class="limitee-pied">
+    <i class="fas fa-eye-slash"></i> {{localize "AGONE.Limitee.Aide"}}
+  </footer>
+</div>

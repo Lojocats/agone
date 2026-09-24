@@ -321,6 +321,55 @@
 .agone .effet-bloc.effet-inactif {
   opacity: 0.55;
 }
+.agone .effet-aide {
+  margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.8;
+}
+/* Effets du bienfait d'une peine (suspendus tant qu'il n'est pas acquis) */
+.agone .agone-effets-bienfait {
+  padding: 6px 8px;
+  border-left: 3px solid var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
+  border-radius: var(--radius, 4px);
+}
+.agone .agone-effets-bienfait.effets-suspendus .effet-bloc {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+/* Bloc bienfait de la fiche de peine */
+.agone .peine-bienfait-bloc {
+  margin-top: 10px;
+  padding: 6px 10px 10px;
+  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.5);
+  border-radius: var(--radius, 4px);
+}
+.agone .peine-bienfait-bloc.bienfait-acquis {
+  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
+}
+.agone .peine-bienfait-bloc legend {
+  padding: 0 4px;
+  font-weight: 700;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .peine-bienfait-bloc legend i { color: var(--agone-gold, #c9a227); }
+.agone .bienfait-texte-livre {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  border-radius: 3px;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  font-size: 12px;
+}
+.agone .bienfait-texte-livre p { margin: 0; }
+.agone .bienfait-texte-livre-aide { font-size: 10px; opacity: 0.7; }
+.agone .bienfait-texte-livre button { align-self: flex-start; width: auto; }
 .agone .effet-entete,
 .agone .effet-modif {
   display: flex;
@@ -366,4 +415,71 @@
   font-size: 11px;
   padding: 1px 8px;
   width: auto;
+}
+
+/* ── Vue limitée (permission « Limité ») ────────────────── */
+.agone-limitee .window-content {
+  padding: 0;
+  background: var(--agone-parchment, #f4e8c1);
+}
+.agone .agone-limitee-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  font-family: 'Crimson Text', Georgia, serif;
+  color: var(--agone-dark-text, #2a1a08);
+}
+.agone .limitee-entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--agone-gold, #c9a227);
+}
+.agone .limitee-portrait {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 2px solid var(--agone-border, #7d5a2a);
+  border-radius: var(--radius, 4px);
+}
+.agone .limitee-nom {
+  margin: 0;
+  font-family: 'MedievalSharp', Georgia, serif;
+  font-size: 24px;
+  border: none;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone .limitee-type {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.8;
+}
+.agone .limitee-description {
+  max-height: 420px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.agone .limitee-vide {
+  font-style: italic;
+  opacity: 0.6;
+}
+.agone .limitee-pied {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.6;
+}
+
+/* ── Lecture seule (permission « Observateur ») ─────────── */
+.agone-lecture-seule .window-content :is(button, input, select, textarea):disabled {
+  cursor: default;
+}
+.agone-lecture-seule .window-content button:disabled:hover {
+  filter: none;
+  box-shadow: none;
 }

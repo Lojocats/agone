@@ -1231,3 +1231,21 @@
 .agone-browser .browser-perso-possede {
   background: rgba(var(--agone-or-rgb, 201,162,39), 0.08);
 }
+
+/* ── Recherche : correspondances surlignées, résultats approchants ── */
+.agone-browser mark.agone-surligne {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.45);
+  color: inherit;
+}
+.agone-browser .browser-recherche-approx {
+  margin: 4px 0;
+  padding: 4px 8px;
+  border-left: 3px solid var(--agone-txt-orange, #c07820);
+  border-radius: 3px;
+  background: rgba(var(--agone-orange-rgb, 180,100,0), 0.1);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--agone-txt-orange, #a06010);
+}

@@ -1,0 +1,69 @@
+name: Tag automatique de version
+
+# Quand la version de system.json change sur main : lint et tests, puis tag vX.Y.Z et release.
+# Un tag poussé avec GITHUB_TOKEN ne déclenche pas d'autre workflow : la release est donc
+# appelée directement (release.yml est réutilisable), pas via l'évènement « push tag ».
+
+on:
+  push:
+    branches: [main]
+    paths: [system.json]
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.lire.outputs.tag }}
+      nouveau: ${{ steps.lire.outputs.nouveau }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # tags existants
+
+      - name: Lire la version et vérifier le tag
+        id: lire
+        run: |
+          TAG="v$(jq -r .version system.json)"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; then
+            echo "Le tag $TAG existe déjà : rien à faire."
+            echo "nouveau=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Nouvelle version : $TAG"
+            echo "nouveau=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  checks:
+    needs: version
+    if: needs.version.outputs.nouveau == 'true'
+    uses: ./.github/workflows/lint.yml
+
+  tag:
+    needs: [version, checks]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Créer et pousser le tag
+        env:
+          TAG: ${{ needs.version.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+  release:
+    needs: [version, tag]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.version.outputs.tag }}
