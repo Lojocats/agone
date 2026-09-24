@@ -7,6 +7,8 @@ import { AgoneBrowser } from "./agone-browser.mjs";
  */
 export class PeuplesBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "peuple";
+
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterPossede: "all",

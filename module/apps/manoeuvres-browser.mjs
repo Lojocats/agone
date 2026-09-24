@@ -6,6 +6,8 @@ import { AgoneBrowser } from "./agone-browser.mjs";
  */
 export class ManoeuvresBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "manoeuvre";
+
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterCat    : "all",

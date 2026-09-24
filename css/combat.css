@@ -21,8 +21,8 @@
 
 /* ── Carte générique ─────────────────────────────────────── */
 .agone .combat-card {
-  background: rgba(92,58,30,0.05);
-  border: 1px solid rgba(92,58,30,0.25);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
   border-radius: 6px;
   padding: 8px 10px;
 }
@@ -49,7 +49,7 @@
 }
 .agone .card-btns .btn-icon {
   background: none;
-  border: 1px solid rgba(92,58,30,0.3);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
   border-radius: var(--radius);
   color: var(--agone-brown-dark);
   width: 22px;
@@ -63,7 +63,7 @@
   justify-content: center;
   flex-shrink: 0;
 }
-.agone .card-btns .btn-icon:hover { opacity: 1; background: rgba(92,58,30,0.1); }
+.agone .card-btns .btn-icon:hover { opacity: 1; background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1); }
 
 /* ── Barre PdV ───────────────────────────────────────────── */
 .agone .pdv-bar-wrap { margin-bottom: 8px; }
@@ -85,7 +85,7 @@
 .agone .pdv-label { font-size: 11px; font-variant: small-caps; color: var(--agone-brown); margin-left: 3px; }
 .agone .pdv-track {
   height: 7px;
-  background: rgba(92,58,30,0.15);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 5px;
@@ -108,8 +108,8 @@
   border-radius: 3px;
   font-weight: 600;
 }
-.agone .seuil-bg { background: rgba(200, 100, 0, 0.15); color: #a05000; }
-.agone .seuil-bc { background: rgba(160, 0, 0, 0.12); color: #800000; }
+.agone .seuil-bg { background: rgba(var(--agone-orange-rgb, 200,100,0), 0.15); color: var(--agone-txt-orange, #a05000); }
+.agone .seuil-bc { background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.12); color: var(--agone-txt-rouge, #800000); }
 .agone .pdv-bonus-inline {
   display: flex;
   align-items: center;
@@ -138,8 +138,8 @@
   align-items: center;
   gap: 3px;
   padding: 2px 6px;
-  background: rgba(92,58,30,0.08);
-  border: 1px solid rgba(92,58,30,0.2);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
   border-radius: 4px;
   cursor: pointer;
   font-size: 11px;
@@ -147,7 +147,7 @@
 }
 .agone .bg-cell input[type="checkbox"] { display: none; }
 .agone .bg-cell.bg-active {
-  background: rgba(160,0,0,0.15);
+  background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.15);
   border-color: var(--agone-red);
 }
 .agone .bg-dot { font-weight: 700; }
@@ -158,8 +158,8 @@
   align-items: center;
   gap: 5px;
   padding: 3px 6px;
-  background: rgba(92,58,30,0.05);
-  border: 1px solid rgba(92,58,30,0.15);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
   border-radius: 4px;
   cursor: pointer;
   font-size: 11px;
@@ -170,7 +170,7 @@
 }
 .agone .bc-row input[type="checkbox"] { display: none; }
 .agone .bc-row.bc-active {
-  background: rgba(160,0,0,0.2);
+  background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.2);
   border-color: var(--agone-red);
   color: var(--agone-red);
 }
@@ -186,16 +186,16 @@
   align-items: center;
   gap: 5px;
   padding: 3px 5px;
-  background: rgba(92,58,30,0.06);
-  border: 1px solid rgba(92,58,30,0.15);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
   border-radius: 4px;
   font-size: 11px;
 }
 .agone .cstat-roll {
   flex-shrink: 0;
   width: 22px; height: 22px;
-  background: rgba(92,58,30,0.15);
-  border: 1px solid rgba(92,58,30,0.3);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
   border-radius: var(--radius);
   display: flex; align-items: center; justify-content: center;
   font-size: 11px;
@@ -205,7 +205,7 @@
 }
 .agone .cstat-roll:hover { background: var(--agone-gold); color: #fff; }
 .agone .cstat-passive { cursor: default; opacity: 0.5; }
-.agone .cstat-passive:hover { background: rgba(92,58,30,0.15); color: var(--agone-brown-dark); }
+.agone .cstat-passive:hover { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15); color: var(--agone-brown-dark); }
 .agone .cstat-score { font-size: 14px; font-weight: 700; color: var(--agone-brown-dark); min-width: 20px; text-align: center; }
 .agone .cstat-label { font-variant: small-caps; color: var(--agone-brown); font-size: 10px; flex: 1; }
 
@@ -221,14 +221,14 @@
   align-items: center;
   gap: 6px;
   padding: 3px 6px;
-  background: rgba(92,58,30,0.04);
-  border: 1px solid rgba(92,58,30,0.15);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
   border-radius: 4px;
   font-size: 12px;
 }
 .agone .armure-row.armure-worn {
-  background: rgba(74, 154, 74, 0.08);
-  border-color: rgba(74, 154, 74, 0.4);
+  background: rgba(var(--agone-vert-rgb, 74,154,74), 0.08);
+  border-color: rgba(var(--agone-vert-rgb, 74,154,74), 0.4);
 }
 .agone .armure-portee-toggle {
   flex-shrink: 0;
@@ -247,19 +247,19 @@
   font-weight: 700;
   flex-shrink: 0;
 }
-.agone .pro-badge { background: rgba(74,154,74,0.15); color: #2e7d32; border: 1px solid rgba(74,154,74,0.3); }
-.agone .malus-badge { background: rgba(160,0,0,0.1); color: #800000; border: 1px solid rgba(160,0,0,0.2); }
+.agone .pro-badge { background: rgba(var(--agone-vert-rgb, 74,154,74), 0.15); color: var(--agone-txt-vert, #2e7d32); border: 1px solid rgba(var(--agone-vert-rgb, 74,154,74), 0.3); }
+.agone .malus-badge { background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.1); color: var(--agone-txt-rouge, #800000); border: 1px solid rgba(var(--agone-rouge-rgb, 160,0,0), 0.2); }
 .agone .armure-totaux {
   display: flex;
   gap: 10px;
   padding: 4px 8px;
-  background: rgba(92,58,30,0.08);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
 }
 .agone .armure-total-item { display: flex; align-items: center; gap: 3px; }
-.agone .armure-total-item.malus-total { color: #800000; }
+.agone .armure-total-item.malus-total { color: var(--agone-txt-rouge, #800000); }
 
 /* ── Armes ───────────────────────────────────────────────── */
 .agone .armes-table {
@@ -268,25 +268,25 @@
   font-size: 11px;
 }
 .agone .armes-table thead th {
-  background: rgba(92,58,30,0.1);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
   padding: 3px 5px;
   text-align: center;
   font-variant: small-caps;
   font-size: 10px;
-  border-bottom: 1px solid rgba(92,58,30,0.25);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
 }
 .agone .armes-table thead .col-arme-name { text-align: left; }
-.agone .armes-table tbody tr:hover { background: rgba(92,58,30,0.05); }
+.agone .armes-table tbody tr:hover { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05); }
 .agone .armes-table td {
   padding: 3px 4px;
   vertical-align: middle;
   text-align: center;
-  border-bottom: 1px solid rgba(92,58,30,0.08);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
 }
 .agone .armes-table .col-arme-name { text-align: left; }
 .agone .armes-table .col-equipe { width: 24px; text-align: center; }
-.agone .arme-equipee { background: rgba(74, 154, 74, 0.06) !important; }
-.agone .arme-equipee:hover { background: rgba(74, 154, 74, 0.12) !important; }
+.agone .arme-equipee { background: rgba(var(--agone-vert-rgb, 74,154,74), 0.06) !important; }
+.agone .arme-equipee:hover { background: rgba(var(--agone-vert-rgb, 74,154,74), 0.12) !important; }
 .agone .arme-equipe-toggle {
   display: inline-flex;
   align-items: center;
@@ -298,9 +298,9 @@
 }
 .agone .arme-equipee .arme-equipe-toggle { opacity: 1; color: #4a9a4a; }
 .agone .arme-equipe-toggle input { display: none; }
-.agone .arme-score-inactive { color: rgba(92,58,30,0.3); font-size: 12px; font-weight: 600; }
-.agone .ab-bouclier-pro { font-size: 10px; font-weight: 700; color: #2e7d32; padding: 1px 4px; background: rgba(74,154,74,0.12); border-radius: 3px; border: 1px solid rgba(74,154,74,0.3); margin-left: 3px; }
-.agone .ab-bouclier-malus { font-size: 10px; font-weight: 700; color: #800000; padding: 1px 4px; background: rgba(160,0,0,0.08); border-radius: 3px; border: 1px solid rgba(160,0,0,0.2); margin-left: 2px; }
+.agone .arme-score-inactive { color: rgba(var(--agone-brun-rgb, 92,58,30), 0.3); font-size: 12px; font-weight: 600; }
+.agone .ab-bouclier-pro { font-size: 10px; font-weight: 700; color: var(--agone-txt-vert, #2e7d32); padding: 1px 4px; background: rgba(var(--agone-vert-rgb, 74,154,74), 0.12); border-radius: 3px; border: 1px solid rgba(var(--agone-vert-rgb, 74,154,74), 0.3); margin-left: 3px; }
+.agone .ab-bouclier-malus { font-size: 10px; font-weight: 700; color: var(--agone-txt-rouge, #800000); padding: 1px 4px; background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.08); border-radius: 3px; border: 1px solid rgba(var(--agone-rouge-rgb, 160,0,0), 0.2); margin-left: 2px; }
 .agone .arme-cell {
   display: flex;
   align-items: center;
@@ -313,16 +313,16 @@
 
 /* Roll buttons colorés (modificateur de couleur uniquement, taille définie dans controls.css) */
 .agone .roll-btn-small { cursor: pointer; }
-.agone .roll-init-btn { background: rgba(200,160,0,0.2); color: #7a5c00; border: 1px solid rgba(200,160,0,0.4); }
+.agone .roll-init-btn { background: rgba(200,160,0,0.2); color: var(--agone-txt-jaune, #7a5c00); border: 1px solid rgba(200,160,0,0.4); }
 .agone .roll-init-btn:hover { background: rgba(200,160,0,0.5); }
-.agone .roll-atk-btn { background: rgba(160,0,0,0.15); color: #800000; border: 1px solid rgba(160,0,0,0.3); }
-.agone .roll-atk-btn:hover { background: rgba(160,0,0,0.35); }
-.agone .roll-def-btn { background: rgba(0,80,160,0.12); color: #004080; border: 1px solid rgba(0,80,160,0.25); }
-.agone .roll-def-btn:hover { background: rgba(0,80,160,0.3); }
+.agone .roll-atk-btn { background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.15); color: var(--agone-txt-rouge, #800000); border: 1px solid rgba(var(--agone-rouge-rgb, 160,0,0), 0.3); }
+.agone .roll-atk-btn:hover { background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.35); }
+.agone .roll-def-btn { background: rgba(var(--agone-bleu-rgb, 0,80,160), 0.12); color: var(--agone-txt-bleu, #004080); border: 1px solid rgba(var(--agone-bleu-rgb, 0,80,160), 0.25); }
+.agone .roll-def-btn:hover { background: rgba(var(--agone-bleu-rgb, 0,80,160), 0.3); }
 
 /* Bouton bonus de PdV (mode création) */
 .agone .btn-bonus-de.btn-crea {
-  background: rgba(200, 110, 0, 0.85);
+  background: rgba(var(--agone-orange-rgb, 200,110,0), 0.85);
   color: #fff;
   border: 1px solid #e8a030;
   border-radius: 3px;

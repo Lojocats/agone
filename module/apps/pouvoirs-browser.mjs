@@ -6,6 +6,8 @@ import { AgoneBrowser } from "./agone-browser.mjs";
  */
 export class PouvoirsBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "pouvoir";
+
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterCat    : "all",

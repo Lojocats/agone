@@ -6,6 +6,8 @@ import { AgoneBrowser } from "./agone-browser.mjs";
  */
 export class ArmuresBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "armure";
+
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterPossede: "all",

@@ -8,6 +8,8 @@ const _ALL_ARMES_DATA = [...ARMES_DATA, ...BOUCLIERS_DATA];
  */
 export class ArmesBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "arme";
+
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterStyles : new Set(),

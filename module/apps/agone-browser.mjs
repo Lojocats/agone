@@ -6,7 +6,9 @@
  *  - FILTERS         : liaison entre les contrôles du template et ces propriétés ;
  *  - DEFAULT_OPTIONS.actions : les boutons d'ajout (data-action dans le template).
  * La base gère la recherche avec debounce, la conservation du focus entre deux rendus,
- * les filtres select / nombre / cases à cocher et la réinitialisation.
+ * les filtres select / nombre / cases à cocher et la réinitialisation, le tri par colonne,
+ * et la section « objets personnalisés » (items du type ITEM_TYPE créés dans le monde ou
+ * dans des compendiums autres que ceux du système, avec leurs effets actifs).
  */
 export class AgoneBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
@@ -17,10 +19,17 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
   }
 
   static DEFAULT_OPTIONS = {
-    classes : ["agone"],
+    classes : ["agone", "agone-browser"],
     position: { width: 680, height: 560 },
     window  : { resizable: true },
+    actions : {
+      persoAjouter: AgoneBrowser.#onPersoAjouter,
+      persoOuvrir : AgoneBrowser.#onPersoOuvrir,
+    },
   };
+
+  /** Type d'item proposé par le navigateur (section des objets personnalisés). */
+  static ITEM_TYPE = null;
 
   /**
    * Valeurs initiales des filtres. Un Set est recopié à chaque réinitialisation.
@@ -80,6 +89,69 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     this.render();
   }
 
+  // ── Objets personnalisés (monde et compendiums hors système) ──────────────
+
+  /** @override — ajoute la liste des objets personnalisés au contexte du template. */
+  async _preparePartContext(partId, context, options) {
+    context = await super._preparePartContext(partId, context, options);
+    if (this.constructor.ITEM_TYPE) context.personnalises = await this._objetsPersonnalises();
+    return context;
+  }
+
+  /**
+   * Items du type ITEM_TYPE : items du monde et des compendiums d'items qui n'appartiennent
+   * pas au système (les compendiums du système reprennent les tables du livre de base).
+   * La recherche et le filtre « possédé » du navigateur s'y appliquent aussi.
+   */
+  async _objetsPersonnalises() {
+    const type = this.constructor.ITEM_TYPE;
+    const possedes = new Set(this.actor.items.filter(i => i.type === type).map(i => i.name));
+    const entrees = game.items
+      .filter(i => i.type === type)
+      .map(i => ({
+        uuid: i.uuid, name: i.name, img: i.img, description: i.system.description ?? "",
+        effets: i.effects.size > 0, source: game.i18n.localize("AGONE.Browser.SourceMonde"),
+      }));
+
+    for (const pack of game.packs) {
+      if (pack.documentName !== "Item" || pack.metadata.packageName === game.system.id) continue;
+      if (!pack.visible) continue;
+      const index = await pack.getIndex({ fields: ["type", "img", "system.description", "effects"] });
+      for (const e of index) {
+        if (e.type !== type) continue;
+        entrees.push({
+          uuid: e.uuid, name: e.name, img: e.img, description: e.system?.description ?? "",
+          effets: (e.effects?.length ?? 0) > 0, source: pack.metadata.label,
+        });
+      }
+    }
+
+    let liste = entrees.map(e => ({ ...e, possede: possedes.has(e.name), hasInActor: possedes.has(e.name) }));
+    liste = this._applySearch(liste, ["name", "description"]);
+    liste = this._applyPossede(liste);
+    return liste.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+  }
+
+  /** Ajoute l'objet personnalisé à l'acteur, avec ses effets actifs. */
+  static async #onPersoAjouter(event, target) {
+    const doc = await fromUuid(target.closest("[data-uuid]")?.dataset.uuid);
+    if (!doc) return;
+    // Un peuple s'applique à la fiche (bonus raciaux) au lieu d'être ajouté comme item
+    if (doc.type === "peuple" && this.actor.sheet?._applyPeuple) {
+      await this.actor.sheet._applyPeuple(doc);
+      ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: doc.name, acteur: this.actor.name }));
+      return this.render();
+    }
+    const data = doc.toObject();
+    delete data._id;
+    await this._addItem(data, "AGONE.Notif.ObjetAjoute");
+  }
+
+  static async #onPersoOuvrir(event, target) {
+    const doc = await fromUuid(target.closest("[data-uuid]")?.dataset.uuid);
+    doc?.sheet.render(true);
+  }
+
   // ── Rendu ─────────────────────────────────────────────────────────────────
 
   _onRender(context, options) {
@@ -89,6 +161,70 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     for (const [selector, spec] of Object.entries(this.constructor.FILTERS)) {
       for (const el of this.element.querySelectorAll(selector)) this._bindFilter(el, selector, spec);
     }
+    this._bindTri();
+    this._bindClavier(options);
+  }
+
+  /**
+   * Tri de la liste principale en cliquant sur un en-tête de colonne (croissant, puis décroissant).
+   * Les lignes de description (`*-desc-row`) suivent leur ligne. Le tri survit aux rendus.
+   */
+  _bindTri() {
+    const table = this.element.querySelector("table:not(.browser-perso-table)");
+    if (!table?.tBodies[0]) return;
+    [...table.tHead?.rows[0]?.cells ?? []].forEach((th, col) => {
+      if (!th.textContent.trim()) return;
+      th.classList.add("browser-triable");
+      th.addEventListener("click", () => {
+        this._tri = { col, dir: this._tri?.col === col ? -this._tri.dir : 1 };
+        this._appliquerTri(table);
+      });
+    });
+    this._appliquerTri(table);
+  }
+
+  _appliquerTri(table) {
+    [...table.tHead.rows[0].cells].forEach((th, col) => {
+      th.classList.toggle("tri-asc",  this._tri?.col === col && this._tri.dir === 1);
+      th.classList.toggle("tri-desc", this._tri?.col === col && this._tri.dir === -1);
+    });
+    if (!this._tri) return;
+
+    // Groupes : une ligne principale et ses lignes de description
+    const tbody = table.tBodies[0];
+    const groupes = [];
+    for (const tr of [...tbody.rows]) {
+      if (/-desc-row\b/.test(tr.className) && groupes.length) groupes.at(-1).push(tr);
+      else groupes.push([tr]);
+    }
+    const cle = groupe => {
+      const texte = groupe[0].cells[this._tri.col]?.textContent.trim() ?? "";
+      return { texte, nombre: parseFloat(texte.replace(",", ".")) };
+    };
+    groupes.sort((a, b) => {
+      const ka = cle(a), kb = cle(b);
+      const diff = (!isNaN(ka.nombre) && !isNaN(kb.nombre))
+        ? ka.nombre - kb.nombre
+        : ka.texte.localeCompare(kb.texte, "fr", { numeric: true });
+      return diff * this._tri.dir;
+    });
+    for (const groupe of groupes) tbody.append(...groupe);
+  }
+
+  /** Focus sur la recherche à l'ouverture ; Échap efface la recherche avant de fermer. */
+  _bindClavier(options) {
+    const [selecteur] = Object.entries(this.constructor.FILTERS).find(([, spec]) => spec.kind === "text") ?? [];
+    const recherche = selecteur ? this.element.querySelector(selecteur) : null;
+    if (!recherche) return;
+    if (options.isFirstRender) requestAnimationFrame(() => recherche.focus());
+    recherche.addEventListener("keydown", ev => {
+      if (ev.key !== "Escape" || !recherche.value) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      this._search = "";
+      this._refocusSelector = selecteur;
+      this.render();
+    });
   }
 
   _restoreFocus() {

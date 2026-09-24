@@ -7,6 +7,8 @@ import { AgoneBrowser } from "./agone-browser.mjs";
  */
 export class CompetencesBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "competence";
+
   static FILTER_DEFAULTS = {
     _search       : "",
     _filterFams   : new Set(),

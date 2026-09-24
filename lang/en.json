@@ -869,6 +869,10 @@
     },
 
     "Browser": {
+      "Personnalises": "Custom items",
+      "PersonnalisesAide": "No custom item of this type. Create some in the world or in a compendium: they will show up here, with their effects.",
+      "SourceMonde": "World",
+      "OuvrirFiche": "Open sheet",
       "EffacerFiltres":       "Clear filters",
       "Effacer":              "Clear",
       "Tous":                 "All",
@@ -938,6 +942,7 @@
     },
 
     "Notif": {
+      "ObjetAjoute": "{nom} added to {acteur}.",
       "ArmeAjoutee":              "{nom} added to {acteur}.",
       "ArmureAjoutee":            "{nom} added to {acteur}.",
       "AvantageAjoute":           "{nom} added to {acteur}.",

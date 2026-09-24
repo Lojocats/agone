@@ -27,6 +27,8 @@ export class AvantagesBrowser extends AgoneBrowser {
     this._filterType = options.filterType ?? "all";
   }
 
+  static ITEM_TYPE = "don";
+
   static FILTER_DEFAULTS = {
     _search           : "",
     _filterSection    : "all",

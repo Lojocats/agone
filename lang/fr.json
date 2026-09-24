@@ -868,6 +868,10 @@
     },
 
     "Browser": {
+      "Personnalises": "Objets personnalisés",
+      "PersonnalisesAide": "Aucun objet personnalisé de ce type. Créez-en dans le monde ou dans un compendium : ils apparaîtront ici, avec leurs effets.",
+      "SourceMonde": "Monde",
+      "OuvrirFiche": "Ouvrir la fiche",
       "EffacerFiltres":       "Effacer les filtres",
       "Effacer":              "Effacer",
       "Tous":                 "Tous",
@@ -937,6 +941,7 @@
     },
 
     "Notif": {
+      "ObjetAjoute": "{nom} ajouté à {acteur}.",
       "ArmeAjoutee":              "{nom} ajoutée à {acteur}.",
       "ArmureAjoutee":            "{nom} ajoutée à {acteur}.",
       "AvantageAjoute":           "{nom} ajouté à {acteur}.",

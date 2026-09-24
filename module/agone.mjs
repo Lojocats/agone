@@ -127,10 +127,11 @@ Hooks.once("init", () => {
   });
 
   // ── Thème visuel (clair / sombre, par joueur) ─────────────────────────────
+  // "auto" : suit le thème des applications Foundry ; "light" / "dark" : choix du joueur (bouton 🌙)
   game.settings.register("agone", "agoneTheme", {
     scope: "client", config: false,
     type: String,
-    default: "light",
+    default: "auto",
   });
   // ── Domaines d'Arts Magiques personnalisés ─────────────────────────────
   game.settings.register("agone", "domainesArtsCustom", {
@@ -266,6 +267,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/calendrier.hbs",
     "systems/agone/templates/apps/calendrier-widget.hbs",
     "systems/agone/templates/apps/combat-tracker.hbs",
+    "systems/agone/templates/apps/parts/browser-personnalises.hbs",
   ];
   foundry.applications.handlebars.loadTemplates(templates);
 
@@ -289,8 +291,21 @@ Hooks.once("init", () => {
 /* ============================================================================
  * THÈME VISUEL
  * ========================================================================= */
-function _applyAgoneTheme(theme) {
-  document.body.classList.toggle("agone-dark", theme === "dark");
+/**
+ * Thème Agone effectif : choix du joueur, ou en mode « auto » celui des applications Foundry
+ * (réglage d'interface), à défaut la préférence du système d'exploitation.
+ */
+function _agoneThemeEffectif() {
+  const choix = game.settings.get("agone", "agoneTheme");
+  if (choix === "light" || choix === "dark") return choix;
+  let foundryTheme;
+  try { foundryTheme = game.settings.get("core", "uiConfig")?.colorScheme?.applications; } catch { /* réglage absent */ }
+  if (foundryTheme === "light" || foundryTheme === "dark") return foundryTheme;
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function _applyAgoneTheme() {
+  document.body.classList.toggle("agone-dark", _agoneThemeEffectif() === "dark");
 }
 
 /* ============================================================================
@@ -313,7 +328,12 @@ Hooks.once("ready", async () => {
   game.agone.calendrierWidget.render(true);
 
   // Applique le thème au démarrage
-  _applyAgoneTheme(game.settings.get("agone", "agoneTheme"));
+  _applyAgoneTheme();
+  window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", () => _applyAgoneTheme());
+  // Réglages client (thème Agone, thème d'interface Foundry) : pas de hook updateSetting
+  Hooks.on("clientSettingChanged", key => {
+    if (key === "agone.agoneTheme" || key === "core.uiConfig") _applyAgoneTheme();
+  });
 
   // ── Météo → Scène ───────────────────────────────────────────────────────
   /**
@@ -484,9 +504,7 @@ Hooks.once("ready", async () => {
     if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo") {
       _applyWeatherToScene();
     }
-    if (key === "agone.agoneTheme") {
-      _applyAgoneTheme(game.settings.get("agone", "agoneTheme"));
-    }
+    if (key === "agone.agoneTheme" || key === "core.uiConfig") _applyAgoneTheme();
   });
 
   if (!game.user.isGM) return;
@@ -665,11 +683,10 @@ Hooks.on("getSceneControlButtons", (controls) => {
         icon: "fas fa-moon",
         order: 3,
         toggle: true,
-        active: game.settings.get("agone", "agoneTheme") === "dark",
+        active: _agoneThemeEffectif() === "dark",
         onChange: (_event, active) => {
-          const newTheme = active ? "dark" : "light";
-          _applyAgoneTheme(newTheme);
-          game.settings.set("agone", "agoneTheme", newTheme);
+          // Un clic fixe le thème choisi (il ne suit plus l'interface Foundry)
+          game.settings.set("agone", "agoneTheme", active ? "dark" : "light").then(() => _applyAgoneTheme());
         },
       },
     },

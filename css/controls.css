@@ -48,27 +48,27 @@
 
 /* Score sous le minimum racial requis */
 .agone .carac-row.carac-min-requis .stat-num:not(.exp) {
-  border-color: #c04040;
-  background: rgba(180, 40, 40, 0.12);
-  color: #c84040;
+  border-color: var(--agone-txt-rouge, #c04040);
+  background: rgba(var(--agone-rouge-rgb, 180,40,40), 0.12);
+  color: var(--agone-txt-rouge, #c84040);
 }
 
 /* Maximum racial atteint en mode création */
 .agone .carac-row.carac-at-max .stat-num:not(.exp) {
   border-color: #b87820;
-  background: rgba(185, 130, 30, 0.1);
-  color: #a06010;
+  background: rgba(var(--agone-orange-rgb, 185,130,30), 0.1);
+  color: var(--agone-txt-orange, #a06010);
 }
 .agone .carac-max-label {
   font-size: 10px;
-  color: #a06010;
+  color: var(--agone-txt-orange, #a06010);
   font-weight: 600;
   white-space: nowrap;
   opacity: 0.85;
 }
 .agone .carac-min-label {
   font-size: 10px;
-  color: #c04040;
+  color: var(--agone-txt-rouge, #c04040);
   font-weight: 600;
   white-space: nowrap;
   opacity: 0.85;
@@ -84,24 +84,24 @@
   flex-shrink: 0;
 }
 .agone .racial-pos {
-  color: #2e7d32;
-  background: rgba(74, 154, 74, 0.12);
-  border: 1px solid rgba(74, 154, 74, 0.3);
+  color: var(--agone-txt-vert, #2e7d32);
+  background: rgba(var(--agone-vert-rgb, 74,154,74), 0.12);
+  border: 1px solid rgba(var(--agone-vert-rgb, 74,154,74), 0.3);
 }
 .agone .racial-neg {
-  color: #800000;
-  background: rgba(160, 0, 0, 0.08);
-  border: 1px solid rgba(160, 0, 0, 0.2);
+  color: var(--agone-txt-rouge, #800000);
+  background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.08);
+  border: 1px solid rgba(var(--agone-rouge-rgb, 160,0,0), 0.2);
 }
 
 /* Ligne racial dans les aspects */
-.agone .aspect-stat.racial .derived-val.racial-pos { color: #2e7d32; font-weight: 700; }
-.agone .aspect-stat.racial .derived-val.racial-neg { color: #800000; font-weight: 700; }
+.agone .aspect-stat.racial .derived-val.racial-pos { color: var(--agone-txt-vert, #2e7d32); font-weight: 700; }
+.agone .aspect-stat.racial .derived-val.racial-neg { color: var(--agone-txt-rouge, #800000); font-weight: 700; }
 
 /* Bonus total aspect (row "derived") : couleur de texte uniquement, sans fond ni bordure */
 .agone .aspect-stat.derived .derived-val.racial-pos,
 .agone .aspect-stat.avantage .derived-val.racial-pos {
-  color: #2e7d32;
+  color: var(--agone-txt-vert, #2e7d32);
   font-weight: 700;
   background: none;
   border: none;
@@ -109,7 +109,7 @@
 }
 .agone .aspect-stat.derived .derived-val.racial-neg,
 .agone .aspect-stat.avantage .derived-val.racial-neg {
-  color: #800000;
+  color: var(--agone-txt-rouge, #800000);
   font-weight: 700;
   background: none;
   border: none;
@@ -145,7 +145,7 @@
 }
 .agone .levelup-btn:hover:not(:disabled) {
   opacity: 1;
-  background: rgba(201, 162, 39, 0.15);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
 }
 
 /* ── Bouton level-down (rétrogradation) ─────────────────── */
@@ -176,7 +176,7 @@
 }
 .agone .leveldown-btn:hover:not(:disabled) {
   opacity: 1;
-  background: rgba(154, 42, 42, 0.12);
+  background: rgba(var(--agone-rouge-rgb, 154,42,42), 0.12);
 }
 
 /* ── Bouton toggle mode level-up ─────────────────────────── */
@@ -193,7 +193,7 @@
 }
 .agone .btn-toggle-levelup:hover {
   opacity: 1;
-  background: rgba(201, 162, 39, 0.15);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
 }
 .agone .btn-toggle-levelup.active {
   background: var(--agone-gold, #c9a227);
@@ -224,14 +224,14 @@
 }
 .agone table td {
   padding: 3px 6px;
-  border-bottom: 1px solid rgba(93,58,30,0.2);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.2);
   vertical-align: middle;
 }
 .agone table tbody tr:nth-child(even) td {
-  background: rgba(92,58,30,0.05);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
 }
 .agone table tbody tr:hover td {
-  background: rgba(201,162,39,0.12);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
 }
 .agone .col-num { width: 50px; text-align: center; }
 .agone .col-tai  { width: 40px; text-align: center; }
@@ -259,7 +259,7 @@
 .agone select:focus {
   outline: none;
   border-color: var(--agone-gold);
-  box-shadow: 0 0 4px rgba(201,162,39,0.4);
+  box-shadow: 0 0 4px rgba(var(--agone-or-rgb, 201,162,39), 0.4);
 }
 .agone input.stat-num {
   width: 52px;
@@ -411,7 +411,7 @@
   gap: 5px;
   margin: 4px 0 6px 0;
   padding: 3px 6px;
-  background: rgba(92,58,30,0.05);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
   border: 1px solid var(--agone-border);
   border-radius: 4px;
 }
@@ -506,22 +506,22 @@
   text-transform: uppercase;
   white-space: nowrap;
   letter-spacing: 0.4px;
-  border: 1px solid rgba(92,58,30,0.3);
-  background: rgba(92,58,30,0.10);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
   color: var(--agone-brown);
 }
-.agone .comp-score-badge.score-0 { background: rgba(92,58,30,0.07); color: #9a8070; border-color: rgba(92,58,30,0.18); }
-.agone .comp-score-badge.score-1 { background: rgba(92,58,30,0.10); color: #7a5c3a; }
-.agone .comp-score-badge.score-2 { background: rgba(120,90,30,0.14); color: #6a5020; }
-.agone .comp-score-badge.score-3 { background: rgba(160,120,20,0.16); color: #5a4010; border-color: rgba(160,120,20,0.4); }
-.agone .comp-score-badge.score-4 { background: rgba(180,140,10,0.20); color: #4a3000; border-color: rgba(180,140,10,0.5); }
-.agone .comp-score-badge.score-5 { background: rgba(201,162,39,0.25); color: #3a2200; border-color: rgba(201,162,39,0.55); }
+.agone .comp-score-badge.score-0 { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.07); color: #9a8070; border-color: rgba(var(--agone-brun-rgb, 92,58,30), 0.18); }
+.agone .comp-score-badge.score-1 { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.10); color: var(--agone-txt-brun, #7a5c3a); }
+.agone .comp-score-badge.score-2 { background: rgba(120,90,30,0.14); color: var(--agone-txt-brun, #6a5020); }
+.agone .comp-score-badge.score-3 { background: rgba(160,120,20,0.16); color: var(--agone-txt-brun, #5a4010); border-color: rgba(160,120,20,0.4); }
+.agone .comp-score-badge.score-4 { background: rgba(180,140,10,0.20); color: var(--agone-txt-brun, #4a3000); border-color: rgba(180,140,10,0.5); }
+.agone .comp-score-badge.score-5 { background: rgba(var(--agone-or-rgb, 201,162,39), 0.25); color: var(--agone-txt-brun, #3a2200); border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.55); }
 .agone .comp-score-badge.score-6,
 .agone .comp-score-badge.score-7,
 .agone .comp-score-badge.score-8,
 .agone .comp-score-badge.score-9,
-.agone .comp-score-badge.score-10 { background: rgba(201,162,39,0.35); color: #2a1800; border-color: var(--agone-gold); }
-.agone .comp-score-badge.fam-badge { background: rgba(40,80,120,0.12); color: #1a3a5c; border-color: rgba(40,80,120,0.3); }
+.agone .comp-score-badge.score-10 { background: rgba(var(--agone-or-rgb, 201,162,39), 0.35); color: var(--agone-txt-brun, #2a1800); border-color: var(--agone-gold); }
+.agone .comp-score-badge.fam-badge { background: rgba(var(--agone-bleu-rgb, 40,80,120), 0.12); color: var(--agone-txt-bleu, #1a3a5c); border-color: rgba(var(--agone-bleu-rgb, 40,80,120), 0.3); }
 /* Badge de domaine (partagé avec le browser) */
 .agone .comp-dom-badge {
   display: inline-block;
@@ -531,9 +531,9 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(92,58,30,0.12);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
   color: var(--agone-brown);
-  border: 1px solid rgba(92,58,30,0.3);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
   letter-spacing: 0.4px;
 }
 /* Grille de cartes */
@@ -544,7 +544,7 @@
 }
 /* Carte individuelle */
 .agone .comp-card {
-  background: rgba(92,58,30,0.03);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.03);
   border: 1px solid var(--agone-border);
   border-radius: 5px;
   padding: 5px 7px 5px 7px;
@@ -557,7 +557,7 @@
 }
 .agone .comp-card:hover {
   border-color: var(--agone-gold);
-  box-shadow: 0 1px 5px rgba(201,162,39,0.15);
+  box-shadow: 0 1px 5px rgba(var(--agone-or-rgb, 201,162,39), 0.15);
 }
 /* En-tête de carte : nom + ligne meta (spécialité + domaine) */
 .agone .comp-card-header {
@@ -622,7 +622,7 @@
 .agone .comp-card-attr-badge {
   margin-left: auto;
   font-size: 9px;
-  background: rgba(92,58,30,0.1);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
   color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 4px;
@@ -661,8 +661,8 @@
 .agone .comp-card:hover .comp-card-actions { display: flex; }
 /* Carte NA (non acquise) */
 .agone .comp-card--na {
-  background: rgba(92,58,30,0.02);
-  border-color: rgba(92,58,30,0.18);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.02);
+  border-color: rgba(var(--agone-brun-rgb, 92,58,30), 0.18);
 }
 .agone .comp-card--na .comp-card-name {
   color: #a08878;

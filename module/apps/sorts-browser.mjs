@@ -7,6 +7,8 @@ import { AgoneBrowser } from "./agone-browser.mjs";
  */
 export class SortsBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "sort";
+
   static FILTER_DEFAULTS = {
     _search          : "",
     _filterTypes     : new Set(),

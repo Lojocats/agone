@@ -24,7 +24,7 @@
 .agone .aspect-block {
   flex: 1;
   min-width: 120px;
-  background: rgba(92,58,30,0.08);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
   border: 1px solid var(--agone-border);
   border-radius: var(--radius);
   padding: 6px 8px;
@@ -87,7 +87,7 @@
   min-width: 24px;
   text-align: center;
   color: var(--agone-brown-dark);
-  background: rgba(92,58,30,0.08);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
   border: 1px solid var(--agone-border);
   border-radius: var(--radius);
   padding: 0 4px;
@@ -100,7 +100,7 @@
   min-width: 22px;
   text-align: center;
   color: var(--agone-brown-dark);
-  background: rgba(92,58,30,0.08);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
   border: 1px solid var(--agone-border);
   border-radius: var(--radius);
   padding: 0 3px;
@@ -112,7 +112,7 @@
   gap: 20px;
   margin-top: 8px;
   padding: 6px;
-  background: rgba(92,58,30,0.1);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
   border-radius: var(--radius);
   border: 1px solid var(--agone-gold);
 }
@@ -160,7 +160,7 @@
   align-items: center;
   gap: 8px;
   padding: 3px 0;
-  border-bottom: 1px dotted rgba(92,58,30,0.3);
+  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
 }
 /* Le bouton-nom doit avoir une largeur fixe pour que toutes les lignes soient alignées */
 .agone .carac-row .stat-label {
@@ -210,9 +210,9 @@
 .agone .cstat-emprise-wrap .emprise-type-select {
   font-size: 9px;
   padding: 1px 2px;
-  border: 1px solid rgba(92,58,30,0.25);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
   border-radius: 3px;
-  background: rgba(255,255,255,0.5);
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.5);
   width: 100%;
   max-width: 100%;
   color: var(--agone-brown);
@@ -224,9 +224,9 @@
   padding: 1px 3px;
   margin-left: 4px;
   height: auto;
-  border: 1px solid #8a6a3a;
-  background: #f5ede0;
-  color: #4b3a24;
+  border: 1px solid var(--agone-txt-brun, #8a6a3a);
+  background: var(--agone-fond-brun, #f5ede0);
+  color: var(--agone-txt-brun, #4b3a24);
   border-radius: 3px;
   cursor: pointer;
 }
@@ -236,7 +236,7 @@
   display: flex;
   gap: 20px;
   padding: 8px;
-  background: rgba(201,162,39,0.1);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.1);
   border: 1px solid var(--agone-gold);
   border-radius: var(--radius);
   margin-bottom: 10px;

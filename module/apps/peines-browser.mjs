@@ -15,6 +15,8 @@ function _buildCatLabels() {
  */
 export class PeinesBrowser extends AgoneBrowser {
 
+  static ITEM_TYPE = "peine";
+
   static FILTER_DEFAULTS = {
     _search         : "",
     _filterCategorie: "all",

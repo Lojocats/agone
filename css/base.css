@@ -64,7 +64,7 @@
 
 /* ── Scrollbar ───────────────────────────────────────────── */
 .agone ::-webkit-scrollbar { width: 6px; }
-.agone ::-webkit-scrollbar-track { background: rgba(92,58,30,0.1); }
+.agone ::-webkit-scrollbar-track { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1); }
 .agone ::-webkit-scrollbar-thumb { background: var(--agone-brown); border-radius: 3px; }
 .agone ::-webkit-scrollbar-thumb:hover { background: var(--agone-gold); }
 
@@ -73,9 +73,12 @@
    Activé par body.agone-dark (toggle JS côté client)
    ============================================================ */
 
-/* ── 1. Remapping des variables CSS Agone + Foundry v14 ──── */
-body.agone-dark .application.agone,
-body.agone-dark .window-app.agone {
+/* ── 1. Variables Agone en mode sombre ───────────────────────
+   Définies sur le body : elles s'appliquent aussi hors des fenêtres Agone
+   (cartes de jet du chat, widget calendrier, tracker de combat).
+   Les jetons --agone-*-rgb / --agone-txt-* / --agone-fond-* n'existent qu'ici :
+   en mode clair, chaque règle retombe sur sa couleur d'origine (valeur de repli). */
+body.agone-dark {
   --agone-parchment:    #1c1208;
   --agone-parchment2:   #251809;
   --agone-dark-text:    #d4b896;
@@ -83,10 +86,36 @@ body.agone-dark .window-app.agone {
   --agone-brown-dark:   #c9a060;
   --agone-gold:         #e0c060;
   --agone-gold-light:   #f0d880;
+  --agone-red:          #f28b82;
   --agone-input-bg:     rgba(255,255,255,0.08);
   --agone-border:       #6b491e;
   --agone-noir:         #9090c8;
   --agone-noir-text:    #c0c0d0;
+  --agone-shadow:       rgba(0,0,0,0.6);
+  --agone-fond-brun: rgba(255,255,255,0.06);
+  --agone-fond-vert: rgba(110,207,122,0.16);
+  --agone-bleu-rgb: 138,180,248;
+  --agone-brun-rgb: 180,130,60;
+  --agone-encre-rgb: 212,184,150;
+  --agone-noir-rgb: 144,144,200;
+  --agone-or-rgb: 224,192,96;
+  --agone-orange-rgb: 224,176,96;
+  --agone-rouge-rgb: 242,139,130;
+  --agone-surface-rgb: 70,48,24;
+  --agone-vert-rgb: 110,207,122;
+  --agone-violet-rgb: 201,160,240;
+  --agone-txt-bleu: #8ab4f8;
+  --agone-txt-brun: #c9a060;
+  --agone-txt-jaune: #e0c060;
+  --agone-txt-orange: #e0b060;
+  --agone-txt-rouge: #f28b82;
+  --agone-txt-vert: #6ecf7a;
+  --agone-txt-violet: #c9a0f0;
+}
+
+/* ── 1a. Variables Foundry v14 dans les fenêtres Agone ───── */
+body.agone-dark .application.agone,
+body.agone-dark .window-app.agone {
   --color-text-dark-secondary: #c0a060;
   --background:                #1c1208;
   --color-text-primary:        #d4b896;

@@ -3,6 +3,17 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.2] — 2026-09-24
+
+### Ajouté
+- **Navigateurs de compendium** : section « Objets personnalisés » qui liste les objets du même type créés dans le monde ou dans vos compendiums (avec leurs effets actifs) ; ajout à la fiche en un clic et ouverture de leur fiche.
+- Navigateurs : tri en cliquant sur les en-têtes de colonnes, focus automatique sur la recherche, Échap pour effacer la recherche.
+- Thème **automatique** : sans choix explicite, le thème Agone suit le thème des applications Foundry (ou celui du système). Le bouton 🌙 fixe un choix clair/sombre.
+
+### Corrigé
+- **Mode sombre** : plus de 600 couleurs codées en dur passent par des jetons de thème ; les éléments qui restaient clairs (cartes, bordures, badges, textes colorés, nouvelles sections d'effets et de caractéristiques) s'adaptent au mode sombre. Le mode clair est inchangé.
+- Les cartes de jet du chat, le widget calendrier et le tracker de combat suivent désormais le mode sombre.
+
 ## [1.9.1] — 2026-09-24
 
 ### Ajouté

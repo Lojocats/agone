@@ -1,0 +1,46 @@
+{{!-- Objets personnalisés du type du navigateur : items du monde et des compendiums (hors
+      compendiums du système). Contexte : personnalises (AgoneBrowser#_preparePartContext). --}}
+<details class="browser-perso" {{#if personnalises.length}}open{{/if}}>
+  <summary>
+    <i class="fas fa-feather-alt"></i> {{localize "AGONE.Browser.Personnalises"}}
+    <span class="browser-perso-count">({{personnalises.length}})</span>
+  </summary>
+  {{#if personnalises.length}}
+  <table class="browser-perso-table">
+    <tbody>
+      {{#each personnalises as |p|}}
+      <tr class="browser-perso-row{{#if p.possede}} browser-perso-possede{{/if}}" data-uuid="{{p.uuid}}">
+        <td class="browser-perso-nom">
+          <img src="{{p.img}}" alt="" />
+          <span>{{p.name}}</span>
+          {{#if p.effets}}<i class="fas fa-magic browser-perso-effets" title='{{localize "AGONE.Effets.Titre"}}'></i>{{/if}}
+        </td>
+        <td class="browser-perso-source">{{p.source}}</td>
+        <td class="browser-perso-actions">
+          <a class="btn-icon" data-action="persoOuvrir" title='{{localize "AGONE.Browser.OuvrirFiche"}}'><i class="fas fa-eye"></i></a>
+          {{#if p.possede}}
+          <i class="fas fa-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+          {{else}}
+          <button type="button" class="btn-icon" data-action="persoAjouter" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <i class="fas fa-plus"></i>
+          </button>
+          {{/if}}
+        </td>
+      </tr>
+      {{#if p.description}}
+      <tr class="browser-perso-desc-row">
+        <td colspan="3">
+          <details class="item-details">
+            <summary>{{localize "AGONE.VoirDescription"}}</summary>
+            <div class="item-desc-content">{{{p.description}}}</div>
+          </details>
+        </td>
+      </tr>
+      {{/if}}
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="browser-perso-aide">{{localize "AGONE.Browser.PersonnalisesAide"}}</p>
+  {{/if}}
+</details>
