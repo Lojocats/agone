@@ -35,10 +35,10 @@
             <label>{{localize "AGONE.SaisonDefaut"}}</label>
             <select name="system.saisonDefaut">
               <option value="" {{#if (eq system.saisonDefaut "")}}selected{{/if}}>—</option>
-              <option value="printemps" {{#if (eq system.saisonDefaut "printemps")}}selected{{/if}}>Printemps</option>
-              <option value="ete"       {{#if (eq system.saisonDefaut "ete")}}selected{{/if}}>Été</option>
-              <option value="automne"   {{#if (eq system.saisonDefaut "automne")}}selected{{/if}}>Automne</option>
-              <option value="hiver"     {{#if (eq system.saisonDefaut "hiver")}}selected{{/if}}>Hiver</option>
+              <option value="printemps" {{#if (eq system.saisonDefaut "printemps")}}selected{{/if}}>{{localize "AGONE.Printemps"}}</option>
+              <option value="ete"       {{#if (eq system.saisonDefaut "ete")}}selected{{/if}}>{{localize "AGONE.Ete"}}</option>
+              <option value="automne"   {{#if (eq system.saisonDefaut "automne")}}selected{{/if}}>{{localize "AGONE.Automne"}}</option>
+              <option value="hiver"     {{#if (eq system.saisonDefaut "hiver")}}selected{{/if}}>{{localize "AGONE.Hiver"}}</option>
             </select>
           </div>
         </div>
@@ -123,7 +123,7 @@
     <!-- ONGLET DESCRIPTION -->
     <div class="tab" data-group="primary" data-tab="description">
       <div class="editor-container">
-        <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
+        {{> systems/agone/templates/items/parts/editeur.hbs champ="description"}}
       </div>
     </div>
 

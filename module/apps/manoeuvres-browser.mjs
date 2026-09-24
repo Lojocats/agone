@@ -1,23 +1,29 @@
 import { MANOEUVRES_DATA } from "../helpers/compendium-data.mjs";
+import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
  * Navigateur de manœuvres & bottes Agone — fenêtre de sélection avec filtres.
  */
-export class ManoeuvresBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class ManoeuvresBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor          = actor;
-    this._search        = "";
-    this._filterCat     = "all";
-    this._filterPossede = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search       : "",
+    _filterCat    : "all",
+    _filterPossede: "all",
+  };
+
+  static FILTERS = {
+    ".mb-search"         : { kind: "text",   prop: "_search" },
+    ".mb-cat-filter"     : { kind: "select", prop: "_filterCat" },
+    ".mb-possede-filter" : { kind: "select", prop: "_filterPossede" },
+    ".mb-clear"          : { kind: "reset" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-manoeuvres-browser",
     classes : ["agone", "manoeuvres-browser"],
     position: { width: 980, height: 600 },
-    window  : { resizable: true },
+    actions : { addManoeuvre: ManoeuvresBrowser.#onAddManoeuvre },
   };
 
   static PARTS = {
@@ -77,64 +83,22 @@ export class ManoeuvresBrowser extends foundry.applications.api.HandlebarsApplic
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-    const html = $(this.element);
-
-    html.find(".mb-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".mb-search";
-      this.render();
-    }, 250));
-
-    html.find(".mb-cat-filter").on("change", e => {
-      this._filterCat = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".mb-possede-filter").on("change", e => {
-      this._filterPossede = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".mb-clear").on("click", () => {
-      this._search        = "";
-      this._filterCat     = "all";
-      this._filterPossede = "all";
-      this.render();
-    });
-
-    html.find("[data-action='addManoeuvre']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-man-idx]")?.dataset?.manIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = MANOEUVRES_DATA[idx];
-      if (!d) return;
-
-      await Item.create({
-        name  : d.name,
-        type  : "manoeuvre",
-        system: {
-          categorie : d.categorie  ?? "manoeuvre",
-          ini       : d.ini        ?? 0,
-          att       : d.att        ?? 0,
-          def       : d.def        ?? 0,
-          dom       : d.dom        ?? "0",
-          condition : d.condition  ?? "",
-          description: d.description ?? "",
-        },
-      }, { parent: this.actor });
-
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.ManoeuvreAjoutee", { nom: d.name, acteur: this.actor.name }));
-      this.render();
-    });
+  static async #onAddManoeuvre(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, MANOEUVRES_DATA, "manIdx");
+    if (!d) return;
+    await this._addItem({
+      name  : d.name,
+      type  : "manoeuvre",
+      system: {
+        categorie  : d.categorie   ?? "manoeuvre",
+        ini        : d.ini         ?? 0,
+        att        : d.att         ?? 0,
+        def        : d.def         ?? 0,
+        dom        : d.dom         ?? "0",
+        condition  : d.condition   ?? "",
+        description: d.description ?? "",
+      },
+    }, "AGONE.Notif.ManoeuvreAjoutee");
   }
 
 }

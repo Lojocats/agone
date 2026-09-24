@@ -38,9 +38,9 @@
           <td class="col-score">
             {{#if d.comp}}
             <span class="arts-scores-pair">
-              <span title="Score Arts Magiques">{{d.comp.system.score}}</span>
+              <span title='{{localize "AGONE.Ui.ScoreArtsMagiques"}}'>{{d.comp.system.score}}</span>
               <span class="arts-comp-liee-score {{#unless d.compLiee}}arts-comp-liee-manquante{{/unless}}"
-                    title="{{d.nomCompLiee}}{{#unless d.compLiee}} (non possédée){{/unless}}">
+                    title="{{d.nomCompLiee}}{{#unless d.compLiee}} ({{localize "AGONE.Ui.NonPossedee"}}){{/unless}}">
                 / {{d.scoreCompLiee}} <em class="arts-comp-liee-nom">{{d.nomCompLiee}}</em>
               </span>
             </span>
@@ -48,8 +48,8 @@
             <div class="arts-levelup-pair">
               <button type="button" class="levelup-btn" data-action="levelUp"
                       data-type="competence" data-item-id="{{d.comp.id}}" data-cout="{{d.comp.xpCout}}" data-crea-cout="{{d.comp.creaCout}}"
-                      title='{{localize "AGONE.MonterNiveau"}} Arts Magiques ({{d.comp.coutAffiche}})'>
-                <i class="fas fa-arrow-up"></i> Arts ({{d.comp.coutAffiche}})
+                      title='{{localize "AGONE.Ui.MonterArtsMagiques" cout=d.comp.coutAffiche}}'>
+                <i class="fas fa-arrow-up"></i> {{localize "AGONE.Ui.ArtsCout" cout=d.comp.coutAffiche}}
               </button>
               <button type="button" class="leveldown-btn" data-action="levelDown"
                       data-type="competence" data-item-id="{{d.comp.id}}"
@@ -70,7 +70,7 @@
                 <i class="fas fa-arrow-down"></i> {{d.compLiee.coutAfficheDown}}
               </button>
               {{else}}
-              <span class="arts-comp-liee-manquante arts-levelup-absent" title="{{d.nomCompLiee}} non possédée">
+              <span class="arts-comp-liee-manquante arts-levelup-absent" title='{{localize "AGONE.Ui.NonPossedeeNom" nom=d.nomCompLiee}}'>
                 <i class="fas fa-arrow-up"></i> {{d.nomCompLiee}} —
               </span>
               {{/if}}
@@ -160,29 +160,29 @@
           </div>
         </div>
         <div class="portees-ref-section">
-          <div class="portees-ref-title">🎲 Marge de qualité</div>
+          <div class="portees-ref-title">🎲 {{localize "AGONE.Ui.MargeQualite"}}</div>
           <div class="portee-ref-row">
-            <span class="portee-ref-label mq-label">MQ 0</span>
-            <span class="portee-ref-desc">Aucune marge — effet de base</span>
+            <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqZero"}}</span>
+            <span class="portee-ref-desc">{{localize "AGONE.Ui.MqAucune"}}</span>
           </div>
           <div class="portee-ref-row">
-            <span class="portee-ref-label mq-label">MQ +1 à +4</span>
+            <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqPlage" min="+1" max="+4"}}</span>
             <span class="portee-ref-desc">x 2</span>
           </div>
           <div class="portee-ref-row">
-            <span class="portee-ref-label mq-label">MQ +5 à +9</span>
+            <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqPlage" min="+5" max="+9"}}</span>
             <span class="portee-ref-desc">x 5</span>
           </div>
           <div class="portee-ref-row">
-            <span class="portee-ref-label mq-label">MQ +10 à +15</span>
+            <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqPlage" min="+10" max="+15"}}</span>
             <span class="portee-ref-desc">x 10</span>
           </div>
           <div class="portee-ref-row">
-            <span class="portee-ref-label mq-label">MQ +16 à +20</span>
+            <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqPlage" min="+16" max="+20"}}</span>
             <span class="portee-ref-desc">x 30</span>
           </div>
           <div class="portee-ref-row">
-            <span class="portee-ref-label mq-label">MQ +21 et plus</span>
+            <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqPlus" min="+21"}}</span>
             <span class="portee-ref-desc">x 100</span>
           </div>
         </div>
@@ -224,12 +224,12 @@
             <div>
               {{#if sort.system.typeMagie}}<span class="sort-type-badge">{{sort.system.typeMagie}}</span>{{/if}}
               {{#if sort.system.instrument}}<span class="sort-type-badge">{{sort.system.instrument}}</span>{{/if}}
-              {{#if sort.system.seuil}}<span class="sort-type-badge">seuil {{sort.system.seuil}}</span>{{/if}}
+              {{#if sort.system.seuil}}<span class="sort-type-badge">{{localize "AGONE.Ui.SeuilN" n=sort.system.seuil}}</span>{{/if}}
             </div>
             <div class="sort-card-stats">
-              {{#if sort.system.portee}}<span class="sort-stat"><em>Portée</em> {{sort.system.portee}}</span>{{/if}}
-              {{#if sort.system.duree}}<span class="sort-stat"><em>Durée</em> {{sort.system.duree}}</span>{{/if}}
-              {{#if sort.system.danse}}<span class="sort-stat"><em>Lancer</em> {{sort.system.danse}}</span>{{/if}}
+              {{#if sort.system.portee}}<span class="sort-stat"><em>{{localize "AGONE.Portee"}}</em> {{sort.system.portee}}</span>{{/if}}
+              {{#if sort.system.duree}}<span class="sort-stat"><em>{{localize "AGONE.Duree"}}</em> {{sort.system.duree}}</span>{{/if}}
+              {{#if sort.system.danse}}<span class="sort-stat"><em>{{localize "AGONE.Lancer"}}</em> {{sort.system.danse}}</span>{{/if}}
             </div>
             {{#if sort.system.description}}
             <details class="item-details sort-card-details">
@@ -274,38 +274,38 @@
             <input class="danseur-inline-num danseur-pts-max-input" type="number"
                    data-item-id="{{d.id}}" data-field="ptsCreationMax"
                    value="{{d.ptsBudget}}" min="4" title='{{localize "AGONE.DanseurPtsCreationMax"}}'>
-            pts &middot; restants : <strong>{{d.ptsRestants}}</strong>
+            {{localize "AGONE.Ui.PtsRestants"}} <strong>{{d.ptsRestants}}</strong>
           </span>
           {{else}}
-          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title="Mémoire (pts Seuil)">Mém : {{d.memoireUtilisee}}/{{d.capaciteSeuil}} pts</span>
-          <span class="danseur-stat" title="Endurance">End :
+          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title='{{localize "AGONE.Ui.MemoireTitre"}}'>{{localize "AGONE.Ui.MemAbr" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</span>
+          <span class="danseur-stat" title='{{localize "AGONE.Endurance"}}'>{{localize "AGONE.Ui.EndAbr"}}
             <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0">
             /{{d.system.enduranceMax}}
           </span>
-          <span class="danseur-stat" title="Bonus d'Emprise du danseur">EMP+{{d.system.bonusEmprise}}</span>
-          <span class="danseur-stat danseur-pot-emp" title="Potentiel d'Emprise total avec ce danseur (base + bonus danseur)">Pot.{{d.potentielEmprise}}</span>
-          <span class="danseur-stat danseur-pot-impro" title="Potentiel d'Improvisation (CRÉ + Empathie danseur + Bonus Esprit)">Impro.{{d.potentielImpro}}</span>
-          <span class="danseur-stat" title="Empathie">Emp {{d.system.empathie}}</span>
+          <span class="danseur-stat" title="{{localize "AGONE.Ui.BonusEmpriseDanseur"}}">EMP+{{d.system.bonusEmprise}}</span>
+          <span class="danseur-stat danseur-pot-emp" title="{{localize "AGONE.Ui.PotEmpriseTitre"}}">{{localize "AGONE.Ui.PotAbr"}}{{d.potentielEmprise}}</span>
+          <span class="danseur-stat danseur-pot-impro" title="{{localize "AGONE.Ui.PotImproTitre"}}">{{localize "AGONE.Ui.ImproAbr"}}{{d.potentielImpro}}</span>
+          <span class="danseur-stat" title='{{localize "AGONE.Empathie"}}'>{{localize "AGONE.Ui.EmpAbr"}} {{d.system.empathie}}</span>
 
           {{/if}}
         </div>
         <div class="danseur-actions">
           {{#unless d.system.modeCreation}}
           <button type="button" class="danseur-roll-btn" data-action="rollEmprise" data-item-id="{{d.id}}" title='{{localize "AGONE.JeterEmprise"}}'>
-            <i class="fas fa-dice-d10"></i> Emprise
+            <i class="fas fa-dice-d10"></i> {{localize "AGONE.Emprise"}}
           </button>
           <button type="button" class="danseur-roll-btn" data-action="rollImprovisation" data-item-id="{{d.id}}" title='{{localize "AGONE.JeterImprovisation"}}'>
-            <i class="fas fa-dice-d10"></i> Impro
+            <i class="fas fa-dice-d10"></i> {{localize "AGONE.Impro"}}
           </button>
           <button type="button" class="danseur-recrea-btn btn-icon" data-action="reactiverCreationDanseur" data-item-id="{{d.id}}" title='{{localize "AGONE.DanseurReactiverCrea"}}'>
             <i class="fas fa-table"></i>
           </button>
           {{else}}
           <button type="button" class="danseur-valider-btn" data-action="validerCreationDanseur" data-item-id="{{d.id}}" title='{{localize "AGONE.DanseurValiderCrea"}}'>
-            <i class="fas fa-check"></i> Valider
+            <i class="fas fa-check"></i> {{localize "AGONE.Valider"}}
           </button>
           {{/unless}}
-          <a class="item-delete" data-item-id="{{d.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
+          <a class="item-delete" data-item-id="{{d.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </div>
       </div>
 
@@ -318,21 +318,21 @@
           <button type="button" class="danseur-niv-btn" data-action="danseurNiveauDown"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   {{#unless cn.canDown}}disabled{{/unless}}>−</button>
-          <span class="danseur-niv-num" title="Coût : {{cn.cout}} pt(s)">{{cn.niv}}</span>
+          <span class="danseur-niv-num" title='{{localize "AGONE.Ui.CoutPts" cout=cn.cout}}'>{{cn.niv}}</span>
           <button type="button" class="danseur-niv-btn" data-action="danseurNiveauUp"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   {{#unless cn.canUp}}disabled{{/unless}}>+</button>
           <button type="button" class="danseur-niv-btn danseur-roll-indiv-btn" data-action="danseurRollStatIndiv"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   data-stat-key="{{cn.stat}}" data-label="{{cn.label}}" data-prefix="{{cn.prefix}}"
-                  title="Jet 3d10 pour {{cn.label}}"><i class="fas fa-dice"></i></button>
+                  title='{{localize "AGONE.Ui.Jet3d10Pour" stat=cn.label}}'><i class="fas fa-dice"></i></button>
           <span class="danseur-crea-arrow">&#8594;</span>
           <span class="danseur-crea-val">{{cn.prefix}}{{cn.val}}</span>
-          {{#if cn.nextVal}}<span class="danseur-next-val">(niv.{{cn.nextNiv}} &#8594; {{cn.prefix}}{{cn.nextVal}})</span>{{/if}}
+          {{#if cn.nextVal}}<span class="danseur-next-val">({{localize "AGONE.Ui.NivAbr"}}{{cn.nextNiv}} &#8594; {{cn.prefix}}{{cn.nextVal}})</span>{{/if}}
         </div>
         {{/each}}
         <div class="danseur-crea-capacite">
-          Capacité mémoire : <strong>{{d.capaciteSeuil}}</strong> pts Seuil
+          {{localize "AGONE.Ui.CapaciteMemoire"}} <strong>{{d.capaciteSeuil}}</strong> {{localize "AGONE.Ui.PtsSeuil"}}
         </div>
       </div>
       {{else}}
@@ -340,23 +340,23 @@
       <div class="danseur-levelup-section">
         {{#each d.levelUpStats as |lu|}}
         <div class="danseur-levelup-row">
-          <span class="danseur-levelup-label">{{lu.label}} <em class="danseur-niv-badge">niv.{{lu.niv}}</em></span>
+          <span class="danseur-levelup-label">{{lu.label}} <em class="danseur-niv-badge">{{localize "AGONE.Ui.NivAbr"}}{{lu.niv}}</em></span>
           <input type="number" class="danseur-inline-num danseur-exp-stat-input" min="0"
                  data-item-id="{{../id}}" data-field="{{lu.expField}}"
                  value="{{lu.localExp}}"
-                 title="XP en réserve pour {{lu.label}}">
+                 title='{{localize "AGONE.Ui.XPReservePour" stat=lu.label}}'>
           <button type="button" class="leveldown-btn" data-action="levelDownDanseur"
                   data-item-id="{{../id}}" data-stat="{{lu.nivField}}" data-exp-field="{{lu.expField}}"
                   data-cout-down="{{lu.coutDown}}" data-label="{{lu.label}}"
                   {{#unless lu.canDown}}disabled{{/unless}}
-                  title="Rétrograder {{lu.label}} (remboursement {{lu.coutDown}} XP)">
+                  title='{{localize "AGONE.Ui.RetrograderStat" stat=lu.label cout=lu.coutDown}}'>
             <i class="fas fa-arrow-down"></i> {{lu.coutDown}} XP
           </button>
           <button type="button" class="levelup-btn" data-action="levelUpDanseur"
                   data-item-id="{{../id}}" data-stat="{{lu.nivField}}" data-exp-field="{{lu.expField}}"
                   data-cout="{{lu.cout}}" data-label="{{lu.label}}"
                   {{#unless lu.canUp}}disabled{{/unless}}
-                  title="Monter {{lu.label}} (coût : {{lu.cout}} XP)">
+                  title='{{localize "AGONE.Ui.MonterStat" stat=lu.label cout=lu.cout}}'>
             <i class="fas fa-arrow-up"></i> {{lu.cout}} XP
           </button>
         </div>
@@ -372,25 +372,25 @@
           <div class="slot-main">
             <button type="button" class="slot-name" data-action="rollSortDanseur"
                     data-sort-id="{{s.id}}" data-danseur-id="{{d.id}}"
-                    title="Lancer {{s.name}} (End. {{../system.enduranceActuelle}}/{{../system.enduranceMax}})">{{s.name}}</button>
-          <button type="button" class="slot-remove" data-sort-id="{{s.id}}" title="Retirer">x</button>
+                    title='{{localize "AGONE.Ui.LancerSortDanseur" sort=s.name actuelle=../system.enduranceActuelle max=../system.enduranceMax}}'>{{s.name}}</button>
+          <button type="button" class="slot-remove" data-sort-id="{{s.id}}" title='{{localize "AGONE.Retirer"}}'>x</button>
           </div>
           <div class="slot-meta">
-            {{#if s.seuil}}<span>Seuil : {{s.seuil}}</span>{{/if}}
-            {{#if s.portee}}<span>Portée : {{s.portee}}</span>{{/if}}
-            {{#if s.duree}}<span>Durée : {{s.duree}}</span>{{/if}}
-            {{#if s.danse}}<span>Incant. : {{s.danse}}</span>{{/if}}
+            {{#if s.seuil}}<span>{{localize "AGONE.Seuil"}} : {{s.seuil}}</span>{{/if}}
+            {{#if s.portee}}<span>{{localize "AGONE.Portee"}} : {{s.portee}}</span>{{/if}}
+            {{#if s.duree}}<span>{{localize "AGONE.Duree"}} : {{s.duree}}</span>{{/if}}
+            {{#if s.danse}}<span>{{localize "AGONE.Ui.IncantAbr"}} : {{s.danse}}</span>{{/if}}
           </div>
           {{#if s.description}}
           <details class="slot-details">
-            <summary>Description</summary>
+            <summary>{{localize "AGONE.Description"}}</summary>
             <div class="slot-description">{{{s.description}}}</div>
           </details>
           {{/if}}
         </div>
         {{/each}}
         {{#unless d.isFull}}
-        <div class="danseur-drop-hint"><i class="fas fa-arrow-down"></i> Glisser un sort ici ({{d.memoireUtilisee}}/{{d.capaciteSeuil}} pts Seuil)</div>
+        <div class="danseur-drop-hint"><i class="fas fa-arrow-down"></i> {{localize "AGONE.Ui.GlisserSortIci" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</div>
         {{/unless}}
       </div>
     </div>
@@ -418,7 +418,7 @@
       {{#each pouvoirs as |pouvoir|}}
       <li class="pouvoir-row item-row" data-item-id="{{pouvoir.id}}">
         <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
-        <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" title='Envoyer dans le chat'>{{pouvoir.name}}</button>
+        <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" title='{{localize "AGONE.EnvoyerChat"}}'>{{pouvoir.name}}</button>
         <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
         <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
       </li>
@@ -426,7 +426,7 @@
       <li class="pouvoir-desc-li">
         <details class="item-details">
           <summary>{{localize "AGONE.VoirDescription"}}</summary>
-          <div class="item-desc-content">{{pouvoir.system.description}}</div>
+          <div class="item-desc-content">{{{pouvoir.system.description}}}</div>
         </details>
       </li>
       {{/if}}

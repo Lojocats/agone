@@ -14,12 +14,12 @@
       {{#if fumbleTotal}}{{fumbleTotal}}{{else}}{{total}}{{/if}}
     </span>
     {{#if seuil}}<span class="roll-seuil">/ {{seuil}}</span>{{/if}}
-    {{#if resultat}}<span class="roll-resultat {{#if (eq resultat "✔ Succès")}}roll-succes{{else}}roll-echec{{/if}}">{{resultat}}</span>{{/if}}
+    {{#if resultat}}<span class="roll-resultat {{#if resultatSucces}}roll-succes{{else}}roll-echec{{/if}}">{{resultat}}</span>{{/if}}
   </div>
 
   {{#if details}}
   <details class="roll-details">
-    <summary class="roll-details-summary"><i class="fas fa-list-ul"></i> Détails du calcul</summary>
+    <summary class="roll-details-summary"><i class="fas fa-list-ul"></i> {{localize "AGONE.Des.DetailsCalcul"}}</summary>
     <table class="roll-breakdown">
       <tbody>
         {{#each details as |detail|}}
@@ -58,18 +58,18 @@
 
   {{#if armeMeta}}
   <div class="roll-sort-meta">
-    {{#if (eq armeMeta.style "trait")}}<span class="sort-meta-badge sort-type"><i class="fas fa-bow-arrow"></i> Trait</span>
-    {{else if (eq armeMeta.style "jet")}}<span class="sort-meta-badge sort-type"><i class="fas fa-khanda"></i> Jet</span>
-    {{else if (eq armeMeta.style "bouclier")}}<span class="sort-meta-badge sort-type"><i class="fas fa-shield-alt"></i> Bouclier</span>
-    {{else}}<span class="sort-meta-badge sort-type"><i class="fas fa-sword"></i> Mêlée</span>{{/if}}
+    {{#if (eq armeMeta.style "trait")}}<span class="sort-meta-badge sort-type"><i class="fas fa-bow-arrow"></i> {{localize "AGONE.Trait"}}</span>
+    {{else if (eq armeMeta.style "jet")}}<span class="sort-meta-badge sort-type"><i class="fas fa-khanda"></i> {{localize "AGONE.Jet"}}</span>
+    {{else if (eq armeMeta.style "bouclier")}}<span class="sort-meta-badge sort-type"><i class="fas fa-shield-alt"></i> {{localize "AGONE.Bouclier"}}</span>
+    {{else}}<span class="sort-meta-badge sort-type"><i class="fas fa-sword"></i> {{localize "AGONE.Melee"}}</span>{{/if}}
     {{#if armeMeta.portee}}<span class="sort-meta-badge"><i class="fas fa-location-arrow"></i> {{armeMeta.portee}}</span>{{/if}}
-    {{#if armeMeta.dommages}}<span class="sort-meta-badge"><i class="fas fa-tint"></i> Dom : {{armeMeta.dommages}}{{#if armeMeta.dommagesTotal}} (tot. {{armeMeta.dommagesTotal}}){{/if}}</span>{{/if}}
+    {{#if armeMeta.dommages}}<span class="sort-meta-badge"><i class="fas fa-tint"></i> {{localize "AGONE.DommagesAbr"}} : {{armeMeta.dommages}}{{#if armeMeta.dommagesTotal}} ({{localize "AGONE.Des.TotalAbr"}} {{armeMeta.dommagesTotal}}){{/if}}</span>{{/if}}
   </div>
   {{/if}}
 
   {{#if description}}
   <details class="roll-sort-description">
-    <summary><i class="fas fa-book-open"></i> {{#if sortMeta}}Description du sort{{else}}Description{{/if}}</summary>
+    <summary><i class="fas fa-book-open"></i> {{#if sortMeta}}{{localize "AGONE.Des.DescriptionSort"}}{{else}}{{localize "AGONE.Description"}}{{/if}}</summary>
     <div class="roll-sort-desc-content">{{{description}}}</div>
   </details>
   {{/if}}

@@ -24,7 +24,7 @@
     <table class="danseur-stats-table">
       <thead>
         <tr>
-          <th>Stat</th>
+          <th>{{localize "AGONE.Ui.Stat"}}</th>
           <th>{{localize "AGONE.DanseurNivSuffix"}}</th>
           <th>{{localize "AGONE.DanseurBaseTable"}}</th>
           <th>{{localize "AGONE.DanseurBonus"}}</th>
@@ -75,7 +75,7 @@
     <!-- Capacité mémoire en Seuil -->
     <div class="danseur-memoire-bloc">
       <span>{{localize "AGONE.DanseurCapaciteSeuil"}} : <strong>{{system.capaciteSeuil}}</strong> pts</span>
-      <small>({{system.memoireMax}} cases × 5 · {{localize "AGONE.DanseurMemoireExplain"}})</small>
+      <small>({{localize "AGONE.Ui.CasesMemoire" n=system.memoireMax}} · {{localize "AGONE.DanseurMemoireExplain"}})</small>
     </div>
 
     <!-- Expérience + Saison -->
@@ -88,10 +88,10 @@
         <label>{{localize "AGONE.SaisonSaisonin"}}</label>
         <select name="system.saison">
           <option value="" {{#if (eq system.saison "")}}selected{{/if}}>—</option>
-          <option value="printemps" {{#if (eq system.saison "printemps")}}selected{{/if}}>Printemps</option>
-          <option value="ete"       {{#if (eq system.saison "ete")}}selected{{/if}}>Été</option>
-          <option value="automne"   {{#if (eq system.saison "automne")}}selected{{/if}}>Automne</option>
-          <option value="hiver"     {{#if (eq system.saison "hiver")}}selected{{/if}}>Hiver</option>
+          <option value="printemps" {{#if (eq system.saison "printemps")}}selected{{/if}}>{{localize "AGONE.Printemps"}}</option>
+          <option value="ete"       {{#if (eq system.saison "ete")}}selected{{/if}}>{{localize "AGONE.Ete"}}</option>
+          <option value="automne"   {{#if (eq system.saison "automne")}}selected{{/if}}>{{localize "AGONE.Automne"}}</option>
+          <option value="hiver"     {{#if (eq system.saison "hiver")}}selected{{/if}}>{{localize "AGONE.Hiver"}}</option>
         </select>
       </div>
     </div>
@@ -99,7 +99,7 @@
     <!-- Description -->
     <div class="form-group">
       <label>{{localize "AGONE.Description"}}</label>
-      <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
+      {{> systems/agone/templates/items/parts/editeur.hbs champ="description"}}
     </div>
   </section>
 </form>

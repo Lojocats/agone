@@ -51,28 +51,7 @@
         <div class="npc-left-col">
           <div class="combat-card">
             <h3 class="combat-card-title"><i class="fas fa-fist-raised"></i> {{localize "AGONE.Caracteristiques"}}</h3>
-            <div class="carac-grid npc-carac-grid">
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Agilite"}}</label>
-                <input type="number" name="system.agilite" value="{{system.agilite}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Force"}}</label>
-                <input type="number" name="system.force" value="{{system.force}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Perception"}}</label>
-                <input type="number" name="system.perception" value="{{system.perception}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Resistance"}}</label>
-                <input type="number" name="system.resistance" value="{{system.resistance}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.ChargeMax"}}</label>
-                <input type="number" name="system.chargeMax" value="{{system.chargeMax}}" class="stat-num" />
-              </div>
-            </div>
+            {{> systems/agone/templates/actors/parts/caracs-simples.hbs}}
           </div>
 
           <div class="combat-card" style="margin-top:8px;">

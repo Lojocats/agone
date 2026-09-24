@@ -1,23 +1,29 @@
 import { POUVOIRS_DATA } from "../helpers/compendium-data.mjs";
+import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
  * Navigateur de Pouvoirs de Flamme & Saisonins Agone — fenêtre de sélection avec filtres.
  */
-export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class PouvoirsBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor          = actor;
-    this._search        = "";
-    this._filterCat     = "all";
-    this._filterPossede = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search       : "",
+    _filterCat    : "all",
+    _filterPossede: "all",
+  };
+
+  static FILTERS = {
+    ".pvb-search"         : { kind: "text",   prop: "_search" },
+    ".pvb-cat-filter"     : { kind: "select", prop: "_filterCat" },
+    ".pvb-possede-filter" : { kind: "select", prop: "_filterPossede" },
+    ".pvb-clear"          : { kind: "reset" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-pouvoirs-browser",
     classes : ["agone", "pouvoirs-browser"],
     position: { width: 680, height: 560 },
-    window  : { resizable: true },
+    actions : { addPouvoir: PouvoirsBrowser.#onAddPouvoir },
   };
 
   static PARTS = {
@@ -70,59 +76,17 @@ export class PouvoirsBrowser extends foundry.applications.api.HandlebarsApplicat
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-    const html = $(this.element);
-
-    html.find(".pvb-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".pvb-search";
-      this.render();
-    }, 250));
-
-    html.find(".pvb-cat-filter").on("change", e => {
-      this._filterCat = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".pvb-possede-filter").on("change", e => {
-      this._filterPossede = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".pvb-clear").on("click", () => {
-      this._search        = "";
-      this._filterCat     = "all";
-      this._filterPossede = "all";
-      this.render();
-    });
-
-    html.find("[data-action='addPouvoir']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-pouvoir-idx]")?.dataset?.pouvoirIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = POUVOIRS_DATA[idx];
-      if (!d) return;
-
-      await Item.create({
-        name  : d.name,
-        type  : "pouvoir",
-        system: {
-          categorie  : d.categorie   ?? "flamme",
-          description: d.description ?? "",
-        },
-      }, { parent: this.actor });
-
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.PouvoirAjoute", { nom: d.name, acteur: this.actor.name }));
-      this.render();
-    });
+  static async #onAddPouvoir(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, POUVOIRS_DATA, "pouvoirIdx");
+    if (!d) return;
+    await this._addItem({
+      name  : d.name,
+      type  : "pouvoir",
+      system: {
+        categorie  : d.categorie   ?? "flamme",
+        description: d.description ?? "",
+      },
+    }, "AGONE.Notif.PouvoirAjoute");
   }
 
 }

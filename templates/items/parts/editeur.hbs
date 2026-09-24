@@ -1,0 +1,9 @@
+{{!-- Champ de texte riche d'un item (HTML) : éditeur ProseMirror si la fiche est modifiable,
+      sinon contenu enrichi. Paramètre : champ (ex. "description", "notes"). --}}
+<div class="editor-container">
+  {{#if @root.editable}}
+  <prose-mirror name="system.{{champ}}" value="{{lookup @root.system champ}}" document-uuid="{{@root.item.uuid}}"></prose-mirror>
+  {{else}}
+  <div class="editor-content">{{{lookup @root.enrichi champ}}}</div>
+  {{/if}}
+</div>

@@ -48,14 +48,14 @@
         <tr class="cb-row {{#if c.count}}cb-row-owned{{/if}}">
           <td class="cb-name">
             {{c.displayName}}
-            {{#if c.count}}<span class="cb-count-badge" title="Possédée {{c.count}} fois">x{{c.count}}</span>{{/if}}
+            {{#if c.count}}<span class="cb-count-badge" title='{{localize "AGONE.Ui.PossedeeNFois" n=c.count}}'>x{{c.count}}</span>{{/if}}
           </td>
           <td><span class="cb-fam-badge fam-{{c.famille}}">{{c.famille}}</span></td>
           <td class="cb-attr">{{c.attributLie}}</td>
           <td>
             <button type="button" class="cb-add-btn" data-action="addCompetence"
                     data-name="{{c.name}}" data-attribut-lie="{{c.attributLie}}"
-                    title="Ajouter «{{c.name}}»">
+                    title='{{localize "AGONE.Ui.AjouterNom" nom=c.name}}'>
               <i class="fas fa-plus"></i>
             </button>
           </td>

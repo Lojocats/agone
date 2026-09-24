@@ -1,3 +1,5 @@
+import { listen } from "../helpers/dom.mjs";
+
 /**
  * DomainesArtsConfig — Application GM pour gérer les domaines d'Arts Magiques personnalisés.
  *
@@ -46,12 +48,12 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
 
   _onRender(context, options) {
     super._onRender(context, options);
-    const html = $(this.element);
+    const root = this.element;
 
     // Ajouter un domaine
-    html.find("[data-action='addDomaine']").on("click", async () => {
-      const nom      = html.find(".dac-new-nom").val()?.trim() ?? "";
-      const compLiee = html.find(".dac-new-comp").val()?.trim() ?? "";
+    listen(root, "[data-action='addDomaine']", "click", async () => {
+      const nom      = root.querySelector(".dac-new-nom")?.value?.trim() ?? "";
+      const compLiee = root.querySelector(".dac-new-comp")?.value?.trim() ?? "";
 
       if (!nom) {
         ui.notifications.warn(game.i18n.localize("AGONE.DomainesArts.NomObligatoire"));
@@ -75,7 +77,7 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
     });
 
     // Modifier la compétence liée d'un domaine custom
-    html.find("[data-action='editCompLiee']").on("change", async (e) => {
+    listen(root, "[data-action='editCompLiee']", "change", async (e) => {
       const idx      = Number(e.currentTarget.dataset.idx);
       const compLiee = e.currentTarget.value.trim();
       const custom   = [...(game.settings.get("agone", "domainesArtsCustom") ?? [])];
@@ -86,7 +88,7 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
     });
 
     // Supprimer un domaine custom
-    html.find("[data-action='removeDomaine']").on("click", async (e) => {
+    listen(root, "[data-action='removeDomaine']", "click", async (e) => {
       const idx    = Number(e.currentTarget.dataset.idx);
       const custom = [...(game.settings.get("agone", "domainesArtsCustom") ?? [])];
       const cible  = custom[idx];

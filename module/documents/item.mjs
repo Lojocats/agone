@@ -97,9 +97,9 @@ export class AgoneItem extends Item {
     // ── Autres types (sort, armure, pouvoir, don…) ───────────────────
     let details = "";
     if (this.type === "armure") {
-      details = `PRO : ${sd.protection ?? 0} | -AGI : ${sd.malusAgi ?? 0}`;
+      details = `${game.i18n.localize("AGONE.Des.ProAbr")} : ${sd.protection ?? 0} | -AGI : ${sd.malusAgi ?? 0}`;
     } else if (this.type === "sort") {
-      details = `Seuil : ${sd.seuil ?? 0} | Portée : ${sd.portee ?? "-"} | Durée : ${sd.duree ?? "-"}`;
+      details = `${game.i18n.localize("AGONE.Seuil")} : ${sd.seuil ?? 0} | ${game.i18n.localize("AGONE.Portee")} : ${sd.portee ?? "-"} | ${game.i18n.localize("AGONE.Duree")} : ${sd.duree ?? "-"}`;
     } else if (this.type === "pouvoir") {
       const catLabel = sd.categorie === "saisonin" ? "Saisonin" : "Pouvoir de Flamme";
       details = `<em>${catLabel}</em>`;

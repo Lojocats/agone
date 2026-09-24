@@ -4,7 +4,7 @@
   <span class="acw-saison acw-saison-{{saison}}" title="{{saisonLabel}}">{{saisonLabel}}</span>
 
   <button type="button" class="acw-date acw-clickable" data-action="openCalendrier"
-          title='Ouvrir le calendrier'>
+          title='{{localize "AGONE.Ui.OuvrirCalendrier"}}'>
     <i class="fas fa-calendar-alt"></i>
     <span>{{dateCourte}}</span>
   </button>
@@ -17,7 +17,7 @@
 
   {{#if isGM}}
   <button type="button" class="acw-meteo acw-clickable" data-action="cycleMeteo"
-          title="Cliquer pour changer la météo">
+          title='{{localize "AGONE.Ui.ChangerMeteo"}}'>
     {{meteoIcon}} <span class="acw-meteo-label">{{meteoLabel}}</span>
   </button>
   {{else}}

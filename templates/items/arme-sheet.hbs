@@ -48,7 +48,7 @@
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.Portee"}}</label>
-        <input type="text" name="system.portee" value="{{system.portee}}" placeholder="ex: 80 m / FORx4 m" />
+        <input type="text" name="system.portee" value="{{system.portee}}" placeholder='{{localize "AGONE.Ui.PorteeExemple"}}' />
       </div>
       <div class="form-group">
         <label>{{localize "AGONE.ReqFor"}}</label>
@@ -62,7 +62,7 @@
         <label>{{localize "AGONE.CompetenceLiee"}}</label>
         {{#if isEmbedded}}
         <select name="system.competence">
-          <option value="">— aucune —</option>
+          <option value="">{{localize "AGONE.Ui.AucuneOption"}}</option>
           {{#each actorCompetences as |c|}}
           <option value="{{c.domaine}}" {{#if c.selected}}selected{{/if}}>{{c.label}}</option>
           {{/each}}
@@ -70,7 +70,7 @@
         {{#if linkedComp}}
         <span class="comp-score-preview">{{linkedComp.name}} ({{linkedComp.domaine}}) · {{linkedComp.score}}</span>
         {{else if system.competence}}
-        <span class="comp-score-preview comp-manquante">⚠ "{{system.competence}}" introuvable</span>
+        <span class="comp-score-preview comp-manquante">{{localize "AGONE.Ui.Introuvable" nom=system.competence}}</span>
         {{/if}}
         {{else}}
         <input type="text" name="system.competence" value="{{system.competence}}"
@@ -99,7 +99,8 @@
 
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>
-      <textarea name="system.description" class="description-textarea" rows="6">{{system.description}}</textarea>
+      {{> systems/agone/templates/items/parts/editeur.hbs champ="description"}}
     </div>
+    {{> systems/agone/templates/items/parts/effets.hbs}}
   </section>
 </form>

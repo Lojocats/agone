@@ -1,23 +1,31 @@
+import { AgoneBrowser } from "./agone-browser.mjs";
+
 /**
  * Navigateur de compétences Agone — fenêtre de sélection avec filtres.
  * Permet d'ajouter des compétences depuis la liste de référence CONFIG.AGONE.competences.
  * Une même compétence peut être ajoutée plusieurs fois (ex : Arts Magiques avec domaines différents).
  */
-export class CompetencesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class CompetencesBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor          = actor;
-    this._search        = "";
-    this._filterFams    = new Set();
-    this._filterPossede = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search       : "",
+    _filterFams   : new Set(),
+    _filterPossede: "all",
+  };
+
+  static FILTERS = {
+    ".cb-search"         : { kind: "text",   prop: "_search" },
+    ".cb-search-clear"   : { kind: "reset",  props: ["_search"], refocus: ".cb-search" },
+    ".cb-all-check"      : { kind: "setAll", prop: "_filterFams" },
+    ".cb-fam-check"      : { kind: "set",    prop: "_filterFams" },
+    ".cb-possede-select" : { kind: "select", prop: "_filterPossede" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-competences-browser",
     classes : ["agone", "competences-browser"],
     position: { width: 660, height: 560 },
-    window  : { resizable: true },
+    actions : { addCompetence: CompetencesBrowser.#onAddCompetence },
   };
 
   static PARTS = {
@@ -77,63 +85,12 @@ export class CompetencesBrowser extends foundry.applications.api.HandlebarsAppli
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-    const html = $(this.element);
-
-    // Recherche (avec debounce)
-    html.find(".cb-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".cb-search";
-      this.render();
-    }, 250));
-
-    // Effacer la recherche
-    html.find(".cb-search-clear").on("click", () => {
-      this._search = "";
-      this._refocusSelector = ".cb-search";
-      this.render();
-    });
-
-    // Checkbox "Tous" — efface le filtre de famille
-    html.find(".cb-all-check").on("change", () => {
-      this._filterFams.clear();
-      this.render();
-    });
-
-    // Checkboxes de famille
-    html.find(".cb-fam-check").on("change", e => {
-      const f = e.currentTarget.value;
-      if (e.currentTarget.checked) this._filterFams.add(f);
-      else                         this._filterFams.delete(f);
-      this.render();
-    });
-
-    // Filtre possédées
-    html.find(".cb-possede-select").on("change", e => {
-      this._filterPossede = e.currentTarget.value;
-      this.render();
-    });
-
-    // Bouton ajouter
-    html.find("[data-action='addCompetence']").on("click", async e => {
-      const btn          = e.currentTarget;
-      const name         = btn.dataset.name;
-      const attributLie  = btn.dataset.attributLie ?? "agilite";
-      await Item.create({
-        name,
-        type  : "competence",
-        system: { domaine: "", attributLie, score: 0, exp: 0 }
-      }, { parent: this.actor });
-      this.render();
+  static async #onAddCompetence(event, target) {
+    const { name, attributLie = "agilite" } = target.dataset;
+    await this._addItem({
+      name,
+      type  : "competence",
+      system: { domaine: "", attributLie, score: 0, exp: 0 },
     });
   }
 

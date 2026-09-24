@@ -14,7 +14,7 @@ export function registerHandlebarsHelpers() {
     const escapedValue = RegExp.escape !== undefined
       ? RegExp.escape(selected)
       : selected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const rgx = new RegExp(`value=[\"']${escapedValue}[\"']`);
+    const rgx = new RegExp(`value=["']${escapedValue}["']`);
     const html = options.fn(this);
     return html.replace(rgx, "$& selected");
   });

@@ -1,3 +1,5 @@
+import { listen } from "../helpers/dom.mjs";
+
 /**
  * CalendrierAgone — Calendrier d'Harmonde (10 mois x 30 jours)
  * Visible par tous les joueurs. Navigation réservée au MJ.
@@ -43,11 +45,12 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
     const moisArr  = CONFIG.AGONE.calendrier.mois;
     const moisData = moisArr[(date.mois - 1)] ?? moisArr[0];
     const saison   = moisData.saison;
-    const saisonLabel = CONFIG.AGONE.saisons?.[saison] ?? saison;
+    const saisonLabel = CONFIG.AGONE.saisons?.[saison] ? game.i18n.localize(CONFIG.AGONE.saisons[saison]) : saison;
 
     // Jours de l'an (pour la phase de lune, 300 jours / an)
     const jourDeLAn = (date.mois - 1) * CONFIG.AGONE.calendrier.joursParMois + date.jour;
-    const moonPhase = CalendrierAgone.moonPhase(jourDeLAn);
+    const phase     = CalendrierAgone.moonPhase(jourDeLAn);
+    const moonPhase = { ...phase, label: phase.label ? game.i18n.localize(phase.label) : "" };
 
     // Météo
     const meteoObj  = (CONFIG.AGONE.meteoTypes ?? []).find(m => m.id === meteoId) ?? { id: "", icon: "—", label: "—" };
@@ -76,7 +79,7 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
       ordinal, noteJour, isGM: game.user.isGM,
       heure, minute, timeStr,
       moonPhase,
-      meteoId, meteoIcon: meteoObj.icon, meteoLabel: meteoObj.label,
+      meteoId, meteoIcon: meteoObj.icon, meteoLabel: game.i18n.localize(meteoObj.label),
       meteoTypes: CONFIG.AGONE.meteoTypes ?? [],
     };
   }
@@ -85,58 +88,48 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
 
   _onRender(context, options) {
     super._onRender(context, options);
-    const html = $(this.element);
+    const root = this.element;
 
     // Lecture seule pour les joueurs
     if (!game.user.isGM) return;
 
     // Navigation (jours, mois, ans, heures, minutes)
-    html.find("[data-nav]").on("click", async (e) => {
+    listen(root, "[data-nav]", "click", async (e) => {
       const { delta, unit } = e.currentTarget.dataset;
       await this._navigate(Number(delta), unit);
     });
 
     // Boutons rapides avancer de N heures
-    html.find("[data-advance-hours]").on("click", async (e) => {
+    listen(root, "[data-advance-hours]", "click", async (e) => {
       const h = Number(e.currentTarget.dataset.advanceHours);
       if (!isNaN(h) && h > 0) await this._navigate(h, "heure");
     });
 
     // Changement d'année via label interactif
-    html.find("[data-open-year-picker]").on("click", async () => {
+    listen(root, "[data-open-year-picker]", "click", async () => {
       const currentYear = Number((game.settings.get("agone", "calendrierDate") ?? { an: 1 }).an) || 1;
       const content = `
-        <form class="agone-year-picker-form">
+        <div class="agone-year-picker-form">
           <div class="form-group">
             <label>${game.i18n.localize("AGONE.Calendrier.An")}</label>
-            <input type="number" name="annee" min="1" step="1" value="${currentYear}" />
+            <input type="number" name="annee" min="1" step="1" value="${currentYear}" autofocus />
           </div>
-        </form>
+        </div>
       `;
-      new Dialog({
-        title: game.i18n.localize("AGONE.Calendrier.ChangerAnnee"),
+      const annee = await foundry.applications.api.DialogV2.prompt({
+        window : { title: game.i18n.localize("AGONE.Calendrier.ChangerAnnee") },
         content,
-        buttons: {
-          cancel: { label: game.i18n.localize("AGONE.Fermer") },
-          ok: {
-            label: game.i18n.localize("AGONE.Confirmer"),
-            callback: async (dialogHtml) => {
-              const yearInput = Number(dialogHtml.find("input[name='annee']").val());
-              await this._setYear(yearInput);
-            },
-          },
+        ok     : {
+          label   : game.i18n.localize("AGONE.Confirmer"),
+          callback: (_event, button) => Number(button.form.elements.annee.value),
         },
-        default: "ok",
-        render: (dialogHtml) => {
-          const input = dialogHtml.find("input[name='annee']");
-          input.trigger("focus");
-          input.trigger("select");
-        },
-      }).render(true);
+        rejectClose: false,
+      });
+      if (annee) await this._setYear(annee);
     });
 
     // Clic sur un jour
-    html.find(".cal-day").on("click", async (e) => {
+    listen(root, ".cal-day", "click", async (e) => {
       const jour = Number(e.currentTarget.dataset.jour);
       const date = game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1, heure: 8, minute: 0 };
       await game.settings.set("agone", "calendrierDate", { ...date, jour });
@@ -144,17 +137,17 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
     });
 
     // Changement météo via select (GM)
-    html.find(".cal-meteo-select").on("change", async (e) => {
+    listen(root, ".cal-meteo-select", "change", async (e) => {
       await game.settings.set("agone", "calendrierMeteo", e.currentTarget.value);
       this.render();
     });
 
     // Sauvegarde de note
-    html.find(".cal-note-save").on("click", async () => {
+    listen(root, ".cal-note-save", "click", async () => {
       const date    = game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1 };
       const noteKey = `${date.an}-${date.mois}-${date.jour}`;
       const notes   = { ...(game.settings.get("agone", "calendrierNotes") ?? {}) };
-      const val     = html.find(".cal-note-input").val()?.trim() ?? "";
+      const val     = root.querySelector(".cal-note-input")?.value?.trim() ?? "";
       if (val) notes[noteKey] = val;
       else delete notes[noteKey];
       await game.settings.set("agone", "calendrierNotes", notes);

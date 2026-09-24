@@ -26,11 +26,11 @@
     </div>
     <div class="form-group">
       <label>{{localize "AGONE.ManCondition"}}</label>
-      <input type="text" name="system.condition" value="{{system.condition}}" placeholder="ex. Farfadet uniquement, Réaction…" />
+      <input type="text" name="system.condition" value="{{system.condition}}" placeholder='{{localize "AGONE.Ui.ConditionExemple"}}' />
     </div>
     <div class="form-group description-group">
       <label>{{localize "AGONE.Description"}}</label>
-      <textarea name="system.description" class="description-textarea" rows="5">{{system.description}}</textarea>
+      {{> systems/agone/templates/items/parts/editeur.hbs champ="description"}}
     </div>
   </section>
 </form>

@@ -2,3 +2,5 @@
 *.py
 packs/armes/LOG
 packs/armures/LOG
+CLAUDE.md
+node_modules/

@@ -71,14 +71,14 @@
           {{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-pos">+{{don.system.cout}}</span>
-          <a class="btn-icon item-edit" data-item-id="{{don.id}}" title="Modifier"><i class="fas fa-edit"></i></a>
-          <a class="btn-icon item-delete" data-item-id="{{don.id}}" title="Supprimer"><i class="fas fa-trash"></i></a>
+          <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
+          <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li">
           <details class="item-details">
             <summary>{{localize "AGONE.VoirDescription"}}</summary>
-            <div class="item-desc-content don-desc-text">{{don.system.description}}</div>
+            <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
           </details>
         </li>
         {{/if}}
@@ -119,7 +119,7 @@
         <li class="don-desc-li">
           <details class="item-details">
             <summary>{{localize "AGONE.VoirDescription"}}</summary>
-            <div class="item-desc-content don-desc-text">{{don.system.description}}</div>
+            <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
           </details>
         </li>
         {{/if}}

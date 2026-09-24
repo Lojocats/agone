@@ -1,26 +1,38 @@
 import { SORTS_DATA } from "../helpers/compendium-data.mjs";
+import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
  * Navigateur de sorts Agone — fenêtre de sélection avec filtres.
  * Remplace l'ouverture brute du compendium.
  */
-export class SortsBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class SortsBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor             = actor;
-    this._search           = "";
-    this._filterTypes      = new Set();
-    this._filterSeuilMax   = null;
-    this._filterSeuilExact = null;
-    this._filterPossede    = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search          : "",
+    _filterTypes     : new Set(),
+    _filterSeuilMax  : null,
+    _filterSeuilExact: null,
+    _filterPossede   : "all",
+  };
+
+  static FILTERS = {
+    ".sb-search"         : { kind: "text",   prop: "_search" },
+    ".sb-all-check"      : { kind: "setAll", prop: "_filterTypes" },
+    ".sb-type-check"     : { kind: "set",    prop: "_filterTypes" },
+    // Seuil exact et seuil max sont exclusifs
+    ".sb-seuil-exact"    : { kind: "number", prop: "_filterSeuilExact",
+                             onChange(v) { if (v !== null) this._filterSeuilMax = null; } },
+    ".sb-seuil-max"      : { kind: "number", prop: "_filterSeuilMax", debounce: 300,
+                             onChange(v) { if (v !== null) this._filterSeuilExact = null; } },
+    ".sb-possede-filter" : { kind: "select", prop: "_filterPossede" },
+    ".sb-clear"          : { kind: "reset" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-sorts-browser",
     classes : ["agone", "sorts-browser"],
     position: { width: 820, height: 660 },
-    window  : { resizable: true },
+    actions : { addSort: SortsBrowser.#onAddSort, rollSortImpro: SortsBrowser.#onRollSortImpro },
   };
 
   static PARTS = {
@@ -103,142 +115,63 @@ export class SortsBrowser extends foundry.applications.api.HandlebarsApplication
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-    const html = $(this.element);
+  static async #onRollSortImpro(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, SORTS_DATA, "sortIdx");
+    if (!d) return;
 
-    // Recherche (avec debounce)
-    html.find(".sb-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".sb-search";
-      this.render();
-    }, 250));
-
-    // Checkbox "Tous" — efface la sélection de type
-    html.find(".sb-all-check").on("change", () => {
-      this._filterTypes.clear();
-      this.render();
-    });
-
-    // Checkboxes de type (multi-select)
-    html.find(".sb-type-check").on("change", e => {
-      const t = e.currentTarget.value;
-      if (e.currentTarget.checked) this._filterTypes.add(t);
-      else this._filterTypes.delete(t);
-      this.render();
-    });
-
-    // Filtre seuil exact
-    html.find(".sb-seuil-exact").on("change", e => {
-      const v = parseInt(e.currentTarget.value);
-      this._filterSeuilExact = isNaN(v) ? null : v;
-      // Désactiver le filtre max si un exact est sélectionné
-      if (this._filterSeuilExact !== null) this._filterSeuilMax = null;
-      this.render();
-    });
-
-    // Filtre seuil max
-    html.find(".sb-seuil-max").on("input", foundry.utils.debounce(e => {
-      const v = parseInt(e.currentTarget.value);
-      this._filterSeuilMax = isNaN(v) ? null : v;
-      // Désactiver le filtre exact si le max est utilisé
-      if (this._filterSeuilMax !== null) this._filterSeuilExact = null;
-      this._refocusSelector = ".sb-seuil-max";
-      this.render();
-    }, 300));
-
-    // Filtre possédé
-    html.find(".sb-possede-filter").on("change", e => {
-      this._filterPossede = e.currentTarget.value;
-      this.render();
-    });
-
-    // Effacer les filtres
-    html.find(".sb-clear").on("click", () => {
-      this._search          = "";
-      this._filterTypes.clear();
-      this._filterSeuilMax   = null;
-      this._filterSeuilExact = null;
-      this._filterPossede    = "all";
-      this.render();
-    });
-
-    // Jet improvisé depuis le navigateur
-    html.find("[data-action='rollSortImpro']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-sort-idx]")?.dataset?.sortIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = SORTS_DATA[idx];
-      if (!d) return;
-
-      // Sorts d'emprise (danseurs) : demander quel danseur utiliser
-      const EMPRISE_TYPES = new Set(["jorniste", "obscurantiste", "eclipsiste"]);
-      if (EMPRISE_TYPES.has(d.typeMagie)) {
-        const danseurs = this.actor.items.filter(i => i.type === "danseur" && !i.system.modeCreation);
-        if (!danseurs.length) {
-          ui.notifications.warn(game.i18n.format("AGONE.Notif.AucunDanseurDisponible", { acteur: this.actor.name }));
-          return;
-        }
-        let danseurId;
-        if (danseurs.length === 1) {
-          danseurId = danseurs[0].id;
-        } else {
-          const options = danseurs.map(dan => `<option value="${dan.id}">${dan.name}</option>`).join("");
-          danseurId = await foundry.applications.api.DialogV2.prompt({
-            window:  { title: game.i18n.format("AGONE.Browser.TitreDialogSortImpro", { nom: d.name }) },
-            content: `<div class="form-group" style="margin:8px 0">
-                        <label style="font-weight:600">${game.i18n.localize("AGONE.Browser.DanseurAUtiliser")}</label>
-                        <select name="danseurId" style="width:100%;margin-top:4px">${options}</select>
-                      </div>`,
-            ok: { label: game.i18n.localize("AGONE.Lancer"), callback: (_ev, btn) => btn.form.elements.danseurId.value },
-          });
-          if (!danseurId) return;
-        }
-        await this.actor.rollSortImproDanseur(danseurId, { name: d.name, seuil: d.seuil, description: d.description ?? "", typeMagie: d.typeMagie ?? "", portee: d.portee ?? "", duree: d.duree ?? "", danse: d.danse ?? "" });
+    // Sorts d'emprise (danseurs) : demander quel danseur utiliser
+    const EMPRISE_TYPES = new Set(["jorniste", "obscurantiste", "eclipsiste"]);
+    if (EMPRISE_TYPES.has(d.typeMagie)) {
+      const danseurs = this.actor.items.filter(i => i.type === "danseur" && !i.system.modeCreation);
+      if (!danseurs.length) {
+        ui.notifications.warn(game.i18n.format("AGONE.Notif.AucunDanseurDisponible", { acteur: this.actor.name }));
         return;
       }
-
-      // Sort normal (Arts Magiques)
-      const actorItem = this.actor.items.find(i => i.type === "sort" && i.name === d.name);
-      if (actorItem) {
-        await this.actor.rollSort(actorItem.id, { impro: true });
+      let danseurId;
+      if (danseurs.length === 1) {
+        danseurId = danseurs[0].id;
       } else {
-        await this.actor.rollSort(d, { impro: true });
+        const options = danseurs.map(dan => `<option value="${dan.id}">${dan.name}</option>`).join("");
+        danseurId = await foundry.applications.api.DialogV2.prompt({
+          window:  { title: game.i18n.format("AGONE.Browser.TitreDialogSortImpro", { nom: d.name }) },
+          content: `<div class="form-group" style="margin:8px 0">
+                      <label style="font-weight:600">${game.i18n.localize("AGONE.Browser.DanseurAUtiliser")}</label>
+                      <select name="danseurId" style="width:100%;margin-top:4px">${options}</select>
+                    </div>`,
+          ok: { label: game.i18n.localize("AGONE.Lancer"), callback: (_ev, btn) => btn.form.elements.danseurId.value },
+        });
+        if (!danseurId) return;
       }
-    });
+      await this.actor.rollSortImproDanseur(danseurId, { name: d.name, seuil: d.seuil, description: d.description ?? "", typeMagie: d.typeMagie ?? "", portee: d.portee ?? "", duree: d.duree ?? "", danse: d.danse ?? "" });
+      return;
+    }
 
-    // Ajouter un sort au personnage
-    html.find("[data-action='addSort']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-sort-idx]")?.dataset?.sortIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = SORTS_DATA[idx];
-      if (!d) return;
+    // Sort normal (Arts Magiques)
+    const actorItem = this.actor.items.find(i => i.type === "sort" && i.name === d.name);
+    if (actorItem) {
+      await this.actor.rollSort(actorItem.id, { impro: true });
+    } else {
+      await this.actor.rollSort(d, { impro: true });
+    }
+  }
 
-      await Item.create({
-        name  : d.name,
-        type  : "sort",
-        system: {
-          typeMagie  : d.typeMagie   ?? "",
-          seuil      : d.seuil       ?? 0,
-          portee     : d.portee      ?? "",
-          duree      : d.duree       ?? "",
-          danse      : d.danse       ?? "",
-          instrument : d.instrument  ?? "",
-          special    : d.special     ?? "",
-          description: d.description ?? "",
-        },
-      }, { parent: this.actor });
-
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.SortAjoute", { nom: d.name, acteur: this.actor.name }));
-      this.render(); // rafraîchit le checkmark
-    });
+  static async #onAddSort(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, SORTS_DATA, "sortIdx");
+    if (!d) return;
+    await this._addItem({
+      name  : d.name,
+      type  : "sort",
+      system: {
+        typeMagie  : d.typeMagie   ?? "",
+        seuil      : d.seuil       ?? 0,
+        portee     : d.portee      ?? "",
+        duree      : d.duree       ?? "",
+        danse      : d.danse       ?? "",
+        instrument : d.instrument  ?? "",
+        special    : d.special     ?? "",
+        description: d.description ?? "",
+      },
+    }, "AGONE.Notif.SortAjoute");
   }
 
 }

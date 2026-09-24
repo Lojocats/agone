@@ -11,7 +11,7 @@
         <label>{{localize "AGONE.Domaine"}}</label>
         {{#if (eq item.name "Arts Magiques")}}
         <input type="text" name="system.domaine" value="{{system.domaine}}"
-               list="agone-arts-domaines" placeholder="ex: Accord" />
+               list="agone-arts-domaines" placeholder='{{localize "AGONE.Ui.Exemple" valeur="Accord"}}' />
         <datalist id="agone-arts-domaines">
           {{#each artsDomainOptions as |opt|}}
           <option value="{{opt}}"></option>
@@ -19,7 +19,7 @@
         </datalist>
         {{else if (eq item.name "Musique")}}
         <input type="text" name="system.domaine" value="{{system.domaine}}"
-               list="agone-music-domaines" placeholder="ex: harpe" />
+               list="agone-music-domaines" placeholder='{{localize "AGONE.Ui.Exemple" valeur="harpe"}}' />
         <datalist id="agone-music-domaines">
           {{#each musicDomainOptions as |opt|}}
           <option value="{{opt}}"></option>
@@ -27,7 +27,7 @@
         </datalist>
         {{else if (eq item.name "Saisons")}}
         <input type="text" name="system.domaine" value="{{system.domaine}}"
-               list="agone-saison-domaines" placeholder="ex: printemps" />
+               list="agone-saison-domaines" placeholder='{{localize "AGONE.Ui.Exemple" valeur="printemps"}}' />
         <datalist id="agone-saison-domaines">
           {{#each saisonDomainOptions as |opt|}}
           <option value="{{opt}}"></option>
@@ -35,7 +35,7 @@
         </datalist>
         {{else if (eq item.name "Résonance")}}
         <input type="text" name="system.domaine" value="{{system.domaine}}"
-               list="agone-resonance-domaines" placeholder="ex: jorniste" />
+               list="agone-resonance-domaines" placeholder='{{localize "AGONE.Ui.Exemple" valeur="jorniste"}}' />
         <datalist id="agone-resonance-domaines">
           {{#each resonanceDomainOptions as |opt|}}
           <option value="{{opt}}"></option>
@@ -75,7 +75,7 @@
     </div>
     <div class="form-group description-group">
       <label>{{localize "AGONE.Notes"}}</label>
-      <textarea name="system.notes" class="description-textarea" rows="6">{{system.notes}}</textarea>
+      {{> systems/agone/templates/items/parts/editeur.hbs champ="notes"}}
     </div>
   </section>
 </form>

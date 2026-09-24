@@ -1,4 +1,5 @@
 import { PEINES_PERFIDIE_DATA } from "../helpers/compendium-data.mjs";
+import { AgoneBrowser } from "./agone-browser.mjs";
 
 // Libellés lisibles des catégories de peines de Perfidie
 function _buildCatLabels() {
@@ -12,21 +13,26 @@ function _buildCatLabels() {
 /**
  * Navigateur des Peines de Perfidie — fenêtre de sélection avec filtres.
  */
-export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class PeinesBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor            = actor;
-    this._search          = "";
-    this._filterCategorie = "all";
-    this._filterNoir      = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search         : "",
+    _filterCategorie: "all",
+    _filterNoir     : "all",
+  };
+
+  static FILTERS = {
+    ".pnb-search"     : { kind: "text",   prop: "_search" },
+    ".pnb-cat-filter" : { kind: "select", prop: "_filterCategorie" },
+    ".pnb-noir-filter": { kind: "select", prop: "_filterNoir" },
+    ".pnb-clear"      : { kind: "reset" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-peines-browser",
     classes : ["agone", "peines-browser"],
     position: { width: 720, height: 560 },
-    window  : { resizable: true },
+    actions : { addPeine: PeinesBrowser.#onAddPeine },
   };
 
   static PARTS = {
@@ -84,62 +90,20 @@ export class PeinesBrowser extends foundry.applications.api.HandlebarsApplicatio
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-    const html = $(this.element);
-
-    html.find(".pnb-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".pnb-search";
-      this.render();
-    }, 250));
-
-    html.find(".pnb-cat-filter").on("change", e => {
-      this._filterCategorie = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".pnb-noir-filter").on("change", e => {
-      this._filterNoir = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".pnb-clear").on("click", () => {
-      this._search          = "";
-      this._filterCategorie = "all";
-      this._filterNoir      = "all";
-      this.render();
-    });
-
-    html.find("[data-action='addPeine']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-pn-idx]")?.dataset?.pnIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = PEINES_PERFIDIE_DATA[idx];
-      if (!d) return;
-
-      await Item.create({
-        name  : d.name,
-        type  : "peine",
-        system: {
-          categorie    : d.categorie,
-          noirEffect   : d.noirEffect,
-          bienfait     : d.bienfait ?? "",
-          bienfaitAcquis: false,
-          description  : d.description ?? "",
-        },
-      }, { parent: this.actor });
-
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.PeineAjoutee", { nom: d.name, acteur: this.actor.name }));
-      this.render();
-    });
+  static async #onAddPeine(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, PEINES_PERFIDIE_DATA, "pnIdx");
+    if (!d) return;
+    await this._addItem({
+      name  : d.name,
+      type  : "peine",
+      system: {
+        categorie     : d.categorie,
+        noirEffect    : d.noirEffect,
+        bienfait      : d.bienfait ?? "",
+        bienfaitAcquis: false,
+        description   : d.description ?? "",
+      },
+    }, "AGONE.Notif.PeineAjoutee");
   }
 
 }

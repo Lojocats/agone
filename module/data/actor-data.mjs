@@ -8,6 +8,18 @@ const fields = foundry.data.fields;
 // ================================
 // Personnage (Joueur)
 // ================================
+/**
+ * Applique les effets actifs cumulés de l'acteur (flags.agone.effets, voir helpers/effets.mjs)
+ * aux caractéristiques d'un compagnon, démon ou PNJ, avant le calcul de ses valeurs dérivées.
+ * Les valeurs modifiées sont transitoires : la saisie des fiches utilise `actor._source`.
+ * @returns {object} Le cumul des effets, pour les bonus des stats dérivées
+ */
+function appliquerEffetsCaracs(model, keys) {
+  const fx = model.parent?.flags?.agone?.effets ?? {};
+  for (const k of keys) model[k] = Math.max(0, (model[k] ?? 0) + (fx[k] ?? 0));
+  return fx;
+}
+
 export class PersonnageData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {
@@ -415,10 +427,11 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
-    this.initiative = this.agilite + this.perception;
-    this.melee = Math.floor((this.force + this.agilite * 2) / 3);
+    const fx = appliquerEffetsCaracs(this, ["agilite", "force", "perception", "resistance"]);
+    this.initiative = this.agilite + this.perception + (fx.initiative_bonus ?? 0);
+    this.melee = Math.floor((this.force + this.agilite * 2) / 3) + (fx.melee_bonus ?? 0);
     this.demiCharge = Math.floor(this.chargeMax / 2);
-    this.defenseNaturelle = this.agilite;
+    this.defenseNaturelle = this.agilite + (fx.defense_bonus ?? 0);
     this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
     const malusTable = [0, -2, -6, -12];
     this.malusBlessureGrave = malusTable[this.blessuresGraves];
@@ -493,14 +506,15 @@ export class DemonData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
+    const fx = appliquerEffetsCaracs(this, ["agilite", "force", "perception", "intelligence", "volonte", "charisma", "creativite"]);
     // RÉS = Densité max / 5
-    this.resistance = Math.floor(this.densite.max / 5);
+    this.resistance = Math.max(0, Math.floor(this.densite.max / 5) + (fx.resistance ?? 0));
     // Stats de combat
-    this.melee    = Math.floor((this.force + this.agilite * 2) / 3);
-    this.tir      = Math.floor((this.agilite + this.perception) / 2);
-    this.initiative = this.agilite + this.perception;
-    this.art      = Math.floor((this.charisma + this.creativite) / 2);
-    this.defenseNaturelle = this.agilite;
+    this.melee    = Math.floor((this.force + this.agilite * 2) / 3) + (fx.melee_bonus ?? 0);
+    this.tir      = Math.floor((this.agilite + this.perception) / 2) + (fx.tir_bonus ?? 0);
+    this.initiative = this.agilite + this.perception + (fx.initiative_bonus ?? 0);
+    this.art      = Math.floor((this.charisma + this.creativite) / 2) + (fx.art_bonus ?? 0);
+    this.defenseNaturelle = this.agilite + (fx.defense_bonus ?? 0);
     // Seuils basés sur densité max
     this.seuilBlessureGrave    = Math.max(1, Math.floor(this.densite.max / 3));
     this.seuilBlessureCritique = Math.max(1, Math.floor(this.densite.max / 2));
@@ -561,15 +575,17 @@ export class PnjData extends foundry.abstract.TypeDataModel {
   }
 
   prepareDerivedData() {
-    this.melee      = Math.floor((this.force + this.agilite * 2) / 3);
-    this.tir        = Math.floor((this.perception + this.agilite) / 2);
-    this.initiative = this.agilite + this.perception;
-    this.art             = Math.floor((this.charisma + this.creativite) / 2);
-    this.defenseNaturelle = this.agilite;
+    const fx = appliquerEffetsCaracs(this, ["agilite", "force", "perception", "resistance", "intelligence",
+                                            "volonte", "charisma", "creativite", "corps", "esprit", "ame"]);
+    this.melee      = Math.floor((this.force + this.agilite * 2) / 3) + (fx.melee_bonus ?? 0);
+    this.tir        = Math.floor((this.perception + this.agilite) / 2) + (fx.tir_bonus ?? 0);
+    this.initiative = this.agilite + this.perception + (fx.initiative_bonus ?? 0);
+    this.art             = Math.floor((this.charisma + this.creativite) / 2) + (fx.art_bonus ?? 0);
+    this.defenseNaturelle = this.agilite + (fx.defense_bonus ?? 0);
     if (this.typeMage === "jorniste")           this.emprise = this.intelligence;
     else if (this.typeMage === "obscurantiste") this.emprise = this.volonte;
     else                                        this.emprise = Math.floor((this.intelligence + this.volonte) / 2);
-    this.emprise += this.esprit;
+    this.emprise += this.esprit + (fx.emprise_bonus ?? 0);
     this.seuilBlessureGrave    = Math.max(1, Math.floor(this.pdv.max / 3));
     this.seuilBlessureCritique = Math.max(1, Math.floor(this.pdv.max / 2));
     this.bonusCorps  = this.corps;

@@ -20,7 +20,7 @@ export class CompetenceData extends foundry.abstract.TypeDataModel {
         initial: "agilite",
         choices: ["agilite","force","perception","resistance","intelligence","volonte","charisma","creativite","melee","tir"]
       }),
-      notes: new fields.StringField({ initial: "" })
+      notes: new fields.HTMLField({ initial: "" })
     };
   }
 }
@@ -42,7 +42,7 @@ export class ArmeData extends foundry.abstract.TypeDataModel {
       reqFor:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       reqAgi:      new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       competence:  new fields.StringField({ initial: "" }), // domaine de la compétence liée (ex: Mêlée, Tir, Jet)
-      description: new fields.StringField({ initial: "" }),
+      description: new fields.HTMLField({ initial: "" }),
       poids:       new fields.NumberField({ initial: 0, min: 0 }),
       // Champs complémentaires (boucliers et état d'équipement)
       equipe:      new fields.BooleanField({ initial: false }),
@@ -63,7 +63,7 @@ export class ArmureData extends foundry.abstract.TypeDataModel {
       malusAgi:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       malusPer:   new fields.NumberField({ initial: 0, integer: true, min: 0 }),
       portee:     new fields.BooleanField({ initial: false }),
-      description:new fields.StringField({ initial: "" }),
+      description:new fields.HTMLField({ initial: "" }),
       poids:      new fields.NumberField({ initial: 0, min: 0 })
     };
   }
@@ -181,7 +181,7 @@ export class EquipementData extends foundry.abstract.TypeDataModel {
     return {
       quantite:    new fields.NumberField({ initial: 1, integer: true, min: 0 }),
       poidsUnit:   new fields.NumberField({ initial: 0, min: 0 }),
-      description: new fields.StringField({ initial: "" })
+      description: new fields.HTMLField({ initial: "" })
     };
   }
 

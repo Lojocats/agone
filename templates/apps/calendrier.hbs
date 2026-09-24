@@ -19,7 +19,7 @@
     {{#if isGM}}
       <select class="cal-meteo-select" name="meteo">
         {{#each meteoTypes}}
-          <option value="{{id}}" {{#if (eq id ../meteoId)}}selected{{/if}}>{{icon}} {{label}}</option>
+          <option value="{{id}}" {{#if (eq id ../meteoId)}}selected{{/if}}>{{icon}} {{localize label}}</option>
         {{/each}}
       </select>
     {{else}}

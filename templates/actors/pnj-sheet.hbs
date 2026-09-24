@@ -52,15 +52,15 @@
         <h3 class="combat-card-title"><i class="fas fa-fire"></i> {{localize "AGONE.Aspects"}}</h3>
         <div class="cstats-grid">
           <div class="cstat-item">
-            <input type="number" name="system.corps" value="{{system.corps}}" class="stat-num cstat-input" />
+            <input type="number" name="system.corps" value="{{source.corps}}" class="stat-num cstat-input" />
             <span class="cstat-label">{{localize "AGONE.Corps"}}</span>
           </div>
           <div class="cstat-item">
-            <input type="number" name="system.esprit" value="{{system.esprit}}" class="stat-num cstat-input" />
+            <input type="number" name="system.esprit" value="{{source.esprit}}" class="stat-num cstat-input" />
             <span class="cstat-label">{{localize "AGONE.Esprit"}}</span>
           </div>
           <div class="cstat-item">
-            <input type="number" name="system.ame" value="{{system.ame}}" class="stat-num cstat-input" />
+            <input type="number" name="system.ame" value="{{source.ame}}" class="stat-num cstat-input" />
             <span class="cstat-label">{{localize "AGONE.Ame"}}</span>
           </div>
           <div class="cstat-item">
@@ -80,44 +80,7 @@
         <div class="npc-left-col">
           <div class="combat-card">
             <h3 class="combat-card-title"><i class="fas fa-person"></i> {{localize "AGONE.Caracteristiques"}}</h3>
-            <div class="carac-grid npc-carac-grid npc-carac-2col">
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Agilite"}}</label>
-                <input type="number" name="system.agilite" value="{{system.agilite}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Force"}}</label>
-                <input type="number" name="system.force" value="{{system.force}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Perception"}}</label>
-                <input type="number" name="system.perception" value="{{system.perception}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Resistance"}}</label>
-                <input type="number" name="system.resistance" value="{{system.resistance}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Intelligence"}}</label>
-                <input type="number" name="system.intelligence" value="{{system.intelligence}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Volonte"}}</label>
-                <input type="number" name="system.volonte" value="{{system.volonte}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Charisma"}}</label>
-                <input type="number" name="system.charisma" value="{{system.charisma}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.Attribut.Creativite"}}</label>
-                <input type="number" name="system.creativite" value="{{system.creativite}}" class="stat-num" />
-              </div>
-              <div class="carac-row">
-                <label>{{localize "AGONE.BD"}}</label>
-                <input type="number" name="system.bd" value="{{system.bd}}" class="stat-num" />
-              </div>
-            </div>
+            {{> systems/agone/templates/actors/parts/caracs-simples.hbs}}
           </div>
         </div>
 
@@ -448,7 +411,7 @@
       </div>
       <div class="npc-notes-block">
         <h3 class="npc-notes-title">{{localize "AGONE.Equipement"}}</h3>
-        <textarea name="system.equipement" class="npc-equip-textarea" placeholder="Équipement...">{{system.equipement}}</textarea>
+        <textarea name="system.equipement" class="npc-equip-textarea" placeholder='{{localize "AGONE.Ui.EquipementPlaceholder"}}'>{{system.equipement}}</textarea>
       </div>
     </div>
 

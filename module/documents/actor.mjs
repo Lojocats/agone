@@ -1,4 +1,9 @@
-import { AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
+import { effetsActeur, effetsNeutres } from "../helpers/effets.mjs";
+
+/** Libellé localisé des cartes de jet (section AGONE.Des). */
+const _L = (key, data) => data
+  ? game.i18n.format(`AGONE.Des.${key}`, data)
+  : game.i18n.localize(`AGONE.Des.${key}`);
 
 /**
  * AgoneActor — Classe Actor étendue pour le système Agone
@@ -7,8 +12,11 @@ import { AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
 export class AgoneActor extends Actor {
 
   /** @override */
-  prepareData() {
-    super.prepareData();
+  prepareBaseData() {
+    super.prepareBaseData();
+    // Valeurs neutres des effets actifs : Foundry y cumule les modificateurs des items
+    // pendant applyActiveEffects (clés flags.agone.effets.*, voir helpers/effets.mjs).
+    foundry.utils.setProperty(this.flags, "agone.effets", effetsNeutres());
   }
   /**
    * Redirige les mises à jour de la barre PdV token vers system.pdv.valeur
@@ -117,7 +125,6 @@ export class AgoneActor extends Actor {
 
   /** @override */
   prepareDerivedData() {
-    const actorData = this;
     const systemData = this.system;
 
     // Calcul de la charge totale portée depuis l'inventaire
@@ -194,6 +201,14 @@ export class AgoneActor extends Actor {
           systemData.esquiveTotal     = (systemData.esquiveTotal     ?? 0) + _bs('esquive');
           systemData.emprise          = (systemData.emprise          ?? 0) + _bs('emprise');
         }
+
+        // Effets actifs sur les stats dérivées (initiative, Art et Emprise : voir _applyAvantagesEffets)
+        const fx = effetsActeur(this);
+        systemData.melee            += fx.melee_bonus;
+        systemData.tir              += fx.tir_bonus;
+        systemData.defenseNaturelle += fx.defense_bonus;
+        systemData.esquiveTotal     += fx.esquive_bonus;
+        systemData.bd               += fx.bd_bonus;
       }
     }
 
@@ -201,12 +216,14 @@ export class AgoneActor extends Actor {
     if (this.type === "pnj") {
       const compEsquivePnj = this.items.find(i => i.type === "competence" && i.name === "Esquive");
       const scoreEsquivePnj = compEsquivePnj?.system.score ?? 0;
-      systemData.esquiveTotal = systemData.agilite + scoreEsquivePnj + (systemData.bonusCorps ?? 0);
+      systemData.esquiveTotal = systemData.agilite + scoreEsquivePnj + (systemData.bonusCorps ?? 0)
+                              + effetsActeur(this).esquive_bonus;
     }
   }
 
   /**
-   * Applique les effets mécaniques des avantages & défauts (type "don") sur les stats.
+   * Applique les effets actifs des items (avantages, équipement… : ActiveEffect cumulés dans
+   * flags.agone.effets) et les bonus d'attributs supplémentaires sur les stats du personnage.
    * Modifie uniquement les propriétés calculées (transient), jamais le stockage persistant.
    * Appelée à la FIN de prepareDerivedData() pour le type personnage.
    */
@@ -216,37 +233,9 @@ export class AgoneActor extends Actor {
 
     const dons = this.items.filter(i => i.type === "don");
     const _primairesSupp = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite','corps','esprit','ame'];
-    const _hasSuppPrimaire = (sd.bonusAttributsSupp ?? []).some(e => _primairesSupp.includes(e.attribut));
-    if (!dons.length && !_hasSuppPrimaire) return;
 
-    // Accumulation des deltas
-    const b = {
-      agilite: 0, force: 0, resistance: 0, intelligence: 0,
-      volonte: 0, charisma: 0, creativite: 0, perception: 0,
-      corps: 0, esprit: 0, ame: 0,
-      corps_noir: 0, esprit_noir: 0, ame_noir: 0,
-      tai: 0,
-      initiative_bonus: 0,
-      art_bonus: 0,
-      emprise_bonus: 0,
-      mv_divisor: 1,
-      ptsCreationComp_bonus: 0,
-      charges_double: false,
-      charges_reduction: 0,
-    };
-
-    for (const don of dons) {
-      const effets = AVANTAGES_EFFETS[don.name] ?? [];
-      for (const e of effets) {
-        if (e.stat === "mv_divisor") {
-          b.mv_divisor = Math.max(b.mv_divisor, e.value ?? 1);
-        } else if (e.stat === "charges_double") {
-          b.charges_double = true;
-        } else if (e.delta !== undefined) {
-          b[e.stat] = (b[e.stat] ?? 0) + e.delta;
-        }
-      }
-    }
+    // Cumul des effets actifs des items (ActiveEffect → flags.agone.effets, voir helpers/effets.mjs)
+    const b = effetsActeur(this);
 
     // Bonus/malus d'attributs supplémentaires sur stats primaires
     for (const e of (sd.bonusAttributsSupp ?? [])) {
@@ -254,6 +243,9 @@ export class AgoneActor extends Actor {
         b[e.attribut] = (b[e.attribut] ?? 0) + (Number(e.valeur) || 0);
       }
     }
+
+    // Charges des avantages & défauts : calculées même sans effet mécanique
+    this._calculerCharges(dons, b);
 
     // Rien à faire si aucun effet
     const anyDelta = Object.entries(b).some(([k, v]) => {
@@ -354,32 +346,6 @@ export class AgoneActor extends Actor {
       sd.mv = Math.max(1, Math.floor(sd.mv / b.mv_divisor));
     }
 
-    // --- 6. Calcul des Charges (avantages & défauts) ---
-    {
-      let depense = 0;
-      let recupere = 0;
-      for (const don of dons) {
-        const cout = don.system.cout ?? 0;
-        if (don.system.categorie === "avantage") {
-          let coutEff = cout;
-          if (b.charges_double && don.name !== "Jeune" && don.system.typeCharge === "charge")     coutEff *= 2;
-          if (b.charges_reduction > 0 && don.name !== "Vieillard" && don.system.typeCharge === "charge") coutEff = Math.max(1, coutEff - b.charges_reduction);
-          depense += Math.max(0, coutEff);
-        } else {
-          // défauts : cout stocké négatif → on prend la valeur absolue
-          recupere += Math.abs(cout);
-        }
-      }
-      sd.chargesDepensees   = depense;
-      sd.chargesRecuperees  = recupere;
-      sd.chargesDisponibles = (sd.ptsCharges?.max ?? 0) + recupere;
-      sd.chargesSolde       = sd.chargesDisponibles - depense;
-      sd.chargesSoldeClass  = sd.chargesSolde < 0 ? "charges-deficit" : "charges-ok";
-      // booléens utiles dans le template
-      sd.chargesJeune       = b.charges_double;
-      sd.chargesVieillard   = b.charges_reduction > 0;
-    }
-
     // --- 7. Re-dérivation des stats basées sur les items ---
     const compEsquive  = this.items.find(i => i.type === "competence" && i.name === "Esquive");
     const scoreEsquive = compEsquive?.system.score ?? 0;
@@ -400,6 +366,42 @@ export class AgoneActor extends Actor {
     sd.aptitudeEmprise      = sd.emprise + scoreConnDanseurs + sd.bonusEsprit;
   }
 
+  /** Score d'une caractéristique : `{ score }` (personnage) ou nombre (compagnon, démon, PNJ). */
+  _scoreAttribut(key) {
+    const value = this.system[key];
+    return (typeof value === "object" ? value?.score : value) ?? 0;
+  }
+
+  /**
+   * Charges des avantages & défauts : dépensées, récupérées, solde.
+   * « Coût doublé » et « réduction » viennent des effets actifs (Jeune, Vieillard).
+   */
+  _calculerCharges(dons, b) {
+    const sd = this.system;
+    let depense = 0;
+    let recupere = 0;
+    for (const don of dons) {
+      const cout = don.system.cout ?? 0;
+      if (don.system.categorie === "avantage") {
+        let coutEff = cout;
+        if (b.charges_double && don.name !== "Jeune" && don.system.typeCharge === "charge")     coutEff *= 2;
+        if (b.charges_reduction > 0 && don.name !== "Vieillard" && don.system.typeCharge === "charge") coutEff = Math.max(1, coutEff - b.charges_reduction);
+        depense += Math.max(0, coutEff);
+      } else {
+        // défauts : cout stocké négatif → on prend la valeur absolue
+        recupere += Math.abs(cout);
+      }
+    }
+    sd.chargesDepensees   = depense;
+    sd.chargesRecuperees  = recupere;
+    sd.chargesDisponibles = (sd.ptsCharges?.max ?? 0) + recupere;
+    sd.chargesSolde       = sd.chargesDisponibles - depense;
+    sd.chargesSoldeClass  = sd.chargesSolde < 0 ? "charges-deficit" : "charges-ok";
+    // booléens utiles dans le template
+    sd.chargesJeune       = b.charges_double;
+    sd.chargesVieillard   = b.charges_reduction > 0;
+  }
+
   // ==============================
   // Méthodes de jet de dés
   // ==============================
@@ -408,12 +410,13 @@ export class AgoneActor extends Actor {
    * Jet d'attribut principal
    * Formule: 1d10 explodant + Attribut*2 + BonusAspect + modificateurs
    */
-  async rollAttribut(attributKey) {
+  async rollAttribut(attributKey, options = {}) {
     const sd = this.system;
     const attrConfig = CONFIG.AGONE.attributs[attributKey];
     if (!attrConfig) return;
 
-    const attrScore = sd[attributKey]?.score ?? 0;
+    const attrScore = this._scoreAttribut(attributKey);
+    const hasAspects = sd.bonusCorps !== undefined;
     let bonusAspect = 0;
     if (attrConfig.aspect === "corps")  bonusAspect = sd.bonusCorps  ?? 0;
     if (attrConfig.aspect === "esprit") bonusAspect = sd.bonusEsprit ?? 0;
@@ -422,13 +425,20 @@ export class AgoneActor extends Actor {
     const label = game.i18n.localize(attrConfig.label);
     const baseScore = attrScore * 2 + bonusAspect;
 
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const malusArmure = attributKey === "agilite"
-      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
-      : attributKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
+    let malusArmure = 0;
+    if (this.type === "personnage") {
+      malusArmure = attributKey === "agilite"
+        ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
+        : attributKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
+    } else if (attributKey === "agilite") {
+      // PNJ : malus d'AGI de l'armure portée (stocké en valeur positive)
+      malusArmure = -(sd.armure?.malusAgi ?? 0);
+    }
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
@@ -437,11 +447,11 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:   `${label} x2 : ${attrScore * 2}`,
-      aspect: `Bonus d'aspect : ${bonusAspect}`,
-      modif:  `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+      base:   `${_L("AttributX2", { attribut: label })} : ${attrScore * 2}`,
+      ...(hasAspects ? { aspect: `${_L("BonusAspect")} : ${bonusAspect}` } : {}),
+      modif:  `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
+    }, { rollType: jet.rollType });
     return roll;
   }
 
@@ -449,7 +459,7 @@ export class AgoneActor extends Actor {
    * Jet de compétence
    * Formule: 1d10 explodant + Compétence + Attribut + BonusAspect + modificateurs
    */
-  async rollCompetence(itemId) {
+  async rollCompetence(itemId, options = {}) {
     const item = this.items.get(itemId);
     if (!item || item.type !== "competence") return;
 
@@ -457,7 +467,7 @@ export class AgoneActor extends Actor {
     const compData  = item.system;
     const compScore = compData.score ?? 0;
     const attrKey   = compData.attributLie ?? "agilite";
-    const attrScore = sd[attrKey]?.score ?? sd[attrKey] ?? 0;
+    const attrScore = this._scoreAttribut(attrKey);
 
     const attrConfig = CONFIG.AGONE.attributs[attrKey] ?? {};
     let bonusAspect = 0;
@@ -467,11 +477,12 @@ export class AgoneActor extends Actor {
 
     const specialite = compData.specialite ?? "";
     const label = item.name + (compData.domaine ? ` [${compData.domaine}]` : "");
-    const modif = await this._dialogModificateur(label, { specialite });
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, { ...options, specialite });
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const bonusSpe    = this._lastBonusSpe ?? 0;
+    const bonusSpe    = jet.bonusSpe;
     const malusComp0  = compScore === 0 ? -3 : 0;
     const malusArmure = attrKey === "agilite"
       ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
@@ -491,11 +502,11 @@ export class AgoneActor extends Actor {
     await this._sendRollToChat(roll, label, {
       competence: `${label} : ${compScore}${compScore === 0 ? ` (${game.i18n.localize("AGONE.MalusCompNonApprise")})` : ""}`,
       attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
-      aspect:    `Bonus d'aspect : ${bonusAspect}${bonusSpe ? ` + Spécialité : +${bonusSpe}` : ""}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {}),
+      aspect:    `${_L("BonusAspect")} : ${bonusAspect}${bonusSpe ? ` + ${_L("Specialite")} : +${bonusSpe}` : ""}`,
+      modif:     `${_L("BonusMalus")} : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {}),
       ...(compData.notes    ? { notes:    compData.notes } : {})
-    });
+    }, { rollType: jet.rollType });
     return roll;
   }
 
@@ -509,7 +520,7 @@ export class AgoneActor extends Actor {
     // Construire les options du sélecteur d'attribut
     const attrOptions = Object.entries(CONFIG.AGONE.attributs)
       .map(([key, cfg]) => {
-        const score = sd[key]?.score ?? 0;
+        const score = this._scoreAttribut(key);
         const locLabel = game.i18n.localize(cfg.label ?? key);
         const selected = key === attrKey ? "selected" : "";
         return `<option value="${key}" ${selected}>${locLabel} (${cfg.abbr}) : ${score}</option>`;
@@ -559,11 +570,10 @@ export class AgoneActor extends Actor {
     });
 
     if (!result || typeof result === "string") return null;
-    this._lastRollType = result.type;
-    this._lastBonusSpe = 0;
+    const rollType = result.type;
 
     const chosenKey = result.attrChosen ?? attrKey;
-    const chosenScore = sd[chosenKey]?.score ?? 0;
+    const chosenScore = this._scoreAttribut(chosenKey);
     const chosenCfg   = CONFIG.AGONE.attributs[chosenKey] ?? {};
     const modif = result.modif;
 
@@ -591,10 +601,10 @@ export class AgoneActor extends Actor {
     await this._sendRollToChat(roll, label, {
       competence: `${label} : 0 (${game.i18n.localize("AGONE.MalusCompNonApprise")})`,
       attribut:  `${game.i18n.localize(chosenCfg.label ?? chosenKey)} : ${chosenScore}`,
-      aspect:    `Bonus d'aspect : ${bonusAspect}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+      aspect:    `${_L("BonusAspect")} : ${bonusAspect}`,
+      modif:     `${_L("BonusMalus")} : ${modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
+    }, { rollType: rollType });
     return roll;
   }
 
@@ -617,7 +627,7 @@ export class AgoneActor extends Actor {
   /**
    * Jet d'initiative (fermé)
    */
-  async rollInitiative(armeId = null) {
+  async rollInitiative(armeId = null, options = {}) {
     const sd = this.system;
     let base = sd.initiative ?? 0;
     let label = game.i18n.localize("AGONE.Initiative");
@@ -632,8 +642,9 @@ export class AgoneActor extends Actor {
       }
     }
 
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
@@ -643,20 +654,23 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:  `Initiative : ${base}`,
-      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    }, armeInit ? {
-      arme:        armeInit,
-      typeJet:     "initiative",
-      description: armeInit.system.description ?? "",
-      armeMeta: {
-        dommages:      armeInit.system.dommages ?? "",
-        dommagesTotal: armeInit.system.dommagesTotal ?? null,
-        portee:        armeInit.system.portee || null,
-        style:         armeInit.system.style ?? "melee",
-      }
-    } : {});
+      base:  `${_L("Initiative")} : ${base}`,
+      modif: `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
+    }, {
+      rollType: jet.rollType,
+      ...(armeInit ? {
+        arme:        armeInit,
+        typeJet:     "initiative",
+        description: armeInit.system.description ?? "",
+        armeMeta: {
+          dommages:      armeInit.system.dommages ?? "",
+          dommagesTotal: armeInit.system.dommagesTotal ?? null,
+          portee:        armeInit.system.portee || null,
+          style:         armeInit.system.style ?? "melee",
+        }
+      } : {}),
+    });
 
     // Mettre à jour le tracker de combat
     await this._setInitiativeInCombat(Math.max(0, roll.total));
@@ -666,13 +680,14 @@ export class AgoneActor extends Actor {
   /**
    * Jet d'initiative magique (Initiative + 10, fermé)
    */
-  async rollInitiativeMagique() {
+  async rollInitiativeMagique(options = {}) {
     const sd    = this.system;
     const base  = sd.initMagique ?? 0;
     const label = game.i18n.localize("AGONE.InitMagique");
 
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
@@ -682,10 +697,10 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:  `Initiative Magique : ${base}`,
-      modif: `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+      base:  `${_L("InitiativeMagique")} : ${base}`,
+      modif: `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
+    }, { rollType: jet.rollType });
 
     // Mettre à jour le tracker de combat
     await this._setInitiativeInCombat(Math.max(0, roll.total));
@@ -695,7 +710,7 @@ export class AgoneActor extends Actor {
   /**
    * Jet d'attaque avec arme
    */
-  async rollAttaque(armeId) {
+  async rollAttaque(armeId, options = {}) {
     const sd = this.system;
     const arme = this.items.get(armeId);
     if (!arme) return;
@@ -719,7 +734,7 @@ export class AgoneActor extends Actor {
     } else if (attributLie === "tir") {
       baseAttack = sd.tir ?? 0;
     } else {
-      baseAttack = sd[attributLie]?.score ?? 0;
+      baseAttack = this._scoreAttribut(attributLie);
     }
     const baseAttackLabel = attributLie === "tir" ? "TIR" : attributLie === "melee" ? "MÊL" : attributLie.toUpperCase();
 
@@ -728,8 +743,9 @@ export class AgoneActor extends Actor {
     const total = baseAttack + scoreComp + attackBonus + bonusCorps;
 
     const label = `${game.i18n.localize("AGONE.Attaque")} — ${arme.name}`;
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
@@ -740,12 +756,13 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       style:     `${baseAttackLabel} : ${baseAttack}`,
-      competence:`Compétence : ${scoreComp}`,
-      arme:      `Bonus arme : ${attackBonus}`,
-      aspect:    `Bonus Corps : ${bonusCorps}`,
-      modif:     `Bonus/Malus : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
+      competence:`${_L("Competence")} : ${scoreComp}`,
+      arme:      `${_L("BonusArme")} : ${attackBonus}`,
+      aspect:    `${_L("BonusCorps")} : ${bonusCorps}`,
+      modif:     `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
+      rollType: jet.rollType,
       arme,
       typeJet: "attaque",
       description: arme.system.description ?? "",
@@ -762,7 +779,7 @@ export class AgoneActor extends Actor {
   /**
    * Jet de parade avec arme
    */
-  async rollParade(armeId) {
+  async rollParade(armeId, options = {}) {
     const sd = this.system;
     const arme = this.items.get(armeId);
     if (!arme) return;
@@ -780,8 +797,9 @@ export class AgoneActor extends Actor {
     const total = melee + scoreComp + defenseBonus + bonusCorps;
 
     const label = `${game.i18n.localize("AGONE.Parade")} — ${arme.name}`;
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
@@ -793,12 +811,13 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
       melee:     `MÊL : ${melee}`,
-      competence:`Compétence : ${scoreComp}`,
-      arme:      `Bonus arme : ${defenseBonus}`,
-      aspect:    `Bonus Corps : ${bonusCorps}`,
-      modif:     `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
+      competence:`${_L("Competence")} : ${scoreComp}`,
+      arme:      `${_L("BonusArme")} : ${defenseBonus}`,
+      aspect:    `${_L("BonusCorps")} : ${bonusCorps}`,
+      modif:     `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
+      rollType: jet.rollType,
       arme,
       typeJet: "parade",
       description: arme.system.description ?? "",
@@ -815,12 +834,13 @@ export class AgoneActor extends Actor {
   /**
    * Jet d'esquive
    */
-  async rollEsquive() {
+  async rollEsquive(options = {}) {
     const sd = this.system;
-    const total = sd.esquiveTotal ?? (sd.agilite?.score ?? 0);
+    const total = sd.esquiveTotal ?? (this._scoreAttribut("agilite"));
     const label = game.i18n.localize("AGONE.Esquive");
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
@@ -831,22 +851,23 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:  `Esquive : ${total}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+      base:  `${_L("Esquive")} : ${total}`,
+      modif: `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
+    }, { rollType: jet.rollType });
     return roll;
   }
 
   /**
    * Jet de Défense Naturelle
    */
-  async rollDefenseNaturelle() {
+  async rollDefenseNaturelle(options = {}) {
     const sd = this.system;
-    const total = sd.defenseNaturelle ?? (sd.agilite?.score ?? 0);
+    const total = sd.defenseNaturelle ?? (this._scoreAttribut("agilite"));
     const label = game.i18n.localize("AGONE.DefenseNaturelle");
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
@@ -857,10 +878,10 @@ export class AgoneActor extends Actor {
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:  `Défense Naturelle : ${total}`,
-      modif: `Bonus/Malus : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
-    });
+      base:  `${_L("DefenseNaturelle")} : ${total}`,
+      modif: `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
+    }, { rollType: jet.rollType });
     return roll;
   }
 
@@ -870,14 +891,13 @@ export class AgoneActor extends Actor {
    */
   async rollVolBlessure3() {
     const sd = this.system;
-    const volScore = sd.volonte?.score ?? 0;
+    const volScore = this._scoreAttribut("volonte");
     const bonusAme = sd.bonusAme ?? 0;
     const base = volScore * 2 + bonusAme;
     const label = game.i18n.localize("AGONE.JetVolBlessure3");
     const DIFFICULTE = 10;
 
     // On force le type ouvert pour que _sendRollToChat gère fumbles & critiques
-    this._lastRollType = "ouvert";
     const roll = new Roll("1d10x10 + @base", { base });
     await roll.evaluate();
 
@@ -885,7 +905,7 @@ export class AgoneActor extends Actor {
       volonte: `${game.i18n.localize("AGONE.Attribut.Volonte")} x2 : ${volScore * 2}`,
       ame:     `${game.i18n.localize("AGONE.BonusAme")} : ${bonusAme}`,
       diff:    `${game.i18n.localize("AGONE.Difficulte")} : ${DIFFICULTE}`,
-    });
+    }, { rollType: "ouvert" });
 
     // Fumble (dé = 1) = échec automatique, sinon on compare le total
     const firstFace = finalRoll?.dice[0]?.results?.[0]?.result ?? null;
@@ -932,7 +952,7 @@ export class AgoneActor extends Actor {
   /**
    * Jet de sort / magie
    */
-  async rollSort(itemIdOrData, { impro = false } = {}) {
+  async rollSort(itemIdOrData, { impro = false, ...options } = {}) {
     const sd = this.system;
     let sort;
     if (typeof itemIdOrData === "string") {
@@ -981,8 +1001,8 @@ export class AgoneActor extends Actor {
         (domaineCible === null ? true : i.system.domaine === domaineCible)
       );
       if (!hasArts) {
-        const domainLabel = domaineCible ?? (typeMagieResolved || "ce domaine");
-        ui.notifications.warn(`${this.name} ne possède pas Arts Magiques (${domainLabel}) pour lancer ce sort.`);
+        const domainLabel = domaineCible ?? (typeMagieResolved || "—");
+        ui.notifications.warn(game.i18n.format("AGONE.Notif.PasArtsMagiques", { acteur: this.name, domaine: domainLabel }));
         return null;
       }
     }
@@ -1001,11 +1021,11 @@ export class AgoneActor extends Actor {
       );
       const scoreExact = compArtsExact?.system.score ?? 0;
       aptitude = (sd.art ?? 0) + scoreExact + (sd.bonusAme ?? 0);
-      aptitudeDomainLabel = `Arts Magiques (${domaineCibleApt}) : ${aptitude}`;
+      aptitudeDomainLabel = `${_L("ArtsMagiquesDomaine", { domaine: domaineCibleApt })} : ${aptitude}`;
     } else {
       // Pas de domaine précis (jorniste / obscurantiste / eclipsiste)
       aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
-      aptitudeDomainLabel = `Arts Magiques : ${aptitude}`;
+      aptitudeDomainLabel = `${_L("ArtsMagiques")} : ${aptitude}`;
     }
 
     // Compétence alternative : min(artsMagiques, compAlt + attrAlt + bonusAspect)
@@ -1014,7 +1034,7 @@ export class AgoneActor extends Actor {
       const compAltItem = this.items.find(i => i.type === "competence" && i.name === compAltNom);
       if (compAltItem) {
         const attrAltKey  = sort.system.attrAlt || compAltItem.system.attributLie || "charisma";
-        const attrAltScore = sd[attrAltKey]?.score ?? 0;
+        const attrAltScore = this._scoreAttribut(attrAltKey);
         const attrCfg     = CONFIG.AGONE.attributs[attrAltKey] ?? {};
         let bonusAlt = 0;
         if (attrCfg.aspect === "corps")  bonusAlt = sd.bonusCorps  ?? 0;
@@ -1035,11 +1055,11 @@ export class AgoneActor extends Actor {
         i.type === "competence" && i.system.domaine?.trim().toLowerCase() === instrument
       );
       if (!compInstrument) {
-        ui.notifications.warn(`${this.name} ne possède pas la compétence pour l'instrument "${sort.system.instrument}" (Accord).`);
+        ui.notifications.warn(game.i18n.format("AGONE.Notif.PasInstrument", { acteur: this.name, instrument: sort.system.instrument }));
         return null;
       }
       const attrInstrKey   = compInstrument.system.attributLie || "charisma";
-      const attrInstrScore = sd[attrInstrKey]?.score ?? 0;
+      const attrInstrScore = this._scoreAttribut(attrInstrKey);
       const attrInstrCfg   = CONFIG.AGONE.attributs[attrInstrKey] ?? {};
       let bonusInstr = 0;
       if (attrInstrCfg.aspect === "corps")  bonusInstr = sd.bonusCorps  ?? 0;
@@ -1051,10 +1071,10 @@ export class AgoneActor extends Actor {
         + (compInstrument.system.domaine ? ` (${compInstrument.system.domaine})` : "");
     }
 
-    const label = impro ? `${sort.name} (improvisé)` : sort.name;
-    const dialogResult = await this._dialogSort(label, seuilBase, impro);
-    if (dialogResult === null) return;
-    const { modif, seuilBonus, instantane } = dialogResult;
+    const label = impro ? _L("SortImprovise", { sort: sort.name }) : sort.name;
+    const jet = await this._dialogSort(label, seuilBase, impro, options);
+    if (!jet) return;
+    const { modif, seuilBonus, instantane } = jet;
 
     const seuilEffectif = instantane ? seuilBase * 2 : seuilBase;
     const seuilFinal = impro ? (seuilEffectif + seuilBonus) * 2 : seuilEffectif + seuilBonus;
@@ -1067,35 +1087,28 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
 
     const succes = roll.total >= seuilFinal;
-    const aptitudeLabel = compAltNom
-      ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compAltNom}) : ${aptitude}`
-      : compInstrumentLabel
-        ? `${aptitudeDomainLabel.replace(/ : \d+$/, "")} (min avec ${compInstrumentLabel}) : ${aptitude}`
-        : aptitudeDomainLabel;
-    let seuilLabel;
-    if (impro && instantane && seuilBonus > 0)
-      seuilLabel = `Seuil : ${seuilFinal} ((${seuilBase} × 2 + ${seuilBonus}) × 2, instantané + improvisé)`;
-    else if (impro && instantane)
-      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} × 2 × 2, instantané + improvisé)`;
-    else if (instantane && seuilBonus > 0)
-      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} × 2 + ${seuilBonus}, instantané)`;
-    else if (instantane)
-      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} × 2, instantané)`;
-    else if (impro && seuilBonus > 0)
-      seuilLabel = `Seuil : ${seuilFinal} ((${seuilBase} + ${seuilBonus}) x 2, improvisé)`;
-    else if (impro)
-      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} x 2, improvisé)`;
-    else if (seuilBonus > 0)
-      seuilLabel = `Seuil : ${seuilFinal} (${seuilBase} + ${seuilBonus} augmenté)`;
-    else
-      seuilLabel = `Seuil : ${seuilFinal}`;
+    const aptitudeAutre = compAltNom || compInstrumentLabel;
+    const aptitudeLabel = aptitudeAutre
+      ? `${_L("MinAvec", { label: aptitudeDomainLabel.replace(/ : \d+$/, ""), autre: aptitudeAutre })} : ${aptitude}`
+      : aptitudeDomainLabel;
+    const inst = _L("Instantane"), imp = _L("Improvise");
+    let seuilCalc = "";
+    if (impro && instantane && seuilBonus > 0) seuilCalc = `((${seuilBase} × 2 + ${seuilBonus}) × 2, ${inst} + ${imp})`;
+    else if (impro && instantane)              seuilCalc = `(${seuilBase} × 2 × 2, ${inst} + ${imp})`;
+    else if (instantane && seuilBonus > 0)     seuilCalc = `(${seuilBase} × 2 + ${seuilBonus}, ${inst})`;
+    else if (instantane)                       seuilCalc = `(${seuilBase} × 2, ${inst})`;
+    else if (impro && seuilBonus > 0)          seuilCalc = `((${seuilBase} + ${seuilBonus}) × 2, ${imp})`;
+    else if (impro)                            seuilCalc = `(${seuilBase} × 2, ${imp})`;
+    else if (seuilBonus > 0)                   seuilCalc = `(${seuilBase} + ${seuilBonus} ${_L("Augmente")})`;
+    const seuilLabel = `${_L("Seuil")} : ${seuilFinal}${seuilCalc ? ` ${seuilCalc}` : ""}`;
     await this._sendRollToChat(roll, label, {
       aptitude: aptitudeLabel,
       seuil:    seuilLabel,
-      resultat: succes ? "✔ Succès" : "✘ Échec",
-      modif:    `Bonus/Malus : ${modif}`,
-      ...(bonusSaisonin > 0 ? { saisonin: `Bonus Saisonin : +${bonusSaisonin}` } : {})
+      resultat: _L(succes ? "Succes" : "Echec"),
+      modif:    `${_L("BonusMalus")} : ${modif}`,
+      ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
+      rollType: jet.rollType,
       seuilNumeric: seuilFinal,
       description: sort.system.description ?? "",
       sortMeta: {
@@ -1109,39 +1122,68 @@ export class AgoneActor extends Actor {
   }
 
   /**
-   * Jet de sort d'emprise improvis\u00e9 via un danseur (depuis le browser de sorts).
-   * Reprend la logique de _onRollSortDanseur avec s\u00e9uil \u00d7 2.
+   * Source du score d'Emprise selon l'obédience (affichée en tooltip).
    */
-  async rollSortImproDanseur(danseurId, sortData) {
-    const danseur = this.items.get(danseurId);
-    if (!danseur) return;
+  _empriseSourceLabel() {
+    const sd = this.system;
+    if (sd.typeMage === "jorniste")      return `INT (${this._scoreAttribut("intelligence")}) — ${game.i18n.localize("AGONE.Jorniste")}`;
+    if (sd.typeMage === "obscurantiste") return `VOL (${this._scoreAttribut("volonte")}) — ${game.i18n.localize("AGONE.Obscurantiste")}`;
+    return `(INT ${this._scoreAttribut("intelligence")} + VOL ${this._scoreAttribut("volonte")}) / 2 — ${game.i18n.localize("AGONE.Eclipsiste")}`;
+  }
 
-    if ((danseur.system.enduranceActuelle ?? 0) <= 0) {
-      ui.notifications.warn(`${danseur.name} n'a plus d'endurance et ne peut pas lancer de sort.`);
-      return;
-    }
-
-    const sd          = this.system;
-    const seuilBase   = sortData.seuil ?? 0;
-    const seuil       = seuilBase * 2;
-    const label       = `${sortData.name} (improvis\u00e9 via ${danseur.name})`;
-
+  /**
+   * Aptitude d'Emprise via un danseur : EMP + Conn. Danseurs + bonus Esprit,
+   * avec les lignes de détail communes pour la carte de chat.
+   */
+  _aptitudeEmpriseDanseur(danseur) {
+    const sd = this.system;
     const compDanseurs      = this.items.find(i =>
       i.type === "competence" && i.name.toLowerCase().includes("danseur")
     );
     const scoreConnDanseurs = compDanseurs?.system.score ?? 0;
-    const aptitude          = (sd.emprise ?? 0) + scoreConnDanseurs + (sd.bonusEsprit ?? 0);
-    const bonusDanseur      = danseur.system.bonusEmprise ?? 0;
     const bonusEsprit       = sd.bonusEsprit ?? 0;
-    const endBefore         = danseur.system.enduranceActuelle ?? 0;
-    const newEnd            = Math.max(0, endBefore - 1);
+    const aptitude          = (sd.emprise ?? 0) + scoreConnDanseurs + bonusEsprit;
+    const bonusDanseur      = danseur.system.bonusEmprise ?? 0;
+    const details = {
+      empBase:   { label: _L("EmpriseBase"), value: sd.emprise ?? 0, tooltip: this._empriseSourceLabel() },
+      connDans:  { label: compDanseurs?.name ?? _L("ConnDanseurs"), value: `+${scoreConnDanseurs}` },
+      esprit:    { label: _L("BonusEsprit"), value: `+${bonusEsprit}`,
+                   tooltip: _L("BonusEspritTooltip", { esprit: this._scoreAttribut("esprit"), noir: sd.esprit?.noir ?? 0 }) },
+      aptTotal:  { label: _L("TotalEmprise"), value: aptitude },
+      bonusDans: { label: _L("BonusEmpriseDanseur", { danseur: danseur.name }), value: `+${bonusDanseur}` },
+    };
+    return { aptitude, bonusDanseur, details };
+  }
 
-    const empSourceLabel = sd.typeMage === "jorniste"      ? `INT (${sd.intelligence?.score ?? 0}) \u2014 Jorniste`
-                         : sd.typeMage === "obscurantiste" ? `VOL (${sd.volonte?.score ?? 0}) \u2014 Obscurantiste`
-                         : `(INT ${sd.intelligence?.score ?? 0} + VOL ${sd.volonte?.score ?? 0}) / 2 \u2014 \u00c9clipsiste`;
+  /**
+   * Jet de sort d'emprise lancé via un danseur. Consomme 1 point d'endurance du danseur.
+   * @param {string} danseurId
+   * @param {object} sortData  Données du sort ({ name, seuil, description, typeMagie, portee, duree, danse })
+   * @param {object} [options]
+   * @param {boolean} [options.impro=false]  Sort improvisé (non mémorisé) : seuil × 2
+   */
+  async rollSortDanseur(danseurId, sortData, { impro = false, ...options } = {}) {
+    const danseur = this.items.get(danseurId);
+    if (!danseur) return;
 
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    if ((danseur.system.enduranceActuelle ?? 0) <= 0) {
+      ui.notifications.warn(game.i18n.format("AGONE.Notif.DanseurEpuise", { danseur: danseur.name }));
+      return;
+    }
+
+    const seuilBase = sortData.seuil ?? 0;
+    const seuil     = impro ? seuilBase * 2 : seuilBase;
+    const label     = impro
+      ? _L("SortImproviseVia", { sort: sortData.name, danseur: danseur.name })
+      : _L("SortVia", { sort: sortData.name, danseur: danseur.name });
+
+    const { aptitude, bonusDanseur, details } = this._aptitudeEmpriseDanseur(danseur);
+    const endBefore = danseur.system.enduranceActuelle ?? 0;
+    const newEnd    = Math.max(0, endBefore - 1);
+
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const roll = new Roll("1d10x10 + @apt + @bd + @modif", {
       apt: aptitude, bd: bonusDanseur, modif,
@@ -1150,19 +1192,17 @@ export class AgoneActor extends Actor {
 
     const succes = roll.total >= seuil;
     await this._sendRollToChat(roll, label, {
-      sort:      { label: "Sort",         value: sortData.name },
-      seuil:     { label: "Seuil",        value: `${seuil} (${seuilBase} \u00d7 2, improvis\u00e9)` },
-      resultat:  { label: "R\u00e9sultat", value: succes ? "\u2714 Succ\u00e8s" : "\u2718 \u00c9chec" },
-      danseur:   { label: "Danseur",      value: danseur.name },
-      endurance: { label: "Endurance",    value: `${endBefore} \u2192 ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
-      empBase:   { label: "Emprise (base)", value: sd.emprise ?? 0, tooltip: empSourceLabel },
-      connDans:  { label: compDanseurs?.name ?? "Conn. Danseurs", value: `+${scoreConnDanseurs}` },
-      esprit:    { label: "Bonus Esprit",   value: `+${bonusEsprit}`,
-                   tooltip: `Esprit ${sd.esprit?.score ?? 0} \u2212 Esprit Noir ${sd.esprit?.noir ?? 0}` },
-      aptTotal:  { label: "Total Emprise",  value: aptitude },
-      bonusDans: { label: `Bonus d'Emprise (${danseur.name})`, value: `+${bonusDanseur}` },
-      modif:     { label: "Bonus / Malus",  value: modif >= 0 ? `+${modif}` : modif },
+      sort:      { label: _L("Sort"),      value: sortData.name },
+      seuil:     impro
+        ? { label: _L("Seuil"), value: `${seuil} (${seuilBase} × 2, ${_L("Improvise")})` }
+        : { label: _L("Seuil"), value: seuil, tooltip: _L("SeuilTooltip") },
+      resultat:  { label: _L("Resultat"),  value: _L(succes ? "Succes" : "Echec") },
+      danseur:   { label: _L("Danseur"),   value: danseur.name },
+      endurance: { label: _L("Endurance"), value: `${endBefore} → ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
+      ...details,
+      modif:     { label: _L("BonusMalus"), value: modif >= 0 ? `+${modif}` : modif },
     }, {
+      rollType: jet.rollType,
       seuilNumeric: seuil,
       description: sortData.description ?? "",
       sortMeta: {
@@ -1177,35 +1217,190 @@ export class AgoneActor extends Actor {
     return roll;
   }
 
-  async rollImprovisationDanseur(danseurId) {
+  /**
+   * Jet de sort d'emprise improvisé via un danseur (depuis le browser de sorts).
+   */
+  async rollSortImproDanseur(danseurId, sortData) {
+    return this.rollSortDanseur(danseurId, sortData, { impro: true });
+  }
+
+  /**
+   * Jet de potentiel d'Emprise d'un danseur.
+   */
+  async rollEmprise(danseurId, options = {}) {
+    const danseur = this.items.get(danseurId);
+    if (!danseur) return;
+
+    const label = game.i18n.format("AGONE.PotentielEmpriseLabel", { nom: danseur.name });
+    const { aptitude, bonusDanseur, details } = this._aptitudeEmpriseDanseur(danseur);
+
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
+
+    const roll = new Roll("1d10x10 + @apt + @bd + @modif", {
+      apt: aptitude, bd: bonusDanseur, modif
+    });
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      danseur:   { label: _L("Danseur"),          value: danseur.name },
+      endurance: { label: _L("EnduranceDanseur"), value: `${danseur.system.enduranceActuelle ?? 0} / ${danseur.system.enduranceMax ?? 0}` },
+      ...details,
+      modif:     { label: _L("BonusMalus"),       value: modif >= 0 ? `+${modif}` : modif },
+    }, { rollType: jet.rollType });
+    return roll;
+  }
+
+  /**
+   * Jet d'Emprise brut : EMP + Résonance + bonus Esprit.
+   */
+  async rollEmpriseAttr(options = {}) {
+    const sd    = this.system;
+    const label = game.i18n.localize("AGONE.JeterEmprise");
+
+    const compResonance = this.items.find(i =>
+      i.type === "competence" && i.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes("resonance")
+    );
+    const scoreResonance = compResonance?.system.score ?? 0;
+    const bonusEsprit    = sd.bonusEsprit ?? 0;
+    const empriseBase    = sd.emprise ?? 0;
+
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
+
+    const roll = new Roll("1d10x10 + @emp + @res + @modif", {
+      emp: empriseBase, res: scoreResonance, modif
+    });
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      empBase:   { label: _L("EmpriseBase"), value: empriseBase, tooltip: this._empriseSourceLabel() },
+      resonance: { label: compResonance?.name ?? _L("Resonance"), value: `+${scoreResonance}` },
+      ...(bonusEsprit ? { esprit: { label: _L("BonusEsprit"), value: `+${bonusEsprit}` } } : {}),
+      modif:     { label: _L("BonusMalus"),  value: modif >= 0 ? `+${modif}` : modif },
+    }, { rollType: jet.rollType });
+    return roll;
+  }
+
+  /**
+   * Jet d'aptitude aux Arts Magiques (ART + Arts Magiques + bonus Âme).
+   */
+  async rollAptitudeMagie(options = {}) {
+    const apt   = this.system.aptitudeArtsMagiques ?? 0;
+    const label = game.i18n.localize("AGONE.AptitudeArtsMagiques");
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
+    const roll = new Roll("1d10x10 + @apt + @modif", { apt, modif });
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      aptitude: `${label} : ${apt}`,
+      modif:    `${_L("BonusMalus")} : ${modif}`,
+    }, { rollType: jet.rollType });
+    return roll;
+  }
+
+  /**
+   * Jet d'aptitude à la conjuration (Noirceur + Démonologie + bonus Âme).
+   */
+  async rollAptitudeConjuration(options = {}) {
+    const apt   = this.system.aptitudeConjuration ?? 0;
+    const label = game.i18n.localize("AGONE.AptitudeConjuration");
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
+    const roll = new Roll("1d10x10 + @apt + @modif", { apt, modif });
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      aptitude: `${label} : ${apt}`,
+      modif:    `${_L("BonusMalus")} : ${modif}`,
+    }, { rollType: jet.rollType });
+    return roll;
+  }
+
+  /**
+   * Jet de conjuration : Noirceur + compétence Démonologie.
+   */
+  async rollConjurationDemonologie(options = {}) {
+    const label = game.i18n.localize("AGONE.RollConjurationDemonologie");
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
+    const compDemon = this.items.find(i =>
+      i.type === "competence" && i.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes("demonologi")
+    );
+    const scoreComp = compDemon?.system?.score ?? 0;
+    const noirceur  = this.system.noirceur ?? 0;
+    const roll = new Roll("1d10x10 + @noirceur + @comp + @modif", { noirceur, comp: scoreComp, modif });
+    await roll.evaluate();
+    await this._sendRollToChat(roll, label, {
+      noirceur:    `${_L("Noirceur")} : ${noirceur}`,
+      demonologie: `${_L("Demonologie")} : ${scoreComp}`,
+      modif:       `${_L("BonusMalus")} : ${modif}`,
+    }, { rollType: jet.rollType });
+    return roll;
+  }
+
+  /**
+   * Jet d'Art Magique pour un domaine : potentiel (ART) ou improvisation (CRÉ).
+   * @param {object} d  Composantes affichées dans l'onglet Magie
+   *   ({ domaine, apt, specialite, art, cre, scoreArts, scoreComp, nomComp, scoreEff, bonusAme })
+   * @param {object} [options]
+   * @param {boolean} [options.impro=false]  Improvisation (CRÉ) au lieu du potentiel (ART)
+   */
+  async rollArtDomaine(d, { impro = false, ...options } = {}) {
+    const label = game.i18n.format(impro ? "AGONE.ImproArtLabel" : "AGONE.PotentielArtLabel", { domaine: d.domaine });
+    const jet = await this._dialogModificateur(label, { ...options, specialite: d.specialite });
+    if (!jet) return;
+    const { modif, bonusSpe } = jet;
+
+    const roll = new Roll("1d10x10 + @total + @modif", { total: d.apt + bonusSpe, modif });
+    await roll.evaluate();
+
+    // Formule détaillée visible dans le chat
+    const base    = impro ? `CRÉ(${d.cre})` : `ART(${d.art})`;
+    const arts    = d.nomComp
+      ? `min(Arts:${d.scoreArts}, ${d.nomComp}:${d.scoreComp})→${d.scoreEff}`
+      : `Arts:${d.scoreArts}`;
+    const spe     = bonusSpe ? ` + ${_L("SpeAbr")}(+${bonusSpe})` : "";
+    const formule = `${base} + ${arts} + ${_L("BonusAme")}(${d.bonusAme})${spe}`;
+    await this._sendRollToChat(roll, label, {
+      aptitude: `${formule} : ${d.apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
+      modif:    `${_L("BonusMalus")} : ${modif}`,
+    }, { rollType: jet.rollType });
+    return roll;
+  }
+
+  async rollImprovisationDanseur(danseurId, options = {}) {
     const danseur = this.items.get(danseurId);
     if (!danseur) return;
 
     const sd    = this.system;
     const label = game.i18n.format("AGONE.ImprovisationEmpriseLabel", { nom: danseur.name });
 
-    const cre         = sd.creativite?.score ?? 0;
+    const cre         = this._scoreAttribut("creativite");
     const empathie    = danseur.system.empathie ?? 0;
     const bonusEsprit = sd.bonusEsprit ?? 0;
     const aptitude    = cre + empathie + bonusEsprit;
     const endAct      = danseur.system.enduranceActuelle ?? 0;
     const endMax      = danseur.system.enduranceMax     ?? 0;
 
-    const modif = await this._dialogModificateur(label);
-    if (modif === null) return;
+    const jet = await this._dialogModificateur(label, options);
+    if (!jet) return;
+    const { modif } = jet;
 
     const roll = new Roll("1d10x10 + @apt + @modif", { apt: aptitude, modif });
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      danseur:   { label: "Danseur",                      value: danseur.name },
-      endurance: { label: "Endurance danseur",            value: `${endAct} / ${endMax}` },
-      cre:       { label: "Cr\u00e9ativit\u00e9 (CR\u00c9)",              value: cre },
-      empathie:  { label: `Empathie (${danseur.name})`,  value: `+${empathie}` },
-      esprit:    { label: "Bonus Esprit",                 value: `+${bonusEsprit}`,
-                   tooltip: `Esprit ${sd.esprit?.score ?? 0} \u2212 Esprit Noir ${sd.esprit?.noir ?? 0}` },
-      aptTotal:  { label: "Total Improvisation",          value: aptitude },
-      modif:     { label: "Bonus / Malus",                value: modif >= 0 ? `+${modif}` : modif },
-    });
+      danseur:   { label: _L("Danseur"),                      value: danseur.name },
+      endurance: { label: _L("EnduranceDanseur"),            value: `${endAct} / ${endMax}` },
+      cre:       { label: _L("CreativiteCre"),              value: cre },
+      empathie:  { label: _L("EmpathieDanseur", { danseur: danseur.name }),  value: `+${empathie}` },
+      esprit:    { label: _L("BonusEsprit"),                 value: `+${bonusEsprit}`,
+                   tooltip: _L("BonusEspritTooltip", { esprit: this._scoreAttribut("esprit"), noir: sd.esprit?.noir ?? 0 }) },
+      aptTotal:  { label: _L("TotalImprovisation"),          value: aptitude },
+      modif:     { label: _L("BonusMalus"),                value: modif >= 0 ? `+${modif}` : modif },
+    }, { rollType: jet.rollType });
     return roll;
   }
 
@@ -1276,9 +1471,17 @@ export class AgoneActor extends Actor {
    * @param {boolean} impro    - Si vrai, le seuil sera doublé
    * @returns {Promise<{modif: number, seuilBonus: number}|null>}
    */
-  async _dialogSort(label, seuilBase = 0, impro = false) {
+  /**
+   * Dialogue de jet de sort.
+   * @param {object} [options]
+   * @param {boolean} [options.fastForward=false]  Lancer sans dialogue (modificateur 0, jet ouvert)
+   * @returns {Promise<{modif: number, seuilBonus: number, instantane: boolean, rollType: string}|null>}
+   */
+  async _dialogSort(label, seuilBase = 0, impro = false, { fastForward = false } = {}) {
+    if (fastForward) return { modif: 0, seuilBonus: 0, instantane: false, rollType: "ouvert" };
+
     const seuilInfo = impro
-      ? `${seuilBase} × 2 = ${seuilBase * 2} (improvisé)`
+      ? `${seuilBase} × 2 = ${seuilBase * 2} (${_L("Improvise")})`
       : `${seuilBase}`;
 
     const result = await this._renderChildDialog({
@@ -1292,7 +1495,7 @@ export class AgoneActor extends Actor {
               <input type="number" id="modif" name="modif" value="0" autofocus/>
             </div>
             <div class="form-group">
-              <label>${game.i18n.localize("AGONE.AugmentationSeuil")} <em>(base : ${seuilInfo})</em></label>
+              <label>${game.i18n.localize("AGONE.AugmentationSeuil")} <em>(${_L("Base")} : ${seuilInfo})</em></label>
               <input type="number" id="seuilBonus" name="seuilBonus" value="0" min="0"/>
             </div>
             <div class="form-group form-check">
@@ -1329,16 +1532,23 @@ export class AgoneActor extends Actor {
     });
 
     if (!result || typeof result === "string") return null;
-    this._lastRollType = result.type;
-    this._lastBonusSpe = 0;
-    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus), instantane: !!result.instantane };
+    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus), instantane: !!result.instantane, rollType: result.type };
   }
 
   /**
    * Affiche un dialog pour saisir le modificateur (bonus/malus)
    * @returns {Promise<number|null>} modificateur ou null si annulé
    */
-  async _dialogModificateur(label, { specialite = "" } = {}) {
+  /**
+   * Dialogue de jet standard : bonus/malus, jet ouvert ou fermé, bonus de spécialité.
+   * @param {object} [options]
+   * @param {string}  [options.specialite]          Spécialité proposée (+1)
+   * @param {boolean} [options.fastForward=false]   Lancer sans dialogue (modificateur 0, jet ouvert)
+   * @returns {Promise<{modif: number, rollType: string, bonusSpe: number}|null>}
+   */
+  async _dialogModificateur(label, { specialite = "", fastForward = false } = {}) {
+    if (fastForward) return { modif: 0, rollType: "ouvert", bonusSpe: 0 };
+
     const speRow = specialite ? `
               <div class="form-group form-check">
                 <input type="checkbox" id="bonusSpe" name="bonusSpe" />
@@ -1384,10 +1594,7 @@ export class AgoneActor extends Actor {
     });
 
     if (!result || typeof result === "string") return null;
-    // Mémoriser le type de jet et le bonus spécialité pour les callers
-    this._lastRollType = result.type;
-    this._lastBonusSpe = result.bonusSpe ?? 0;
-    return result.modif;
+    return { modif: result.modif, rollType: result.type, bonusSpe: result.bonusSpe ?? 0 };
   }
 
   async _promptMagicTypeFallback(unknownType) {
@@ -1477,7 +1684,7 @@ export class AgoneActor extends Actor {
    * Envoie un résultat de jet dans le chat
    */
   async _sendRollToChat(roll, label, details = {}, extra = {}) {
-    const rollType = this._lastRollType ?? "ouvert";
+    const rollType = extra.rollType ?? "ouvert";
 
     // Si jet fermé: recalculer sans explosion
     let finalRoll = roll;
@@ -1490,7 +1697,7 @@ export class AgoneActor extends Actor {
 
     // Valeur brute du dé (premier dé de la formule)
     const diceResult = finalRoll.dice[0]?.total ?? "?";
-    const diceLabel  = rollType === "ferme" ? "Dé (fermé)" : "Dé (ouvert)";
+    const diceLabel  = _L(rollType === "ferme" ? "DeFerme" : "DeOuvert");
 
     // Convertir les détails en tableau {label, value}
     // Extraire resultat et seuil pour les afficher en permanence
@@ -1501,7 +1708,7 @@ export class AgoneActor extends Actor {
       .map(([, v]) => v);
     const detailsArr = [
       { label: diceLabel, value: diceResult },
-      ...(_seuil    ? [typeof _seuil    === "object" ? _seuil    : { label: "Seuil",    value: _seuil    }] : []),
+      ...(_seuil    ? [typeof _seuil    === "object" ? _seuil    : { label: _L("Seuil"), value: _seuil }] : []),
       ..._filtered.map(v => {
         if (typeof v === "object" && v !== null) return v;
         const idx = v.lastIndexOf(" : ");
@@ -1539,7 +1746,7 @@ export class AgoneActor extends Actor {
     let finalResultat = resultatLabel;
     if (isFumble && extra.seuilNumeric !== undefined && resultatLabel !== null) {
       const adjustedTotal = finalRoll.total - fumblePenalty;
-      finalResultat = adjustedTotal >= extra.seuilNumeric ? "✔ Succès" : "✘ Échec";
+      finalResultat = _L(adjustedTotal >= extra.seuilNumeric ? "Succes" : "Echec");
     }
 
     const content = await foundry.applications.handlebars.renderTemplate(
@@ -1552,6 +1759,7 @@ export class AgoneActor extends Actor {
         details:       detailsArr,
         rollType,
         resultat:      finalResultat,
+        resultatSucces: finalResultat === _L("Succes"),
         seuil:         seuilValue,
         isFumble,
         fumblePenalty,

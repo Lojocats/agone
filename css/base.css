@@ -150,7 +150,6 @@ body.agone-dark .agone .window-header {
 body.agone-dark .agone input,
 body.agone-dark .agone select,
 body.agone-dark .agone textarea,
-body.agone-dark .agone-saison-config .sc-row input[type="number"],
 body.agone-dark .agone-domaines-arts-config .dac-comp-input,
 body.agone-dark .agone-domaines-arts-config .dac-add-form input[type="text"],
 body.agone-dark .charges-compteur .charges-input,
@@ -217,7 +216,6 @@ body.agone-dark .agone-calendrier-wrap .cal-meteo-row {
 body.agone-dark .sorts-browser .window-content,
 body.agone-dark .armes-browser .window-content,
 body.agone-dark .armures-browser .window-content,
-body.agone-dark .dons-browser .window-content,
 body.agone-dark .avantages-browser .window-content,
 body.agone-dark .manoeuvres-browser .window-content,
 body.agone-dark .competences-browser .window-content,
@@ -230,7 +228,6 @@ body.agone-dark .peines-browser-app .window-content {
 body.agone-dark .sorts-browser .sb-search-wrap,
 body.agone-dark .armes-browser .ab-search-wrap,
 body.agone-dark .armures-browser .arb-search-wrap,
-body.agone-dark .dons-browser .db-search-wrap,
 body.agone-dark .avantages-browser .avb-search-wrap,
 body.agone-dark .manoeuvres-browser .mb-search-wrap,
 body.agone-dark .competences-browser .cb-search-wrap,
@@ -377,7 +374,6 @@ body.agone-dark .agone-roll-card .fumble-alert   { color: #f28b82 !important; ba
 body.agone-dark .sorts-browser .desc-toggle,
 body.agone-dark .armes-browser .desc-toggle,
 body.agone-dark .armures-browser .desc-toggle,
-body.agone-dark .dons-browser .desc-toggle,
 body.agone-dark .avantages-browser .avb-table .desc-toggle,
 body.agone-dark .manoeuvres-browser .desc-toggle,
 body.agone-dark .competences-browser .desc-toggle,
@@ -386,8 +382,7 @@ body.agone-dark .pouvoirs-browser .desc-toggle { color: rgba(180,140,80,0.55) !i
 body.agone-dark .avantages-browser .avb-badge     { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }
 body.agone-dark .manoeuvres-browser .mb-badge-manoeuvre { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }
 body.agone-dark .manoeuvres-browser .mb-badge-botte     { color: #e0a060 !important; background: rgba(200,120,40,0.2) !important; border-color: rgba(224,160,96,0.35) !important; }
-/* Badges verts dans dons/pouvoirs browsers */
-body.agone-dark .dons-browser .db-badge-avantage   { color: #6ecf7a !important; background: rgba(30,130,60,0.2) !important; border-color: rgba(110,207,122,0.35) !important; }
+/* Badges verts dans le browser de pouvoirs */
 body.agone-dark .pouvoirs-browser .pvb-badge-saisonin { color: #6ecf7a !important; background: rgba(60,130,80,0.2) !important; border-color: rgba(110,207,122,0.35) !important; }
 /* Avantages browser : ligne prérequis et badge brun foncé */
 body.agone-dark .avantages-browser .avb-table .avb-prerequis-row td { color: #c9a060 !important; background: rgba(201,162,39,0.08) !important; }
@@ -396,7 +391,6 @@ body.agone-dark .sorts-browser .sb-filter-sep,
 body.agone-dark .sorts-browser .sb-lbl,
 body.agone-dark .armes-browser,
 body.agone-dark .armures-browser,
-body.agone-dark .dons-browser,
 body.agone-dark .avantages-browser,
 body.agone-dark .manoeuvres-browser,
 body.agone-dark .competences-browser,

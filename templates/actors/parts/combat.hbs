@@ -258,7 +258,7 @@
           <td class="man-col-name">
             <div class="man-name-line">
               <span class="man-badge man-badge-{{man.system.categorie}}">
-                {{#if (eq man.system.categorie "botte")}}{{localize "AGONE.Botte"}}{{else}}Man.{{/if}}
+                {{#if (eq man.system.categorie "botte")}}{{localize "AGONE.Botte"}}{{else}}{{localize "AGONE.Ui.ManoeuvreAbr"}}{{/if}}
               </span>
               <button type="button" class="roll-btn item-name" data-action="rollManoeuvre" data-item-id="{{man.id}}">
                 {{man.name}}
@@ -298,7 +298,7 @@
           <td colspan="7" class="man-desc-cell">
             <details class="item-details">
               <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{man.system.description}}</div>
+              <div class="item-desc-content">{{{man.system.description}}}</div>
             </details>
           </td>
         </tr>

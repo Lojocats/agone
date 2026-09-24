@@ -19,26 +19,27 @@ export class CalendrierWidget {
 
     const moisArr   = CONFIG.AGONE.calendrier.mois;
     const moisData  = moisArr[(date.mois - 1)] ?? moisArr[0];
-    const saisonLabel = CONFIG.AGONE.saisons?.[saison] ?? "—";
+    const saisonLabel = game.i18n.localize(CONFIG.AGONE.saisons?.[saison] ?? "—");
 
     const jourDeLAn = (date.mois - 1) * CONFIG.AGONE.calendrier.joursParMois + date.jour;
     const phases    = CONFIG.AGONE.phasesLune ?? [];
     const phaseIdx  = Math.floor(((jourDeLAn - 1) % 28) / 28 * 8);
-    const moonPhase = phases[phaseIdx] ?? { icon: "🌑", label: "" };
+    const phase     = phases[phaseIdx] ?? { icon: "🌑", label: "" };
+    const moonPhase = { ...phase, label: phase.label ? game.i18n.localize(phase.label) : "" };
 
     const meteoObj  = (CONFIG.AGONE.meteoTypes ?? []).find(m => m.id === meteoId) ?? { id: "", icon: "—", label: "—" };
 
     const heure   = date.heure  ?? 8;
     const minute  = date.minute ?? 0;
     const timeStr = `${String(heure).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-    const dateCourte = `${date.jour} ${moisData.nom} · An ${date.an}`;
+    const dateCourte = `${date.jour} ${moisData.nom} · ${game.i18n.localize("AGONE.Calendrier.An")} ${date.an}`;
 
     return {
       isGM: game.user.isGM,
       saison, saisonLabel, dateCourte, timeStr,
       moonPhase,
       meteoIcon:  meteoObj.icon,
-      meteoLabel: meteoObj.label,
+      meteoLabel: game.i18n.localize(meteoObj.label),
       meteoId,
     };
   }

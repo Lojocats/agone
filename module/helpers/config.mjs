@@ -174,40 +174,40 @@ AGONE.competences = [
 // ── Saisons du Monde ────────────────────────────────────────────────────────
 AGONE.saisons = {
   "": "—",
-  printemps: "Printemps",
-  ete:       "Été",
-  automne:   "Automne",
-  hiver:     "Hiver",
+  printemps: "AGONE.Printemps",
+  ete:       "AGONE.Ete",
+  automne:   "AGONE.Automne",
+  hiver:     "AGONE.Hiver",
 };
 
 // ── Météo ────────────────────────────────────────────────────────────────────
 AGONE.meteoTypes = [
   { id: "",           icon: "—",  label: "—"                    },
-  { id: "ensoleille", icon: "☀️", label: "Ensoleillé"            },
-  { id: "nuageux",    icon: "⛅", label: "Nuageux"               },
-  { id: "pluie",      icon: "🌧️", label: "Pluie"                 },
-  { id: "orage",      icon: "⛈️", label: "Orage"                 },
-  { id: "brouillard", icon: "🌫️", label: "Brouillard"             },
-  { id: "neige",      icon: "❄️", label: "Neige"                 },
-  { id: "grele",      icon: "🌨️", label: "Grêle"                 },
-  { id: "blizzard",   icon: "🌪️", label: "Blizzard"              },
-  { id: "chaleur",    icon: "🔆", label: "Chaleur accablante"    },
-  { id: "nuit",       icon: "🌙", label: "Nuit étoilée"           },
-  { id: "automne",    icon: "🍂", label: "Vent d'automne"         },
-  { id: "cendres",    icon: "🌋", label: "Pluie de cendres"       },
-  { id: "brumechaleur",icon: "🌅",label: "Brume de chaleur"       },
+  { id: "ensoleille", icon: "☀️", label: "AGONE.Meteo.ensoleille"            },
+  { id: "nuageux",    icon: "⛅", label: "AGONE.Meteo.nuageux"               },
+  { id: "pluie",      icon: "🌧️", label: "AGONE.Meteo.pluie"                 },
+  { id: "orage",      icon: "⛈️", label: "AGONE.Meteo.orage"                 },
+  { id: "brouillard", icon: "🌫️", label: "AGONE.Meteo.brouillard"             },
+  { id: "neige",      icon: "❄️", label: "AGONE.Meteo.neige"                 },
+  { id: "grele",      icon: "🌨️", label: "AGONE.Meteo.grele"                 },
+  { id: "blizzard",   icon: "🌪️", label: "AGONE.Meteo.blizzard"              },
+  { id: "chaleur",    icon: "🔆", label: "AGONE.Meteo.chaleur"    },
+  { id: "nuit",       icon: "🌙", label: "AGONE.Meteo.nuit"           },
+  { id: "automne",    icon: "🍂", label: "AGONE.Meteo.automne"         },
+  { id: "cendres",    icon: "🌋", label: "AGONE.Meteo.cendres"       },
+  { id: "brumechaleur",icon: "🌅",label: "AGONE.Meteo.brumechaleur"       },
 ];
 
 // ── Phases de lune (cycle 28 jours) ─────────────────────────────────────────
 AGONE.phasesLune = [
-  { icon: "🌑", label: "Nouvelle lune"     },
-  { icon: "🌒", label: "Premier croissant" },
-  { icon: "🌓", label: "Premier quartier"  },
-  { icon: "🌔", label: "Lune gibbeuse croissante" },
-  { icon: "🌕", label: "Pleine lune"       },
-  { icon: "🌖", label: "Lune gibbeuse décroissante" },
-  { icon: "🌗", label: "Dernier quartier"  },
-  { icon: "🌘", label: "Dernier croissant" },
+  { icon: "🌑", label: "AGONE.Lune.Nouvelle"     },
+  { icon: "🌒", label: "AGONE.Lune.PremierCroissant" },
+  { icon: "🌓", label: "AGONE.Lune.PremierQuartier"  },
+  { icon: "🌔", label: "AGONE.Lune.GibbeuseCroissante" },
+  { icon: "🌕", label: "AGONE.Lune.Pleine"       },
+  { icon: "🌖", label: "AGONE.Lune.GibbeuseDecroissante" },
+  { icon: "🌗", label: "AGONE.Lune.DernierQuartier"  },
+  { icon: "🌘", label: "AGONE.Lune.DernierCroissant" },
 ];
 
 // ── Calendrier d'Harmonde (10 mois x 30 jours) ──────────────────────────────
@@ -227,3 +227,41 @@ AGONE.calendrier = {
   ],
 };
 
+/**
+ * Statistiques modifiables par les effets actifs des items (voir helpers/effets.mjs).
+ * label  : clé i18n ; mode : "add" (cumul, défaut) | "upgrade" (plus grande valeur) | "override"
+ * neutre : valeur sans effet (0 par défaut) ; booleen : pas de valeur à saisir
+ * simple : aussi appliquée aux compagnons, démons et PNJ (sinon personnage uniquement)
+ */
+AGONE.effets = {
+  // Caractéristiques et aspects
+  agilite:      { label: "AGONE.Attribut.Agilite",      simple: true },
+  force:        { label: "AGONE.Attribut.Force",        simple: true },
+  perception:   { label: "AGONE.Attribut.Perception",   simple: true },
+  resistance:   { label: "AGONE.Attribut.Resistance",   simple: true },
+  intelligence: { label: "AGONE.Attribut.Intelligence", simple: true },
+  volonte:      { label: "AGONE.Attribut.Volonte",      simple: true },
+  charisma:     { label: "AGONE.Attribut.Charisma",     simple: true },
+  creativite:   { label: "AGONE.Attribut.Creativite",   simple: true },
+  corps:        { label: "AGONE.Corps",  simple: true },
+  esprit:       { label: "AGONE.Esprit", simple: true },
+  ame:          { label: "AGONE.Ame",    simple: true },
+  corps_noir:   { label: "AGONE.Effets.CorpsNoir" },
+  esprit_noir:  { label: "AGONE.Effets.EspritNoir" },
+  ame_noir:     { label: "AGONE.Effets.AmeNoir" },
+  // Stats dérivées
+  initiative_bonus: { label: "AGONE.Initiative",       simple: true },
+  melee_bonus:      { label: "AGONE.Melee",            simple: true },
+  tir_bonus:        { label: "AGONE.Tir",              simple: true },
+  defense_bonus:    { label: "AGONE.DefenseNaturelle", simple: true },
+  esquive_bonus:    { label: "AGONE.EsquiveTotal",     simple: true },
+  art_bonus:        { label: "AGONE.Art",              simple: true },
+  emprise_bonus:    { label: "AGONE.Emprise",          simple: true },
+  bd_bonus:         { label: "AGONE.BD" },
+  tai:              { label: "AGONE.TAI" },
+  // Création et Charges
+  ptsCreationComp_bonus: { label: "AGONE.Effets.PtsCreationComp" },
+  charges_reduction:     { label: "AGONE.Effets.ReductionCharges" },
+  charges_double:        { label: "AGONE.Effets.ChargesDouble", mode: "override", booleen: true, neutre: false },
+  mv_divisor:            { label: "AGONE.Effets.DiviseurMv",    mode: "upgrade", neutre: 1 },
+};

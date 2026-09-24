@@ -302,3 +302,68 @@
   text-align: center;
   opacity: 0.7;
 }
+
+/* ── Effets actifs d'un item (templates/items/parts/effets.hbs) ─────────── */
+.agone .agone-effets {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agone .effet-bloc {
+  border: 1px solid var(--agone-border, rgba(92,58,30,0.35));
+  border-radius: var(--radius, 4px);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone .effet-bloc.effet-inactif {
+  opacity: 0.55;
+}
+.agone .effet-entete,
+.agone .effet-modif {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone .effet-icone {
+  width: 24px;
+  height: 24px;
+  border: none;
+  flex: 0 0 auto;
+}
+.agone .effet-nom {
+  flex: 1 1 auto;
+  font-weight: bold;
+}
+.agone .effet-actif {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.agone .effet-modif select {
+  flex: 1 1 auto;
+}
+.agone .effet-modif .stat-num {
+  width: 52px;
+  text-align: center;
+}
+.agone .effet-cle {
+  flex: 1 1 auto;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agone .effet-valeur-fixe {
+  font-size: 12px;
+  font-style: italic;
+}
+.agone .effet-ajout {
+  align-self: flex-start;
+  font-size: 11px;
+  padding: 1px 8px;
+  width: auto;
+}

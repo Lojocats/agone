@@ -1,27 +1,37 @@
 import { ARMES_DATA, BOUCLIERS_DATA } from "../helpers/compendium-data.mjs";
+import { AgoneBrowser } from "./agone-browser.mjs";
 
 const _ALL_ARMES_DATA = [...ARMES_DATA, ...BOUCLIERS_DATA];
 
 /**
  * Navigateur d'armes Agone — fenêtre de sélection avec filtres.
  */
-export class ArmesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class ArmesBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor          = actor;
-    this._search        = "";
-    this._filterStyles  = new Set();
-    this._filterTypes   = new Set();
-    this._filterReqFor  = null;
-    this._filterPossede = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search       : "",
+    _filterStyles : new Set(),
+    _filterTypes  : new Set(),
+    _filterReqFor : null,
+    _filterPossede: "all",
+  };
+
+  static FILTERS = {
+    ".ab-search"         : { kind: "text",   prop: "_search" },
+    ".ab-all-style"      : { kind: "setAll", prop: "_filterStyles" },
+    ".ab-style-check"    : { kind: "set",    prop: "_filterStyles" },
+    ".ab-all-type"       : { kind: "setAll", prop: "_filterTypes" },
+    ".ab-type-check"     : { kind: "set",    prop: "_filterTypes" },
+    ".ab-req-for"        : { kind: "number", prop: "_filterReqFor", debounce: 300 },
+    ".ab-possede-filter" : { kind: "select", prop: "_filterPossede" },
+    ".ab-clear"          : { kind: "reset" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-armes-browser",
     classes : ["agone", "armes-browser"],
     position: { width: 900, height: 640 },
-    window  : { resizable: true },
+    actions : { addArme: ArmesBrowser.#onAddArme },
   };
 
   static PARTS = {
@@ -112,95 +122,28 @@ export class ArmesBrowser extends foundry.applications.api.HandlebarsApplication
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const html = $(this.element);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-
-    html.find(".ab-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".ab-search";
-      this.render();
-    }, 250));
-
-    html.find(".ab-all-style").on("change", () => {
-      this._filterStyles.clear();
-      this.render();
-    });
-    html.find(".ab-style-check").on("change", e => {
-      const v = e.currentTarget.value;
-      if (e.currentTarget.checked) this._filterStyles.add(v);
-      else this._filterStyles.delete(v);
-      this.render();
-    });
-
-    html.find(".ab-all-type").on("change", () => {
-      this._filterTypes.clear();
-      this.render();
-    });
-    html.find(".ab-type-check").on("change", e => {
-      const v = e.currentTarget.value;
-      if (e.currentTarget.checked) this._filterTypes.add(v);
-      else this._filterTypes.delete(v);
-      this.render();
-    });
-
-    html.find(".ab-req-for").on("input", foundry.utils.debounce(e => {
-      const v = parseInt(e.currentTarget.value);
-      this._filterReqFor = isNaN(v) ? null : v;
-      this._refocusSelector = ".ab-req-for";
-      this.render();
-    }, 300));
-
-    html.find(".ab-possede-filter").on("change", e => {
-      this._filterPossede = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".ab-clear").on("click", () => {
-      this._search        = "";
-      this._filterStyles.clear();
-      this._filterTypes.clear();
-      this._filterReqFor  = null;
-      this._filterPossede = "all";
-      this.render();
-    });
-
-    html.find("[data-action='addArme']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-arme-idx]")?.dataset?.armeIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = _ALL_ARMES_DATA[idx];
-      if (!d) return;
-
-      await Item.create({
-        name  : d.name,
-        type  : "arme",
-        system: {
-          style       : d.style        ?? "melee",
-          type        : d.type         ?? "P",
-          tai         : d.tai          ?? 0,
-          initBonus   : d.initBonus    ?? 0,
-          attackBonus : d.attackBonus  ?? 0,
-          defenseBonus: d.defenseBonus ?? 0,
-          dommages    : d.dommages     ?? 0,
-          portee      : d.portee       ?? "",
-          reqFor      : d.reqFor       ?? 0,
-          reqAgi      : d.reqAgi       ?? 0,
-          protection  : d.protection   ?? 0,
-          malusAgi    : d.malusAgi     ?? 0,
-          description : d.description  ?? "",
-        },
-      }, { parent: this.actor });
-
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.ArmeAjoutee", { nom: d.name, acteur: this.actor.name }));
-      this.render();
-    });
+  static async #onAddArme(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, _ALL_ARMES_DATA, "armeIdx");
+    if (!d) return;
+    await this._addItem({
+      name  : d.name,
+      type  : "arme",
+      system: {
+        style       : d.style        ?? "melee",
+        type        : d.type         ?? "P",
+        tai         : d.tai          ?? 0,
+        initBonus   : d.initBonus    ?? 0,
+        attackBonus : d.attackBonus  ?? 0,
+        defenseBonus: d.defenseBonus ?? 0,
+        dommages    : d.dommages     ?? 0,
+        portee      : d.portee       ?? "",
+        reqFor      : d.reqFor       ?? 0,
+        reqAgi      : d.reqAgi       ?? 0,
+        protection  : d.protection   ?? 0,
+        malusAgi    : d.malusAgi     ?? 0,
+        description : d.description  ?? "",
+      },
+    }, "AGONE.Notif.ArmeAjoutee");
   }
+
 }

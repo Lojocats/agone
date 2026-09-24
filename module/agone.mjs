@@ -7,6 +7,8 @@
 import { AGONE }                from "./helpers/config.mjs";
 import { ARMES_DATA, ARMURES_DATA, BOUCLIERS_DATA, SORTS_DATA, PEUPLES_DATA } from "./helpers/compendium-data.mjs";
 import { registerHandlebarsHelpers as registerHandlebars } from "./helpers/handlebars.mjs";
+import { registerMigrationSettings, migrateWorld } from "./migration.mjs";
+import { registerQuenchTests } from "./tests/quench.mjs";
 
 // ── DataModels ────────────────────────────────────────────────────────────────
 import {
@@ -26,18 +28,17 @@ import { AgoneItem }        from "./documents/item.mjs";
 import { PersonnageSheet }   from "./sheets/personnage-sheet.mjs";
 
 // ── Apps ─────────────────────────────────────────────────────────────────────
-import { SortsBrowser }     from "./apps/sorts-browser.mjs";
-import { AvantagesBrowser } from "./apps/avantages-browser.mjs";
-import { PeinesBrowser }   from "./apps/peines-browser.mjs";
-import { SaisonConfig }        from "./apps/saison-config.mjs";
 import { CalendrierAgone }     from "./apps/calendrier.mjs";
 import { CalendrierWidget }    from "./apps/calendrier-widget.mjs";
 import { DomainesArtsConfig }  from "./apps/domaines-arts-config.mjs";
 import { AgoreCombatTracker }  from "./apps/combat-tracker.mjs";
-import {
-  CompagnonSheet, DemonSheet, PnjSheet
-} from "./sheets/actor-sheets.mjs";
+import { CompagnonSheet } from "./sheets/compagnon-sheet.mjs";
+import { DemonSheet }     from "./sheets/demon-sheet.mjs";
+import { PnjSheet }       from "./sheets/pnj-sheet.mjs";
 import { AgoneItemSheet }    from "./sheets/item-sheet.mjs";
+
+// Tests d'intégration (actifs seulement si le module Quench est installé et activé)
+Hooks.on("quenchReady", registerQuenchTests);
 
 /* ============================================================================
  * INIT HOOK
@@ -137,6 +138,8 @@ Hooks.once("init", () => {
     type:  Array,
     default: [],
   });
+
+  registerMigrationSettings();
 
   // Hachages des données des compendiums pour détection de changement
   game.settings.register("agone", "compendiumHashes", {
@@ -239,6 +242,10 @@ Hooks.once("init", () => {
     "systems/agone/templates/items/manoeuvre-sheet.hbs",
     "systems/agone/templates/items/peuple-sheet.hbs",
     "systems/agone/templates/items/danseur-sheet.hbs",
+    "systems/agone/templates/items/peine-sheet.hbs",
+    "systems/agone/templates/items/demon-sheet.hbs",
+    "systems/agone/templates/items/parts/effets.hbs",
+    "systems/agone/templates/items/parts/editeur.hbs",
     // Chat
     "systems/agone/templates/chat/roll-result.hbs",
     "systems/agone/templates/chat/item-card.hbs",
@@ -246,17 +253,16 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/sorts-browser.hbs",
     "systems/agone/templates/apps/armes-browser.hbs",
     "systems/agone/templates/apps/armures-browser.hbs",
-    "systems/agone/templates/apps/dons-browser.hbs",
     "systems/agone/templates/apps/avantages-browser.hbs",
     "systems/agone/templates/apps/peines-browser.hbs",
     // Partials Perfidie
     "systems/agone/templates/actors/parts/perfidie.hbs",
     "systems/agone/templates/actors/parts/companions.hbs",
+    "systems/agone/templates/actors/parts/caracs-simples.hbs",
     "systems/agone/templates/actors/parts/parametres.hbs",
     "systems/agone/templates/apps/manoeuvres-browser.hbs",
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",
-    "systems/agone/templates/apps/saison-config.hbs",
     "systems/agone/templates/apps/calendrier.hbs",
     "systems/agone/templates/apps/calendrier-widget.hbs",
     "systems/agone/templates/apps/combat-tracker.hbs",
@@ -485,6 +491,8 @@ Hooks.once("ready", async () => {
 
   if (!game.user.isGM) return;
 
+  await migrateWorld();
+
   // ── Utilitaires de synchronisation de compendium ───────────────────────
   // Calcule un hash SHA-256 tronqué (16 hex) des données passées
   async function _dataHash(data) {
@@ -681,23 +689,6 @@ Hooks.on("preCreateActor", (actor, _data, _options) => {
     "prototypeToken.displayBars": CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40,
     "prototypeToken.actorLink": true,
   });
-});
-
-// ── Tokens existants : migration bar PdV au premier chargement (GM) ─────────
-Hooks.once("ready", () => {
-  if (!game.user?.isGM) return;
-  const toUpdate = [];
-  for (const actor of game.actors ?? []) {
-    const bar = actor.prototypeToken?.bar1?.attribute;
-    if (!bar || bar === "pdv" || bar === "") {
-      toUpdate.push(actor.update({
-        "prototypeToken.bar1.attribute": "system.pdv",
-        "prototypeToken.displayBars":   CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40,
-        "prototypeToken.actorLink":      true,
-      }));
-    }
-  }
-  if (toUpdate.length) Promise.all(toUpdate).then(() => console.log("Agone | bar PdV configurée sur", toUpdate.length, "acteur(s)"));
 });
 
 // ── Scènes : grille en mètres (1 m / case) par défaut ───────────────────────

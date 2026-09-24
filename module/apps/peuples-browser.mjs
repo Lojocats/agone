@@ -1,23 +1,28 @@
 import { PEUPLES_DATA } from "../helpers/compendium-data.mjs";
+import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
  * Navigateur de peuples Agone — fenêtre de sélection avec filtres.
  * Applique un peuple sur l'acteur (via drag ou bouton Appliquer).
  */
-export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+export class PeuplesBrowser extends AgoneBrowser {
 
-  constructor(actor, options = {}) {
-    super(options);
-    this.actor          = actor;
-    this._search        = "";
-    this._filterPossede = "all";
-  }
+  static FILTER_DEFAULTS = {
+    _search       : "",
+    _filterPossede: "all",
+  };
+
+  static FILTERS = {
+    ".pb-search"         : { kind: "text",   prop: "_search" },
+    ".pb-possede-filter" : { kind: "select", prop: "_filterPossede" },
+    ".pb-clear"          : { kind: "reset" },
+  };
 
   static DEFAULT_OPTIONS = {
     id      : "agone-peuples-browser",
     classes : ["agone", "peuples-browser"],
     position: { width: 680, height: 540 },
-    window  : { resizable: true },
+    actions : { applyPeuple: PeuplesBrowser.#onApplyPeuple },
   };
 
   static PARTS = {
@@ -61,65 +66,19 @@ export class PeuplesBrowser extends foundry.applications.api.HandlebarsApplicati
     };
   }
 
-  _onRender(context, options) {
-    super._onRender(context, options);
-    const sel = this._refocusSelector;
-    if (sel) {
-      this._refocusSelector = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(sel);
-        if (el) { el.focus(); try { el.setSelectionRange?.(el.value.length, el.value.length); } catch {} }
-      });
-    }
-    const html = $(this.element);
+  static async #onApplyPeuple(event, target) {
+    const d = AgoneBrowser._entryFromTarget(target, PEUPLES_DATA, "peupleIdx");
+    if (!d) return;
 
-    html.find(".pb-search").on("input", foundry.utils.debounce(e => {
-      this._search = e.currentTarget.value.trim();
-      this._refocusSelector = ".pb-search";
-      this.render();
-    }, 250));
+    const pack  = game.packs.get("agone.peuples");
+    const entry = pack ? (await pack.getIndex()).find(e => e.name === d.name) : null;
+    const item  = entry ? await pack.getDocument(entry._id) : null;
+    const sheet = this.actor.sheet;
+    if (item && sheet?._applyPeuple) await sheet._applyPeuple(item);
+    else                             await this.actor.update({ "system.peuple": d.name });
 
-    html.find(".pb-possede-filter").on("change", e => {
-      this._filterPossede = e.currentTarget.value;
-      this.render();
-    });
-
-    html.find(".pb-clear").on("click", () => {
-      this._search        = "";
-      this._filterPossede = "all";
-      this.render();
-    });
-
-    // Appliquer un peuple
-    html.find("[data-action='applyPeuple']").on("click", async e => {
-      const idx = parseInt(e.currentTarget.closest("[data-peuple-idx]")?.dataset?.peupleIdx ?? "");
-      if (isNaN(idx)) return;
-      const d = PEUPLES_DATA[idx];
-      if (!d) return;
-
-      // Chercher l'item peuple dans le compendium pour déclencher _applyPeuple
-      const pack = game.packs.get("agone.peuples");
-      if (pack) {
-        const index = await pack.getIndex();
-        const entry = index.find(e => e.name === d.name);
-        if (entry) {
-          const item = await pack.getDocument(entry._id);
-          if (item) {
-            const sheet = this.actor.sheet;
-            if (sheet?._applyPeuple) {
-              await sheet._applyPeuple(item);
-              ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: d.name, acteur: this.actor.name }));
-              this.render();
-              return;
-            }
-          }
-        }
-      }
-      // Fallback : mettre le nom directement
-      await this.actor.update({ "system.peuple": d.name });
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: d.name, acteur: this.actor.name }));
-      this.render();
-    });
+    ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: d.name, acteur: this.actor.name }));
+    this.render();
   }
 
 }

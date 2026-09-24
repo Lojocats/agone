@@ -24,7 +24,7 @@
     </div>
     <!-- Filtres secondaires -->
     <div class="sb-filter-row2">
-      <select class="sb-seuil-exact" title="Filtrer par seuil exact">
+      <select class="sb-seuil-exact" title='{{localize "AGONE.Ui.FiltrerSeuilExact"}}'>
         <option value="">{{localize "AGONE.Browser.TousSeuils"}}</option>
         {{#each allSeuils}}
         <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>{{localize "AGONE.Browser.SeuilEgal"}} {{this}}</option>
@@ -82,7 +82,7 @@
           <td colspan="7" class="sort-description-cell">
             <details class="item-details">
               <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{sort.description}}</div>
+              <div class="item-desc-content">{{{sort.description}}}</div>
             </details>
           </td>
         </tr>

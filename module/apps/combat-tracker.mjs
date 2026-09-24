@@ -1,3 +1,5 @@
+import { listen } from "../helpers/dom.mjs";
+
 /**
  * AgoreCombatTracker — Application GM de suivi de combat pour Agone.
  *
@@ -114,13 +116,13 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
   _onRender(context, options) {
     super._onRender(context, options);
     if (!this._hookIds) this._registerHooks();
-    const html = $(this.element);
+    const root = this.element;
 
     // ── Navigation de tour ──────────────────────────────────────────────
-    html.find("[data-action='prevTurn']").on("click", () => game.combat?.previousTurn());
-    html.find("[data-action='nextTurn']").on("click", () => game.combat?.nextTurn());
-    html.find("[data-action='startCombat']").on("click", () => game.combat?.startCombat());
-    html.find("[data-action='endCombat']").on("click", async () => {
+    listen(root, "[data-action='prevTurn']", "click", () => game.combat?.previousTurn());
+    listen(root, "[data-action='nextTurn']", "click", () => game.combat?.nextTurn());
+    listen(root, "[data-action='startCombat']", "click", () => game.combat?.startCombat());
+    listen(root, "[data-action='endCombat']", "click", async () => {
       const confirmed = await foundry.applications.api.DialogV2.confirm({
         title:   game.i18n.localize("AGONE.Combat.TerminerCombat"),
         content: `<p>${game.i18n.localize("AGONE.Combat.TerminerCombatConfirm")}</p>`,
@@ -129,7 +131,7 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     });
 
     // ── Initiative ──────────────────────────────────────────────────────
-    html.find("[data-action='rollInit']").on("click", async (e) => {
+    listen(root, "[data-action='rollInit']", "click", async (e) => {
       const row  = e.currentTarget.closest("[data-combatant-id]");
       const id   = row.dataset.combatantId;
       const c    = game.combat?.combatants.get(id);
@@ -144,27 +146,27 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
       this.render(false);
     });
 
-    html.find("[data-action='rollAllInit']").on("click", async () => {
+    listen(root, "[data-action='rollAllInit']", "click", async () => {
       if (!game.combat) return;
       await game.combat.rollAll();
       this.render(false);
     });
 
-    html.find("[data-action='resetInit']").on("click", async () => {
+    listen(root, "[data-action='resetInit']", "click", async () => {
       if (!game.combat) return;
       await game.combat.resetAll();
       this.render(false);
     });
 
     // ── Édition initiative inline ───────────────────────────────────────
-    html.find(".ct-init-input").on("change", async (e) => {
+    listen(root, ".ct-init-input", "change", async (e) => {
       const id  = e.currentTarget.closest("[data-combatant-id]").dataset.combatantId;
       const val = Number(e.currentTarget.value);
       if (!isNaN(val)) await game.combat?.setInitiative(id, val);
     });
 
     // ── PdV inline ──────────────────────────────────────────────────────
-    html.find(".ct-pdv-input").on("change", async (e) => {
+    listen(root, ".ct-pdv-input", "change", async (e) => {
       const row   = e.currentTarget.closest("[data-combatant-id]");
       const actor = this._resolveActor(row);
       if (!actor) return;
@@ -173,18 +175,18 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     });
 
     // ── Dégâts / soins rapides ──────────────────────────────────────────
-    html.find("[data-action='applyDamage']").on("click", async (e) => {
+    listen(root, "[data-action='applyDamage']", "click", async (e) => {
       const row = e.currentTarget.closest("[data-combatant-id]");
       await this._promptDeltaPdv(row, "degats");
     });
 
-    html.find("[data-action='applySoin']").on("click", async (e) => {
+    listen(root, "[data-action='applySoin']", "click", async (e) => {
       const row = e.currentTarget.closest("[data-combatant-id]");
       await this._promptDeltaPdv(row, "soins");
     });
 
     // ── Blessures graves ────────────────────────────────────────────────
-    html.find(".ct-bg-cell").on("click", async (e) => {
+    listen(root, ".ct-bg-cell", "click", async (e) => {
       const cell  = e.currentTarget;
       const row   = cell.closest("[data-combatant-id]");
       const actor = this._resolveActor(row);
@@ -194,7 +196,7 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     });
 
     // ── Statuts rapides ─────────────────────────────────────────────────
-    html.find("[data-action='toggleStatus']").on("click", async (e) => {
+    listen(root, "[data-action='toggleStatus']", "click", async (e) => {
       const btn    = e.currentTarget;
       const row    = btn.closest("[data-combatant-id]");
       const actor  = this._resolveActor(row);
@@ -219,27 +221,27 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     });
 
     // ── Ouvrir la fiche acteur ──────────────────────────────────────────
-    html.find("[data-action='openSheet']").on("click", (e) => {
+    listen(root, "[data-action='openSheet']", "click", (e) => {
       const row   = e.currentTarget.closest("[data-combatant-id]");
       const actor = this._resolveActor(row);
       actor?.sheet?.render(true);
     });
 
     // ── Marquer vaincu ─────────────────────────────────────────────────
-    html.find("[data-action='toggleDefeated']").on("click", async (e) => {
+    listen(root, "[data-action='toggleDefeated']", "click", async (e) => {
       const id = e.currentTarget.closest("[data-combatant-id]").dataset.combatantId;
       const c  = game.combat?.combatants.get(id);
       if (c) await c.update({ defeated: !c.defeated });
     });
 
     // ── Créer un nouveau combat ─────────────────────────────────────────
-    html.find("[data-action='createCombat']").on("click", async () => {
+    listen(root, "[data-action='createCombat']", "click", async () => {
       const combat = await Combat.create({ scene: canvas.scene?.id, active: true });
       if (combat) ui.notifications.info(game.i18n.localize("AGONE.Combat.CombatCree"));
     });
 
     // ── Ajouter les tokens sélectionnés au combat ───────────────────────
-    html.find("[data-action='addTokens']").on("click", async () => {
+    listen(root, "[data-action='addTokens']", "click", async () => {
       const tokens = canvas.tokens?.controlled ?? [];
       if (!tokens.length) {
         ui.notifications.warn(game.i18n.localize("AGONE.Combat.AucunTokenSelectionne"));
