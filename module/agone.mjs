@@ -9,6 +9,7 @@ import { ARMES_DATA, ARMURES_DATA, BOUCLIERS_DATA, SORTS_DATA, PEUPLES_DATA } fr
 import { registerHandlebarsHelpers as registerHandlebars } from "./helpers/handlebars.mjs";
 import { registerMigrationSettings, migrateWorld } from "./migration.mjs";
 import { registerQuenchTests } from "./tests/quench.mjs";
+import { libelleSante } from "./helpers/sante.mjs";
 
 // ── DataModels ────────────────────────────────────────────────────────────────
 import {
@@ -495,11 +496,14 @@ Hooks.once("ready", async () => {
     });
   }
 
-  // Re-rendu du widget à chaque changement de setting calendrier, météo ou thème
+  // Re-rendu du widget et du calendrier à chaque changement de setting calendrier, météo ou thème
   Hooks.on("updateSetting", (setting) => {
     const key = setting.key ?? "";
     if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo" || key === "agone.saisonMonde") {
       game.agone.calendrierWidget?.render(true);
+    }
+    if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo" || key === "agone.calendrierNotes") {
+      CalendrierAgone.rafraichir();
     }
     if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo") {
       _applyWeatherToScene();
@@ -666,7 +670,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
         icon: "fas fa-calendar-alt",
         order: 1,
         button: true,
-        onChange: () => new CalendrierAgone().render(true),
+        onChange: () => CalendrierAgone.ouvrir(),
       },
       combatTracker: {
         name: "combatTracker",
@@ -675,7 +679,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
         order: 2,
         button: true,
         visible: game.user?.isGM ?? false,
-        onChange: () => new AgoreCombatTracker().render(true),
+        onChange: () => AgoreCombatTracker.ouvrir(),
       },
       darkMode: {
         name: "darkMode",
@@ -724,16 +728,7 @@ Hooks.on("preCreateScene", (scene, data) => {
   let _agoneSanteToken = null;
 
   function _buildTipLabel(token) {
-    const pdv = token.actor?.system?.pdv;
-    if (!pdv?.max) return null;
-    const pct = pdv.valeur / pdv.max;
-    const get = (k) => game.settings.get("agone", k);
-    return pct >= 1.0  ? get("santeLabel100") :
-           pct >= 0.75 ? get("santeLabel75")  :
-           pct >= 0.5  ? get("santeLabel50")  :
-           pct >= 0.25 ? get("santeLabel25")  :
-           pct >  0    ? get("santeLabel10")  :
-                         get("santeLabel0");
+    return libelleSante(token.actor);
   }
 
   function _removeTip() {

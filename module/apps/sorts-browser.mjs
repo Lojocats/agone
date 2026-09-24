@@ -46,8 +46,11 @@ export class SortsBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
+    // Un même nom peut exister dans plusieurs domaines (Créer un familier, Bénédiction…) :
+    // un sort est identifié par son nom ET son type de magie
+    const cleSort = (nom, type) => `${nom}|${(type ?? "").toLowerCase()}`;
     const actorSortNames = new Set(
-      this.actor.items.filter(i => i.type === "sort").map(i => i.name)
+      this.actor.items.filter(i => i.type === "sort").map(i => cleSort(i.name, i.system.typeMagie))
     );
 
     // Labels lisibles pour les types
@@ -71,7 +74,7 @@ export class SortsBrowser extends AgoneBrowser {
       duree     : d.duree,
       danse     : d.danse,
       description: d.description ?? "",
-      hasInActor: actorSortNames.has(d.name),
+      hasInActor: actorSortNames.has(cleSort(d.name, d.typeMagie)),
     }));
 
     // Filtres
@@ -149,7 +152,8 @@ export class SortsBrowser extends AgoneBrowser {
     }
 
     // Sort normal (Arts Magiques)
-    const actorItem = this.actor.items.find(i => i.type === "sort" && i.name === d.name);
+    const actorItem = this.actor.items.find(i => i.type === "sort" && i.name === d.name
+      && (i.system.typeMagie ?? "").toLowerCase() === (d.typeMagie ?? "").toLowerCase());
     if (actorItem) {
       await this.actor.rollSort(actorItem.id, { impro: true });
     } else {

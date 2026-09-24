@@ -3,7 +3,7 @@
  * Classe simple (pas d'Application) pour éviter toute interférence
  * avec le pipeline de rendu de FoundryVTT.
  */
-import { CalendrierAgone } from "./calendrier.mjs";
+import { CalendrierAgone, etatCalendrier } from "./calendrier.mjs";
 
 export class CalendrierWidget {
   constructor() {
@@ -13,34 +13,14 @@ export class CalendrierWidget {
 
   // ── Données ───────────────────────────────────────────────
   getData() {
-    const date    = game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1, heure: 8, minute: 0 };
-    const meteoId = game.settings.get("agone", "calendrierMeteo") ?? "";
-    const saison  = game.settings.get("agone", "saisonMonde") ?? "";
-
-    const moisArr   = CONFIG.AGONE.calendrier.mois;
-    const moisData  = moisArr[(date.mois - 1)] ?? moisArr[0];
-    const saisonLabel = game.i18n.localize(CONFIG.AGONE.saisons?.[saison] ?? "—");
-
-    const jourDeLAn = (date.mois - 1) * CONFIG.AGONE.calendrier.joursParMois + date.jour;
-    const phases    = CONFIG.AGONE.phasesLune ?? [];
-    const phaseIdx  = Math.floor(((jourDeLAn - 1) % 28) / 28 * 8);
-    const phase     = phases[phaseIdx] ?? { icon: "🌑", label: "" };
-    const moonPhase = { ...phase, label: phase.label ? game.i18n.localize(phase.label) : "" };
-
-    const meteoObj  = (CONFIG.AGONE.meteoTypes ?? []).find(m => m.id === meteoId) ?? { id: "", icon: "—", label: "—" };
-
-    const heure   = date.heure  ?? 8;
-    const minute  = date.minute ?? 0;
-    const timeStr = `${String(heure).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-    const dateCourte = `${date.jour} ${moisData.nom} · ${game.i18n.localize("AGONE.Calendrier.An")} ${date.an}`;
-
+    const etat = etatCalendrier();
+    const { date, moisData } = etat;
+    const saison = game.settings.get("agone", "saisonMonde") ?? "";
     return {
-      isGM: game.user.isGM,
-      saison, saisonLabel, dateCourte, timeStr,
-      moonPhase,
-      meteoIcon:  meteoObj.icon,
-      meteoLabel: game.i18n.localize(meteoObj.label),
-      meteoId,
+      ...etat,
+      saison,
+      saisonLabel: game.i18n.localize(CONFIG.AGONE.saisons?.[saison] ?? "—"),
+      dateCourte : `${date.jour} ${moisData.nom} · ${game.i18n.localize("AGONE.Calendrier.An")} ${date.an}`,
     };
   }
 
@@ -69,7 +49,7 @@ export class CalendrierWidget {
     if (!btn) return;
     const action = btn.dataset.action;
     if (action === "openCalendrier") {
-      new CalendrierAgone().render(true);
+      CalendrierAgone.ouvrir();
     } else if (action === "cycleMeteo" && game.user.isGM) {
       this._cycleMeteo();
     }

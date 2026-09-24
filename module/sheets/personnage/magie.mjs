@@ -520,7 +520,7 @@ export const MagieMixin = Base => class extends Base {
     if (next === current) return;
     // Vérifier le budget si montée (coût = delta en pts)
     if (delta > 0 && (danseur.system.ptsCreationRestants ?? 0) < 1) {
-      return ui.notifications.warn(game.i18n.localize("AGONE.PasAssezPtsCrea") || "Plus de points de création disponibles.");
+      return ui.notifications.warn(game.i18n.format("AGONE.PasAssezPtsCrea", { cout: 1, actuel: danseur.system.ptsCreationRestants ?? 0 }));
     }
     await danseur.update({ [`system.${stat}`]: next });
   }

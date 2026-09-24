@@ -1,4 +1,4 @@
-import { PEINES_PERFIDIE_DATA } from "../helpers/compendium-data.mjs";
+import { PEINES_PERFIDIE_DATA, descriptionBienfait } from "../helpers/compendium-data.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 // Libellés lisibles des catégories de peines de Perfidie
@@ -58,6 +58,7 @@ export class PeinesBrowser extends AgoneBrowser {
       noirEffect   : d.noirEffect,   // "corps" | "ame" | ""
       noirLabel    : d.noirEffect === "corps" ? game.i18n.localize("AGONE.Corps") : d.noirEffect === "ame" ? game.i18n.localize("AGONE.Ame") : "—",
       bienfait     : d.bienfait ?? "",
+      bienfaitDescription: descriptionBienfait(d.bienfait),
       description  : d.description ?? "",
       hasInActor   : actorPeineNames.has(d.name),
     }));

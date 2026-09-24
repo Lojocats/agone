@@ -351,33 +351,45 @@
 
 /* ── Calendrier ──────────────────────────────────────────── */
 .agone-calendrier-wrap {
+  --cal-saison: var(--agone-gold, #c9a227);
   background: var(--agone-parchment, #f4e8c1);
   padding: 10px;
   font-family: 'Crimson Text', Georgia, serif;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   overflow-y: auto;
+  max-height: 80vh;
 }
 
-/* En-tête : saison / mois / an */
+/* En-tête : saison / mois / lune / an, teinté selon la saison */
 .agone-calendrier-wrap .cal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 4px 0;
+  padding: 6px 10px;
+  border-radius: var(--radius, 4px);
+  border-left: 4px solid var(--cal-saison);
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.07);
 }
+.agone-calendrier-wrap .cal-saison-printemps { --cal-saison: #6aa84f; }
+.agone-calendrier-wrap .cal-saison-ete       { --cal-saison: #e0a030; }
+.agone-calendrier-wrap .cal-saison-automne   { --cal-saison: #b0582a; }
+.agone-calendrier-wrap .cal-saison-hiver     { --cal-saison: #6a8fb8; }
 .agone-calendrier-wrap .cal-header .cal-mois-nom {
   font-family: 'MedievalSharp', Georgia, serif;
-  font-size: 16px;
+  font-size: 19px;
   color: var(--agone-brown, #5c3a1e);
   margin: 0;
+  border: none;
+  flex: 1;
+  text-align: center;
 }
 .agone-calendrier-wrap .cal-header .cal-an {
   font-size: 12px;
   color: var(--agone-brown, #5c3a1e);
-  opacity: 0.7;
+  opacity: 0.75;
 }
 .agone-calendrier-wrap .cal-header .cal-an.cal-an-clickable {
   cursor: pointer;
@@ -385,97 +397,250 @@
 }
 .agone-calendrier-wrap .cal-header .cal-an.cal-an-clickable:hover {
   opacity: 1;
-  color: var(--agone-brown, #5c3a1e);
   border-bottom-color: var(--agone-gold, #c9a227);
 }
 .agone-calendrier-wrap .cal-saison-badge {
   font-size: 11px;
   color: var(--agone-brown, #5c3a1e);
   font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
+  border: 1px solid var(--cal-saison);
   border-radius: 10px;
-  padding: 1px 7px;
+  padding: 1px 8px;
+}
+.agone-calendrier-wrap .cal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone-calendrier-wrap .cal-moon-badge {
+  font-size: 17px;
+  line-height: 1;
 }
 
-/* Barre de navigation */
-.agone-calendrier-wrap .cal-nav-bar {
+/* Résumé : date longue, moment de la journée, heure, lune */
+.agone-calendrier-wrap .cal-resume {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 0 4px;
+}
+.agone-calendrier-wrap .cal-resume-date {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone-calendrier-wrap .cal-resume-infos {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone-calendrier-wrap .cal-resume-infos i { opacity: 0.7; margin-right: 2px; }
+.agone-calendrier-wrap .cal-heure {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--agone-txt-brun, #4a3b1e);
+  letter-spacing: 0.05em;
+}
+.agone-calendrier-wrap .cal-moon-label { font-style: italic; opacity: 0.85; }
+
+/* Barre horaire : nuit aux extrémités, jour au centre */
+.agone-calendrier-wrap .cal-time-track {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  margin-top: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right,
+    #1f2a44 0%, #1f2a44 18%, #d9925a 25%, #f2d98a 38%, #f7e7a8 50%,
+    #f2d98a 62%, #d9925a 77%, #1f2a44 88%, #1f2a44 100%);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+}
+.agone-calendrier-wrap .cal-time-marker {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 12px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--agone-txt-rouge, #800000);
+  box-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
+
+/* Météo : météo courante + un bouton par type (MJ) */
+.agone-calendrier-wrap .cal-meteo-row {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid rgba(var(--agone-bleu-rgb, 60,100,150), 0.35);
+  border-left: 4px solid rgba(var(--agone-bleu-rgb, 60,100,150), 0.7);
+  border-radius: var(--radius, 4px);
+  background: rgba(var(--agone-bleu-rgb, 60,100,150), 0.08);
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone-calendrier-wrap .cal-meteo-courante {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.agone-calendrier-wrap .cal-meteo-titre {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+.agone-calendrier-wrap .cal-meteo-icon  { font-size: 20px; line-height: 1; }
+.agone-calendrier-wrap .cal-meteo-label { flex: 1; font-style: italic; font-size: 14px; }
+.agone-calendrier-wrap .cal-meteo-choix {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.agone-calendrier-wrap .cal-meteo-btn {
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  line-height: 1;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.4);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
+  border-radius: 4px;
+  color: var(--agone-brown, #5c3a1e);
+  cursor: pointer;
+  filter: grayscale(0.5);
+  opacity: 0.75;
+  transition: background 0.12s, border-color 0.12s, opacity 0.12s, filter 0.12s;
+}
+.agone-calendrier-wrap .cal-meteo-btn i { font-size: 13px; }
+.agone-calendrier-wrap .cal-meteo-btn:hover {
+  opacity: 1;
+  filter: none;
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.18);
+  border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.6);
+}
+.agone-calendrier-wrap .cal-meteo-btn.actif {
+  opacity: 1;
+  filter: none;
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.3);
+  border: 2px solid var(--agone-gold, #c9a227);
+  box-shadow: 0 0 4px rgba(var(--agone-or-rgb, 201,162,39), 0.5);
+}
+
+/* Navigation (MJ) : une ligne pour la date, une pour l'heure */
+.agone-calendrier-wrap .cal-nav-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agone-calendrier-wrap .cal-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.agone-calendrier-wrap .cal-nav-titre {
+  width: 44px;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.7;
 }
 .agone-calendrier-wrap .cal-nav-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 24px;
+  padding: 0 4px;
   background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
   color: var(--agone-brown, #5c3a1e);
   border-radius: 3px;
-  min-width: 28px;
-  height: 28px;
-  padding: 0 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  transition: background 0.15s;
+  gap: 3px;
+  font-size: 11px;
+  line-height: 1;
   white-space: nowrap;
+  transition: background 0.15s;
 }
 .agone-calendrier-wrap .cal-nav-btn:hover {
   background: rgba(var(--agone-or-rgb, 201,162,39), 0.2);
   border-color: var(--agone-gold, #c9a227);
 }
-.agone-calendrier-wrap .cal-date-label {
-  font-size: 12px;
-  color: var(--agone-brown, #5c3a1e);
-  font-style: italic;
-  flex: 1;
-  text-align: center;
+.agone-calendrier-wrap .cal-quick-btn {
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+  border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.5);
 }
 
-/* Date display (joueurs) */
-.agone-calendrier-wrap .cal-date-display {
-  font-size: 13px;
-  color: var(--agone-brown, #5c3a1e);
-  font-style: italic;
-  text-align: center;
-  padding: 4px 0;
-}
-
-/* Grille 30 jours (6 colonnes x 5 rangées) */
+/* Grille du mois (6 colonnes x 5 rangées) */
 .agone-calendrier-wrap .cal-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 2px;
+  gap: 3px;
 }
 .agone-calendrier-wrap .cal-day {
-  min-height: 32px;
-  padding: 4px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  border-radius: 2px;
+  position: relative;
+  min-height: 36px;
+  padding: 3px 5px;
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
+  border-radius: 3px;
   background: rgba(var(--agone-surface-rgb, 255,255,255), 0.3);
-  transition: background 0.1s;
+  transition: background 0.1s, border-color 0.1s;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: space-between;
   font-size: 13px;
   font-weight: 600;
   color: var(--agone-dark-text, #2a1a08);
 }
+.agone-calendrier-wrap .cal-day-lune {
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.85;
+}
 .agone-calendrier-wrap .cal-day.clickable { cursor: pointer; }
-.agone-calendrier-wrap .cal-day.clickable:hover { background: rgba(var(--agone-or-rgb, 201,162,39), 0.1); }
+.agone-calendrier-wrap .cal-day.clickable:hover {
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+  border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.6);
+}
 .agone-calendrier-wrap .cal-day.today {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.22);
+  border: 2px solid var(--agone-gold, #c9a227);
+  color: var(--agone-txt-rouge, #800000);
   font-weight: 700;
 }
+/* Jour avec note : pastille en bas */
+.agone-calendrier-wrap .cal-day.has-note::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--agone-txt-rouge, #800000);
+}
 
-/* Zone de note du jour */
-.agone-calendrier-wrap .cal-note-area {
+/* Note du jour et notes du mois (MJ) */
+.agone-calendrier-wrap .cal-note-area,
+.agone-calendrier-wrap .cal-notes-mois {
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
   border-radius: var(--radius, 4px);
-  padding: 8px;
+  padding: 6px 8px;
   background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
   display: flex;
   flex-direction: column;
@@ -487,6 +652,7 @@
   color: var(--agone-brown, #5c3a1e);
   margin: 0;
 }
+.agone-calendrier-wrap .cal-note-aide { font-weight: 400; font-style: italic; opacity: 0.65; }
 .agone-calendrier-wrap .cal-note-input {
   resize: vertical;
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
@@ -501,96 +667,39 @@
   box-sizing: border-box;
 }
 .agone-calendrier-wrap .cal-note-input:focus { outline: none; border-color: var(--agone-gold, #c9a227); }
-.agone-calendrier-wrap .cal-note-save {
-  align-self: flex-end;
-  font-size: 11px;
-  padding: 2px 10px;
-  cursor: pointer;
-}
-
-/* ── Calendrier v2 : header-right / lune / météo / heure ── */
-.agone-calendrier-wrap .cal-header-right {
+.agone-calendrier-wrap .cal-notes-mois ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  align-items: center;
-  gap: 5px;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 120px;
+  overflow-y: auto;
 }
-.agone-calendrier-wrap .cal-moon-badge {
-  font-size: 16px;
-  line-height: 1;
-}
-.agone-calendrier-wrap .cal-meteo-row {
+.agone-calendrier-wrap .cal-note-item {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 6px;
-  padding: 3px 6px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
-  border-radius: var(--radius, 4px);
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.25);
+  padding: 2px 4px;
+  border-radius: 3px;
   font-size: 12px;
-  color: var(--agone-brown, #5c3a1e);
-}
-.agone-calendrier-wrap .cal-meteo-row.clickable { cursor: pointer; }
-.agone-calendrier-wrap .cal-meteo-row.clickable:hover { background: rgba(var(--agone-or-rgb, 201,162,39), 0.1); border-color: var(--agone-gold, #c9a227); }
-.agone-calendrier-wrap .cal-meteo-icon { font-size: 15px; line-height: 1; }
-.agone-calendrier-wrap .cal-meteo-label { flex: 1; font-style: italic; }
-.agone-calendrier-wrap .cal-meteo-hint { font-size: 10px; opacity: 0.55; margin-left: auto; }
-.agone-calendrier-wrap .cal-meteo-select {
-  flex: 1;
-  font-size: 12px;
-  font-family: 'Crimson Text', Georgia, serif;
-  font-style: italic;
-  background: transparent;
-  border: none;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-dark-text, #2a1a08);
   cursor: pointer;
-  padding: 0 2px;
-  outline: none;
-  box-shadow: none !important;
-  -webkit-appearance: none;
-  appearance: none;
 }
-
-.agone-calendrier-wrap .cal-time-bar { gap: 4px; }
-.agone-calendrier-wrap .cal-nav-btn--sm {
-  font-size: 10px;
-  min-width: 38px;
-  height: 22px;
-  padding: 0 4px;
-}
-.agone-calendrier-wrap .cal-time-display {
-  font-size: 15px;
+.agone-calendrier-wrap .cal-note-item:hover { background: rgba(var(--agone-or-rgb, 201,162,39), 0.15); }
+.agone-calendrier-wrap .cal-note-item.actif { background: rgba(var(--agone-or-rgb, 201,162,39), 0.22); }
+.agone-calendrier-wrap .cal-note-jour {
+  min-width: 20px;
   font-weight: 700;
-  color: var(--agone-gold, #c9a227);
-  font-family: 'Crimson Text', Georgia, serif;
+  text-align: right;
+  color: var(--agone-txt-rouge, #800000);
+}
+.agone-calendrier-wrap .cal-note-texte {
   flex: 1;
-  text-align: center;
-  letter-spacing: 0.05em;
-}
-.agone-calendrier-wrap .cal-quick-btns {
-  display: flex;
-  gap: 5px;
-  justify-content: center;
-}
-.agone-calendrier-wrap .cal-quick-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.07);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
-  color: var(--agone-brown, #5c3a1e);
-  border-radius: var(--radius, 3px);
-  font-size: 11px;
-  padding: 2px 9px;
-  cursor: pointer;
-  transition: background 0.12s;
-}
-.agone-calendrier-wrap .cal-quick-btn:hover { background: rgba(var(--agone-or-rgb, 201,162,39), 0.15); border-color: var(--agone-gold, #c9a227); }
-
-/* Jour avec note */
-.agone-calendrier-wrap .cal-day.has-note::after {
-  content: "";
-  display: block;
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: var(--agone-gold, #c9a227);
-  margin: 1px auto 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Widget HUD Calendrier (haut d'écran) ─────────────────── */
@@ -1162,19 +1271,21 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  flex: 1;
   padding: 32px 16px;
   color: var(--agone-brown, #5c3a1e);
-  opacity: 0.6;
+  text-align: center;
 }
-.agone-ct-empty i { font-size: 32px; }
-.agone-ct-empty p { font-size: 14px; font-weight: 600; margin: 0; }
-.agone-ct-hint    { font-size: 11px; font-style: italic; }
+.agone-ct-empty > i { font-size: 36px; opacity: 0.4; }
+.agone-ct-empty p   { font-size: 15px; font-weight: 600; margin: 0; }
+.agone-ct-hint      { font-size: 11px; font-style: italic; opacity: 0.7; }
+.agone-ct-empty .agone-ct-btn--start { height: 30px; margin-top: 8px; font-size: 12px; }
 
-/* ── En-tête ─────────────────────────────────────────────── */
+/* ── En-tête : round, tour en cours, navigation ──────────── */
 .agone-ct-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   padding: 6px 10px;
   background: linear-gradient(to right, var(--agone-brown-dark, #3b1e0a), var(--agone-brown, #5c3a1e));
   color: var(--agone-parchment, #f4e8c1);
@@ -1183,26 +1294,50 @@
 }
 .agone-ct-round {
   display: flex;
-  align-items: baseline;
-  gap: 5px;
-  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-width: 42px;
+  padding-right: 10px;
+  border-right: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.35);
 }
 .agone-ct-round-label {
-  font-size: 11px;
+  font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   opacity: 0.75;
 }
 .agone-ct-round-num {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--agone-gold, #c9a227);
   line-height: 1;
 }
+.agone-ct-tour {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+.agone-ct-tour-num {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+.agone-ct-tour-nom {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--agone-gold-light, #e8c860);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .agone-ct-nav {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   align-items: center;
+  flex-shrink: 0;
 }
 .agone-ct-btn {
   background: rgba(var(--agone-surface-rgb, 255,255,255), 0.1);
@@ -1211,6 +1346,7 @@
   border-radius: var(--radius, 3px);
   width: 26px;
   height: 26px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1219,10 +1355,50 @@
   transition: background 0.15s;
 }
 .agone-ct-btn:hover          { background: rgba(var(--agone-or-rgb, 201,162,39), 0.25); }
+.agone-ct-btn--next          { width: 32px; background: rgba(var(--agone-or-rgb, 201,162,39), 0.3); border-color: var(--agone-gold, #c9a227); }
 .agone-ct-btn--start         { width: auto; padding: 0 10px; gap: 5px; color: var(--agone-txt-brun, #4a3b1e); border-color: #8bc34a; background: var(--agone-fond-vert, #b8d98a); font-size: 11px; }
 .agone-ct-btn--start:hover   { background: #a0c46a; }
-.agone-ct-btn--end           { color: #f4b0b0; border-color: var(--agone-txt-rouge, #c04040); }
-.agone-ct-btn--reset         { opacity: 0.7; }
+
+/* ── Barre d'outils MJ ───────────────────────────────────── */
+.agone-ct-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  flex-shrink: 0;
+}
+.agone-ct-toolbar-spacer { flex: 1; }
+.agone-ct-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  width: auto;
+  padding: 0 7px;
+  font-size: 11px;
+  line-height: 1;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.35);
+  border-radius: 3px;
+  color: var(--agone-brown, #5c3a1e);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.agone-ct-tool:hover       { background: rgba(var(--agone-or-rgb, 201,162,39), 0.25); border-color: var(--agone-gold, #c9a227); }
+.agone-ct-tool--end        { color: var(--agone-txt-rouge, #a03030); border-color: rgba(var(--agone-rouge-rgb, 160,48,48), 0.5); }
+.agone-ct-tool--end:hover  { background: rgba(var(--agone-rouge-rgb, 160,48,48), 0.15); border-color: var(--agone-txt-rouge, #a03030); }
+
+.agone-ct-alerte {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-txt-orange, #a06010);
+  background: rgba(var(--agone-orange-rgb, 180,100,0), 0.1);
+  border-bottom: 1px solid rgba(var(--agone-orange-rgb, 180,100,0), 0.25);
+  flex-shrink: 0;
+}
 
 /* ── Liste ───────────────────────────────────────────────── */
 .agone-ct-list {
@@ -1230,37 +1406,45 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 4px;
+  gap: 3px;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
 }
 
 /* ── Ligne combattant ────────────────────────────────────── */
 .agone-ct-row {
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  gap: 9px;
   padding: 6px 8px;
   border-radius: 4px;
   background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
-  border: 1px solid transparent;
-  transition: border-color 0.15s;
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
+  border-left: 3px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
 }
-.agone-ct-row:hover           { border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.3); }
+.agone-ct-row:hover           { border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.35); }
 .agone-ct-row.ct-active       {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.14);
   border-color: var(--agone-gold, #c9a227);
-  box-shadow: 0 0 0 1px rgba(var(--agone-or-rgb, 201,162,39), 0.2);
+  border-left-color: var(--agone-gold, #c9a227);
+  box-shadow: 0 0 6px rgba(var(--agone-or-rgb, 201,162,39), 0.35);
 }
-.agone-ct-row.ct-defeated     { opacity: 0.45; filter: grayscale(0.5); }
+.agone-ct-row.ct-defeated     { opacity: 0.45; filter: grayscale(0.6); }
+.agone-ct-row.ct-hidden       { border-style: dashed; background: rgba(var(--agone-noir-rgb, 0,0,0), 0.06); }
+.agone-ct-row.ct-hidden .agone-ct-portrait { opacity: 0.55; }
+.agone-ct-row.ct-sans-init .agone-ct-init-badge { border-color: var(--agone-txt-orange, #c07820); }
 
 /* ── Portrait + badge initiative ─────────────────────────── */
 .agone-ct-portrait-wrap {
   position: relative;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 .agone-ct-portrait {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 4px;
   border: 1px solid var(--agone-border, #7d5a2a);
   object-fit: cover;
@@ -1268,22 +1452,23 @@
   transition: border-color 0.15s;
 }
 .agone-ct-portrait:hover      { border-color: var(--agone-gold, #c9a227); }
+.ct-active .agone-ct-portrait { border-color: var(--agone-gold, #c9a227); }
 .agone-ct-init-badge {
   position: absolute;
-  bottom: -4px;
-  right: -4px;
+  bottom: -5px;
+  right: -6px;
   background: var(--agone-brown-dark, #3b1e0a);
   border: 1px solid var(--agone-gold, #c9a227);
   border-radius: 3px;
-  min-width: 22px;
-  height: 18px;
+  min-width: 24px;
+  height: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .ct-init-input {
   width: 30px;
-  height: 16px;
+  height: 17px;
   background: transparent;
   border: none;
   color: var(--agone-gold, #c9a227);
@@ -1292,6 +1477,24 @@
   text-align: center;
   padding: 0;
 }
+.ct-init-val {
+  padding: 0 4px;
+  color: var(--agone-gold, #c9a227);
+  font-size: 11px;
+  font-weight: 700;
+}
+.ct-init-roll {
+  width: 24px;
+  height: 17px;
+  padding: 0;
+  line-height: 1;
+  font-size: 11px;
+  background: transparent;
+  border: none;
+  color: var(--agone-txt-orange, #e0a040);
+  cursor: pointer;
+}
+.ct-init-roll:hover { color: var(--agone-gold-light, #e8c860); }
 .ct-init-dash {
   color: var(--agone-gold, #c9a227);
   font-size: 11px;
@@ -1307,39 +1510,49 @@
   min-width: 0;
 }
 
-/* Nom + actions rapides */
+/* Nom, marqueurs + actions rapides */
 .agone-ct-name-row {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 .agone-ct-name {
-  flex: 1;
-  font-size: 13px;
+  flex: 0 1 auto;
+  font-size: 14px;
   font-weight: 600;
   color: var(--agone-dark-text, #1a110a);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
+}
+.agone-ct-name:hover { color: var(--agone-txt-rouge, #800000); text-decoration: none; text-shadow: none; }
+.ct-marque {
+  font-size: 10px;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.6;
 }
 .agone-ct-actions {
   display: flex;
   gap: 3px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 .ct-action-btn {
   background: transparent;
   border: 1px solid var(--agone-border, #7d5a2a);
   border-radius: 3px;
-  width: 20px;
-  height: 20px;
+  width: 21px;
+  height: 21px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
+  line-height: 1;
   cursor: pointer;
   color: var(--agone-brown, #5c3a1e);
-  opacity: 0.65;
+  opacity: 0.6;
   transition: opacity 0.15s, background 0.15s;
 }
 .ct-action-btn:hover         { opacity: 1; background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1); }
@@ -1347,27 +1560,37 @@
 .ct-btn-heal:hover           { border-color: var(--agone-txt-vert, #3a8a3a); color: var(--agone-txt-vert, #3a8a3a); }
 .ct-btn-defeated:hover       { border-color: var(--agone-txt-rouge, #600); color: var(--agone-txt-rouge, #900); }
 
-/* Barre PdV */
+/* Barre PdV / Densité */
 .agone-ct-pdv-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+}
+.agone-ct-pdv-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.8;
+  min-width: 24px;
 }
 .agone-ct-pdv-track {
   flex: 1;
-  height: 6px;
+  height: 8px;
   background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
-  border-radius: 3px;
+  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  border-radius: 4px;
   overflow: hidden;
 }
 .agone-ct-pdv-fill {
   height: 100%;
   border-radius: 3px;
-  transition: width 0.3s;
+  transition: width 0.3s, background 0.3s;
 }
 .ct-pdv-input {
-  width: 36px;
-  height: 18px;
+  width: 38px;
+  height: 19px;
   text-align: center;
   font-size: 11px;
   font-weight: 600;
@@ -1376,32 +1599,58 @@
   border-radius: 3px;
   color: var(--agone-dark-text, #1a110a);
   padding: 0;
+  flex: 0 0 auto;
 }
-.agone-ct-pdv-sep,
 .agone-ct-pdv-max {
   font-size: 10px;
   color: var(--agone-brown, #5c3a1e);
   opacity: 0.7;
+  min-width: 26px;
 }
+/* État de santé descriptif (joueurs, acteurs non possédés) */
+.agone-ct-sante {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+}
+.agone-ct-sante i { font-size: 10px; opacity: 0.6; margin-right: 3px; }
 
-/* Blessures */
-.agone-ct-blessures {
+/* Repères de combat + blessures */
+.agone-ct-details {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 3px;
 }
+.agone-ct-details-spacer { flex: 1; }
+.ct-stat {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
+  color: var(--agone-brown, #5c3a1e);
+  white-space: nowrap;
+}
+.ct-stat strong  { color: var(--agone-dark-text, #1a110a); }
+.ct-stat-malus   { font-weight: 700; color: var(--agone-txt-rouge, #a03030); background: rgba(var(--agone-rouge-rgb, 160,48,48), 0.12); }
 .ct-bg-cell {
   font-size: 9px;
   font-weight: 700;
-  padding: 1px 4px;
+  width: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  line-height: 1;
   border-radius: 3px;
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  background: transparent;
   color: var(--agone-brown, #5c3a1e);
   cursor: pointer;
   opacity: 0.5;
+  flex: 0 0 auto;
   transition: opacity 0.15s, background 0.15s, border-color 0.15s;
-  user-select: none;
 }
-.ct-bg-cell:hover             { opacity: 0.8; }
+.ct-bg-cell:hover             { opacity: 0.85; }
 .ct-bg-cell.ct-bg-active      { opacity: 1; background: #c04040; border-color: var(--agone-txt-rouge, #a03030); color: #fff; }
 .ct-bc-cell.ct-bg-active      { background: #6a0000; border-color: var(--agone-txt-rouge, #900); }
 
@@ -1414,23 +1663,26 @@
   background: transparent;
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
   border-radius: 3px;
-  width: 20px;
-  height: 20px;
+  width: 21px;
+  height: 21px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
+  line-height: 1;
   cursor: pointer;
   color: var(--agone-brown, #5c3a1e);
-  opacity: 0.45;
+  opacity: 0.4;
+  flex: 0 0 auto;
   transition: opacity 0.15s, background 0.15s, color 0.15s;
 }
 .ct-status-btn:hover          { opacity: 0.8; }
 .ct-status-btn.ct-status-active {
   opacity: 1;
-  background: rgba(var(--agone-orange-rgb, 180,100,0), 0.2);
+  background: rgba(var(--agone-orange-rgb, 180,100,0), 0.22);
   border-color: var(--agone-gold, #c9a227);
-  color: var(--agone-brown-dark, #3b1e0a);
+  color: var(--agone-dark-text, #3b1e0a);
 }
 
 /* ── Chat : cartes d'items (armes, manœuvres, bottes) ────── */

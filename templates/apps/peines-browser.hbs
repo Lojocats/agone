@@ -63,6 +63,7 @@
           <td class="pnb-bienfait-cell">
             {{#if item.bienfait}}
             <span class="pnb-bienfait-name">{{item.bienfait}}</span>
+            {{#if item.bienfaitDescription}}<i class="fas fa-info-circle pn-bienfait-info" data-tooltip="{{item.bienfaitDescription}}" data-tooltip-class="agone-tooltip-texte"></i>{{/if}}
             {{else}}
             <span class="pnb-bienfait-none">{{localize "AGONE.Aucun"}}</span>
             {{/if}}

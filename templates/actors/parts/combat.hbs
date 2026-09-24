@@ -13,7 +13,7 @@
         <div class="pdv-values">
           <span class="pdv-current {{#if system.blessuresCritique}}pdv-critique{{/if}}">{{system.pdv.valeur}}</span>
           <span class="pdv-sep">/</span>
-          <span class="pdv-max" title='{{localize "AGONE.Combat.PdvMaxTooltip"}}'>{{system.pdv.max}}</span>
+          <span class="pdv-max" title='{{localize "AGONE.Combat.PdvMaxTooltip" bpdv=bpdv}}'>{{system.pdv.max}}</span>
           <span class="pdv-label">PdV</span>
         </div>
         <div class="pdv-track" title="{{system.pdv.valeur}} / {{system.pdv.max}}">

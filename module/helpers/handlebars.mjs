@@ -53,10 +53,6 @@ export function registerHandlebarsHelpers() {
     return value ? "checked" : "";
   });
 
-  Handlebars.registerHelper("localize", function(key) {
-    return game.i18n.localize(key);
-  });
-
   Handlebars.registerHelper("concat", function(...args) {
     args.pop(); // remove options object
     return args.join("");

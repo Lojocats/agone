@@ -65,7 +65,7 @@
             <td class="peine-bienfait-cell">
               {{#if peine.system.bienfait}}
                 {{#if peine.system.bienfaitAcquis}}
-                  <span class="pn-bienfait-acquis" data-tooltip='{{localize "AGONE.PerfidieBienfaitAcquis"}} {{peine.system.bienfait}}'>
+                  <span class="pn-bienfait-acquis" data-tooltip='{{localize "AGONE.PerfidieBienfaitAcquis" nom=peine.system.bienfait}}'>
                     <i class="fas fa-star"></i> {{peine.system.bienfait}}
                   </span>
                 {{else if isOwner}}
@@ -78,6 +78,7 @@
                     <i class="fas fa-lock"></i> {{peine.system.bienfait}}
                   </span>
                 {{/if}}
+                {{#if peine._bienfaitDescription}}<i class="fas fa-info-circle pn-bienfait-info" data-tooltip="{{peine._bienfaitDescription}}" data-tooltip-class="agone-tooltip-texte"></i>{{/if}}
               {{else}}
                 <span class="pn-bienfait-none">{{localize "AGONE.Aucun"}}</span>
               {{/if}}
@@ -90,14 +91,20 @@
               {{/if}}
             </td>
           </tr>
-          {{#if peine.system.description}}
+          {{#if (or peine.system.description peine._bienfaitDescription)}}
           <tr class="peine-desc-row">
             <td></td>
             <td></td>
             <td colspan="4" class="peine-desc-cell">
               <details class="item-details">
                 <summary>{{localize "AGONE.VoirDescription"}}</summary>
-                <div class="item-desc-content">{{{peine.system.description}}}</div>
+                {{#if peine.system.description}}<div class="item-desc-content">{{{peine.system.description}}}</div>{{/if}}
+                {{#if peine._bienfaitDescription}}
+                <div class="item-desc-content pn-bienfait-desc">
+                  <strong><i class="fas fa-star"></i> {{localize "AGONE.BienfaitLabel"}} : {{peine.system.bienfait}}</strong>
+                  <p>{{peine._bienfaitDescription}}</p>
+                </div>
+                {{/if}}
               </details>
             </td>
           </tr>

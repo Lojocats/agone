@@ -453,3 +453,31 @@
   background: rgba(var(--agone-noir-rgb, 26,26,46), 0.03);
   border-bottom: 1px dashed rgba(var(--agone-noir-rgb, 26,26,46), 0.12) !important;
 }
+
+/* Description d'un bienfait avant acquisition (onglet Perfidie, navigateur des peines) */
+.agone .pn-bienfait-info,
+.peines-browser-app .pn-bienfait-info {
+  margin-left: 4px;
+  font-size: 11px;
+  cursor: help;
+  color: rgba(var(--agone-brun-rgb, 92,58,30), 0.6);
+}
+.agone .pn-bienfait-info:hover,
+.peines-browser-app .pn-bienfait-info:hover {
+  color: var(--agone-gold);
+}
+.agone .pn-bienfait-desc {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+}
+.agone .pn-bienfait-desc p {
+  margin: 2px 0 0;
+}
+/* Infobulle Foundry élargie pour les textes de règles */
+#tooltip.agone-tooltip-texte,
+.tooltip.agone-tooltip-texte {
+  max-width: 320px;
+  text-align: left;
+  white-space: normal;
+}

@@ -511,7 +511,7 @@ export class AgoneActor extends Actor {
   }
 
   // Jet d'une compétence non acquise (score 0, malus -3 automatique)
-  async rollCompetenceSansItem(nom, attributLie, domaine) {
+  async rollCompetenceSansItem(nom, attributLie, domaine, { fastForward = false } = {}) {
     const sd     = this.system;
     const attrKey = attributLie ?? "agilite"; // défaut pour la présélection dans le dialog
 
@@ -527,7 +527,8 @@ export class AgoneActor extends Actor {
       })
       .join("");
 
-    const result = await foundry.applications.api.DialogV2.wait({
+    // fastForward : caractéristique liée, sans modificateur, jet ouvert (tests, macros)
+    const result = fastForward ? { attrChosen: attrKey, modif: 0, type: "ouvert" } : await foundry.applications.api.DialogV2.wait({
       window:  { title: label },
       content: `
         <form>

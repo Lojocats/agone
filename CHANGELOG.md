@@ -3,6 +3,26 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.3] — non publiée
+
+### Ajouté
+- **Description des bienfaits de Perfidie avant acquisition** : icône d'information (infobulle) à côté de chaque bienfait dans l'onglet Perfidie et dans le navigateur des peines, texte complet dans « Voir description » de la peine, et rappel dans la confirmation d'acquisition (+1 Perfidie).
+- **Tracker de combat repensé** : bandeau « Au tour de… » avec le numéro de tour, navigation par tour et par round, barre d'outils MJ (initiative de tous / des PNJ, réinitialisation, ajout des tokens sélectionnés, fin du combat), alerte des combattants sans initiative, suivi automatique du combattant actif. Par combattant : clic sur le nom pour centrer la carte, repères DEF / ESQ / Mêlée, malus de blessure, blessures graves et critique, statuts rapides, combattants cachés aux joueurs (MJ).
+- Tracker : un joueur ne voit ni les combattants cachés ni les PdV exacts des acteurs qu'il ne possède pas, seulement l'état de santé descriptif (comme au survol des tokens).
+- **Calendrier repensé** : en-tête teinté selon la saison, date longue traduite, moment de la journée (aube, matin, midi, après-midi, soir, nuit) avec barre horaire, phases principales de la lune dans la grille, notes visibles au survol d'un jour, liste des notes du mois (clic pour y aller), navigation regroupée date / heure. Le widget en haut d'écran affiche l'icône du moment de la journée.
+
+### Corrigé
+- Les textes à paramètres affichaient leur modèle brut (« Seuil {n} », « Bienfait acquis : {nom} », info-bulles de montée de niveau, mémoire des danseurs, marges de qualité…) : le système remplaçait le helper `localize` de Foundry par une version qui ignorait les paramètres.
+- Info-bulle des PdV max et notification de points de création des danseurs incomplètes.
+- Tracker de combat : l'initiative d'un combattant était lancée deux fois ; les tokens non liés modifiaient l'acteur du monde au lieu de leur propre acteur ; les démons affichaient des PdV au lieu de leur Densité (tracker et info-bulle des tokens) ; le tracker ne se rafraîchissait pas quand un token changeait.
+- Calendrier : la note du jour est enregistrée automatiquement en quittant le champ ; le calendrier ouvert se met à jour quand la date, la météo ou les notes changent (y compris chez les joueurs) ; rouvrir le calendrier ou le tracker ramène la fenêtre existante au lieu d'en créer une seconde.
+
+- Navigateur de sorts : un sort est identifié par son nom **et** son type de magie. Les sorts homonymes de domaines différents (« Créer un familier », « Bénédiction ») n'étaient plus proposés une fois l'un d'eux appris, et le lancer improvisé pouvait utiliser la mauvaise version.
+
+### Modifié
+- README mis à jour (effets actifs, navigateurs, thème automatique, développement).
+- Tests : suite unitaire Node (`npm test`, exécutée en CI) et suite Quench étendue à ~200 tests (formule de chaque jet, chaque statistique d'effet, fiches, éditeur d'effets, navigateurs, intégration).
+
 ## [1.9.2] — 2026-09-24
 
 ### Ajouté

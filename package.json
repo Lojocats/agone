@@ -4,12 +4,15 @@
   "description": "Système Agone pour Foundry VTT — outillage de développement (lint)",
   "type": "module",
   "scripts": {
-    "lint": "eslint module",
-    "lint:fix": "eslint module --fix"
+    "lint": "eslint module tests",
+    "lint:fix": "eslint module tests --fix",
+    "test": "node --test \"tests/unit/*.test.mjs\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "css-tree": "^3.2.1",
     "eslint": "^10.11.0",
-    "globals": "^17.12.0"
+    "globals": "^17.12.0",
+    "handlebars": "^4.7.9"
   }
 }

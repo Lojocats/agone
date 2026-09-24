@@ -9,7 +9,7 @@
 import { EFFET_PREFIX, effetsDepuisTable } from "./helpers/effets.mjs";
 
 /** Texte brut (sans balise) → paragraphes HTML ; `null` si le texte est déjà du HTML ou vide. */
-function texteEnHTML(texte) {
+export function texteEnHTML(texte) {
   if (typeof texte !== "string" || !texte.trim() || /<[a-z][\s\S]*>/i.test(texte)) return null;
   const echappe = foundry.utils.escapeHTML ?? (t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
   return texte.trim().split(/\n\s*\n/)

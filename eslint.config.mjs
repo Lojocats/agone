@@ -24,4 +24,16 @@ export default [
       "no-empty": ["error", { allowEmptyCatch: true }],
     },
   },
+  {
+    // Tests unitaires Node (tests/unit) : globales Node + globales Foundry simulées
+    files: ["tests/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: { ...globals.node, ...foundryGlobals },
+    },
+    rules: {
+      "no-unused-vars": ["error", { args: "none", caughtErrors: "none" }],
+    },
+  },
 ];

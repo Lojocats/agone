@@ -816,7 +816,22 @@
       "AucunTokenSelectionne": "No token selected on the scene",
       "CombatCree":            "Combat created successfully!",
       "TokensAjoutes":         "{count} combatant(s) added to combat.",
-      "TokensDejaPresents":    "These tokens are all already in combat."
+      "TokensDejaPresents":    "These tokens are all already in combat.",
+      "TourN":                 "Turn {n}/{total}",
+      "AuTourDe":              "{nom}'s turn",
+      "PasCommence":           "Combat not started",
+      "RoundPrecedent":        "Previous round",
+      "RoundSuivant":          "Next round",
+      "Tous":                  "All",
+      "Pnj":                   "NPCs",
+      "LancerInitPnj":         "Roll NPC initiative",
+      "Fin":                   "End",
+      "SansInitiative":        "{n} combatant(s) without initiative",
+      "CentrerToken":          "Pan to token",
+      "Cache":                 "Hidden from players",
+      "Cacher":                "Hide from players",
+      "Reveler":               "Reveal to players",
+      "Esq":                   "DODGE"
     },
 
     "Avantages": {
@@ -865,7 +880,23 @@
       "NoteSauvegardee": "Note saved.",
       "An":              "Year",
       "Jour":            "Day",
-      "ChangerAnnee":    "Change year"
+      "ChangerAnnee":    "Change year",
+      "DateLongue1":     "1st day of {mois}, Year {an}",
+      "DateLongue":      "Day {n} of {mois}, Year {an}",
+      "Date":            "Date",
+      "Heure":           "Time",
+      "JourAbr":         "d",
+      "NoteAuto":        "(saved automatically)",
+      "NotesDuMois":     "Notes this month",
+      "AllerAuJour":     "Go to this day",
+      "Periode": {
+        "Aube":      "Dawn",
+        "Matin":     "Morning",
+        "Midi":      "Noon",
+        "ApresMidi": "Afternoon",
+        "Soir":      "Evening",
+        "Nuit":      "Night"
+      }
     },
 
     "Browser": {

@@ -1418,3 +1418,8 @@ export const BIENFAITS_PERFIDIE_DATA = [
   { name:"Sensualité",         peines:["Lubricité","Voix éraillée"],
     description:"Votre tempérament voluptueux vous pousse à rechercher et à goûter tout ce qui flatte et touche les sens. Vous êtes un expert en goût et en parfum. Quelles que soient votre apparence actuelle ou votre extraction, vous êtes toujours bien accueilli (au début du moins) dans les endroits dédiés aux plaisirs des sens." },
 ];
+
+/** Description d'un bienfait de Perfidie (texte du livre), ou "" s'il est inconnu. */
+export function descriptionBienfait(nom) {
+  return BIENFAITS_PERFIDIE_DATA.find(b => b.name === nom)?.description ?? "";
+}

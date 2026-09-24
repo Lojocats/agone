@@ -459,14 +459,6 @@ body.agone-dark .agone .sort-card           { background: rgba(255,255,255,0.05)
 body.agone-dark .agone .bonus-supp-table select,
 body.agone-dark .agone .bonus-supp-table input { background: rgba(255,255,255,0.08) !important; color: #d4b896 !important; }
 
-/* ── 18. Select météo calendrier dark mode ───────────────── */
-body.agone-dark .agone-calendrier-wrap .cal-meteo-select {
-  color: #c9a060 !important;
-  background: #2a1808 !important;
-  border: 1px solid rgba(180,130,60,0.3) !important;
-  border-radius: 3px;
-}
-
 /* ── 19. Ténèbres/Perfidie : labels vides restants ──────── */
 body.agone-dark .agone .pn-noir-none,
 body.agone-dark .peines-browser-app .pnb-noir-none,

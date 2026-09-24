@@ -815,7 +815,22 @@
       "AucunTokenSelectionne": "Aucun token sélectionné sur la scène",
       "CombatCree":            "Combat créé avec succès !",
       "TokensAjoutes":         "{count} combattant(s) ajouté(s) au combat.",
-      "TokensDejaPresents":    "Ces tokens sont déjà tous dans le combat."
+      "TokensDejaPresents":    "Ces tokens sont déjà tous dans le combat.",
+      "TourN":                 "Tour {n}/{total}",
+      "AuTourDe":              "Au tour de {nom}",
+      "PasCommence":           "Combat non démarré",
+      "RoundPrecedent":        "Round précédent",
+      "RoundSuivant":          "Round suivant",
+      "Tous":                  "Tous",
+      "Pnj":                   "PNJ",
+      "LancerInitPnj":         "Lancer l'initiative des PNJ",
+      "Fin":                   "Fin",
+      "SansInitiative":        "{n} combattant(s) sans initiative",
+      "CentrerToken":          "Centrer sur le token",
+      "Cache":                 "Caché aux joueurs",
+      "Cacher":                "Cacher aux joueurs",
+      "Reveler":               "Révéler aux joueurs",
+      "Esq":                   "ESQ"
     },
 
     "Avantages": {
@@ -864,7 +879,23 @@
       "NoteSauvegardee":  "Note sauvegardée.",
       "An":               "An",
       "Jour":             "Jour",
-      "ChangerAnnee":     "Changer l'année"
+      "ChangerAnnee":     "Changer l'année",
+      "DateLongue1":      "1er jour de {mois}, An {an}",
+      "DateLongue":       "{n}e jour de {mois}, An {an}",
+      "Date":             "Date",
+      "Heure":            "Heure",
+      "JourAbr":          "j",
+      "NoteAuto":         "(enregistrée automatiquement)",
+      "NotesDuMois":      "Notes du mois",
+      "AllerAuJour":      "Aller à ce jour",
+      "Periode": {
+        "Aube":      "Aube",
+        "Matin":     "Matin",
+        "Midi":      "Midi",
+        "ApresMidi": "Après-midi",
+        "Soir":      "Soir",
+        "Nuit":      "Nuit"
+      }
     },
 
     "Browser": {

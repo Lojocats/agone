@@ -31,8 +31,17 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - **8 caractéristiques primaires** : Agilité, Force, Perception, Résistance, Intelligence, Volonté, Charisme, Créativité
 - **Stats dérivées** automatiques : Mêlée, Tir, Art, Emprise, Initiative, Défense, PdV, Charge
 - Gestion des **bonus raciaux** avec min/max et malus en attente
-- Système d'**avantages & défauts** (Dons) avec effets mécaniques automatiques
+- Système d'**avantages & défauts** (Dons) dont les bonus et malus sont des effets actifs modifiables (voir ci-dessous)
 - Suivi des **Ténèbres & Perfidie** avec apparition automatique des démons intérieurs aux paliers
+
+### Effets actifs des objets
+- Les avantages, défauts, armes, armures, équipements, pouvoirs et peines peuvent **donner des bonus ou des malus** au personnage qui les possède
+- Statistiques modifiables : caractéristiques, aspects et aspects noirs, Initiative, Mêlée, Tir, Défense, Esquive, Art, Emprise, BD, TAI, points de création, coût des Charges, mouvement
+- Éditeur dans la **fiche de l'objet** : ajouter, modifier, désactiver ou supprimer un modificateur en choisissant la statistique dans une liste
+- Ce sont de vrais **Active Effects** Foundry : l'éditeur avancé (durées, statuts) reste accessible
+- Fonctionne aussi dans les **compendiums** : créez vos propres objets avec leurs effets, ils les conservent en passant sur une fiche
+- S'applique à tous les types d'acteur : personnages, compagnons, démons et PNJ
+- Les avantages du livre de base reçoivent automatiquement leurs effets
 
 ### Ténèbres & Paliers
 - Tableau interactif des 20 paliers avec peines et bienfaits
@@ -66,22 +75,35 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - Création automatique lors du franchissement des paliers de Ténèbres (modes auto et manuel)
 - Stats propres (AGI/FOR/PER/INT/VOL/CHA/CRÉ, densité, blessures)
 
-### Combat
-- Jets d'attributs et de compétences avec dé explosif d10
+### Combat & jets
+- Jets de caractéristiques, de compétences, d'attaque, de parade, d'esquive et de défense avec dé explosif d10 (jet ouvert ou fermé)
 - Détection automatique des **fumbles** et **critiques**
-- Cartes de chat enrichies avec détail des calculs
+- Cartes de chat enrichies avec détail des calculs, en français et en anglais
 - Notes de compétences affichées dans le chat
 
-### Compagnons & PNJ
-- Fiches simplifiées pour compagnons et PNJ
+### Compagnons, Démons & PNJ
+- Fiches dédiées pour compagnons, démons et PNJ, construites sur la même base que la fiche personnage
+- Caractéristiques **regroupées par aspect** (Corps, Esprit, Âme) : cliquer sur une caractéristique lance le jet, comme pour un personnage
+- Onglet Magie des PNJ (sorts, Arts Magiques, filtres et tri)
 - Liés à la fiche personnage (onglet Compagnons)
+
+### Objets
+- Fiche pour chaque type d'objet, dont les peines de Perfidie et les démons
+- **Descriptions en texte riche** : mise en forme (gras, listes, liens, tableaux…) rendue dans les fiches, les navigateurs et le chat
 
 ### Applications
 - **Navigateurs** : armes, armures, compétences, sorts, pouvoirs, manœuvres, peuples, avantages, peines
+  - Recherche et filtres, **tri en cliquant sur les colonnes**, Échap pour effacer la recherche
+  - Section **Objets personnalisés** : les objets du même type créés dans le monde ou dans vos compendiums, avec leurs effets, ajoutés en un clic
 - **Calendrier d'Harmonde** : suivi du jour/mois/année, phases de lune, notes journalières, heure par quarts
 - **Météo dynamique** : sélection via le calendrier, appliquée automatiquement à la scène active (effets de particules + filtres + luminosité selon l'heure)
 - **Tracker de combat** : initiative et ordre du tour custom, passage de round, gestion de l'état des combattants
-- **Mode sombre** : bascule via le bouton 🌙 dans la barre d'outils Agone — la préférence est mémorisée par utilisateur
+- **Mode sombre** : par défaut, le thème Agone suit le thème des applications Foundry ; le bouton 🌙 de la barre d'outils Agone fixe un choix clair ou sombre, mémorisé par joueur. Les cartes de jet du chat et les widgets suivent le même thème.
+
+### Langues & mises à jour
+- Interface en **français** et en **anglais**
+- **Migrations automatiques** : à la première connexion du MJ après une mise à jour, les données du monde sont adaptées (par exemple, effets des avantages existants)
+- Historique des versions : [CHANGELOG](CHANGELOG.md)
 
 ---
 
@@ -128,6 +150,7 @@ La luminosité de la scène varie automatiquement selon l'heure du jour (nuit �
 | Module | Utilité |
 |---|---|
 | [FXMaster](https://foundryvtt.com/packages/fxmaster) | Effets météo avancés (particules + filtres) — fortement recommandé |
+| [Quench](https://foundryvtt.com/packages/quench) | Tests d'intégration du système (pour le développement uniquement) |
 
 ---
 
@@ -140,11 +163,29 @@ La luminosité de la scène varie automatiquement selon l'heure du jour (nuit �
 
 ---
 
+## Développement
+
+Le système est servi tel quel par Foundry (modules ES natifs, sans étape de build) : le dépôt se place directement dans `FoundryVTT/Data/systems/agone`, et un rechargement du monde (F5) suffit pour tester une modification.
+
+```bash
+npm install      # outillage de développement uniquement
+npm run lint     # vérification ESLint du code (module/, tests/)
+npm test         # tests unitaires hors Foundry (tests/unit)
+```
+
+- **Tests unitaires** (`tests/unit`, Node) : logique des effets, données de contexte des fiches, intégrité des données de compendium, traductions fr/en, compilation des templates, validité du CSS, cohérence du manifeste et du CHANGELOG.
+- ESLint et les tests unitaires sont exécutés par GitHub Actions à chaque push et pull request.
+- **Tests d'intégration** (`module/tests`, Quench) : activez le module Quench dans un monde de test, puis lancez les batchs « Agone » depuis son onglet — intégration du système, valeurs dérivées, formules de chaque jet, chaque statistique d'effet sur chaque type d'acteur, fiches et éditeur d'effets, navigateurs de compendium.
+- **Publication** : augmentez `version` dans `system.json`, complétez le [CHANGELOG](CHANGELOG.md), puis poussez un tag `vX.Y.Z` : la release et `agone.zip` sont créés automatiquement.
+- Les contenus des compendiums du système sont générés depuis `module/helpers/compendium-data.mjs` ; les modifications de données persistantes passent par une migration (`module/migration.mjs`).
+
+---
+
 ## Crédits
 
 - **Développeur** : Lojocats
 - **Jeu original** : Agone — Multisim
-- Code développé avec l'assistance de GitHub Copilot
+- Code développé avec l'assistance de Claude Code
 
 ## Licence
 
