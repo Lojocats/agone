@@ -1,4 +1,4 @@
-import { PEINES_PERFIDIE_DATA, descriptionBienfait } from "../helpers/compendium-data.mjs";
+import { PEINES_PERFIDIE_DATA, descriptionBienfaitPeine } from "../helpers/compendium-data.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 // Libellés lisibles des catégories de peines de Perfidie
@@ -52,18 +52,25 @@ export class PeinesBrowser extends AgoneBrowser {
       this.actor.items.filter(i => i.type === "peine").map(i => i.name)
     );
 
-    let items = PEINES_PERFIDIE_DATA.map((d, idx) => ({
-      idx          : String(idx),
-      name         : d.name,
-      categorie    : d.categorie,
-      categorieLabel: _buildCatLabels()[d.categorie] ?? d.categorie,
-      noirEffect   : d.noirEffect,   // "corps" | "ame" | ""
-      noirLabel    : d.noirEffect === "corps" ? game.i18n.localize("AGONE.Corps") : d.noirEffect === "ame" ? game.i18n.localize("AGONE.Ame") : "—",
-      bienfait     : d.bienfait ?? "",
-      bienfaitDescription: descriptionBienfait(d.bienfait),
-      description  : d.description ?? "",
-      hasInActor   : actorPeineNames.has(d.name),
-    }));
+    let items = PEINES_PERFIDIE_DATA.map((d, idx) => {
+      const bienfaitInfo = descriptionBienfaitPeine({ system: { bienfait: d.bienfait, bienfaitDescription: "" } });
+      return {
+        idx          : String(idx),
+        name         : d.name,
+        categorie    : d.categorie,
+        categorieLabel: _buildCatLabels()[d.categorie] ?? d.categorie,
+        noirEffect   : d.noirEffect,   // "corps" | "ame" | ""
+        noirLabel    : d.noirEffect === "corps" ? game.i18n.localize("AGONE.Corps") : d.noirEffect === "ame" ? game.i18n.localize("AGONE.Ame") : "—",
+        noirEffectLabel: d.noirEffect === "corps" ? game.i18n.localize("AGONE.PerfidieCorpsNoir1")
+                        : d.noirEffect === "ame"   ? game.i18n.localize("AGONE.PerfidieAmeNoire1")
+                        : game.i18n.localize("AGONE.Aucun"),
+        bienfait     : d.bienfait ?? "",
+        bienfaitDescription: bienfaitInfo.texte,
+        bienfaitHTML : bienfaitInfo.html,
+        description  : d.description ?? "",
+        hasInActor   : actorPeineNames.has(d.name),
+      };
+    });
 
     // Filtres
     items = this._applySearch(items, ["name", "bienfait", "description"]);

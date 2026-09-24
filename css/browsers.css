@@ -46,16 +46,6 @@
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
-.sorts-browser .sb-table .desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
-  font-size: 0.75em;
-  transition: color 0.15s;
-}
-.sorts-browser .sb-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
 .sorts-browser .sb-impro-btn,
 .sorts-browser .sb-add-btn {
   background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
@@ -115,16 +105,6 @@
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
-.armes-browser .ab-table .desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
-  font-size: 0.75em;
-  transition: color 0.15s;
-}
-.armes-browser .ab-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
 .armes-browser .ab-add-btn {
   background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
@@ -243,16 +223,6 @@
   background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
   color: var(--agone-txt-brun, #6a4a00);
 }
-.avantages-browser .avb-table .desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
-  font-size: 0.75em;
-  transition: color 0.15s;
-}
-.avantages-browser .avb-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
 .avantages-browser .avb-badge {
   display: inline-block;
   border-radius: 10px;
@@ -363,16 +333,6 @@
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
-.manoeuvres-browser .mb-table .desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
-  font-size: 0.75em;
-  transition: color 0.15s;
-}
-.manoeuvres-browser .mb-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
 .manoeuvres-browser .mb-badge-manoeuvre {
   display: inline-block;
   border-radius: 10px;
@@ -500,16 +460,6 @@
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
-.competences-browser .cb-table .desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
-  font-size: 0.75em;
-  transition: color 0.15s;
-}
-.competences-browser .cb-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
 .competences-browser .cb-fam-badge {
   display: inline-block;
   border-radius: 10px;
@@ -682,16 +632,6 @@
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
-.pouvoirs-browser .pvb-table .desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
-  font-size: 0.75em;
-  transition: color 0.15s;
-}
-.pouvoirs-browser .pvb-table .desc-toggle:hover { color: var(--agone-gold, #c9a227); }
 .pouvoirs-browser .pvb-badge-flamme {
   display: inline-block;
   border-radius: 10px;

@@ -41,7 +41,7 @@
     <table class="mb-table">
       <thead>
         <tr>
-          <th class="mb-col-toggle"></th>
+          <th class="mb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
           <th class="mb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="mb-col-cat">{{localize "AGONE.Categorie"}}</th>
           <th class="mb-col-ini"  title='{{localize "AGONE.Combat.ModInit"}}'>{{localize "AGONE.ManIni"}}</th>
@@ -55,7 +55,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="mb-row mb-row-{{item.categorie}} {{#if item.hasInActor}}mb-has-item{{/if}}" data-man-idx="{{item.idx}}">
-          <td></td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="mb-name">{{item.name}}</td>
           <td class="mb-cat">
             {{#if (eq item.categorie "botte")}}
@@ -86,13 +86,10 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="mb-desc-row" data-man-idx="{{item.idx}}">
+        <tr class="mb-desc-row desc-pliable" data-man-idx="{{item.idx}}" data-desc-de="{{item.idx}}" hidden>
           <td></td>
           <td colspan="8" class="mb-description-cell">
-            <details class="item-details">
-              <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{{item.description}}}</div>
-            </details>
+            <div class="item-desc-content">{{{item.description}}}</div>
           </td>
         </tr>
         {{/if}}

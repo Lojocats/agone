@@ -42,7 +42,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - Fonctionne aussi dans les **compendiums** : créez vos propres objets avec leurs effets, ils les conservent en passant sur une fiche
 - S'applique à tous les types d'acteur : personnages, compagnons, démons et PNJ
 - Les avantages du livre de base reçoivent automatiquement leurs effets
-- **Peines de Perfidie** : effets de la peine (actifs dès qu'elle est possédée) et effets de son **bienfait**, suspendus tant que le bienfait n'est pas acquis ; description du bienfait modifiable (le texte du livre sert par défaut)
+- **Peines de Perfidie** : effets de la peine (actifs dès qu'elle est possédée) et effets de son **bienfait**, suspendus tant que le bienfait n'est pas acquis ; description du bienfait modifiable (le texte du livre sert par défaut) ; dans l'onglet Perfidie et le navigateur, la description dépliable d'une peine détaille son texte, son effet et son bienfait
 
 ### Ténèbres & Paliers
 - Tableau interactif des 20 paliers avec peines et bienfaits
@@ -95,7 +95,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 
 ### Objets
 - Fiche pour chaque type d'objet, dont les peines de Perfidie (avec leur bienfait) et les démons
-- **Descriptions en texte riche** : mise en forme (gras, listes, liens, tableaux…) rendue dans les fiches, les navigateurs et le chat
+- **Descriptions en texte riche** : mise en forme (gras, listes, liens, tableaux…) rendue dans les fiches, les navigateurs et le chat ; dans les listes, elles se replient derrière un chevron (ou un clic sur la ligne dans les navigateurs), avec un bouton pour tout ouvrir
 
 ### Applications
 - **Navigateurs** : armes, armures, compétences, sorts, pouvoirs, manœuvres, peuples, avantages, peines

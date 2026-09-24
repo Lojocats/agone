@@ -395,13 +395,6 @@ body.agone-dark .agone-roll-card .fumble-alert   { color: #f28b82 !important; ba
 
 /* ── 15. Browsers : desc-toggle, badges couleurs ─────────── */
 /* Boutons "▼" description dans tous les browsers */
-body.agone-dark .sorts-browser .desc-toggle,
-body.agone-dark .armes-browser .desc-toggle,
-body.agone-dark .armures-browser .desc-toggle,
-body.agone-dark .avantages-browser .avb-table .desc-toggle,
-body.agone-dark .manoeuvres-browser .desc-toggle,
-body.agone-dark .competences-browser .desc-toggle,
-body.agone-dark .pouvoirs-browser .desc-toggle { color: rgba(180,140,80,0.55) !important; }
 /* Badges bleus dans avantages/manoeuvres/armes browsers */
 body.agone-dark .avantages-browser .avb-badge     { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }
 body.agone-dark .manoeuvres-browser .mb-badge-manoeuvre { color: #8ab4f8 !important; background: rgba(80,110,200,0.2) !important; border-color: rgba(138,180,248,0.35) !important; }

@@ -241,7 +241,7 @@
     <table class="manoeuvres-table">
       <thead>
         <tr>
-          <th class="man-col-toggle"></th>
+          <th class="man-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
           <th class="man-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="man-col-num" title='{{localize "AGONE.Combat.ModInit"}}'>INI</th>
           <th class="man-col-num" title='{{localize "AGONE.Combat.ModAtt"}}'>ATT</th>
@@ -254,7 +254,7 @@
       <tbody>
         {{#each manoeuvres as |man|}}
         <tr class="item-row man-row" data-item-id="{{man.id}}">
-          <td class="man-col-toggle"></td>
+          <td class="man-col-toggle">{{#if man.system.description}}<button type="button" class="desc-bascule" data-desc="{{man.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="man-col-name">
             <div class="man-name-line">
               <span class="man-badge man-badge-{{man.system.categorie}}">
@@ -293,13 +293,10 @@
           <td class="col-drag"><span class="item-drag-handle" title='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span></td>
         </tr>
         {{#if man.system.description}}
-        <tr class="man-desc-row">
+        <tr class="man-desc-row desc-pliable" data-desc-de="{{man.id}}" hidden>
           <td></td>
           <td colspan="7" class="man-desc-cell">
-            <details class="item-details">
-              <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{{man.system.description}}}</div>
-            </details>
+            <div class="item-desc-content">{{{man.system.description}}}</div>
           </td>
         </tr>
         {{/if}}

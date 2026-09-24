@@ -3,6 +3,16 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.5] — non publiée
+
+### Ajouté
+- **Détails des peines de Perfidie lisibles sans survol** (onglet Perfidie et navigateur des peines) : la description dépliable de chaque peine est organisée en trois sous-sections. **Description** donne le texte de la peine, **Effet de la peine** l'aspect noirci en toutes lettres (et, sur la fiche, les effets automatisés de la peine), **Bienfait** son nom et sa description (et, sur la fiche, s'il est acquis ou non), ou « Aucun bienfait ». Ces informations n'étaient jusqu'ici visibles qu'en infobulle.
+
+### Modifié
+- **Descriptions dépliables plus ergonomiques** (fiches et navigateurs de compendium) : la ligne « ▶ Voir la description » sous chaque objet est remplacée par un chevron dans la ligne elle-même. La description s'ouvre juste sous l'objet et, dans les navigateurs, un clic n'importe où sur la ligne suffit. Un bouton en tête des tableaux ouvre ou ferme toutes les descriptions. Les descriptions ouvertes le restent après une mise à jour de la fiche, un filtre ou un tri, et le chevron reste utilisable en lecture seule. Les bienfaits acquis de l'onglet Perfidie se replient aussi, avec leur propre bouton « tout ouvrir ». Sur les cartes de sorts, le chevron précède le nom pour ne pas être recouvert par les boutons qui apparaissent au survol.
+- README : descriptions repliables, détails des peines de Perfidie.
+- Tests : appariement chevron / description dans les templates (tests unitaires), ouverture, conservation et « tout ouvrir » dans chaque navigateur et sur la fiche personnage, chevron des cartes de sorts cliquable malgré les actions au survol, bienfaits acquis, sous-sections des peines sur la fiche et dans le navigateur (Quench) ; position du chevron des cartes de sorts (tests unitaires).
+
 ## [1.9.4] — non publiée
 
 ### Ajouté

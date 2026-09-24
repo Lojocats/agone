@@ -40,7 +40,7 @@
     <table class="pb-table">
       <thead>
         <tr>
-          <th class="pb-col-toggle"></th>
+          <th class="pb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
           <th class="pb-col-name">{{localize "AGONE.PeupleLabel"}}</th>
           <th class="pb-col-tai" title='{{localize "AGONE.TAI"}}'>{{localize "AGONE.Combat.Tai"}}</th>
           <th class="pb-col-action"></th>
@@ -49,7 +49,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pb-row {{#if item.isActif}}pb-row-actif{{/if}}" data-peuple-idx="{{item.idx}}">
-          <td></td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="pb-name">
             {{item.name}}
             {{#if item.isActif}}<span class="pb-badge-actif">{{localize "AGONE.Actif"}}</span>{{/if}}
@@ -66,13 +66,10 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="pb-desc-row" data-peuple-idx="{{item.idx}}">
+        <tr class="pb-desc-row desc-pliable" data-peuple-idx="{{item.idx}}" data-desc-de="{{item.idx}}" hidden>
           <td></td>
           <td colspan="3" class="pb-description-cell">
-            <details class="item-details">
-              <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{{item.description}}}</div>
-            </details>
+            <div class="item-desc-content">{{{item.description}}}</div>
           </td>
         </tr>
         {{/if}}

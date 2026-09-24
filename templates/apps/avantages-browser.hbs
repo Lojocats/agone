@@ -68,7 +68,7 @@
     <table class="avb-table">
       <thead>
         <tr>
-          <th class="avb-col-toggle"></th>
+          <th class="avb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
           <th class="avb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="avb-col-section">{{localize "AGONE.Categorie"}}</th>
           <th class="avb-col-type">{{localize "AGONE.Type"}}</th>
@@ -79,7 +79,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="avb-row avb-row-{{item.type}} {{#if item.hasInActor}}avb-has-item{{/if}}" data-av-idx="{{item.idx}}">
-          <td></td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="avb-name">{{item.name}}</td>
           <td class="avb-section">
             <span class="avb-section-badge avb-sect-{{item.section}}">{{item.sectionLabel}}</span>
@@ -109,18 +109,15 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="avb-desc-row" data-av-idx="{{item.idx}}">
+        <tr class="avb-desc-row desc-pliable" data-av-idx="{{item.idx}}" data-desc-de="{{item.idx}}" hidden>
           <td></td>
           <td colspan="5" class="avb-description-cell">
-            <details class="item-details">
-              <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">
-                {{#if item.prerequis}}
-                <em class="avb-prerequis">{{localize "AGONE.Prerequis"}} : {{item.prerequis}}</em>
-                {{/if}}
-                {{{item.description}}}
-              </div>
-            </details>
+            <div class="item-desc-content">
+              {{#if item.prerequis}}
+              <em class="avb-prerequis">{{localize "AGONE.Prerequis"}} : {{item.prerequis}}</em>
+              {{/if}}
+              {{{item.description}}}
+            </div>
           </td>
         </tr>
         {{/if}}

@@ -69,17 +69,15 @@
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}}">{{don._avSectionLabel}}</span>
           {{/if}}
+          {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-pos">+{{don.system.cout}}</span>
           <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
           <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
-        <li class="don-desc-li">
-          <details class="item-details">
-            <summary>{{localize "AGONE.VoirDescription"}}</summary>
-            <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
-          </details>
+        <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
+          <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
         </li>
         {{/if}}
         {{/each}}
@@ -110,17 +108,15 @@
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}} av-defaut-sect">{{don._avSectionLabel}}</span>
           {{/if}}
+          {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-neg">{{don.system.cout}}</span>
           <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
           <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
-        <li class="don-desc-li">
-          <details class="item-details">
-            <summary>{{localize "AGONE.VoirDescription"}}</summary>
-            <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
-          </details>
+        <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
+          <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
         </li>
         {{/if}}
         {{/each}}

@@ -40,7 +40,7 @@
         <thead>
           <tr>
             <th class="item-drag-handle-col"></th>
-            <th></th>
+            <th class="peine-col-desc"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
             <th>{{localize "AGONE.NomPeine"}}</th>
             <th>{{localize "AGONE.NoirEffect"}}</th>
             <th>{{localize "AGONE.Bienfaits"}}</th>
@@ -51,7 +51,7 @@
           {{#each peines as |peine|}}
           <tr class="peine-row item-row" data-item-id="{{peine.id}}">
             <td class="item-drag-handle"><i class="fas fa-grip-vertical"></i></td>
-            <td></td>
+            <td class="peine-col-desc"><button type="button" class="desc-bascule" data-desc="{{peine.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button></td>
             <td class="peine-name"><a class="item-edit" data-item-id="{{peine.id}}" title='{{localize "AGONE.Peine.Modifier"}}'>{{peine.name}}</a></td>
             <td class="peine-noir">
               {{#if (eq peine.system.noirEffect "corps")}}
@@ -94,24 +94,19 @@
               {{/if}}
             </td>
           </tr>
-          {{#if (or peine.system.description peine._bienfaitDescription)}}
-          <tr class="peine-desc-row">
+          <tr class="peine-desc-row desc-pliable" data-desc-de="{{peine.id}}" hidden>
             <td></td>
             <td></td>
             <td colspan="4" class="peine-desc-cell">
-              <details class="item-details">
-                <summary>{{localize "AGONE.VoirDescription"}}</summary>
-                {{#if peine.system.description}}<div class="item-desc-content">{{{peine.system.description}}}</div>{{/if}}
-                {{#if peine._bienfaitDescription}}
-                <div class="item-desc-content pn-bienfait-desc">
-                  <strong><i class="fas fa-star"></i> {{localize "AGONE.BienfaitLabel"}} : {{peine.system.bienfait}}</strong>
-                  {{{peine._bienfaitHTML}}}
-                </div>
-                {{/if}}
-              </details>
+              {{> systems/agone/templates/apps/parts/peine-details.hbs
+                  description=peine.system.description
+                  noirEffectLabel=peine._noirEffectLabel
+                  effetsPeine=peine._effetsPeine
+                  bienfaitNom=peine.system.bienfait
+                  bienfaitHTML=peine._bienfaitHTML
+                  bienfaitEtatLabel=peine._bienfaitEtatLabel }}
             </td>
           </tr>
-          {{/if}}
           {{/each}}
         </tbody>
       </table>
@@ -122,18 +117,22 @@
 
     <!-- Bienfaits acquis -->
     {{#if bienfaitsActifsPerfidie.length}}
-    <div class="bienfaits-perfidie-section">
-      <h3 class="section-title">{{localize "AGONE.BienfaitsPerfidie"}}</h3>
+    <div class="bienfaits-perfidie-section desc-groupe">
+      <h3 class="section-title">
+        {{localize "AGONE.BienfaitsPerfidie"}}
+        <button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button>
+      </h3>
       <ul class="bienfaits-perfidie-list">
         {{#each bienfaitsActifsPerfidie as |b|}}
         <li class="bienfait-perfidie-item">
           <div class="bienfait-perfidie-header">
+            {{#if b.description}}<button type="button" class="desc-bascule" data-desc="bienfait:{{b.name}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
             <i class="fas fa-star pn-star-icon"></i>
             <strong>{{b.name}}</strong>
             <span class="bienfait-peines-src">({{b.sourceNames}})</span>
           </div>
           {{#if b.description}}
-          <div class="bienfait-perfidie-desc">{{{b.description}}}</div>
+          <div class="bienfait-perfidie-desc desc-pliable" data-desc-de="bienfait:{{b.name}}" hidden>{{{b.description}}}</div>
           {{/if}}
         </li>
         {{/each}}

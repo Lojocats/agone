@@ -40,7 +40,7 @@
     <table class="pnb-table">
       <thead>
         <tr>
-          <th class="pnb-col-toggle"></th>
+          <th class="pnb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
           <th class="pnb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="pnb-col-cat">{{localize "AGONE.Categorie"}}</th>
           <th class="pnb-col-noir">{{localize "AGONE.Noir"}}</th>
@@ -51,7 +51,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pnb-row {{#if item.hasInActor}}pnb-has-item{{/if}}" data-pn-idx="{{item.idx}}">
-          <td></td>
+          <td class="desc-col"><button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button></td>
           <td class="pnb-name">{{item.name}}</td>
           <td class="pnb-cat">
             <span class="pnb-cat-badge pnb-cat-{{item.categorie}}">{{item.categorieLabel}}</span>
@@ -83,17 +83,16 @@
             {{/if}}
           </td>
         </tr>
-        {{#if item.description}}
-        <tr class="pnb-desc-row" data-pn-idx="{{item.idx}}">
+        <tr class="pnb-desc-row desc-pliable" data-pn-idx="{{item.idx}}" data-desc-de="{{item.idx}}" hidden>
           <td></td>
           <td colspan="5" class="pnb-description-cell">
-            <details class="item-details">
-              <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{{item.description}}}</div>
-            </details>
+            {{> systems/agone/templates/apps/parts/peine-details.hbs
+                description=item.description
+                noirEffectLabel=item.noirEffectLabel
+                bienfaitNom=item.bienfait
+                bienfaitHTML=item.bienfaitHTML }}
           </td>
         </tr>
-        {{/if}}
         {{/each}}
         {{#unless items.length}}
         <tr>

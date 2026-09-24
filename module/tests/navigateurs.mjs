@@ -197,6 +197,31 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
         await app.render();
       });
 
+      it("descriptions pliables : chevron, clic sur la ligne, état conservé, tout ouvrir", async () => {
+        const table = () => app.element.querySelector("table:not(.browser-perso-table)");
+        const chevron = table().querySelector(".desc-bascule[data-desc]");
+        if (!chevron) return;  // navigateur sans description dépliable
+        const cle = chevron.dataset.desc;
+        const desc = () => table().querySelector(`[data-desc-de="${CSS.escape(cle)}"]`);
+        assert.ok(desc().hidden, "description masquée par défaut");
+        chevron.click();
+        assert.notOk(desc().hidden, "ouverte au clic sur le chevron");
+        assert.equal(chevron.getAttribute("aria-expanded"), "true");
+        await app.render();
+        assert.notOk(desc().hidden, "toujours ouverte après un rendu");
+        chevron.closest("tr").querySelector("td[class$='-name']").click();
+        await app.render();
+        assert.ok(desc().hidden, "refermée au clic sur la ligne");
+
+        const tout = table().querySelector(".desc-bascule-tout");
+        assert.ok(tout, "bouton tout ouvrir");
+        tout.click();
+        assert.ok([...table().querySelectorAll(".desc-pliable")].every(d => !d.hidden), "toutes ouvertes");
+        tout.click();
+        assert.ok([...table().querySelectorAll(".desc-pliable")].every(d => d.hidden), "toutes fermées");
+        assert.equal(app._descOuvertes.size, 0);
+      });
+
       it("tri par colonne (clic sur l'en-tête)", async () => {
         const th = app.element.querySelector("table:not(.browser-perso-table) th.browser-triable");
         assert.ok(th, "colonne triable");
@@ -394,6 +419,26 @@ export function navigateursBatch({ describe, it, assert, before, after }) {
           assert.equal(select.value, "harpe");
           app._resetFilters();
           await app.render();
+        });
+      }
+
+      if (fichier === "peines") {
+        it("la ligne dépliable d'une peine avec bienfait détaille l'effet noir et le bienfait", async () => {
+          const table = () => app.element.querySelector("table:not(.browser-perso-table)");
+          const avecBienfait = PEINES_PERFIDIE_DATA.findIndex(d => d.bienfait && d.noirEffect);
+          assert.isAbove(avecBienfait, -1, "au moins une peine du livre avec bienfait");
+          const d = PEINES_PERFIDIE_DATA[avecBienfait];
+          const chevron = table().querySelector(`.desc-bascule[data-desc="${avecBienfait}"]`);
+          const desc = table().querySelector(`[data-desc-de="${avecBienfait}"]`);
+          assert.ok(chevron, "chevron de la peine");
+          chevron.click();
+          assert.notOk(desc.hidden, "ouverte au clic");
+          const noirLabelKey = d.noirEffect === "corps" ? "AGONE.PerfidieCorpsNoir1" : "AGONE.PerfidieAmeNoire1";
+          assert.include(desc.textContent, game.i18n.localize(noirLabelKey), "effet noir en toutes lettres");
+          assert.include(desc.textContent, d.bienfait, "nom du bienfait");
+          const { descriptionBienfait } = await import("../helpers/compendium-data.mjs");
+          const texteLivre = descriptionBienfait(d.bienfait);
+          if (texteLivre) assert.include(desc.textContent, texteLivre, "description du bienfait");
         });
       }
 

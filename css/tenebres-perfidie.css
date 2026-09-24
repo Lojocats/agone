@@ -274,11 +274,51 @@
 .agone .pn-bienfait-none  { font-size: 11px; color: rgba(var(--agone-noir-rgb, 26,26,46), 0.30); }
 .agone .peine-desc-cell {
   font-size: 11px;
-  font-style: italic;
   color: rgba(var(--agone-noir-rgb, 26,26,46), 0.65);
   padding: 4px 8px 6px 8px !important;
   background: rgba(var(--agone-noir-rgb, 26,26,46), 0.03);
   border-bottom: 1px dashed rgba(var(--agone-noir-rgb, 26,26,46), 0.12) !important;
+}
+
+/* Sous-sections titrées d'une peine (Description / Effet de la peine / Bienfait), fiche + navigateur */
+.agone .peine-details,
+.peines-browser-app .peine-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-style: normal;
+}
+.agone .peine-details-titre,
+.peines-browser-app .peine-details-titre {
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(var(--agone-brun-rgb, 92,58,30), 0.65);
+}
+.agone .peine-details-noir,
+.peines-browser-app .peine-details-noir { margin: 0; font-size: 11px; color: var(--agone-brown); }
+.agone .peine-details-effets,
+.peines-browser-app .peine-details-effets {
+  margin: 2px 0 0;
+  padding-left: 16px;
+  font-size: 11px;
+  color: var(--agone-brown);
+}
+.agone .peine-details-etat,
+.peines-browser-app .peine-details-etat {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(var(--agone-noir-rgb, 26,26,46), 0.55);
+}
+.agone .peine-details-aucun,
+.peines-browser-app .peine-details-aucun {
+  margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  color: rgba(var(--agone-noir-rgb, 26,26,46), 0.35);
 }
 
 /* Bienfaits acquis */

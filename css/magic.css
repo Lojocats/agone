@@ -848,24 +848,53 @@
   color: rgba(var(--agone-encre-rgb, 60,35,15), 0.45);
 }
 
-/* ── <details> universels pour toutes les descriptions pliables ─────────────── */
-.agone .item-details {
-  margin: 1px 0;
-}
-.agone .item-details > summary {
-  display: inline-block;
-  font-size: 10px;
-  color: var(--agone-brown);
-  opacity: 0.6;
+/* ── Descriptions pliables (helpers/descriptions.mjs) ───────────────────────── */
+.agone .desc-bascule,
+.agone .desc-bascule-tout {
+  background: none;
+  border: none;
+  box-shadow: none;
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 9px;
   cursor: pointer;
-  user-select: none;
-  list-style: none;
-  padding: 1px 4px;
+  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.45);
+  border-radius: 50%;
 }
-.agone .item-details > summary::-webkit-details-marker { display: none; }
-.agone .item-details > summary::before { content: '\25b6\00a0'; font-size: 8px; }
-.agone .item-details[open] > summary::before { content: '\25bc\00a0'; }
-.agone .item-details > summary:hover { opacity: 1; color: var(--agone-gold); }
+.agone .desc-bascule-tout { font-size: 10px; }
+.agone .desc-bascule i,
+.agone .desc-bascule-tout i { transition: transform 0.15s ease; }
+.agone .desc-bascule[aria-expanded="true"] i { transform: rotate(90deg); }
+.agone .desc-bascule-tout[aria-expanded="true"] i { transform: rotate(180deg); }
+.agone .desc-bascule:hover,
+.agone .desc-bascule-tout:hover,
+.agone .desc-bascule:focus-visible,
+.agone .desc-bascule-tout:focus-visible,
+.agone .desc-bascule[aria-expanded="true"] {
+  color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+}
+.agone .desc-bascule-vide { display: inline-block; width: 16px; flex: 0 0 16px; }
+.agone .desc-pliable[hidden] { display: none !important; }
+.agone .desc-pliable { animation: agone-desc-ouvre 0.15s ease-out; }
+@keyframes agone-desc-ouvre { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
+.agone .desc-ligne.desc-ouverte > td,
+.agone li.desc-ligne.desc-ouverte { background: rgba(var(--agone-or-rgb, 201,162,39), 0.06); }
+.agone.desc-lignes-cliquables .desc-ligne:has(.desc-bascule) { cursor: pointer; }
+.agone .desc-col,
+.agone .man-col-toggle,
+.agone .peine-col-desc { width: 18px; text-align: center; }
+.agone .sort-card .desc-pliable { margin: 3px 0; }
+.agone .section-title .desc-bascule-tout { margin-left: 6px; vertical-align: middle; }
 .agone .item-desc-content {
   font-size: 11px;
   color: var(--agone-brown);

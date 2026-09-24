@@ -86,6 +86,33 @@ describe("Templates Handlebars", () => {
     for (const chemin of cites) assert.ok(existsSync(join(racine, chemin)), chemin);
   });
 
+  test("descriptions pliables : chaque chevron a sa description, masquée par défaut", () => {
+    for (const f of templates) {
+      const src = readFileSync(f, "utf8");
+      const nom = relative(racine, f);
+      assert.doesNotMatch(src, /class="item-details/, `${nom} : <details> remplacé par .desc-bascule`);
+      const chevrons = [...src.matchAll(/class="desc-bascule" data-desc="([^"]+)"/g)].map(m => m[1]);
+      const descs = [...src.matchAll(/<[^>]*\bdesc-pliable\b[^>]*>/g)].map(m => m[0]);
+      assert.equal(chevrons.length > 0, descs.length > 0, `${nom} : chevrons et descriptions vont ensemble`);
+      for (const balise of descs) {
+        assert.match(balise, /\shidden[\s>]/, `${nom} : description masquée par défaut`);
+        const cle = balise.match(/data-desc-de="([^"]+)"/)?.[1];
+        assert.ok(cle && chevrons.includes(cle), `${nom} : ${balise} sans chevron`);
+      }
+    }
+  });
+
+  test("carte de sort : le chevron précède le nom, pas de margin-left:auto qui le pousse sous les actions", () => {
+    const magie = readFileSync(join(racine, "templates/actors/parts/magie.hbs"), "utf8");
+    const carte = magie.match(/<div class="sort-card-top">[\s\S]*?<\/div>/)?.[0];
+    assert.ok(carte, "bloc .sort-card-top trouvé");
+    const posChevron = carte.indexOf("desc-bascule");
+    const posNom = carte.indexOf("sort-card-name");
+    assert.ok(posChevron >= 0 && posChevron < posNom, "le chevron précède le bouton du nom, hors de portée de .sort-card-actions");
+    const css = readFileSync(join(racine, "css/magic.css"), "utf8");
+    assert.doesNotMatch(css, /\.sort-card-top \.desc-bascule\s*\{\s*margin-left:\s*auto/, "le chevron n'est plus poussé à droite, sous .sort-card-actions");
+  });
+
   test("chaque type d'item et d'acteur a son template de fiche", () => {
     const manifeste = JSON.parse(lire("system.json"));
     for (const type of Object.keys(manifeste.documentTypes.Item)) {

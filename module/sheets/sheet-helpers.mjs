@@ -26,7 +26,7 @@ export function bindTabs(sheet, root, on, defaultTab = "attributs") {
  */
 export const CONTROLES_CONSULTATION = [
   ".section-toggle", ".item-edit", ".item-send-chat", "[data-action='rollItemChat']", "[data-action='toChat']",
-  ".comp-search-input", ".comp-search-clear", ".smf-search", ".smf-check",
+  ".comp-search-input", ".comp-search-clear", ".smf-search", ".smf-check", ".desc-bascule", ".desc-bascule-tout",
 ].join(", ");
 
 /**

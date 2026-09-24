@@ -8,6 +8,7 @@ import { PeuplesBrowser }    from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser }   from "../apps/pouvoirs-browser.mjs";
 import { PeinesBrowser }     from "../apps/peines-browser.mjs";
 import { delegate } from "../helpers/dom.mjs";
+import { lierDescriptions } from "../helpers/descriptions.mjs";
 import { bindTabs, bindCompetenceSearch, appliquerLectureSeule } from "./sheet-helpers.mjs";
 
 /** Template de la vue limitée, commun à tous les types d'acteur. */
@@ -147,6 +148,7 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     const on   = (type, selector, handler) => delegate(root, type, selector, handler, { signal });
     bindTabs(this, root, on, this.constructor.DEFAULT_TAB);
     this._bindViewListeners(on, root);
+    lierDescriptions(root, this._descOuvertes ??= new Set(), { signal });
 
     appliquerLectureSeule(root, !this.isEditable);
     if (this.isEditable) this._bindListeners(on, root);

@@ -30,7 +30,7 @@
     <table class="pvb-table">
       <thead>
         <tr>
-          <th class="pvb-col-toggle"></th>
+          <th class="pvb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
           <th class="pvb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="pvb-col-cat">{{localize "AGONE.Categorie"}}</th>
           <th class="pvb-col-action"></th>
@@ -39,7 +39,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pvb-row pvb-row-{{item.categorie}} {{#if item.hasInActor}}pvb-has-item{{/if}}" data-pouvoir-idx="{{item.idx}}">
-          <td></td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="pvb-name">{{item.name}}</td>
           <td class="pvb-cat">
             {{#if (eq item.categorie "flamme")}}
@@ -59,13 +59,10 @@
           </td>
         </tr>
         {{#if item.description}}
-        <tr class="pvb-desc-row" data-pouvoir-idx="{{item.idx}}">
+        <tr class="pvb-desc-row desc-pliable" data-pouvoir-idx="{{item.idx}}" data-desc-de="{{item.idx}}" hidden>
           <td></td>
           <td colspan="3" class="pvb-description-cell">
-            <details class="item-details">
-              <summary>{{localize "AGONE.VoirDescription"}}</summary>
-              <div class="item-desc-content">{{{item.description}}}</div>
-            </details>
+            <div class="item-desc-content">{{{item.description}}}</div>
           </td>
         </tr>
         {{/if}}

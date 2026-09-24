@@ -1,4 +1,5 @@
 import { rechercher, comparerPertinence, plagesSurlignage } from "../helpers/recherche.mjs";
+import { lierDescriptions } from "../helpers/descriptions.mjs";
 
 /**
  * Base commune des navigateurs Agone (armes, sorts, compétences, peuples…).
@@ -10,6 +11,7 @@ import { rechercher, comparerPertinence, plagesSurlignage } from "../helpers/rec
  * La base gère la recherche (helpers/recherche.mjs : sans accent, plusieurs mots, exclusions,
  * fautes de frappe, pertinence, surlignage) avec debounce, la conservation du focus entre deux rendus,
  * les filtres select / nombre / cases à cocher et la réinitialisation, le tri par colonne,
+ * les descriptions pliables (chevron ou clic sur la ligne, état conservé entre deux rendus),
  * et la section « objets personnalisés » (items du type ITEM_TYPE créés dans le monde ou
  * dans des compendiums autres que ceux du système, avec leurs effets actifs).
  */
@@ -185,6 +187,11 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     this._bindTri();
     this._bindClavier(options);
     this._afficherRecherche();
+
+    this._descSignal?.abort();
+    this._descSignal = new AbortController();
+    lierDescriptions(this.element, this._descOuvertes ??= new Set(),
+      { signal: this._descSignal.signal, ligneCliquable: true });
   }
 
   /**

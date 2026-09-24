@@ -11,6 +11,7 @@
       {{#each personnalises as |p|}}
       <tr class="browser-perso-row{{#if p.possede}} browser-perso-possede{{/if}}" data-uuid="{{p.uuid}}">
         <td class="browser-perso-nom">
+          {{#if p.description}}<button type="button" class="desc-bascule" data-desc="{{p.uuid}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}
           <img src="{{p.img}}" alt="" />
           <span>{{p.name}}</span>
           {{#if p.effets}}<i class="fas fa-magic browser-perso-effets" title='{{localize "AGONE.Effets.Titre"}}'></i>{{/if}}
@@ -28,12 +29,9 @@
         </td>
       </tr>
       {{#if p.description}}
-      <tr class="browser-perso-desc-row">
+      <tr class="browser-perso-desc-row desc-pliable" data-desc-de="{{p.uuid}}" hidden>
         <td colspan="3">
-          <details class="item-details">
-            <summary>{{localize "AGONE.VoirDescription"}}</summary>
-            <div class="item-desc-content">{{{p.description}}}</div>
-          </details>
+          <div class="item-desc-content">{{{p.description}}}</div>
         </td>
       </tr>
       {{/if}}

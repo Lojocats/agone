@@ -1,4 +1,20 @@
 import { descriptionBienfaitPeine } from "../../helpers/compendium-data.mjs";
+import { lireChange } from "../../helpers/effets.mjs";
+
+/** Libellés lisibles des effets automatisés propres à une peine (hors effets de son bienfait). */
+function effetsLisiblesPeine(peine) {
+  const libelles = [];
+  for (const effect of peine.effects) {
+    if (!effect.active || effect.getFlag("agone", "bienfait")) continue;
+    for (const change of effect.changes) {
+      const { def, connu, value } = lireChange(change);
+      if (!connu) continue;
+      const label = game.i18n.localize(def.label);
+      libelles.push(def.booleen ? label : `${label} : ${Number(value) >= 0 ? "+" : ""}${value}`);
+    }
+  }
+  return libelles;
+}
 
 /**
  * Onglets Ténèbres & Perfidie : paliers (auto / manuel), bienfaits, conjuration, démons (items et acteurs liés).
@@ -17,6 +33,13 @@ export const TenebresMixin = Base => class extends Base {
       const { html, texte } = descriptionBienfaitPeine(peine);
       peine._bienfaitDescription = texte;
       peine._bienfaitHTML        = html;
+      peine._noirEffectLabel = peine.system.noirEffect === "corps" ? game.i18n.localize("AGONE.PerfidieCorpsNoir1")
+                              : peine.system.noirEffect === "ame"   ? game.i18n.localize("AGONE.PerfidieAmeNoire1")
+                              : game.i18n.localize("AGONE.Aucun");
+      peine._effetsPeine = effetsLisiblesPeine(peine);
+      peine._bienfaitEtatLabel = peine.system.bienfait
+        ? game.i18n.localize(peine.system.bienfaitAcquis ? "AGONE.BienfaitAcquis" : "AGONE.PerfidieNonAcquis")
+        : "";
     }
     // Bienfaits actifs : peines avec bienfaitAcquis=true, dedupliqué par nom de bienfait
     const bienfaitsMap = new Map();

@@ -99,6 +99,151 @@ export function fichesBatch({ describe, it, assert, before, after }) {
     });
   }
 
+  describe("Fiche personnage : descriptions pliables", function () {
+    this.timeout(DELAI);
+    it("le chevron ouvre la description, qui le reste après une mise à jour, même en lecture seule", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      const [don] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Don décrit", type: "don", system: { categorie: "avantage", cout: 1, description: "<p>Texte du don</p>" } },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        const chevron = () => sheet.element.querySelector(`.desc-bascule[data-desc="${don.id}"]`);
+        const desc = () => sheet.element.querySelector(`[data-desc-de="${don.id}"]`);
+        assert.ok(chevron(), "chevron du don");
+        assert.ok(desc().hidden, "masquée par défaut");
+        chevron().click();
+        assert.notOk(desc().hidden, "ouverte au clic");
+        await don.update({ name: "Don renommé" });
+        await attendre(() => sheet.element.textContent.includes("Don renommé"), "fiche rendue à nouveau");
+        assert.notOk(desc().hidden, "toujours ouverte après la mise à jour");
+
+        Object.defineProperty(sheet, "isEditable", { configurable: true, get: () => false });
+        await sheet.render();
+        assert.notOk(chevron().disabled, "chevron actif en lecture seule");
+        chevron().click();
+        assert.ok(desc().hidden, "refermée en lecture seule");
+      } finally {
+        delete sheet.isEditable;
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("le chevron d'une carte de sort reste cliquable malgré les actions affichées au survol", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      const [sort] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Sort décrit", type: "sort", system: { typeMagie: "Runes", seuil: 1, description: "<p>Texte du sort</p>" } },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="magie"]').click();
+        const carte = sheet.element.querySelector(`.sort-card[data-item-id="${sort.id}"]`);
+        assert.ok(carte, "carte du sort");
+        const actions = carte.querySelector(".sort-card-actions");
+        actions.style.display = "flex"; // simule le survol, :hover n'étant pas simulable
+        const chevron = carte.querySelector(`.desc-bascule[data-desc="${sort.id}"]`);
+        const desc = carte.querySelector(`[data-desc-de="${sort.id}"]`);
+        assert.ok(chevron, "chevron du sort");
+        assert.ok(desc.hidden, "masquée par défaut");
+
+        const rc = chevron.getBoundingClientRect();
+        const ra = actions.getBoundingClientRect();
+        const chevauche = rc.left < ra.right && rc.right > ra.left && rc.top < ra.bottom && rc.bottom > ra.top;
+        assert.notOk(chevauche, "le chevron n'est pas recouvert par les actions au survol");
+
+        const cx = rc.left + rc.width / 2;
+        const cy = rc.top + rc.height / 2;
+        const auPoint = document.elementFromPoint(cx, cy);
+        assert.ok(chevron === auPoint || chevron.contains(auPoint), "le chevron est au premier plan, donc cliquable");
+
+        chevron.click();
+        assert.notOk(desc.hidden, "ouverte au clic");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("bienfaits acquis (Perfidie) : chevron par bienfait et bouton « tout ouvrir »", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Peine A", type: "peine", system: { bienfait: "Bienfait A", bienfaitAcquis: true, bienfaitDescription: "<p>Texte A</p>" } },
+        { name: "Peine B", type: "peine", system: { bienfait: "Bienfait B", bienfaitAcquis: true, bienfaitDescription: "<p>Texte B</p>" } },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        const section = sheet.element.querySelector(".bienfaits-perfidie-section");
+        assert.ok(section, "section des bienfaits acquis");
+        const descs = () => [...section.querySelectorAll(".bienfait-perfidie-desc")];
+        assert.equal(descs().length, 2);
+        assert.ok(descs().every(d => d.hidden), "descriptions masquées par défaut");
+
+        section.querySelector('.desc-bascule[data-desc="bienfait:Bienfait A"]').click();
+        assert.notOk(section.querySelector('[data-desc-de="bienfait:Bienfait A"]').hidden, "ouverte au clic");
+        assert.ok(section.querySelector('[data-desc-de="bienfait:Bienfait B"]').hidden, "l'autre reste fermée");
+
+        const tout = section.querySelector(".desc-bascule-tout");
+        tout.click();
+        assert.ok(descs().every(d => !d.hidden), "toutes ouvertes");
+        tout.click();
+        assert.ok(descs().every(d => d.hidden), "toutes fermées");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("peine de Perfidie : la ligne dépliable détaille description, effet et bienfait", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      const [peine] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Peine détaillée", type: "peine", system: {
+          noirEffect: "ame", description: "<p>Texte de la peine</p>",
+          bienfait: "Hargne", bienfaitDescription: "<p>Texte du bienfait propre</p>",
+        } },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="perfidie"]').click();
+        const chevron = sheet.element.querySelector(`.desc-bascule[data-desc="${peine.id}"]`);
+        const desc = sheet.element.querySelector(`[data-desc-de="${peine.id}"]`);
+        assert.ok(chevron, "chevron de la peine");
+        assert.ok(desc.hidden, "masquée par défaut");
+        chevron.click();
+        assert.notOk(desc.hidden, "ouverte au clic");
+
+        const texte = desc.textContent;
+        assert.include(texte, game.i18n.localize("AGONE.Description"));
+        assert.include(texte, "Texte de la peine");
+        assert.include(texte, game.i18n.localize("AGONE.Peine.EffetsPeine"));
+        assert.include(texte, game.i18n.localize("AGONE.PerfidieAmeNoire1"));
+        assert.include(texte, game.i18n.localize("AGONE.BienfaitLabel"));
+        assert.include(texte, "Hargne");
+        assert.include(texte, "Texte du bienfait propre");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("peine de Perfidie sans description ni bienfait : chevron quand même présent, avec l'effet", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      const [peine] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Peine sans détails", type: "peine" },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="perfidie"]').click();
+        const chevron = sheet.element.querySelector(`.desc-bascule[data-desc="${peine.id}"]`);
+        const desc = sheet.element.querySelector(`[data-desc-de="${peine.id}"]`);
+        assert.ok(chevron, "chevron présent même sans description ni bienfait");
+        chevron.click();
+        assert.notOk(desc.hidden, "ouverte au clic");
+        assert.include(desc.textContent, game.i18n.localize("AGONE.Peine.EffetsPeine"));
+        assert.include(desc.textContent, game.i18n.localize("AGONE.Aucun"));
+        assert.include(desc.textContent, game.i18n.localize("AGONE.PerfidieAucunBienfait"));
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+  });
+
   describe("Fiche personnage : sauvegarde automatique", function () {
     this.timeout(DELAI);
     it("un champ nommé est enregistré au changement", async () => {

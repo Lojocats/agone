@@ -274,6 +274,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/apps/combat-tracker.hbs",
     "systems/agone/templates/apps/parts/browser-personnalises.hbs",
     "systems/agone/templates/apps/parts/browser-filtres-tete.hbs",
+    "systems/agone/templates/apps/parts/peine-details.hbs",
   ];
   foundry.applications.handlebars.loadTemplates(templates);
 

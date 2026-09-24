@@ -1,0 +1,33 @@
+{{!-- Détails dépliables d'une peine de Perfidie (fiche personnage + navigateur des peines) :
+      description, effet de la peine, bienfait. Le chevron et la ligne .desc-pliable restent dans
+      le template appelant (perfidie.hbs / peines-browser.hbs).
+      Contexte : description, noirEffectLabel, effetsPeine (facultatif, effets actifs automatisés
+      de la peine possédée), bienfaitNom, bienfaitHTML, bienfaitEtatLabel (facultatif, fiche uniquement). --}}
+<div class="peine-details">
+  {{#if description}}
+  <div class="peine-details-section">
+    <h4 class="peine-details-titre">{{localize "AGONE.Description"}}</h4>
+    <div class="item-desc-content">{{{description}}}</div>
+  </div>
+  {{/if}}
+
+  <div class="peine-details-section">
+    <h4 class="peine-details-titre">{{localize "AGONE.Peine.EffetsPeine"}}</h4>
+    <p class="peine-details-noir">{{noirEffectLabel}}</p>
+    {{#if effetsPeine.length}}
+    <ul class="peine-details-effets">
+      {{#each effetsPeine as |e|}}<li>{{e}}</li>{{/each}}
+    </ul>
+    {{/if}}
+  </div>
+
+  <div class="peine-details-section">
+    <h4 class="peine-details-titre">{{localize "AGONE.BienfaitLabel"}}{{#if bienfaitNom}} : {{bienfaitNom}}{{/if}}</h4>
+    {{#if bienfaitNom}}
+      {{#if bienfaitEtatLabel}}<p class="peine-details-etat">{{bienfaitEtatLabel}}</p>{{/if}}
+      {{#if bienfaitHTML}}<div class="item-desc-content">{{{bienfaitHTML}}}</div>{{/if}}
+    {{else}}
+    <p class="peine-details-aucun">{{localize "AGONE.PerfidieAucunBienfait"}}</p>
+    {{/if}}
+  </div>
+</div>
