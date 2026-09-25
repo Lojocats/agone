@@ -1358,7 +1358,11 @@
   margin-top: 2px;
 }
 /* Fond neutre tant que la carte n'est pas survolée : la place est réservée par .sort-card-top,
-   le fond plein n'apparaît qu'au survol pour ne pas peser en permanence sur la carte. */
+   le fond plein n'apparaît qu'au survol pour ne pas peser en permanence sur la carte.
+   La boîte reste dans le DOM et hit-testable en tout temps (elle n'est plus display:none hors
+   survol depuis la 1.9.8) : pointer-events:none l'empêche de capter les clics/survols en dehors
+   de ses icônes (chevron ou tout autre contenu sous son emprise), qui restent cliquables via
+   pointer-events:auto sur .agone .sort-card-actions a/span. */
 .agone .sort-card-actions {
   position: absolute;
   top: 4px;
@@ -1371,6 +1375,7 @@
   padding: 2px 3px;
   border: 1px solid transparent;
   transition: background 0.15s, border-color 0.15s;
+  pointer-events: none;
 }
 .agone .sort-card:hover .sort-card-actions,
 .agone .sort-card-actions:focus-within {
@@ -1389,6 +1394,7 @@
   align-items: center;
   justify-content: center;
   transition: opacity 0.15s;
+  pointer-events: auto;
 }
 .agone .sort-card-drag-handle { cursor: grab; }
 .agone .sort-card-drag-handle:active { cursor: grabbing; }

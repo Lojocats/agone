@@ -118,6 +118,20 @@ describe("Templates Handlebars", () => {
     assert.doesNotMatch(css, /\.sort-card-top \.desc-bascule\s*\{\s*margin-left:\s*auto/, "le chevron n'est plus poussé à droite, sous .sort-card-actions");
   });
 
+  test("carte de sort : la boîte d'actions ne capte pas les clics en dehors de ses icônes", () => {
+    // .sort-card-actions est toujours dans le DOM (display: flex même hors survol depuis la 1.9.8),
+    // donc hit-testable en permanence : sans pointer-events:none, elle recouvre le chevron et tout
+    // autre contenu sous son emprise, même transparente. Les icônes restent cliquables via
+    // pointer-events:auto.
+    const css = readFileSync(join(racine, "css/magic.css"), "utf8");
+    const actions = css.match(/\.agone \.sort-card-actions\s*\{[^}]*\}/)?.[0];
+    assert.ok(actions, ".sort-card-actions trouvée");
+    assert.match(actions, /pointer-events:\s*none/, ".sort-card-actions ne capte pas les clics hors de ses icônes");
+    const icones = css.match(/\.agone \.sort-card-actions a,\s*\n\.agone \.sort-card-actions span\s*\{[^}]*\}/)?.[0];
+    assert.ok(icones, "règle des icônes de .sort-card-actions trouvée");
+    assert.match(icones, /pointer-events:\s*auto/, "les icônes de .sort-card-actions restent cliquables");
+  });
+
   test("carte de jet : classes d'issue et badge d'écart au seuil", () => {
     const src = lire("templates/chat/roll-result.hbs");
     assert.match(src, /roll-issue-\{\{issueClass\}\}/, "classe d'issue absente de .agone-roll-card");

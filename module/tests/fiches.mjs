@@ -263,6 +263,10 @@ export function fichesBatch({ describe, it, assert, before, after }) {
         assert.ok(chevron, "chevron du sort");
         assert.ok(desc.hidden, "masquée par défaut");
 
+        // elementFromPoint ne voit que ce qui est affiché : la carte peut être sous la zone visible
+        // de la fiche (panneau de progression au-dessus des onglets) ou la fiche derrière une autre fenêtre.
+        sheet.bringToFront?.();
+        chevron.scrollIntoView({ block: "center" });
         const rc = chevron.getBoundingClientRect();
         const ra = actions.getBoundingClientRect();
         const chevauche = rc.left < ra.right && rc.right > ra.left && rc.top < ra.bottom && rc.bottom > ra.top;

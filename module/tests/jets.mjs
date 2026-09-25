@@ -180,7 +180,7 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
       assert.include(msg.content, "roll-issue-succes", "classe d'issue succès sur la carte");
       const ecartAttendu = `+${roll.total - seuilNumeric}`;
-      assert.include(msg.content, "roll-ecart-succes", "badge d'écart teinté succès");
+      assert.include(msg.content, "roll-ecart-positif", "badge d'écart teinté positif");
       assert.include(msg.content, `>${ecartAttendu}<`, "badge d'écart = total − seuil");
     });
 
@@ -193,7 +193,7 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
       assert.include(msg.content, "roll-issue-echec", "classe d'issue échec sur la carte");
       const ecartAttendu = `−${seuilNumeric - roll.total}`;
-      assert.include(msg.content, "roll-ecart-echec", "badge d'écart teinté échec");
+      assert.include(msg.content, "roll-ecart-negatif", "badge d'écart teinté négatif");
       assert.include(msg.content, `>${ecartAttendu}<`, "badge d'écart = total − seuil");
     });
   });

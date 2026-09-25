@@ -3,6 +3,12 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.10] — 2026-09-25
+
+### Modifié
+- Cartes de sorts : la zone transparente des actions (modifier, supprimer, déplacer), visible en permanence depuis la 1.9.8, ne capte plus les clics en dehors de ses icônes.
+- Tests : les tests du badge d'écart des cartes de jet suivent le signe de l'écart (positif ou négatif) plutôt que l'issue du jet ; le test du chevron des cartes de sorts fait défiler la carte dans la zone visible avant de vérifier qu'elle est cliquable, le panneau de progression ayant repoussé l'onglet Magie vers le bas (Quench) ; zone d'actions des cartes de sorts (tests unitaires).
+
 ## [1.9.9] — 2026-09-25
 
 ### Ajouté
