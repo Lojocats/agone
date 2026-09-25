@@ -8,17 +8,17 @@
       <span class="derived sombre">{{ptsCreationCompRestant}}</span>
       <span>/</span>
       <span class="derived sombre">{{system.ptsCreationComp.max}}</span>
-      <button type="button" class="btn-icon reset-crea-btn" data-action="resetComps" title='{{localize "AGONE.ResetCreationCompTooltip"}}'>&#8635;</button>
+      <button type="button" class="btn-icon reset-crea-btn" data-action="resetComps" data-tooltip='{{localize "AGONE.ResetCreationCompTooltip"}}' aria-label='{{localize "AGONE.ResetCreationCompTooltip"}}'>&#8635;</button>
     </div>
     {{/if}}
-    <button type="button" class="compendium-browse btn-icon" data-pack="agone.competences" title='{{localize "AGONE.ParcourirCompetences"}}'>
+    <button type="button" class="compendium-browse btn-icon" data-pack="agone.competences" data-tooltip='{{localize "AGONE.ParcourirCompetences"}}' aria-label='{{localize "AGONE.ParcourirCompetences"}}'>
       <i class="fas fa-search"></i>
     </button>
-    <button type="button" class="item-create" data-type="competence" title='{{localize "AGONE.AjouterCompetence"}}'>
+    <button type="button" class="item-create" data-type="competence" data-tooltip='{{localize "AGONE.AjouterCompetence"}}' aria-label='{{localize "AGONE.AjouterCompetence"}}'>
       <i class="fas fa-plus"></i>
     </button>
     <button type="button" class="btn-icon tri-toggle-btn" data-action="triCompsToggle"
-            title='{{#if triCompsEstFamille}}{{localize "AGONE.TrierParNiveau"}}{{else}}{{localize "AGONE.TrierParFamille"}}{{/if}}'>
+            data-tooltip='{{#if triCompsEstFamille}}{{localize "AGONE.TrierParNiveau"}}{{else}}{{localize "AGONE.TrierParFamille"}}{{/if}}'>
       <i class="fas fa-sort"></i> {{#if triCompsEstFamille}}{{localize "AGONE.Famille"}}{{else}}{{localize "AGONE.Niveau"}}{{/if}}
     </button>
   </div>
@@ -27,8 +27,9 @@
   <div class="comp-search-wrap">
     <i class="fas fa-search comp-search-icon"></i>
     <input type="text" class="comp-search-input" placeholder='{{localize "AGONE.FiltrerCompetences"}}' autocomplete="off" />
-    <button type="button" class="comp-search-clear btn-icon" title='{{localize "AGONE.EffacerRecherche"}}' style="display:none">✕</button>
+    <button type="button" class="comp-search-clear btn-icon" data-tooltip='{{localize "AGONE.EffacerRecherche"}}' aria-label='{{localize "AGONE.EffacerRecherche"}}' style="display:none">✕</button>
   </div>
+  <p class="comp-search-empty" hidden>{{localize "AGONE.CompetenceRechercheAucunResultat"}}</p>
 
   {{#if competences.length}}
   <div class="comp-groups-container">
@@ -44,15 +45,15 @@
           <div class="comp-card-header">
             <button type="button" class="roll-btn comp-card-name item-name"
                     data-action="rollCompetence" data-item-id="{{comp.id}}"
-                    title='{{localize "AGONE.JeterCompetence"}}'>
+                    data-tooltip='{{localize "AGONE.JeterCompetence"}}'>
               {{comp.name}}
             </button>
             <div class="comp-card-meta">
               {{#if comp.system.domaine}}
-              <span class="comp-card-dom" title='{{localize "AGONE.Domaine"}}'><i class="fas fa-tag"></i> {{comp.system.domaine}}</span>
+              <span class="comp-card-dom" data-tooltip='{{localize "AGONE.Domaine"}}'><i class="fas fa-tag"></i> {{comp.system.domaine}}</span>
               {{/if}}
               {{#if comp.system.specialite}}
-              <span class="comp-card-spe" title='{{localize "AGONE.Specialite"}}'>&#9733; {{comp.system.specialite}}</span>
+              <span class="comp-card-spe" data-tooltip='{{localize "AGONE.Specialite"}}'>&#9733; {{comp.system.specialite}}</span>
               {{/if}}
             </div>
           </div>
@@ -65,7 +66,7 @@
               <input type="number" name="items.{{comp.id}}.system.exp" value="{{comp.system.exp}}"
                      class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />{{/if}}
               <select class="comp-card-attr-badge inline-edit" data-item-id="{{comp.id}}" data-field="system.attributLie"
-                      title='{{localize "AGONE.AttributLie"}}'>
+                      data-tooltip='{{localize "AGONE.AttributLie"}}'>
                 <option value="agilite"      {{#if (eq comp.system.attributLie "agilite")}}selected{{/if}}>AGI</option>
                 <option value="force"        {{#if (eq comp.system.attributLie "force")}}selected{{/if}}>FOR</option>
                 <option value="perception"   {{#if (eq comp.system.attributLie "perception")}}selected{{/if}}>PER</option>
@@ -83,12 +84,12 @@
               <button type="button" class="levelup-btn" data-action="levelUp"
                       data-type="competence" data-item-id="{{comp.id}}"
                       data-cout="{{comp.xpCout}}" data-crea-cout="{{comp.creaCout}}"
-                      title='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
+                      data-tooltip='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
                 <i class="fas fa-arrow-up"></i> {{comp.coutAffiche}}
               </button>
               <button type="button" class="leveldown-btn" data-action="levelDown"
                       data-type="competence" data-item-id="{{comp.id}}"
-                      title='{{localize "AGONE.RetrograderNiveau"}}'
+                      data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                       {{#unless comp.system.score}}disabled{{/unless}}>
                 <i class="fas fa-arrow-down"></i> {{comp.coutAfficheDown}}
               </button>
@@ -96,9 +97,9 @@
             {{/if}}
           </div>
           <div class="comp-card-actions">
-            <a class="item-edit" data-item-id="{{comp.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
-            <a class="item-delete" data-item-id="{{comp.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
-            <span class="item-drag-handle" title='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
+            <a class="item-edit" data-item-id="{{comp.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
+            <a class="item-delete" data-item-id="{{comp.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+            <span class="item-drag-handle" data-tooltip='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
           </div>
         </div>
         {{/each}}
@@ -119,7 +120,7 @@
         <div class="comp-card-header">
           <button type="button" class="roll-btn comp-card-name na-roll-btn" data-action="rollCompetenceNA"
                   data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.famille}}"
-                  title='{{localize "AGONE.JeterCompetenceNonAcquise"}}'>
+                  data-tooltip='{{localize "AGONE.JeterCompetenceNonAcquise"}}'>
             {{c.displayName}}
           </button>
         </div>
@@ -132,7 +133,7 @@
         <div class="comp-card-actions">
           <button type="button" class="na-apprendre-btn btn-icon" data-action="apprendreCompetenceNA"
                   data-nom="{{c.name}}" data-attribut-lie="{{c.attributLie}}" data-domaine="{{c.famille}}"
-                  title='{{localize "AGONE.ApprendreCompetence"}}'>
+                  data-tooltip='{{localize "AGONE.ApprendreCompetence"}}' aria-label='{{localize "AGONE.ApprendreCompetence"}}'>
             <i class="fas fa-plus"></i>
           </button>
         </div>

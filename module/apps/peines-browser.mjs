@@ -35,7 +35,6 @@ export class PeinesBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-peines-browser",
     classes : ["agone", "peines-browser"],
-    position: { width: 720, height: 560 },
     actions : { addPeine: PeinesBrowser.#onAddPeine },
   };
 

@@ -30,7 +30,6 @@ export class ArmuresBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-armures-browser",
     classes : ["agone", "armures-browser"],
-    position: { width: 700, height: 560 },
     actions : { addArmure: ArmuresBrowser.#onAddArmure },
   };
 

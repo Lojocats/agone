@@ -120,6 +120,31 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       assert.equal(await actor.rollSort(sort.id, FF), null);
     });
 
+    it("sort improvisé : affiche description et badges (portée, durée, danse)", async () => {
+      // Régression : le sort lancé en improvisé depuis le navigateur doit avoir description, portee, duree, danse
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Arts Magiques", type: "competence", system: { domaine: "Geste", score: 2, attributLie: "creativite" } },
+      ]);
+      const roll = await actor.rollSort({
+        name: "Sort brut",
+        typeMagie: "geste",
+        seuil: 10,
+        description: "<p>Desc brute</p>",
+        portee: "10 m",
+        duree: "1 tour",
+        danse: "2 tours"
+      }, { impro: true, fastForward: true });
+      assert.ok(roll, "jet de sort improvisé lancé");
+
+      // Récupérer le dernier message de chat de l'acteur
+      const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
+      assert.ok(msg, "message de chat créé");
+      assert.include(msg.content, "Desc brute", "description affichée");
+      assert.include(msg.content, "10 m", "portée affichée");
+      assert.include(msg.content, "1 tour", "durée affichée");
+      assert.include(msg.content, "2 tours", "danse affichée");
+    });
+
     it("aptitude magique et conjuration", async () => {
       assert.equal(horsDes(await actor.rollAptitudeMagie(FF)), actor.system.aptitudeArtsMagiques);
       assert.equal(horsDes(await actor.rollAptitudeConjuration(FF)), actor.system.aptitudeConjuration);

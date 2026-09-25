@@ -7,7 +7,7 @@
     <h3>{{#if g.bienfait}}<i class="fas fa-star"></i> {{/if}}{{localize g.titre}}</h3>
     {{#if @root.editable}}
     <button type="button" class="btn-icon" data-action="effetCreer"{{#if g.bienfait}} data-bienfait="1"{{/if}}
-            title='{{localize "AGONE.Effets.Nouveau"}}'>
+            data-tooltip='{{localize "AGONE.Effets.Nouveau"}}' aria-label='{{localize "AGONE.Effets.Nouveau"}}'>
       <i class="fas fa-plus"></i>
     </button>
     {{/if}}
@@ -24,8 +24,8 @@
         {{localize "AGONE.Effets.Actif"}}
       </label>
       {{#if @root.editable}}
-      <a class="btn-icon" data-action="effetEditer" title='{{localize "AGONE.Effets.EditeurAvance"}}'><i class="fas fa-cog"></i></a>
-      <a class="btn-icon" data-action="effetSupprimer" title='{{localize "AGONE.Effets.SupprimerEffet"}}'><i class="fas fa-trash"></i></a>
+      <a class="btn-icon" data-action="effetEditer" data-tooltip='{{localize "AGONE.Effets.EditeurAvance"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Effets.EditeurAvance"}}'><i class="fas fa-cog"></i></a>
+      <a class="btn-icon" data-action="effetSupprimer" data-tooltip='{{localize "AGONE.Effets.SupprimerEffet"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Effets.SupprimerEffet"}}'><i class="fas fa-trash"></i></a>
       {{/if}}
     </div>
 
@@ -41,15 +41,15 @@
       <span class="effet-valeur-fixe">{{localize "AGONE.Effets.Oui"}}</span>
       {{else}}
       <input type="number" class="stat-num" data-effet-champ="value" value="{{ch.value}}"
-             title='{{localize "AGONE.Effets.Valeur"}}' {{#unless @root.editable}}disabled{{/unless}} />
+             data-tooltip='{{localize "AGONE.Effets.Valeur"}}' {{#unless @root.editable}}disabled{{/unless}} />
       {{/if}}
       {{else}}
       {{!-- Clé saisie dans l'éditeur Foundry (hors vocabulaire Agone) : affichée telle quelle --}}
-      <code class="effet-cle" title='{{localize "AGONE.Effets.CleLibre"}}'>{{ch.key}}</code>
+      <code class="effet-cle" data-tooltip='{{localize "AGONE.Effets.CleLibre"}}'>{{ch.key}}</code>
       <span class="effet-valeur-fixe">{{ch.value}}</span>
       {{/if}}
       {{#if @root.editable}}
-      <a class="btn-icon" data-action="modifSupprimer" title='{{localize "AGONE.Effets.SupprimerModif"}}'><i class="fas fa-times"></i></a>
+      <a class="btn-icon" data-action="modifSupprimer" data-tooltip='{{localize "AGONE.Effets.SupprimerModif"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Effets.SupprimerModif"}}'><i class="fas fa-times"></i></a>
       {{/if}}
     </div>
     {{/each}}

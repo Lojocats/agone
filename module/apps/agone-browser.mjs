@@ -1,5 +1,6 @@
 import { rechercher, comparerPertinence, plagesSurlignage } from "../helpers/recherche.mjs";
 import { lierDescriptions } from "../helpers/descriptions.mjs";
+import { activerClavier } from "../helpers/dom.mjs";
 
 /**
  * Base commune des navigateurs Agone (armes, sorts, compétences, peuples…).
@@ -25,7 +26,7 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
 
   static DEFAULT_OPTIONS = {
     classes : ["agone", "agone-browser"],
-    position: { width: 680, height: 560 },
+    position: { width: 900, height: 660 },
     window  : { resizable: true },
     actions : {
       persoAjouter: AgoneBrowser.#onPersoAjouter,
@@ -192,6 +193,7 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     this._descSignal = new AbortController();
     lierDescriptions(this.element, this._descOuvertes ??= new Set(),
       { signal: this._descSignal.signal, ligneCliquable: true });
+    activerClavier(this.element, this._descSignal.signal);
   }
 
   /**

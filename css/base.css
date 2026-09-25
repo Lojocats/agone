@@ -82,7 +82,7 @@ body.agone-dark {
   --agone-parchment:    #1c1208;
   --agone-parchment2:   #251809;
   --agone-dark-text:    #d4b896;
-  --agone-brown:        #a07840;
+  --agone-brown:        #c29a62;
   --agone-brown-dark:   #c9a060;
   --agone-gold:         #e0c060;
   --agone-gold-light:   #f0d880;
@@ -95,7 +95,7 @@ body.agone-dark {
   --agone-fond-brun: rgba(255,255,255,0.06);
   --agone-fond-vert: rgba(110,207,122,0.16);
   --agone-bleu-rgb: 138,180,248;
-  --agone-brun-rgb: 180,130,60;
+  --agone-brun-rgb: 200,155,90;
   --agone-encre-rgb: 212,184,150;
   --agone-noir-rgb: 144,144,200;
   --agone-or-rgb: 224,192,96;
@@ -111,6 +111,16 @@ body.agone-dark {
   --agone-txt-rouge: #f28b82;
   --agone-txt-vert: #6ecf7a;
   --agone-txt-violet: #c9a0f0;
+  --agone-fumble-debut: #8a2018;
+  --agone-fumble-fin: #4a1006;
+  --agone-fumble-hover-debut: #a83828;
+  --agone-fumble-hover-fin: #6a1810;
+  --agone-fumble-texte: #ffdede;
+  --agone-saison-printemps: #7ec25f;
+  --agone-saison-ete: #f0b850;
+  --agone-saison-automne: #d07a48;
+  --agone-saison-hiver: #8aa8d8;
+  --agone-ct-start-hover: #3a6a20;
 }
 
 /* ── 1a. Variables Foundry v14 dans les fenêtres Agone ───── */
@@ -120,9 +130,9 @@ body.agone-dark .window-app.agone {
   --background:                #1c1208;
   --color-text-primary:        #d4b896;
   --color-text-emphatic:       #c9a060;
-  --color-form-label:          #a07840;
+  --color-form-label:          #c29a62;
   --color-form-label-hover:    #c9a060;
-  --color-form-hint:           #907030;
+  --color-form-hint:           #b08a52;
   --input-background-color:    rgba(255,255,255,0.08);
   --input-text-color:          #d4b896;
   --input-border-color:        rgba(180,130,60,0.35);
@@ -358,8 +368,13 @@ body.agone-dark .peines-browser-app .pnb-cat-creature_masque { color: #f28b82 !i
 body.agone-dark .agone .pn-noir-ame,
 body.agone-dark .peines-browser-app .pnb-noir-ame,
 body.agone-dark .peines-browser-app .pnb-cat-lieu_perfidie { color: #8ab4f8 !important; background: rgba(60,80,180,0.25) !important; border-color: rgba(138,180,248,0.4) !important; }
-/* Tables rows avec opacity trop faible */
-body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) { opacity: 0.30; }
+/* Paliers non atteints : atténuation par cellule seulement (une opacité sur la ligne
+   s'ajouterait à celle des cellules et rendrait le texte illisible sur fond sombre) */
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-check,
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-palier { opacity: 0.6; }
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-peine { color: rgba(var(--agone-noir-rgb, 144,144,200), 0.75); }
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .peine-dot { border-color: rgba(var(--agone-noir-rgb, 144,144,200), 0.4); }
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-bienfait { opacity: 0.7; }
 body.agone-dark .agone .paliers-table .palier-row td { border-bottom-color: rgba(144,144,200,0.1) !important; }
 /* Perf range legend */
 body.agone-dark .agone .perf-dif-range { color: rgba(144,144,200,0.45) !important; border-color: rgba(144,144,200,0.18) !important; }
@@ -367,8 +382,8 @@ body.agone-dark .agone .perf-dif-range.perf-range-active { color: #9090c8 !impor
 
 /* ── 11c. Aptitudes magiques (arts par domaine) ──────────── */
 body.agone-dark .agone .arts-domaines-table .arts-absent td { opacity: 0.55; }
-body.agone-dark .agone .arts-comp-liee-score { color: #a07840 !important; }
-body.agone-dark .agone .arts-comp-liee-nom   { opacity: 1 !important; color: #907030 !important; }
+body.agone-dark .agone .arts-comp-liee-score { color: #c29a62 !important; }
+body.agone-dark .agone .arts-comp-liee-nom   { opacity: 1 !important; color: #b08a52 !important; }
 body.agone-dark .agone .arts-spe-hint        { color: #c9a060 !important; }
 body.agone-dark .agone .arts-comp-liee-manquante { color: #f28b82 !important; }
 body.agone-dark .agone .arts-levelup-pair .levelup-btn-liee { background: rgba(255,255,255,0.06) !important; border-color: #6b491e !important; color: #d4b896 !important; }
@@ -461,3 +476,21 @@ body.agone-dark .agone-combat-tracker .agone-ct-header {
   color: #d4b896 !important;
   border-bottom-color: rgba(180,130,60,0.4) !important;
 }
+
+/* ── Lisibilité du texte sur fond sombre ─────────────────────
+   Les textes volontairement pâles (valeurs nulles, « aucun… », éléments inactifs)
+   gardent une opacité faible pensée pour le parchemin : on la relève sur fond sombre. */
+body.agone-dark .agone .arme-score-inactive { color: rgba(var(--agone-brun-rgb), 0.6); }
+body.agone-dark .agone .man-val-zero,
+body.agone-dark .agone .man-val-var { color: rgba(var(--agone-encre-rgb), 0.6); }
+body.agone-dark .agone .pn-noir-none,
+body.agone-dark .agone .perf-empty,
+body.agone-dark .peines-browser-app .pnb-empty,
+body.agone-dark .peines-browser-app .pnb-noir-none,
+body.agone-dark .peines-browser-app .pnb-bienfait-none { color: rgba(var(--agone-noir-rgb), 0.65) !important; }
+
+/* Carte de jet du chat : texte courant en couleur de texte, pas en brun atténué */
+body.agone-dark .agone-roll-card .roll-seuil { opacity: 1; }
+body.agone-dark .agone-roll-card .roll-breakdown { opacity: 0.9; }
+body.agone-dark .agone-roll-card .roll-sort-desc-content { color: var(--agone-dark-text); }
+body.agone-dark .agone-roll-card .sort-meta-badge { color: var(--agone-dark-text); }

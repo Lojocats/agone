@@ -28,7 +28,6 @@ export class PeuplesBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-peuples-browser",
     classes : ["agone", "peuples-browser"],
-    position: { width: 680, height: 540 },
     actions : { applyPeuple: PeuplesBrowser.#onApplyPeuple },
   };
 

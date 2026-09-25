@@ -30,7 +30,7 @@
     <table class="pvb-table">
       <thead>
         <tr>
-          <th class="pvb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+          <th class="pvb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
           <th class="pvb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="pvb-col-cat">{{localize "AGONE.Categorie"}}</th>
           <th class="pvb-col-action"></th>
@@ -39,7 +39,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pvb-row pvb-row-{{item.categorie}} {{#if item.hasInActor}}pvb-has-item{{/if}}" data-pouvoir-idx="{{item.idx}}">
-          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="pvb-name">{{item.name}}</td>
           <td class="pvb-cat">
             {{#if (eq item.categorie "flamme")}}
@@ -50,9 +50,9 @@
           </td>
           <td class="pvb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check pvb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+            <i class="fas fa-check pvb-check" data-tooltip='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="pvb-add-btn btn-icon" data-action="addPouvoir" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <button type="button" class="pvb-add-btn btn-icon" data-action="addPouvoir" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}

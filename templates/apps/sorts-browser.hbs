@@ -42,7 +42,7 @@
       <!-- Seuil exact ou maximal (exclusifs) -->
       <label class="agone-filtre-groupe">
         <span class="agone-filtre-label">{{localize "AGONE.Seuil"}}</span>
-        <select class="sb-seuil-exact" title='{{localize "AGONE.Ui.FiltrerSeuilExact"}}'>
+        <select class="sb-seuil-exact" data-tooltip='{{localize "AGONE.Ui.FiltrerSeuilExact"}}'>
           <option value="">{{localize "AGONE.Browser.TousSeuils"}}</option>
           {{#each allSeuils}}
           <option value="{{this}}" {{#if (eq ../filterSeuilExact this)}}selected{{/if}}>{{localize "AGONE.Browser.SeuilEgal"}} {{this}}</option>
@@ -70,7 +70,7 @@
     <table class="sb-table">
       <thead>
         <tr>
-          <th class="sb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+          <th class="sb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
           <th class="sb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="sb-col-type">{{localize "AGONE.Browser.TypeAccord"}}</th>
           <th class="sb-col-seuil">{{localize "AGONE.Seuil"}}</th>
@@ -83,7 +83,7 @@
       <tbody>
         {{#each sorts as |sort|}}
         <tr class="sb-sort-row {{#if sort.hasInActor}}sb-has-sort{{/if}}" data-sort-idx="{{sort.idx}}">
-          <td class="desc-col">{{#if sort.description}}<button type="button" class="desc-bascule" data-desc="{{sort.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
+          <td class="desc-col">{{#if sort.description}}<button type="button" class="desc-bascule" data-desc="{{sort.idx}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="sb-name">{{sort.name}}</td>
           <td class="sb-type">{{sort.typeMagie}}{{#if sort.instrument}} / {{sort.instrument}}{{/if}}</td>
           <td class="sb-seuil">{{sort.seuil}}</td>
@@ -92,12 +92,13 @@
           <td class="sb-danse">{{sort.danse}}</td>
           <td class="sb-action">
             {{#if sort.hasInActor}}
-            <i class="fas fa-check sb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+            <i class="fas fa-check sb-check" data-tooltip='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{/if}}
-            <button type="button" class="sb-impro-btn btn-icon" data-action="rollSortImpro" title='{{localize "AGONE.Browser.JetImprovise"}} ({{multiply sort.seuil 2}})'>
+            <button type="button" class="sb-impro-btn btn-icon" data-action="rollSortImpro" data-tooltip='{{localize "AGONE.Browser.JetImprovise"}} ({{multiply sort.seuil 2}})'
+                    aria-label='{{localize "AGONE.Browser.JetImprovise"}} ({{multiply sort.seuil 2}})'>
               <i class="fas fa-random"></i>
             </button>
-            <button type="button" class="sb-add-btn btn-icon" data-action="addSort" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <button type="button" class="sb-add-btn btn-icon" data-action="addSort" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
           </td>

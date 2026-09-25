@@ -14,10 +14,10 @@
             <label>{{localize "AGONE.Corps"}}</label>
             <input type="number" data-field="system.corps.score" data-raw-input="corps" value="{{rawAspect.corps}}" class="stat-num aspect-num" />
             <span class="derived-val aspect-total-val">{{system.corps.score}}</span>
-            {{#if showLevelUpAspect}}<input type="number" name="system.corps.exp" value="{{system.corps.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeCorps"}}' />{{/if}}
+            {{#if showLevelUpAspect}}<input type="number" name="system.corps.exp" value="{{system.corps.exp}}" class="stat-num aspect-num exp" data-tooltip='{{localize "AGONE.ExpReserveeCorps"}}' />{{/if}}
           </div>
           {{#if bonusRacialAspect.corps}}
-          <div class="aspect-stat racial" title="{{#if (lt bonusRacialAspect.corps 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">
+          <div class="aspect-stat racial" data-tooltip="{{#if (lt bonusRacialAspect.corps 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">
             <label>{{localize "AGONE.Racial"}}</label>
             <span class="derived-val racial-val {{#if (gt bonusRacialAspect.corps 0)}}racial-pos{{else}}racial-neg{{/if}}">{{#if (gt bonusRacialAspect.corps 0)}}+{{/if}}{{bonusRacialAspect.corps}}</span>
           </div>
@@ -31,7 +31,7 @@
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
             <span class="derived-val noir-val">{{system.corpsNoirTotal}}</span>
-            <input type="number" name="system.corps.noir" value="{{system.corps.noir}}" class="stat-num aspect-num noir-base" title='{{localize "AGONE.ValeurBaseTooltip"}}' />
+            <input type="number" name="system.corps.noir" value="{{system.corps.noir}}" class="stat-num aspect-num noir-base" data-tooltip='{{localize "AGONE.ValeurBaseTooltip"}}' />
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
@@ -41,12 +41,12 @@
           <div class="aspect-stat levelup">
             <button type="button" class="levelup-btn" data-action="levelUp"
                     data-type="aspect" data-key="corps" data-cout="{{xpCout.corps}}" data-crea-cout="{{creaCout.corps}}"
-                    title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.corps}} XP)'>
+                    data-tooltip='{{localize "AGONE.MonterNiveau"}} ({{xpCout.corps}} XP)'>
               <i class="fas fa-arrow-up"></i> {{xpCout.corps}}
             </button>
             <button type="button" class="leveldown-btn" data-action="levelDown"
                     data-type="aspect" data-key="corps"
-                    title='{{localize "AGONE.RetrograderNiveau"}}'
+                    data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                     {{#unless system.corps.score}}disabled{{/unless}}>
               <i class="fas fa-arrow-down"></i> {{coutAfficheDown.corps}}
             </button>
@@ -63,10 +63,10 @@
             <label>{{localize "AGONE.Esprit"}}</label>
             <input type="number" data-field="system.esprit.score" data-raw-input="esprit" value="{{rawAspect.esprit}}" class="stat-num aspect-num" />
             <span class="derived-val aspect-total-val">{{system.esprit.score}}</span>
-            {{#if showLevelUpAspect}}<input type="number" name="system.esprit.exp" value="{{system.esprit.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeEsprit"}}' />{{/if}}
+            {{#if showLevelUpAspect}}<input type="number" name="system.esprit.exp" value="{{system.esprit.exp}}" class="stat-num aspect-num exp" data-tooltip='{{localize "AGONE.ExpReserveeEsprit"}}' />{{/if}}
           </div>
           {{#if bonusRacialAspect.esprit}}
-          <div class="aspect-stat racial" title="{{#if (lt bonusRacialAspect.esprit 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">
+          <div class="aspect-stat racial" data-tooltip="{{#if (lt bonusRacialAspect.esprit 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">
             <label>{{localize "AGONE.Racial"}}</label>
             <span class="derived-val racial-val {{#if (gt bonusRacialAspect.esprit 0)}}racial-pos{{else}}racial-neg{{/if}}">{{#if (gt bonusRacialAspect.esprit 0)}}+{{/if}}{{bonusRacialAspect.esprit}}</span>
           </div>
@@ -80,7 +80,7 @@
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
             <span class="derived-val noir-val">{{system.espritNoirTotal}}</span>
-            <input type="number" name="system.esprit.noir" value="{{system.esprit.noir}}" class="stat-num aspect-num noir-base" title='{{localize "AGONE.ValeurBaseTooltip"}}' />
+            <input type="number" name="system.esprit.noir" value="{{system.esprit.noir}}" class="stat-num aspect-num noir-base" data-tooltip='{{localize "AGONE.ValeurBaseTooltip"}}' />
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
@@ -90,12 +90,12 @@
           <div class="aspect-stat levelup">
             <button type="button" class="levelup-btn" data-action="levelUp"
                     data-type="aspect" data-key="esprit" data-cout="{{xpCout.esprit}}" data-crea-cout="{{creaCout.esprit}}"
-                    title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.esprit}} XP)'>
+                    data-tooltip='{{localize "AGONE.MonterNiveau"}} ({{xpCout.esprit}} XP)'>
               <i class="fas fa-arrow-up"></i> {{xpCout.esprit}}
             </button>
             <button type="button" class="leveldown-btn" data-action="levelDown"
                     data-type="aspect" data-key="esprit"
-                    title='{{localize "AGONE.RetrograderNiveau"}}'
+                    data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                     {{#unless system.esprit.score}}disabled{{/unless}}>
               <i class="fas fa-arrow-down"></i> {{coutAfficheDown.esprit}}
             </button>
@@ -112,10 +112,10 @@
             <label>{{localize "AGONE.Ame"}}</label>
             <input type="number" data-field="system.ame.score" data-raw-input="ame" value="{{rawAspect.ame}}" class="stat-num aspect-num" />
             <span class="derived-val aspect-total-val">{{system.ame.score}}</span>
-            {{#if showLevelUpAspect}}<input type="number" name="system.ame.exp" value="{{system.ame.exp}}" class="stat-num aspect-num exp" title='{{localize "AGONE.ExpReserveeAme"}}' />{{/if}}
+            {{#if showLevelUpAspect}}<input type="number" name="system.ame.exp" value="{{system.ame.exp}}" class="stat-num aspect-num exp" data-tooltip='{{localize "AGONE.ExpReserveeAme"}}' />{{/if}}
           </div>
           {{#if bonusRacialAspect.ame}}
-          <div class="aspect-stat racial" title="{{#if (lt bonusRacialAspect.ame 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">
+          <div class="aspect-stat racial" data-tooltip="{{#if (lt bonusRacialAspect.ame 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">
             <label>{{localize "AGONE.Racial"}}</label>
             <span class="derived-val racial-val {{#if (gt bonusRacialAspect.ame 0)}}racial-pos{{else}}racial-neg{{/if}}">{{#if (gt bonusRacialAspect.ame 0)}}+{{/if}}{{bonusRacialAspect.ame}}</span>
           </div>
@@ -129,7 +129,7 @@
           <div class="aspect-stat noir">
             <label>{{localize "AGONE.Noir"}}</label>
             <span class="derived-val noir-val">{{system.ameNoirTotal}}</span>
-            <input type="number" name="system.ame.noir" value="{{system.ame.noir}}" class="stat-num aspect-num noir-base" title='{{localize "AGONE.ValeurBaseTooltip"}}' />
+            <input type="number" name="system.ame.noir" value="{{system.ame.noir}}" class="stat-num aspect-num noir-base" data-tooltip='{{localize "AGONE.ValeurBaseTooltip"}}' />
           </div>
           <div class="aspect-stat derived">
             <label>{{localize "AGONE.Bonus"}}</label>
@@ -139,12 +139,12 @@
           <div class="aspect-stat levelup">
             <button type="button" class="levelup-btn" data-action="levelUp"
                     data-type="aspect" data-key="ame" data-cout="{{xpCout.ame}}" data-crea-cout="{{creaCout.ame}}"
-                    title='{{localize "AGONE.MonterNiveau"}} ({{xpCout.ame}} XP)'>
+                    data-tooltip='{{localize "AGONE.MonterNiveau"}} ({{xpCout.ame}} XP)'>
               <i class="fas fa-arrow-up"></i> {{xpCout.ame}}
             </button>
             <button type="button" class="leveldown-btn" data-action="levelDown"
                     data-type="aspect" data-key="ame"
-                    title='{{localize "AGONE.RetrograderNiveau"}}'
+                    data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                     {{#unless system.ame.score}}disabled{{/unless}}>
               <i class="fas fa-arrow-down"></i> {{coutAfficheDown.ame}}
             </button>
@@ -171,72 +171,72 @@
     <h3 class="section-title">{{localize "AGONE.CaracDerivees"}}</h3>
     <div class="derived-grid">
 
-      <div class="cstat-item" title="{{tooltipsDerives.melee}}">
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.melee}}">
         <span class="cstat-roll cstat-passive"><i class="fas fa-fist-raised"></i></span>
         <span class="cstat-score">{{system.melee}}</span>
-        {{#if bonusDeriveSupp.melee}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.melee 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.melee 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.melee 0)}}+{{/if}}{{bonusDeriveSupp.melee}}</span>{{/if}}
+        {{#if bonusDeriveSupp.melee}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.melee 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.melee 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.melee 0)}}+{{/if}}{{bonusDeriveSupp.melee}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.Melee"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.tir}}">
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.tir}}">
         <span class="cstat-roll cstat-passive"><i class="fas fa-crosshairs"></i></span>
         <span class="cstat-score">{{system.tir}}</span>
-        {{#if bonusDeriveSupp.tir}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.tir 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.tir 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.tir 0)}}+{{/if}}{{bonusDeriveSupp.tir}}</span>{{/if}}
+        {{#if bonusDeriveSupp.tir}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.tir 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.tir 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.tir 0)}}+{{/if}}{{bonusDeriveSupp.tir}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.Tir"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.art}}">
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.art}}">
         <span class="cstat-roll cstat-passive"><i class="fas fa-palette"></i></span>
         <span class="cstat-score">{{system.art}}</span>
-        {{#if bonusDonArt}}<span class="racial-bonus-badge {{#if (lt bonusDonArt 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonArt 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonArt 0)}}+{{/if}}{{bonusDonArt}}</span>{{/if}}
-        {{#if bonusDeriveSupp.art}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.art 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.art 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.art 0)}}+{{/if}}{{bonusDeriveSupp.art}}</span>{{/if}}
+        {{#if bonusDonArt}}<span class="racial-bonus-badge {{#if (lt bonusDonArt 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDonArt 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonArt 0)}}+{{/if}}{{bonusDonArt}}</span>{{/if}}
+        {{#if bonusDeriveSupp.art}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.art 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.art 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.art 0)}}+{{/if}}{{bonusDeriveSupp.art}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.Art"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.initiative}}">
-        <button type="button" class="cstat-roll" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.initiative}}">
+        <button type="button" class="cstat-roll" data-action="rollInitiative" data-tooltip='{{localize "AGONE.JeterInitiative"}}' aria-label='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
         <span class="cstat-score">{{system.initiative}}</span>
-        {{#if bonusDonInitiative}}<span class="racial-bonus-badge {{#if (lt bonusDonInitiative 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonInitiative 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonInitiative 0)}}+{{/if}}{{bonusDonInitiative}}</span>{{/if}}
-        {{#if bonusDeriveSupp.initiative}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.initiative 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.initiative 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.initiative 0)}}+{{/if}}{{bonusDeriveSupp.initiative}}</span>{{/if}}
+        {{#if bonusDonInitiative}}<span class="racial-bonus-badge {{#if (lt bonusDonInitiative 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDonInitiative 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonInitiative 0)}}+{{/if}}{{bonusDonInitiative}}</span>{{/if}}
+        {{#if bonusDeriveSupp.initiative}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.initiative 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.initiative 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.initiative 0)}}+{{/if}}{{bonusDeriveSupp.initiative}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.initMagique}}">
-        <button type="button" class="cstat-roll" data-action="rollInitiativeMagique" title='{{localize "AGONE.JeterInitMagique"}}'><i class="fas fa-magic"></i></button>
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.initMagique}}">
+        <button type="button" class="cstat-roll" data-action="rollInitiativeMagique" data-tooltip='{{localize "AGONE.JeterInitMagique"}}' aria-label='{{localize "AGONE.JeterInitMagique"}}'><i class="fas fa-magic"></i></button>
         <span class="cstat-score">{{system.initMagique}}</span>
-        {{#if bonusDeriveSupp.initMagique}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.initMagique 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.initMagique 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.initMagique 0)}}+{{/if}}{{bonusDeriveSupp.initMagique}}</span>{{/if}}
+        {{#if bonusDeriveSupp.initMagique}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.initMagique 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.initMagique 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.initMagique 0)}}+{{/if}}{{bonusDeriveSupp.initMagique}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.InitMagique"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.defenseNaturelle}}">
-        <button type="button" class="cstat-roll" data-action="rollDefenseNaturelle" title='{{localize "AGONE.JeterDefenseNat"}}'><i class="fas fa-shield-alt"></i></button>
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.defenseNaturelle}}">
+        <button type="button" class="cstat-roll" data-action="rollDefenseNaturelle" data-tooltip='{{localize "AGONE.JeterDefenseNat"}}' aria-label='{{localize "AGONE.JeterDefenseNat"}}'><i class="fas fa-shield-alt"></i></button>
         <span class="cstat-score">{{system.defenseNaturelle}}</span>
-        {{#if bonusDeriveSupp.defenseNaturelle}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.defenseNaturelle 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.defenseNaturelle 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.defenseNaturelle 0)}}+{{/if}}{{bonusDeriveSupp.defenseNaturelle}}</span>{{/if}}
+        {{#if bonusDeriveSupp.defenseNaturelle}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.defenseNaturelle 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.defenseNaturelle 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.defenseNaturelle 0)}}+{{/if}}{{bonusDeriveSupp.defenseNaturelle}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.DefenseNaturelle"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.bd}}">
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.bd}}">
         <span class="cstat-roll cstat-passive"><i class="fas fa-hammer"></i></span>
         <span class="cstat-score">{{system.bd}}</span>
-        {{#if bonusDeriveSupp.bd}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.bd 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.bd 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.bd 0)}}+{{/if}}{{bonusDeriveSupp.bd}}</span>{{/if}}
+        {{#if bonusDeriveSupp.bd}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.bd 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.bd 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.bd 0)}}+{{/if}}{{bonusDeriveSupp.bd}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.BD"}}</span>
       </div>
 
-      <div class="cstat-item" title="{{tooltipsDerives.esquive}}">
-        <button type="button" class="cstat-roll" data-action="rollEsquive" title='{{localize "AGONE.JeterEsquive"}}'><i class="fas fa-running"></i></button>
+      <div class="cstat-item" data-tooltip="{{tooltipsDerives.esquive}}">
+        <button type="button" class="cstat-roll" data-action="rollEsquive" data-tooltip='{{localize "AGONE.JeterEsquive"}}' aria-label='{{localize "AGONE.JeterEsquive"}}'><i class="fas fa-running"></i></button>
         <span class="cstat-score">{{system.esquiveTotal}}</span>
-        {{#if bonusDeriveSupp.esquive}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.esquive 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.esquive 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.esquive 0)}}+{{/if}}{{bonusDeriveSupp.esquive}}</span>{{/if}}
+        {{#if bonusDeriveSupp.esquive}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.esquive 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.esquive 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.esquive 0)}}+{{/if}}{{bonusDeriveSupp.esquive}}</span>{{/if}}
         <span class="cstat-label">{{localize "AGONE.EsquiveTotal"}}</span>
       </div>
 
-      <div class="cstat-item cstat-emprise" title="{{tooltipsDerives.emprise}}">
-        <button type="button" class="cstat-roll" data-action="rollEmpriseAttr" title='{{localize "AGONE.JeterEmprise"}}'><i class="fas fa-fire"></i></button>
+      <div class="cstat-item cstat-emprise" data-tooltip="{{tooltipsDerives.emprise}}">
+        <button type="button" class="cstat-roll" data-action="rollEmpriseAttr" data-tooltip='{{localize "AGONE.JeterEmprise"}}' aria-label='{{localize "AGONE.JeterEmprise"}}'><i class="fas fa-fire"></i></button>
         <span class="cstat-score">{{system.emprise}}</span>
-        {{#if bonusDonEmprise}}<span class="racial-bonus-badge {{#if (lt bonusDonEmprise 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDonEmprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonEmprise 0)}}+{{/if}}{{bonusDonEmprise}}</span>{{/if}}
-        {{#if bonusDeriveSupp.emprise}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.emprise 0)}}racial-neg{{else}}racial-pos{{/if}}" title='{{#if (lt bonusDeriveSupp.emprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.emprise 0)}}+{{/if}}{{bonusDeriveSupp.emprise}}</span>{{/if}}
+        {{#if bonusDonEmprise}}<span class="racial-bonus-badge {{#if (lt bonusDonEmprise 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDonEmprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDonEmprise 0)}}+{{/if}}{{bonusDonEmprise}}</span>{{/if}}
+        {{#if bonusDeriveSupp.emprise}}<span class="racial-bonus-badge {{#if (lt bonusDeriveSupp.emprise 0)}}racial-neg{{else}}racial-pos{{/if}}" data-tooltip='{{#if (lt bonusDeriveSupp.emprise 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusDeriveSupp.emprise 0)}}+{{/if}}{{bonusDeriveSupp.emprise}}</span>{{/if}}
         <div class="cstat-emprise-wrap">
           <span class="cstat-label">{{localize "AGONE.Emprise"}}</span>
-          <select name="system.typeMage" class="emprise-type-select" title='{{localize "AGONE.ObedienceMagique"}}'>
+          <select name="system.typeMage" class="emprise-type-select" data-tooltip='{{localize "AGONE.ObedienceMagique"}}'>
             <option value="jorniste" {{#if (eq system.typeMage "jorniste")}}selected{{/if}}>{{localize "AGONE.JornisteDetail"}}</option>
             <option value="eclipsiste"    {{#if (eq system.typeMage "eclipsiste")}}selected{{/if}}>{{localize "AGONE.EclipsisteDetail"}}</option>
             <option value="obscurantiste" {{#if (eq system.typeMage "obscurantiste")}}selected{{/if}}>{{localize "AGONE.ObscurantisteDetail"}}</option>
@@ -258,25 +258,25 @@
       {{!-- Agilité (Corps) --}}
       <div class="carac-row{{#if caracBelowMin.agilite}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.agilite}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="agilite"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Agilite"}}'>{{localize "AGONE.Attribut.Agilite"}}</button>
         <input type="number" data-field="system.agilite.score" data-raw-input="agilite" value="{{rawCaracVal.agilite}}" class="stat-num"
-               {{#if caracBelowMin.agilite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.agilite}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{agiliteEffectif}}</span>
-        {{#if bonusRacialCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.agilite 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.agilite 0)}}+{{/if}}{{bonusRacialCarac.agilite}}</span>{{/if}}
-        {{#if bonusAvantageCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.agilite 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.agilite 0)}}+{{/if}}{{bonusAvantageCarac.agilite}}</span>{{/if}}
-        {{#if malusArmureAgi}}<span class="racial-bonus-badge racial-neg" title='{{localize "AGONE.MalusAgi"}} ({{system.armure.nom}})'>{{malusArmureAgi}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.agilite}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.agilite}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.agilite}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.agilite}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.agilite 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.agilite 0)}}+{{/if}}{{bonusRacialCarac.agilite}}</span>{{/if}}
+        {{#if bonusAvantageCarac.agilite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.agilite 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.agilite 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.agilite 0)}}+{{/if}}{{bonusAvantageCarac.agilite}}</span>{{/if}}
+        {{#if malusArmureAgi}}<span class="racial-bonus-badge racial-neg" data-tooltip='{{localize "AGONE.MalusAgi"}} ({{system.armure.nom}})'>{{malusArmureAgi}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.agilite.exp" value="{{system.agilite.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.agilite}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.agilite}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.agilite}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.agilite}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="agilite" data-cout="{{xpCout.agilite}}" data-crea-cout="{{creaCout.agilite}}"
-                title='{{#if caracAtMax.agilite}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.agilite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.agilite}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.agilite}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.agilite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.agilite}}){{/if}}'
                 {{#if caracAtMax.agilite}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.agilite}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="agilite"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.agilite.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.agilite}}
         </button>{{/if}}
@@ -284,24 +284,24 @@
       {{!-- Force (Corps) --}}
       <div class="carac-row{{#if caracBelowMin.force}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.force}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="force"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Force"}}'>{{localize "AGONE.Attribut.Force"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Force"}}'>{{localize "AGONE.Attribut.Force"}}</button>
         <input type="number" data-field="system.force.score" data-raw-input="force" value="{{rawCaracVal.force}}" class="stat-num"
-               {{#if caracBelowMin.force}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.force}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{system.force.score}}</span>
-        {{#if bonusRacialCarac.force}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.force 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.force 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.force 0)}}+{{/if}}{{bonusRacialCarac.force}}</span>{{/if}}
-        {{#if bonusAvantageCarac.force}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.force 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.force 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.force 0)}}+{{/if}}{{bonusAvantageCarac.force}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.force}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.force}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.force}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.force}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.force}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.force 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.force 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.force 0)}}+{{/if}}{{bonusRacialCarac.force}}</span>{{/if}}
+        {{#if bonusAvantageCarac.force}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.force 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.force 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.force 0)}}+{{/if}}{{bonusAvantageCarac.force}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.force.exp" value="{{system.force.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.force}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.force}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.force}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.force}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="force" data-cout="{{xpCout.force}}" data-crea-cout="{{creaCout.force}}"
-                title='{{#if caracAtMax.force}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.force}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.force}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.force}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.force}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.force}}){{/if}}'
                 {{#if caracAtMax.force}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.force}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="force"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.force.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.force}}
         </button>{{/if}}
@@ -309,25 +309,25 @@
       {{!-- Perception (Corps) --}}
       <div class="carac-row{{#if caracBelowMin.perception}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.perception}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="perception"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Perception"}}'>{{localize "AGONE.Attribut.Perception"}}</button>
         <input type="number" data-field="system.perception.score" data-raw-input="perception" value="{{rawCaracVal.perception}}" class="stat-num"
-               {{#if caracBelowMin.perception}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.perception}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{perceptionEffectif}}</span>
-        {{#if bonusRacialCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.perception 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.perception 0)}}+{{/if}}{{bonusRacialCarac.perception}}</span>{{/if}}
-        {{#if bonusAvantageCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.perception 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.perception 0)}}+{{/if}}{{bonusAvantageCarac.perception}}</span>{{/if}}
-        {{#if malusArmurePer}}<span class="racial-bonus-badge racial-neg" title='{{localize "AGONE.MalusPer"}} ({{system.armure.nom}})'>{{malusArmurePer}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.perception}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.perception}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.perception}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.perception}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.perception 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.perception 0)}}+{{/if}}{{bonusRacialCarac.perception}}</span>{{/if}}
+        {{#if bonusAvantageCarac.perception}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.perception 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.perception 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.perception 0)}}+{{/if}}{{bonusAvantageCarac.perception}}</span>{{/if}}
+        {{#if malusArmurePer}}<span class="racial-bonus-badge racial-neg" data-tooltip='{{localize "AGONE.MalusPer"}} ({{system.armure.nom}})'>{{malusArmurePer}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.perception.exp" value="{{system.perception.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.perception}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.perception}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.perception}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.perception}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="perception" data-cout="{{xpCout.perception}}" data-crea-cout="{{creaCout.perception}}"
-                title='{{#if caracAtMax.perception}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.perception}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.perception}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.perception}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.perception}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.perception}}){{/if}}'
                 {{#if caracAtMax.perception}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.perception}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="perception"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.perception.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.perception}}
         </button>{{/if}}
@@ -335,24 +335,24 @@
       {{!-- Résistance (Corps) --}}
       <div class="carac-row{{#if caracBelowMin.resistance}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.resistance}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="resistance"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Resistance"}}'>{{localize "AGONE.Attribut.Resistance"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Resistance"}}'>{{localize "AGONE.Attribut.Resistance"}}</button>
         <input type="number" data-field="system.resistance.score" data-raw-input="resistance" value="{{rawCaracVal.resistance}}" class="stat-num"
-               {{#if caracBelowMin.resistance}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.resistance}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{system.resistance.score}}</span>
-        {{#if bonusRacialCarac.resistance}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.resistance 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.resistance 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.resistance 0)}}+{{/if}}{{bonusRacialCarac.resistance}}</span>{{/if}}
-        {{#if bonusAvantageCarac.resistance}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.resistance 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.resistance 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.resistance 0)}}+{{/if}}{{bonusAvantageCarac.resistance}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.resistance}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.resistance}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.resistance}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.resistance}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.resistance}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.resistance 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.resistance 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.resistance 0)}}+{{/if}}{{bonusRacialCarac.resistance}}</span>{{/if}}
+        {{#if bonusAvantageCarac.resistance}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.resistance 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.resistance 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.resistance 0)}}+{{/if}}{{bonusAvantageCarac.resistance}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.resistance.exp" value="{{system.resistance.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.resistance}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.resistance}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.resistance}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.resistance}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="resistance" data-cout="{{xpCout.resistance}}" data-crea-cout="{{creaCout.resistance}}"
-                title='{{#if caracAtMax.resistance}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.resistance}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.resistance}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.resistance}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.resistance}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.resistance}}){{/if}}'
                 {{#if caracAtMax.resistance}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.resistance}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="resistance"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.resistance.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.resistance}}
         </button>{{/if}}
@@ -364,24 +364,24 @@
       {{!-- Intelligence (Esprit) --}}
       <div class="carac-row{{#if caracBelowMin.intelligence}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.intelligence}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="intelligence"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Intelligence"}}'>{{localize "AGONE.Attribut.Intelligence"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Intelligence"}}'>{{localize "AGONE.Attribut.Intelligence"}}</button>
         <input type="number" data-field="system.intelligence.score" data-raw-input="intelligence" value="{{rawCaracVal.intelligence}}" class="stat-num"
-               {{#if caracBelowMin.intelligence}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.intelligence}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{system.intelligence.score}}</span>
-        {{#if bonusRacialCarac.intelligence}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.intelligence 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.intelligence 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.intelligence 0)}}+{{/if}}{{bonusRacialCarac.intelligence}}</span>{{/if}}
-        {{#if bonusAvantageCarac.intelligence}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.intelligence 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.intelligence 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.intelligence 0)}}+{{/if}}{{bonusAvantageCarac.intelligence}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.intelligence}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.intelligence}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.intelligence}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.intelligence}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.intelligence}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.intelligence 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.intelligence 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.intelligence 0)}}+{{/if}}{{bonusRacialCarac.intelligence}}</span>{{/if}}
+        {{#if bonusAvantageCarac.intelligence}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.intelligence 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.intelligence 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.intelligence 0)}}+{{/if}}{{bonusAvantageCarac.intelligence}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.intelligence.exp" value="{{system.intelligence.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.intelligence}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.intelligence}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.intelligence}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.intelligence}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="intelligence" data-cout="{{xpCout.intelligence}}" data-crea-cout="{{creaCout.intelligence}}"
-                title='{{#if caracAtMax.intelligence}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.intelligence}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.intelligence}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.intelligence}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.intelligence}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.intelligence}}){{/if}}'
                 {{#if caracAtMax.intelligence}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.intelligence}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="intelligence"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.intelligence.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.intelligence}}
         </button>{{/if}}
@@ -389,24 +389,24 @@
       {{!-- Volonté (Esprit) --}}
       <div class="carac-row{{#if caracBelowMin.volonte}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.volonte}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="volonte"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Volonte"}}'>{{localize "AGONE.Attribut.Volonte"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Volonte"}}'>{{localize "AGONE.Attribut.Volonte"}}</button>
         <input type="number" data-field="system.volonte.score" data-raw-input="volonte" value="{{rawCaracVal.volonte}}" class="stat-num"
-               {{#if caracBelowMin.volonte}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.volonte}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{system.volonte.score}}</span>
-        {{#if bonusRacialCarac.volonte}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.volonte 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.volonte 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.volonte 0)}}+{{/if}}{{bonusRacialCarac.volonte}}</span>{{/if}}
-        {{#if bonusAvantageCarac.volonte}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.volonte 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.volonte 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.volonte 0)}}+{{/if}}{{bonusAvantageCarac.volonte}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.volonte}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.volonte}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.volonte}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.volonte}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.volonte}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.volonte 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.volonte 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.volonte 0)}}+{{/if}}{{bonusRacialCarac.volonte}}</span>{{/if}}
+        {{#if bonusAvantageCarac.volonte}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.volonte 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.volonte 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.volonte 0)}}+{{/if}}{{bonusAvantageCarac.volonte}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.volonte.exp" value="{{system.volonte.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.volonte}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.volonte}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.volonte}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.volonte}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="volonte" data-cout="{{xpCout.volonte}}" data-crea-cout="{{creaCout.volonte}}"
-                title='{{#if caracAtMax.volonte}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.volonte}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.volonte}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.volonte}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.volonte}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.volonte}}){{/if}}'
                 {{#if caracAtMax.volonte}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.volonte}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="volonte"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.volonte.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.volonte}}
         </button>{{/if}}
@@ -418,24 +418,24 @@
       {{!-- Charisme (Âme) --}}
       <div class="carac-row{{#if caracBelowMin.charisma}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.charisma}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="charisma"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Charisma"}}'>{{localize "AGONE.Attribut.Charisma"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Charisma"}}'>{{localize "AGONE.Attribut.Charisma"}}</button>
         <input type="number" data-field="system.charisma.score" data-raw-input="charisma" value="{{rawCaracVal.charisma}}" class="stat-num"
-               {{#if caracBelowMin.charisma}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.charisma}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{system.charisma.score}}</span>
-        {{#if bonusRacialCarac.charisma}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.charisma 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.charisma 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.charisma 0)}}+{{/if}}{{bonusRacialCarac.charisma}}</span>{{/if}}
-        {{#if bonusAvantageCarac.charisma}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.charisma 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.charisma 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.charisma 0)}}+{{/if}}{{bonusAvantageCarac.charisma}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.charisma}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.charisma}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.charisma}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.charisma}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.charisma}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.charisma 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.charisma 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.charisma 0)}}+{{/if}}{{bonusRacialCarac.charisma}}</span>{{/if}}
+        {{#if bonusAvantageCarac.charisma}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.charisma 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.charisma 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.charisma 0)}}+{{/if}}{{bonusAvantageCarac.charisma}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.charisma.exp" value="{{system.charisma.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.charisma}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.charisma}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.charisma}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.charisma}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="charisma" data-cout="{{xpCout.charisma}}" data-crea-cout="{{creaCout.charisma}}"
-                title='{{#if caracAtMax.charisma}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.charisma}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.charisma}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.charisma}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.charisma}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.charisma}}){{/if}}'
                 {{#if caracAtMax.charisma}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.charisma}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="charisma"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.charisma.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.charisma}}
         </button>{{/if}}
@@ -443,24 +443,24 @@
       {{!-- Créativité (Âme) --}}
       <div class="carac-row{{#if caracBelowMin.creativite}} carac-min-requis{{/if}}{{#if caracAtMaxCreation.creativite}} carac-at-max{{/if}}">
         <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="creativite"
-                title='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Creativite"}}'>{{localize "AGONE.Attribut.Creativite"}}</button>
+                data-tooltip='{{localize "AGONE.JeterDe"}} {{localize "AGONE.Attribut.Creativite"}}'>{{localize "AGONE.Attribut.Creativite"}}</button>
         <input type="number" data-field="system.creativite.score" data-raw-input="creativite" value="{{rawCaracVal.creativite}}" class="stat-num"
-               {{#if caracBelowMin.creativite}}title='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
+               {{#if caracBelowMin.creativite}}data-tooltip='{{localize "AGONE.MinRacialRequis"}}'{{/if}} />
         <span class="derived-val carac-total-val">{{system.creativite.score}}</span>
-        {{#if bonusRacialCarac.creativite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.creativite 0)}}racial-pos{{else}}racial-neg{{/if}}" title="{{#if (lt bonusRacialCarac.creativite 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.creativite 0)}}+{{/if}}{{bonusRacialCarac.creativite}}</span>{{/if}}
-        {{#if bonusAvantageCarac.creativite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.creativite 0)}}racial-pos{{else}}racial-neg{{/if}}" title='{{#if (lt bonusAvantageCarac.creativite 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.creativite 0)}}+{{/if}}{{bonusAvantageCarac.creativite}}</span>{{/if}}
-        {{#if showLevelUpAspect}}<input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" title='{{localize "AGONE.Exp"}}' />{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMax.creativite}}<span class="carac-max-label" title='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.creativite}}</span>{{/if}}{{/if}}
-        {{#if modeCreation}}{{#if caracEffectiveMin.creativite}}<span class="carac-min-label" title='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.creativite}}</span>{{/if}}{{/if}}
+        {{#if bonusRacialCarac.creativite}}<span class="racial-bonus-badge {{#if (gt bonusRacialCarac.creativite 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip="{{#if (lt bonusRacialCarac.creativite 0)}}{{localize "AGONE.MalusRacialPeuple"}}{{else}}{{localize "AGONE.BonusRacialPeuple"}}{{/if}} {{system.peuple}}">{{#if (gt bonusRacialCarac.creativite 0)}}+{{/if}}{{bonusRacialCarac.creativite}}</span>{{/if}}
+        {{#if bonusAvantageCarac.creativite}}<span class="racial-bonus-badge {{#if (gt bonusAvantageCarac.creativite 0)}}racial-pos{{else}}racial-neg{{/if}}" data-tooltip='{{#if (lt bonusAvantageCarac.creativite 0)}}{{localize "AGONE.MalusAvantage"}}{{else}}{{localize "AGONE.BonusAvantage"}}{{/if}}'>{{#if (gt bonusAvantageCarac.creativite 0)}}+{{/if}}{{bonusAvantageCarac.creativite}}</span>{{/if}}
+        {{#if showLevelUpAspect}}<input type="number" name="system.creativite.exp" value="{{system.creativite.exp}}" class="stat-num exp" data-tooltip='{{localize "AGONE.Exp"}}' />{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMax.creativite}}<span class="carac-max-label" data-tooltip='{{localize "AGONE.MaximumRacial"}}'>{{localize "AGONE.MaxLabel"}} {{caracEffectiveMax.creativite}}</span>{{/if}}{{/if}}
+        {{#if modeCreation}}{{#if caracEffectiveMin.creativite}}<span class="carac-min-label" data-tooltip='{{localize "AGONE.MinimumRacial"}}'>{{localize "AGONE.MinLabel"}} {{caracEffectiveMin.creativite}}</span>{{/if}}{{/if}}
         {{#if showLevelUp}}<button type="button" class="levelup-btn" data-action="levelUp"
                 data-type="carac" data-key="creativite" data-cout="{{xpCout.creativite}}" data-crea-cout="{{creaCout.creativite}}"
-                title='{{#if caracAtMax.creativite}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.creativite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.creativite}}){{/if}}'
+                data-tooltip='{{#if caracAtMax.creativite}}{{localize "AGONE.MaxRacialAtteint"}} ({{localize "AGONE.MaxLabel"}} : {{caracEffectiveMax.creativite}}){{else}}{{localize "AGONE.MonterNiveau"}} ({{coutAffiche.creativite}}){{/if}}'
                 {{#if caracAtMax.creativite}}disabled{{/if}}>
           <i class="fas fa-arrow-up"></i> {{coutAffiche.creativite}}
         </button>
         <button type="button" class="leveldown-btn" data-action="levelDown"
                 data-type="carac" data-key="creativite"
-                title='{{localize "AGONE.RetrograderNiveau"}}'
+                data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                 {{#unless system.creativite.score}}disabled{{/unless}}>
           <i class="fas fa-arrow-down"></i> {{coutAfficheDown.creativite}}
         </button>{{/if}}
@@ -477,7 +477,7 @@
         <span class="derived sombre">{{ptsCreationCaracRestant}}</span>
         <span>/</span>
         <span class="derived sombre">{{system.ptsCreationCarac.max}}</span>
-        <button type="button" class="btn-icon reset-crea-btn" data-action="resetCaracs" title='{{localize "AGONE.ResetCreationCaracTooltip"}}'>&#8635;</button>
+        <button type="button" class="btn-icon reset-crea-btn" data-action="resetCaracs" data-tooltip='{{localize "AGONE.ResetCreationCaracTooltip"}}'>&#8635;</button>
       </div>
     </div>
     {{/if}}

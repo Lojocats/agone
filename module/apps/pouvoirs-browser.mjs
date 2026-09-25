@@ -24,7 +24,6 @@ export class PouvoirsBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-pouvoirs-browser",
     classes : ["agone", "pouvoirs-browser"],
-    position: { width: 680, height: 560 },
     actions : { addPouvoir: PouvoirsBrowser.#onAddPouvoir },
   };
 

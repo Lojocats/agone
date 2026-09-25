@@ -29,7 +29,7 @@
       <div class="section-header">
         <h3 class="section-title">{{localize "AGONE.PeinesPerfidie"}}</h3>
         {{#if isOwner}}
-        <button type="button" class="btn-icon compendium-browse" data-pack="agone.peines" title="{{localize "AGONE.OuvrirListePeines"}}">
+        <button type="button" class="btn-icon compendium-browse" data-pack="agone.peines" data-tooltip="{{localize "AGONE.OuvrirListePeines"}}" aria-label="{{localize 'AGONE.OuvrirListePeines'}}">
           <i class="fas fa-search"></i>
         </button>
         {{/if}}
@@ -40,7 +40,7 @@
         <thead>
           <tr>
             <th class="item-drag-handle-col"></th>
-            <th class="peine-col-desc"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+            <th class="peine-col-desc"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
             <th>{{localize "AGONE.NomPeine"}}</th>
             <th>{{localize "AGONE.NoirEffect"}}</th>
             <th>{{localize "AGONE.Bienfaits"}}</th>
@@ -51,8 +51,8 @@
           {{#each peines as |peine|}}
           <tr class="peine-row item-row" data-item-id="{{peine.id}}">
             <td class="item-drag-handle"><i class="fas fa-grip-vertical"></i></td>
-            <td class="peine-col-desc"><button type="button" class="desc-bascule" data-desc="{{peine.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button></td>
-            <td class="peine-name"><a class="item-edit" data-item-id="{{peine.id}}" title='{{localize "AGONE.Peine.Modifier"}}'>{{peine.name}}</a></td>
+            <td class="peine-col-desc"><button type="button" class="desc-bascule" data-desc="{{peine.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button></td>
+            <td class="peine-name"><a class="item-edit" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Peine.Modifier"}}' role="button" tabindex="0">{{peine.name}}</a></td>
             <td class="peine-noir">
               {{#if (eq peine.system.noirEffect "corps")}}
               <span class="pn-noir-badge pn-noir-corps" data-tooltip='{{localize "AGONE.PerfidieCorpsNoir1"}}'>{{localize "AGONE.Corps"}}</span>
@@ -84,11 +84,11 @@
               {{/if}}
             </td>
             <td class="peine-actions">
-              <a class="item-edit" data-item-id="{{peine.id}}" title='{{localize "AGONE.Peine.Modifier"}}' tabindex="-1">
+              <a class="item-edit" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Peine.Modifier"}}' aria-label='{{localize "AGONE.Peine.Modifier"}}' role="button" tabindex="-1">
                 <i class="fas fa-edit fa-xs"></i>
               </a>
               {{#if isOwner}}
-              <a class="item-delete" data-item-id="{{peine.id}}" title='{{localize "AGONE.Supprimer"}}' tabindex="-1">
+              <a class="item-delete" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' aria-label='{{localize "AGONE.Supprimer"}}' role="button" tabindex="-1">
                 <i class="fas fa-trash fa-xs"></i>
               </a>
               {{/if}}
@@ -120,13 +120,13 @@
     <div class="bienfaits-perfidie-section desc-groupe">
       <h3 class="section-title">
         {{localize "AGONE.BienfaitsPerfidie"}}
-        <button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button>
+        <button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button>
       </h3>
       <ul class="bienfaits-perfidie-list">
         {{#each bienfaitsActifsPerfidie as |b|}}
         <li class="bienfait-perfidie-item">
           <div class="bienfait-perfidie-header">
-            {{#if b.description}}<button type="button" class="desc-bascule" data-desc="bienfait:{{b.name}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
+            {{#if b.description}}<button type="button" class="desc-bascule" data-desc="bienfait:{{b.name}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
             <i class="fas fa-star pn-star-icon"></i>
             <strong>{{b.name}}</strong>
             <span class="bienfait-peines-src">({{b.sourceNames}})</span>

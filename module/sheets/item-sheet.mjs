@@ -1,4 +1,4 @@
-import { delegate } from "../helpers/dom.mjs";
+import { delegate, activerClavier } from "../helpers/dom.mjs";
 import { changeEffet, lireChange } from "../helpers/effets.mjs";
 import { bindTabs, appliquerLectureSeule } from "./sheet-helpers.mjs";
 import { BIENFAITS_PERFIDIE_DATA, descriptionBienfait } from "../helpers/compendium-data.mjs";
@@ -20,7 +20,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
 
   static DEFAULT_OPTIONS = {
     classes : ["agone", "sheet", "item"],
-    position: { width: 520, height: 480 },
+    position: { width: 560, height: 620 },
     window  : { resizable: true },
     actions : {
       toChat         : AgoneItemSheet.#onToChat,
@@ -300,6 +300,7 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     const root = this.element;
     const on   = (type, selector, handler) => delegate(root, type, selector, handler, { signal });
     bindTabs(this, root, on, "description");
+    activerClavier(root, signal);
     appliquerLectureSeule(root, !this.isEditable);
     if (!this.isEditable) return;
     on("change", "[data-effet-champ]", (ev, input) => this._onEffetChamp(ev, input));

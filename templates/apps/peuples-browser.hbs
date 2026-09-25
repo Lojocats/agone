@@ -40,16 +40,16 @@
     <table class="pb-table">
       <thead>
         <tr>
-          <th class="pb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+          <th class="pb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
           <th class="pb-col-name">{{localize "AGONE.PeupleLabel"}}</th>
-          <th class="pb-col-tai" title='{{localize "AGONE.TAI"}}'>{{localize "AGONE.Combat.Tai"}}</th>
+          <th class="pb-col-tai" data-tooltip='{{localize "AGONE.TAI"}}'>{{localize "AGONE.Combat.Tai"}}</th>
           <th class="pb-col-action"></th>
         </tr>
       </thead>
       <tbody>
         {{#each items as |item|}}
         <tr class="pb-row {{#if item.isActif}}pb-row-actif{{/if}}" data-peuple-idx="{{item.idx}}">
-          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="pb-name">
             {{item.name}}
             {{#if item.isActif}}<span class="pb-badge-actif">{{localize "AGONE.Actif"}}</span>{{/if}}
@@ -57,9 +57,9 @@
           <td class="pb-tai">{{item.taiBase}}</td>
           <td class="pb-action">
             {{#if item.isActif}}
-            <i class="fas fa-check pb-check" title='{{localize "AGONE.Browser.PeupleActif"}}'></i>
+            <i class="fas fa-check pb-check" data-tooltip='{{localize "AGONE.Browser.PeupleActif"}}'></i>
             {{else}}
-            <button type="button" class="pb-apply-btn btn-icon" data-action="applyPeuple" title='{{localize "AGONE.Browser.AppliquerPeuple"}}'>
+            <button type="button" class="pb-apply-btn btn-icon" data-action="applyPeuple" data-tooltip='{{localize "AGONE.Browser.AppliquerPeuple"}}' aria-label='{{localize "AGONE.Browser.AppliquerPeuple"}}'>
               <i class="fas fa-user-check"></i>
             </button>
             {{/if}}

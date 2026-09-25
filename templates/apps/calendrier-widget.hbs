@@ -1,27 +1,27 @@
 {{! ── WIDGET CALENDRIER – bande HUD haut d'écran ────────────────────────── }}
 <div id="agone-cal-widget" class="agone-cal-widget">
 
-  <span class="acw-saison acw-saison-{{saison}}" title="{{saisonLabel}}">{{saisonLabel}}</span>
+  <span class="acw-saison acw-saison-{{saison}}" data-tooltip="{{saisonLabel}}">{{saisonLabel}}</span>
 
   <button type="button" class="acw-date acw-clickable" data-action="openCalendrier"
-          title='{{localize "AGONE.Ui.OuvrirCalendrier"}}'>
+          data-tooltip='{{localize "AGONE.Ui.OuvrirCalendrier"}}'>
     <i class="fas fa-calendar-alt"></i>
     <span>{{dateCourte}}</span>
   </button>
 
-  <span class="acw-time" title="{{periode.label}}">
+  <span class="acw-time" data-tooltip="{{periode.label}}">
     <i class="fas {{periode.icone}}"></i> {{timeStr}}
   </span>
 
-  <span class="acw-moon" title="{{moonPhase.label}}">{{moonPhase.icon}}</span>
+  <span class="acw-moon" data-tooltip="{{moonPhase.label}}">{{moonPhase.icon}}</span>
 
   {{#if isGM}}
   <button type="button" class="acw-meteo acw-clickable" data-action="cycleMeteo"
-          title='{{localize "AGONE.Ui.ChangerMeteo"}}'>
+          data-tooltip='{{localize "AGONE.Ui.ChangerMeteo"}}'>
     {{meteoIcon}} <span class="acw-meteo-label">{{meteoLabel}}</span>
   </button>
   {{else}}
-  <span class="acw-meteo" title="{{meteoLabel}}">{{meteoIcon}}</span>
+  <span class="acw-meteo" data-tooltip="{{meteoLabel}}">{{meteoIcon}}</span>
   {{/if}}
 
 </div>

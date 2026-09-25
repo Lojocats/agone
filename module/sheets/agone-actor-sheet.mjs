@@ -7,7 +7,7 @@ import { ManoeuvresBrowser } from "../apps/manoeuvres-browser.mjs";
 import { PeuplesBrowser }    from "../apps/peuples-browser.mjs";
 import { PouvoirsBrowser }   from "../apps/pouvoirs-browser.mjs";
 import { PeinesBrowser }     from "../apps/peines-browser.mjs";
-import { delegate } from "../helpers/dom.mjs";
+import { delegate, activerClavier } from "../helpers/dom.mjs";
 import { lierDescriptions } from "../helpers/descriptions.mjs";
 import { bindTabs, bindCompetenceSearch, appliquerLectureSeule } from "./sheet-helpers.mjs";
 
@@ -149,6 +149,7 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     bindTabs(this, root, on, this.constructor.DEFAULT_TAB);
     this._bindViewListeners(on, root);
     lierDescriptions(root, this._descOuvertes ??= new Set(), { signal });
+    activerClavier(root, signal);
 
     appliquerLectureSeule(root, !this.isEditable);
     if (this.isEditable) this._bindListeners(on, root);

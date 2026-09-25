@@ -66,6 +66,7 @@ function filterCompetences(root, value, nonAcquises) {
   if (clearBtn) clearBtn.style.display = query ? "" : "none";
 
   // Cartes acquises ; les groupes vides sont masqués
+  let acquisesVisibles = false;
   root.querySelectorAll(".comp-group").forEach(group => {
     let anyVisible = false;
     group.querySelectorAll(".comp-card.item-row").forEach(card => {
@@ -75,20 +76,28 @@ function filterCompetences(root, value, nonAcquises) {
       if (visible) anyVisible = true;
     });
     group.style.display = (!query || anyVisible) ? "" : "none";
+    if (anyVisible) acquisesVisibles = true;
   });
 
   // Section non acquises : visible seulement pendant une recherche qui y trouve quelque chose
   const naSection = root.querySelector(".comps-na-section");
-  if (!naSection) return;
-  if (!nonAcquises || !query) { naSection.style.display = "none"; return; }
+  let naVisibles = false;
+  if (naSection) {
+    if (!nonAcquises || !query) {
+      naSection.style.display = "none";
+    } else {
+      root.querySelectorAll(".comp-card--na.na-row").forEach(card => {
+        const nom     = (card.dataset.nom     ?? "").toLowerCase();
+        const domaine = (card.dataset.domaine ?? "").toLowerCase();
+        const visible = nom.includes(query) || domaine.includes(query);
+        card.style.display = visible ? "" : "none";
+        if (visible) naVisibles = true;
+      });
+      naSection.style.display = naVisibles ? "" : "none";
+    }
+  }
 
-  let anyVisible = false;
-  root.querySelectorAll(".comp-card--na.na-row").forEach(card => {
-    const nom     = (card.dataset.nom     ?? "").toLowerCase();
-    const domaine = (card.dataset.domaine ?? "").toLowerCase();
-    const visible = nom.includes(query) || domaine.includes(query);
-    card.style.display = visible ? "" : "none";
-    if (visible) anyVisible = true;
-  });
-  naSection.style.display = anyVisible ? "" : "none";
+  // Message d'état vide : recherche en cours mais aucune carte (acquise ou non) ne correspond
+  const empty = root.querySelector(".comp-search-empty");
+  if (empty) empty.hidden = !query || acquisesVisibles || naVisibles;
 }

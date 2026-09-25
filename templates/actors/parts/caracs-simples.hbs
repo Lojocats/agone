@@ -7,30 +7,31 @@
     {{#each g.caracs as |c|}}
     <div class="carac-row">
       <button type="button" class="roll-btn stat-label" data-action="rollAttribut" data-carac="{{c.key}}"
-              title='{{localize "AGONE.JeterDe"}} {{localize c.labelKey}}'>{{localize c.labelKey}}</button>
+              data-tooltip='{{localize "AGONE.JeterDe"}} {{localize c.labelKey}}'>{{localize c.labelKey}}</button>
       {{#if c.derivee}}
-      <span class="derived-val" title="{{c.derivee}}">{{c.score}}</span>
+      <span class="derived-val" data-tooltip="{{c.derivee}}">{{c.score}}</span>
       {{else}}
       <input type="number" name="system.{{c.key}}" value="{{c.score}}" class="stat-num" min="0" />
       {{#if c.bonus}}
       <span class="racial-bonus-badge {{#if (gt c.bonus 0)}}racial-pos{{else}}racial-neg{{/if}}"
-            title='{{localize "AGONE.Effets.Titre"}}'>{{#if (gt c.bonus 0)}}+{{/if}}{{c.bonus}}</span>
+            data-tooltip='{{localize "AGONE.Effets.Titre"}}'>{{#if (gt c.bonus 0)}}+{{/if}}{{c.bonus}}</span>
       <span class="derived-val carac-total-val">{{c.total}}</span>
       {{/if}}
       {{/if}}
       {{#if c.expField}}{{#if @root.showLevelUp}}
       <input type="number" name="system.{{c.expField}}" value="{{c.localExp}}" class="stat-num exp" min="0"
-             title='{{c.shortLabel}} — {{localize "AGONE.ExpReservee"}}' />
+             data-tooltip='{{c.shortLabel}} — {{localize "AGONE.ExpReservee"}}' />
       <button type="button" class="leveldown-btn" data-action="levelDownCaracDemon"
               data-key="{{c.key}}" data-exp-field="{{c.expField}}" data-label="{{c.shortLabel}}"
               {{#unless c.canDown}}disabled{{/unless}}
-              title='{{localize "AGONE.RetrograderCaracXP" stat=c.shortLabel cout=c.coutDown}}'>
+              data-tooltip='{{localize "AGONE.RetrograderCaracXP" stat=c.shortLabel cout=c.coutDown}}'
+              aria-label='{{localize "AGONE.RetrograderCaracXP" stat=c.shortLabel cout=c.coutDown}}'>
         <i class="fas fa-arrow-down"></i>
       </button>
       <button type="button" class="levelup-btn" data-action="levelUpCaracDemon"
               data-key="{{c.key}}" data-exp-field="{{c.expField}}" data-label="{{c.shortLabel}}"
               {{#unless c.canUp}}disabled{{/unless}}
-              title='{{localize "AGONE.MonterCaracXP" stat=c.shortLabel cout=c.cout}}'>
+              data-tooltip='{{localize "AGONE.MonterCaracXP" stat=c.shortLabel cout=c.cout}}'>
         <i class="fas fa-arrow-up"></i> {{c.cout}}
       </button>
       {{/if}}{{/if}}

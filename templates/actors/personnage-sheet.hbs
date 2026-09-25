@@ -1,7 +1,7 @@
 <form class="agone sheet {{actor.type}}" autocomplete="off">
   <header class="sheet-header">
     <div class="header-portrait">
-      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+      <img class="profile-img" src="{{actor.img}}" data-edit="img" data-tooltip="{{actor.name}}" />
     </div>
     <div class="header-fields">
       <h1 class="charname">
@@ -63,7 +63,7 @@
     <a class="item{{#unless tabsVisible.identite}} tab-hidden{{/unless}}" data-tab="identite">{{localize "AGONE.Identite"}}</a>
     <a class="item{{#unless tabsVisible.notes}} tab-hidden{{/unless}}" data-tab="notes">{{localize "AGONE.Notes"}}</a>
     <a class="item{{#unless tabsVisible.companions}} tab-hidden{{/unless}}" data-tab="companions">{{localize "AGONE.Companions"}}</a>
-    <a class="item" data-tab="parametres">⚙</a>
+    <a class="item" data-tab="parametres" data-tooltip="{{localize 'AGONE.Parametres'}}" aria-label="{{localize 'AGONE.Parametres'}}">⚙</a>
   </nav>
 
   <section class="sheet-body">

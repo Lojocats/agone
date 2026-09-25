@@ -322,7 +322,9 @@
 
 /* Bouton bonus de PdV (mode création) */
 .agone .btn-bonus-de.btn-crea {
-  background: rgba(var(--agone-orange-rgb, 200,110,0), 0.85);
+  /* Fond fixe (non lié aux jetons de thème) : reste lisible avec le texte
+     blanc, même en mode sombre où --agone-orange-rgb s'éclaircit. */
+  background: rgba(200,110,0, 0.85);
   color: #fff;
   border: 1px solid #e8a030;
   border-radius: 3px;

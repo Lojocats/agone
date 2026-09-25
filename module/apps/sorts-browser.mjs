@@ -38,7 +38,6 @@ export class SortsBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-sorts-browser",
     classes : ["agone", "sorts-browser"],
-    position: { width: 820, height: 660 },
     actions : { addSort: SortsBrowser.#onAddSort, rollSortImpro: SortsBrowser.#onRollSortImpro },
   };
 

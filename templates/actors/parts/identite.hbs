@@ -18,10 +18,10 @@
           <label>{{localize "AGONE.PeupleLabel"}}</label>
           <div class="peuple-drop-zone {{#unless system.peuple}}empty{{/unless}}"
                data-drop-type="peuple"
-               title='{{localize "AGONE.GlisserPeuple"}}'>
+               data-tooltip='{{localize "AGONE.GlisserPeuple"}}'>
             {{#if system.peuple}}
               <span class="peuple-name">{{system.peuple}}</span>
-              <button type="button" class="btn-icon peuple-clear" title='{{localize "AGONE.RetirerPeuple"}}'>
+              <button type="button" class="btn-icon peuple-clear" data-tooltip='{{localize "AGONE.RetirerPeuple"}}' aria-label='{{localize "AGONE.RetirerPeuple"}}'>
                 <i class="fas fa-times"></i>
               </button>
             {{else}}
@@ -31,7 +31,7 @@
             {{/if}}
           </div>
           <button type="button" class="btn-icon compendium-browse" data-pack="agone.peuples"
-                  title='{{localize "AGONE.ParcourirPeuples"}}'>
+                  data-tooltip='{{localize "AGONE.ParcourirPeuples"}}' aria-label='{{localize "AGONE.ParcourirPeuples"}}'>
             <i class="fas fa-search"></i>
           </button>
         </div>

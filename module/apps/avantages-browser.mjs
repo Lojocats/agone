@@ -54,7 +54,6 @@ export class AvantagesBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-avantages-browser",
     classes : ["agone", "avantages-browser"],
-    position: { width: 740, height: 580 },
     actions : { addAvantage: AvantagesBrowser.#onAddAvantage },
   };
 

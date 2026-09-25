@@ -138,6 +138,127 @@ describe("CSS", () => {
     const partiels = readdirSync(join(racine, "css")).filter(f => f !== "agone.css");
     assert.deepEqual(partiels.filter(p => !imports.includes(p)), []);
   });
+
+  /** Hex codés en dur d'un extrait de CSS, hors d'un appel var(--jeton, #repli) actif. */
+  function hexHorsVar(bloc) {
+    return [...bloc.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].filter(m => {
+      const avant = bloc.slice(0, m.index);
+      return avant.lastIndexOf("var(") <= avant.lastIndexOf(")");
+    });
+  }
+
+  test("mode sombre : les jetons de texte contrastent assez avec le fond (≥ 6:1)", () => {
+    const sombre = lire("css/base.css").match(/body\.agone-dark\s*\{[^}]*\}/)[0];
+    const jeton = nom => sombre.match(new RegExp(`--agone-${nom}:\\s*(#[0-9a-f]{6})`, "i"))[1];
+    const lum = hex => {
+      const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map(c => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const fond = lum(jeton("parchment"));
+    for (const nom of ["dark-text", "brown", "brown-dark", "gold"]) {
+      const ratio = (lum(jeton(nom)) + 0.05) / (fond + 0.05);
+      assert.ok(ratio >= 6, `--agone-${nom} : contraste ${ratio.toFixed(1)}:1 sur le fond sombre`);
+    }
+  });
+
+  test("icônes en CSS : la police Font Awesome 7 (Foundry v14) est citée avant la 6 (v13)", () => {
+    for (const f of fichiers("css", ".css")) {
+      for (const [, familles] of readFileSync(f, "utf8").matchAll(/font-family:\s*([^;]*Font Awesome[^;]*);/g)) {
+        assert.match(familles, /"Font Awesome 7 Pro".*"Font Awesome 6 Pro"/, `${f} : ${familles}`);
+      }
+    }
+  });
+
+  test("paliers de Ténèbres non atteints : pas d'opacité sur la ligne entière en mode sombre", () => {
+    // Une opacité sur la ligne s'ajoute à celle des cellules et rend le texte illisible
+    const css = lire("css/base.css");
+    assert.doesNotMatch(css, /\.palier-row:not\(\.palier-reached\)\s*\{[^}]*opacity/);
+  });
+
+  test("bouton fumble : couleurs sur jetons --agone-fumble-* avec repli, pas de hex en dur", () => {
+    const css = lire("css/apps.css");
+    for (const selecteur of [/\.agone \.fumble-btn\s*\{[^}]*\}/, /\.agone \.fumble-btn:hover\s*\{[^}]*\}/,
+      /\.agone-fumble-btn\s*\{[^}]*\}/, /\.agone-fumble-btn:hover\s*\{[^}]*\}/]) {
+      const bloc = css.match(selecteur)?.[0];
+      assert.ok(bloc, `règle ${selecteur} introuvable dans apps.css`);
+      assert.deepEqual(hexHorsVar(bloc), [], `hex en dur hors var() dans ${bloc}`);
+    }
+  });
+
+  test("saisons du calendrier : couleurs sur jetons --agone-saison-* avec repli, pas de hex en dur", () => {
+    const css = lire("css/apps.css");
+    const bloc = css.match(/\.agone-calendrier-wrap \.cal-saison-printemps[\s\S]*?\.agone-calendrier-wrap \.cal-saison-hiver\s*\{[^}]*\}/)?.[0];
+    assert.ok(bloc, "règles .cal-saison-* introuvables dans apps.css");
+    assert.deepEqual(hexHorsVar(bloc), [], `hex en dur hors var() dans ${bloc}`);
+  });
+});
+
+describe("Fenêtres (fiches et navigateurs)", () => {
+  test("la fiche d'objet est redimensionnable et mesure 560×620", () => {
+    const source = lire("module/sheets/item-sheet.mjs");
+    const position = source.match(/position:\s*\{\s*width:\s*(\d+),\s*height:\s*(\d+)\s*\}/);
+    assert.ok(position, "position introuvable dans item-sheet.mjs");
+    assert.equal(Number(position[1]), 560);
+    assert.equal(Number(position[2]), 620);
+    assert.match(source, /window\s*:\s*\{\s*resizable:\s*true\s*\}/, "la fiche d'objet doit être resizable");
+  });
+
+  test("les navigateurs héritent du gabarit commun 900×660 d'AgoneBrowser, sauf besoin réel", () => {
+    const base = lire("module/apps/agone-browser.mjs");
+    assert.match(base, /position:\s*\{\s*width:\s*900,\s*height:\s*660\s*\}/, "gabarit commun 900×660 dans la classe de base");
+    assert.match(base, /window\s*:\s*\{\s*resizable:\s*true\s*\}/, "la base des navigateurs doit être resizable");
+
+    // Les navigateurs sans besoin de largeur particulière n'ont plus de surcharge de position.
+    // manoeuvres-browser garde la sienne (980×600) : ses colonnes (portée, dégâts, type, description…)
+    // sont plus nombreuses que dans les autres navigateurs et ont besoin de cette largeur supplémentaire.
+    for (const nom of ["armes-browser", "armures-browser", "sorts-browser", "pouvoirs-browser",
+      "competences-browser", "peines-browser", "peuples-browser", "avantages-browser"]) {
+      const src = lire(`module/apps/${nom}.mjs`);
+      assert.doesNotMatch(src, /position:\s*\{/, `${nom} ne doit plus surcharger position`);
+    }
+  });
+});
+
+describe("Accessibilité", () => {
+  /** Un <button> ne contenant qu'une icône (fa-*, pas de texte visible) a besoin d'un aria-label. */
+  function estIconeSeule(interieur) {
+    let s = interieur;
+    s = s.replace(/<i\b[^<>]*>[\s\S]*?<\/i>/g, "");
+    s = s.replace(/<i\b[^<>]*\/?>/g, "");
+    s = s.replace(/\{\{#(if|unless|each)\b[^}]*\}\}/g, "");
+    s = s.replace(/\{\{\/(if|unless|each)\}\}/g, "");
+    s = s.replace(/\{\{else\}\}/g, "");
+    s = s.replace(/<[^>]+>/g, "");
+    return s.trim() === "";
+  }
+
+  test("tout <button> ne contenant qu'une icône a un aria-label", () => {
+    const manquants = [];
+    for (const f of templates) {
+      const src = readFileSync(f, "utf8");
+      for (const m of src.matchAll(/<button\b([^<>]*)>([\s\S]*?)<\/button>/g)) {
+        const [, attrs, interieur] = m;
+        if (estIconeSeule(interieur) && !/\baria-label=/.test(attrs)) {
+          manquants.push(`${relative(racine, f)} : <button${attrs}>`);
+        }
+      }
+    }
+    assert.deepEqual(manquants, []);
+  });
+
+  test("css/controls.css définit un anneau de focus clavier cohérent (:focus-visible)", () => {
+    const css = lire("css/controls.css");
+    const regle = css.match(/([^{}]*:focus-visible[^{}]*)\{([^}]*)\}/);
+    assert.ok(regle, "règle :focus-visible introuvable dans controls.css");
+    const [, selecteurs, corps] = regle;
+    for (const cible of [".agone button", ".agone [role=\"button\"]", ".agone a",
+      ".roll-btn-small", ".btn-icon", ".sheet-tabs .item"]) {
+      assert.ok(selecteurs.includes(cible), `${cible} absent du sélecteur :focus-visible`);
+    }
+    assert.match(corps, /outline:\s*2px solid var\(--agone-gold/, "outline sur --agone-gold avec repli");
+    assert.match(corps, /outline-offset:\s*1px/, "outline-offset: 1px");
+  });
 });
 
 describe("Manifeste (system.json)", () => {

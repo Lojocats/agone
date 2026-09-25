@@ -26,7 +26,7 @@
 
       <label class="agone-filtre-groupe">
         <span class="agone-filtre-label">{{localize "AGONE.Charge"}}</span>
-        <select class="avb-charge-filter" title='{{localize "AGONE.Ui.FiltrerChargeExacte"}}'>
+        <select class="avb-charge-filter" data-tooltip='{{localize "AGONE.Ui.FiltrerChargeExacte"}}'>
           <option value="">{{localize "AGONE.Browser.ToutesCharges"}}</option>
           {{#each allCharges}}
           <option value="{{this}}" {{#if (eq ../filterChargeExact this)}}selected{{/if}}>{{#if (gt this 0)}}+{{/if}}{{this}}</option>
@@ -45,7 +45,7 @@
 
       <label class="agone-filtre-groupe">
         <span class="agone-filtre-label">{{localize "AGONE.Browser.Filtres.EffetAuto"}}</span>
-        <select class="avb-effet-filter" title='{{localize "AGONE.Browser.Filtres.EffetAutoAide"}}'>
+        <select class="avb-effet-filter" data-tooltip='{{localize "AGONE.Browser.Filtres.EffetAutoAide"}}'>
           <option value="all"  {{#if (eq filterEffet "all")}}selected{{/if}}>{{localize "AGONE.Browser.Tous"}}</option>
           <option value="avec" {{#if (eq filterEffet "avec")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.AvecEffet"}}</option>
           <option value="sans" {{#if (eq filterEffet "sans")}}selected{{/if}}>{{localize "AGONE.Browser.Filtres.SansEffet"}}</option>
@@ -68,7 +68,7 @@
     <table class="avb-table">
       <thead>
         <tr>
-          <th class="avb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+          <th class="avb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
           <th class="avb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="avb-col-section">{{localize "AGONE.Categorie"}}</th>
           <th class="avb-col-type">{{localize "AGONE.Type"}}</th>
@@ -79,7 +79,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="avb-row avb-row-{{item.type}} {{#if item.hasInActor}}avb-has-item{{/if}}" data-av-idx="{{item.idx}}">
-          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="avb-name">{{item.name}}</td>
           <td class="avb-section">
             <span class="avb-section-badge avb-sect-{{item.section}}">{{item.sectionLabel}}</span>
@@ -100,9 +100,9 @@
           </td>
           <td class="avb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check avb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+            <i class="fas fa-check avb-check" data-tooltip='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="avb-add-btn btn-icon" data-action="addAvantage" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <button type="button" class="avb-add-btn btn-icon" data-action="addAvantage" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}

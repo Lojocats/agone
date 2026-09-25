@@ -11,18 +11,18 @@
       {{#each personnalises as |p|}}
       <tr class="browser-perso-row{{#if p.possede}} browser-perso-possede{{/if}}" data-uuid="{{p.uuid}}">
         <td class="browser-perso-nom">
-          {{#if p.description}}<button type="button" class="desc-bascule" data-desc="{{p.uuid}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}
+          {{#if p.description}}<button type="button" class="desc-bascule" data-desc="{{p.uuid}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}
           <img src="{{p.img}}" alt="" />
           <span>{{p.name}}</span>
-          {{#if p.effets}}<i class="fas fa-magic browser-perso-effets" title='{{localize "AGONE.Effets.Titre"}}'></i>{{/if}}
+          {{#if p.effets}}<i class="fas fa-magic browser-perso-effets" data-tooltip='{{localize "AGONE.Effets.Titre"}}'></i>{{/if}}
         </td>
         <td class="browser-perso-source">{{p.source}}</td>
         <td class="browser-perso-actions">
-          <a class="btn-icon" data-action="persoOuvrir" title='{{localize "AGONE.Browser.OuvrirFiche"}}'><i class="fas fa-eye"></i></a>
+          <a class="btn-icon" data-action="persoOuvrir" data-tooltip='{{localize "AGONE.Browser.OuvrirFiche"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Browser.OuvrirFiche"}}'><i class="fas fa-eye"></i></a>
           {{#if p.possede}}
-          <i class="fas fa-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+          <i class="fas fa-check" data-tooltip='{{localize "AGONE.Browser.DejaPosse"}}'></i>
           {{else}}
-          <button type="button" class="btn-icon" data-action="persoAjouter" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+          <button type="button" class="btn-icon" data-action="persoAjouter" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
             <i class="fas fa-plus"></i>
           </button>
           {{/if}}

@@ -53,11 +53,11 @@
       <div class="av-col-header">
         <h4 class="av-col-title av-title"><i class="fas fa-star"></i> {{localize "AGONE.Avantages.Avantages"}}</h4>
         <button type="button" class="btn-icon compendium-browse" data-pack="agone.dons" data-filter-type="avantage"
-                title='{{localize "AGONE.ParcourirDons"}}'>
+                data-tooltip='{{localize "AGONE.ParcourirDons"}}' aria-label='{{localize "AGONE.ParcourirDons"}}'>
           <i class="fas fa-search"></i>
         </button>
         <button type="button" class="btn-icon item-create" data-type="don" data-categorie="avantage"
-                title='{{localize "AGONE.Avantages.CreerAvantage"}}'>
+                data-tooltip='{{localize "AGONE.Avantages.CreerAvantage"}}' aria-label='{{localize "AGONE.Avantages.CreerAvantage"}}'>
           <i class="fas fa-plus"></i>
         </button>
       </div>
@@ -69,11 +69,11 @@
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}}">{{don._avSectionLabel}}</span>
           {{/if}}
-          {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
+          {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-pos">+{{don.system.cout}}</span>
-          <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
-          <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          <a class="btn-icon item-edit" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Modifier"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
+          <a class="btn-icon item-delete" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
@@ -92,11 +92,11 @@
       <div class="av-col-header">
         <h4 class="av-col-title def-title"><i class="fas fa-exclamation-circle"></i> {{localize "AGONE.Defauts"}}</h4>
         <button type="button" class="btn-icon compendium-browse" data-pack="agone.dons" data-filter-type="defaut"
-                title='{{localize "AGONE.ParcourirDons"}}'>
+                data-tooltip='{{localize "AGONE.ParcourirDons"}}' aria-label='{{localize "AGONE.ParcourirDons"}}'>
           <i class="fas fa-search"></i>
         </button>
         <button type="button" class="btn-icon item-create" data-type="don" data-categorie="defaut"
-                title='{{localize "AGONE.Avantages.CreerDefaut"}}'>
+                data-tooltip='{{localize "AGONE.Avantages.CreerDefaut"}}' aria-label='{{localize "AGONE.Avantages.CreerDefaut"}}'>
           <i class="fas fa-plus"></i>
         </button>
       </div>
@@ -108,11 +108,11 @@
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}} av-defaut-sect">{{don._avSectionLabel}}</span>
           {{/if}}
-          {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
+          {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-neg">{{don.system.cout}}</span>
-          <a class="btn-icon item-edit" data-item-id="{{don.id}}" title='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
-          <a class="btn-icon item-delete" data-item-id="{{don.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          <a class="btn-icon item-edit" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Modifier"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
+          <a class="btn-icon item-delete" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
@@ -136,7 +136,7 @@
         {{localize "AGONE.Avantages.BonusSupp.Titre"}}
       </h4>
       <button type="button" class="btn-icon bonus-supp-add"
-              title='{{localize "AGONE.Avantages.BonusSupp.Ajouter"}}'>
+              data-tooltip='{{localize "AGONE.Avantages.BonusSupp.Ajouter"}}' aria-label='{{localize "AGONE.Avantages.BonusSupp.Ajouter"}}'>
         <i class="fas fa-plus"></i>
       </button>
     </div>
@@ -200,7 +200,7 @@
           </td>
           <td>
             <button type="button" class="btn-icon bonus-supp-delete"
-                    data-idx="{{@index}}" title='{{localize "AGONE.Supprimer"}}'>
+                    data-idx="{{@index}}" data-tooltip='{{localize "AGONE.Supprimer"}}' aria-label='{{localize "AGONE.Supprimer"}}'>
               <i class="fas fa-trash"></i>
             </button>
           </td>

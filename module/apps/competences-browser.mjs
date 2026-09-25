@@ -28,7 +28,6 @@ export class CompetencesBrowser extends AgoneBrowser {
   static DEFAULT_OPTIONS = {
     id      : "agone-competences-browser",
     classes : ["agone", "competences-browser"],
-    position: { width: 660, height: 560 },
     actions : { addCompetence: CompetencesBrowser.#onAddCompetence },
   };
 

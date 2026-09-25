@@ -32,12 +32,12 @@
     {{#if isGM}}
     <div class="agone-ct-nav">
       {{#if isStarted}}
-      <button type="button" class="agone-ct-btn" data-action="prevRound" title='{{localize "AGONE.Combat.RoundPrecedent"}}'><i class="fas fa-angle-double-left"></i></button>
-      <button type="button" class="agone-ct-btn" data-action="prevTurn" title='{{localize "AGONE.Combat.TourPrecedent"}}'><i class="fas fa-chevron-left"></i></button>
-      <button type="button" class="agone-ct-btn agone-ct-btn--next" data-action="nextTurn" title='{{localize "AGONE.Combat.TourSuivant"}}'><i class="fas fa-chevron-right"></i></button>
-      <button type="button" class="agone-ct-btn" data-action="nextRound" title='{{localize "AGONE.Combat.RoundSuivant"}}'><i class="fas fa-angle-double-right"></i></button>
+      <button type="button" class="agone-ct-btn" data-action="prevRound" data-tooltip='{{localize "AGONE.Combat.RoundPrecedent"}}' aria-label='{{localize "AGONE.Combat.RoundPrecedent"}}'><i class="fas fa-angle-double-left"></i></button>
+      <button type="button" class="agone-ct-btn" data-action="prevTurn" data-tooltip='{{localize "AGONE.Combat.TourPrecedent"}}' aria-label='{{localize "AGONE.Combat.TourPrecedent"}}'><i class="fas fa-chevron-left"></i></button>
+      <button type="button" class="agone-ct-btn agone-ct-btn--next" data-action="nextTurn" data-tooltip='{{localize "AGONE.Combat.TourSuivant"}}' aria-label='{{localize "AGONE.Combat.TourSuivant"}}'><i class="fas fa-chevron-right"></i></button>
+      <button type="button" class="agone-ct-btn" data-action="nextRound" data-tooltip='{{localize "AGONE.Combat.RoundSuivant"}}' aria-label='{{localize "AGONE.Combat.RoundSuivant"}}'><i class="fas fa-angle-double-right"></i></button>
       {{else}}
-      <button type="button" class="agone-ct-btn agone-ct-btn--start" data-action="startCombat" title='{{localize "AGONE.Combat.DebuterCombat"}}'>
+      <button type="button" class="agone-ct-btn agone-ct-btn--start" data-action="startCombat" data-tooltip='{{localize "AGONE.Combat.DebuterCombat"}}'>
         <i class="fas fa-play"></i> {{localize "AGONE.Combat.Debut"}}
       </button>
       {{/if}}
@@ -48,16 +48,16 @@
   {{! ── Barre d'outils MJ ───────────────────────────────────────────── }}
   {{#if isGM}}
   <div class="agone-ct-toolbar">
-    <button type="button" class="agone-ct-tool" data-action="rollAllInit" title='{{localize "AGONE.Combat.LancerToutesInit"}}'>
+    <button type="button" class="agone-ct-tool" data-action="rollAllInit" data-tooltip='{{localize "AGONE.Combat.LancerToutesInit"}}'>
       <i class="fas fa-dice-d10"></i> {{localize "AGONE.Combat.Tous"}}
     </button>
-    <button type="button" class="agone-ct-tool" data-action="rollNpcInit" title='{{localize "AGONE.Combat.LancerInitPnj"}}'>
+    <button type="button" class="agone-ct-tool" data-action="rollNpcInit" data-tooltip='{{localize "AGONE.Combat.LancerInitPnj"}}'>
       <i class="fas fa-dice-d10"></i> {{localize "AGONE.Combat.Pnj"}}
     </button>
-    <button type="button" class="agone-ct-tool" data-action="resetInit" title='{{localize "AGONE.Combat.ResetInit"}}'><i class="fas fa-undo"></i></button>
-    <button type="button" class="agone-ct-tool" data-action="addTokens" title='{{localize "AGONE.Combat.AjouterTokens"}}'><i class="fas fa-user-plus"></i></button>
+    <button type="button" class="agone-ct-tool" data-action="resetInit" data-tooltip='{{localize "AGONE.Combat.ResetInit"}}' aria-label='{{localize "AGONE.Combat.ResetInit"}}'><i class="fas fa-undo"></i></button>
+    <button type="button" class="agone-ct-tool" data-action="addTokens" data-tooltip='{{localize "AGONE.Combat.AjouterTokens"}}' aria-label='{{localize "AGONE.Combat.AjouterTokens"}}'><i class="fas fa-user-plus"></i></button>
     <span class="agone-ct-toolbar-spacer"></span>
-    <button type="button" class="agone-ct-tool agone-ct-tool--end" data-action="endCombat" title='{{localize "AGONE.Combat.TerminerCombat"}}'>
+    <button type="button" class="agone-ct-tool agone-ct-tool--end" data-action="endCombat" data-tooltip='{{localize "AGONE.Combat.TerminerCombat"}}'>
       <i class="fas fa-stop"></i> {{localize "AGONE.Combat.Fin"}}
     </button>
   </div>
@@ -74,12 +74,12 @@
 
       {{! Portrait + initiative }}
       <div class="agone-ct-portrait-wrap">
-        <img class="agone-ct-portrait" src="{{c.img}}" alt="" data-action="openSheet" title='{{localize "AGONE.OuvrirFiche"}}' />
-        <div class="agone-ct-init-badge" title='{{localize "AGONE.Initiative"}}'>
+        <img class="agone-ct-portrait" src="{{c.img}}" alt="" data-action="openSheet" data-tooltip='{{localize "AGONE.OuvrirFiche"}}' />
+        <div class="agone-ct-init-badge" data-tooltip='{{localize "AGONE.Initiative"}}'>
           {{#if c.hasInitiative}}
             {{#if @root.isGM}}<input type="number" class="ct-init-input" value="{{c.initiative}}" />{{else}}<span class="ct-init-val">{{c.initiative}}</span>{{/if}}
           {{else if c.canRollInit}}
-            <button type="button" class="ct-init-roll" data-action="rollInit" title='{{localize "AGONE.Combat.LancerInit"}}'><i class="fas fa-dice-d10"></i></button>
+            <button type="button" class="ct-init-roll" data-action="rollInit" data-tooltip='{{localize "AGONE.Combat.LancerInit"}}' aria-label='{{localize "AGONE.Combat.LancerInit"}}'><i class="fas fa-dice-d10"></i></button>
           {{else}}
             <span class="ct-init-dash">—</span>
           {{/if}}
@@ -89,29 +89,30 @@
       <div class="agone-ct-body">
         {{! Nom, marqueurs et actions }}
         <div class="agone-ct-name-row">
-          <a class="agone-ct-name" data-action="panToken" title='{{localize "AGONE.Combat.CentrerToken"}}'>{{c.name}}</a>
-          {{#if c.isHidden}}<i class="fas fa-eye-slash ct-marque" title='{{localize "AGONE.Combat.Cache"}}'></i>{{/if}}
-          {{#if c.isDefeated}}<i class="fas fa-skull ct-marque" title='{{localize "AGONE.Combat.MarquerVaincu"}}'></i>{{/if}}
+          <a class="agone-ct-name" data-action="panToken" data-tooltip='{{localize "AGONE.Combat.CentrerToken"}}'>{{c.name}}</a>
+          {{#if c.isHidden}}<i class="fas fa-eye-slash ct-marque" data-tooltip='{{localize "AGONE.Combat.Cache"}}'></i>{{/if}}
+          {{#if c.isDefeated}}<i class="fas fa-skull ct-marque" data-tooltip='{{localize "AGONE.Combat.MarquerVaincu"}}'></i>{{/if}}
           <div class="agone-ct-actions">
             {{#if c.hasInitiative}}{{#if c.canRollInit}}
-            <button type="button" class="ct-action-btn" data-action="rollInit" title='{{localize "AGONE.Combat.LancerInit"}}'><i class="fas fa-dice-d10"></i></button>
+            <button type="button" class="ct-action-btn" data-action="rollInit" data-tooltip='{{localize "AGONE.Combat.LancerInit"}}' aria-label='{{localize "AGONE.Combat.LancerInit"}}'><i class="fas fa-dice-d10"></i></button>
             {{/if}}{{/if}}
             {{#if c.visible}}
-            <button type="button" class="ct-action-btn ct-btn-dmg" data-action="applyDamage" title='{{localize "AGONE.Combat.AppliquerDegats"}}'><i class="fas fa-sword"></i></button>
-            <button type="button" class="ct-action-btn ct-btn-heal" data-action="applySoin" title='{{localize "AGONE.Combat.AppliquerSoins"}}'><i class="fas fa-heart"></i></button>
+            <button type="button" class="ct-action-btn ct-btn-dmg" data-action="applyDamage" data-tooltip='{{localize "AGONE.Combat.AppliquerDegats"}}' aria-label='{{localize "AGONE.Combat.AppliquerDegats"}}'><i class="fas fa-sword"></i></button>
+            <button type="button" class="ct-action-btn ct-btn-heal" data-action="applySoin" data-tooltip='{{localize "AGONE.Combat.AppliquerSoins"}}' aria-label='{{localize "AGONE.Combat.AppliquerSoins"}}'><i class="fas fa-heart"></i></button>
             {{/if}}
             {{#if @root.isGM}}
-            <button type="button" class="ct-action-btn" data-action="toggleHidden" title='{{#if c.isHidden}}{{localize "AGONE.Combat.Reveler"}}{{else}}{{localize "AGONE.Combat.Cacher"}}{{/if}}'>
+            <button type="button" class="ct-action-btn" data-action="toggleHidden" data-tooltip='{{#if c.isHidden}}{{localize "AGONE.Combat.Reveler"}}{{else}}{{localize "AGONE.Combat.Cacher"}}{{/if}}'
+                    aria-label='{{#if c.isHidden}}{{localize "AGONE.Combat.Reveler"}}{{else}}{{localize "AGONE.Combat.Cacher"}}{{/if}}'>
               <i class="fas {{#if c.isHidden}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
             </button>
-            <button type="button" class="ct-action-btn ct-btn-defeated" data-action="toggleDefeated" title='{{localize "AGONE.Combat.MarquerVaincu"}}'><i class="fas fa-skull"></i></button>
+            <button type="button" class="ct-action-btn ct-btn-defeated" data-action="toggleDefeated" data-tooltip='{{localize "AGONE.Combat.MarquerVaincu"}}' aria-label='{{localize "AGONE.Combat.MarquerVaincu"}}'><i class="fas fa-skull"></i></button>
             {{/if}}
           </div>
         </div>
 
         {{! Santé : chiffres (MJ, propriétaire) ou état descriptif (autres joueurs) }}
         {{#if c.visible}}
-        <div class="agone-ct-pdv-row" title="{{c.sante}}">
+        <div class="agone-ct-pdv-row" data-tooltip="{{c.sante}}">
           <span class="agone-ct-pdv-label">{{c.pv.label}}</span>
           <div class="agone-ct-pdv-track">
             <div class="agone-ct-pdv-fill" style="width:{{c.pv.pct}}%; background:{{c.pv.couleur}};"></div>
@@ -126,23 +127,23 @@
         {{#if c.visible}}
         <div class="agone-ct-details">
           {{! Repères de combat }}
-          {{#each c.stats as |s|}}<span class="ct-stat" title='{{localize s.label}}'>{{localize s.label}} <strong>{{s.valeur}}</strong></span>{{/each}}
-          {{#if c.malus}}<span class="ct-stat ct-stat-malus" title='{{localize "AGONE.BlessureGrave"}}'>{{c.malus}}</span>{{/if}}
+          {{#each c.stats as |s|}}<span class="ct-stat" data-tooltip='{{localize s.label}}'>{{localize s.label}} <strong>{{s.valeur}}</strong></span>{{/each}}
+          {{#if c.malus}}<span class="ct-stat ct-stat-malus" data-tooltip='{{localize "AGONE.BlessureGrave"}}'>{{c.malus}}</span>{{/if}}
           <span class="agone-ct-details-spacer"></span>
           {{! Blessures graves et critique }}
           {{#each c.blessures as |b|}}
           <button type="button" class="ct-bg-cell{{#if b.actif}} ct-bg-active{{/if}}" data-action="toggleBlessure" data-field="{{b.champ}}"
-                  title='{{localize "AGONE.BlessureGrave"}} {{b.n}}'>{{b.n}}</button>
+                  data-tooltip='{{localize "AGONE.BlessureGrave"}} {{b.n}}'>{{b.n}}</button>
           {{/each}}
           <button type="button" class="ct-bg-cell ct-bc-cell{{#if c.critique}} ct-bg-active{{/if}}" data-action="toggleBlessure" data-field="blessuresCritique"
-                  title='{{localize "AGONE.BlessuresCritiques"}}'><i class="fas fa-skull-crossbones"></i></button>
+                  data-tooltip='{{localize "AGONE.BlessuresCritiques"}}' aria-label='{{localize "AGONE.BlessuresCritiques"}}'><i class="fas fa-skull-crossbones"></i></button>
         </div>
 
         {{! Statuts rapides }}
         <div class="agone-ct-statuts">
           {{#each @root.statuts as |s idx|}}
           <button type="button" class="ct-status-btn{{#if (lookup c.statuts idx)}} ct-status-active{{/if}}"
-                  data-action="toggleStatus" data-status="{{s.id}}" title="{{s.label}}"><i class="fas {{s.icone}}"></i></button>
+                  data-action="toggleStatus" data-status="{{s.id}}" data-tooltip="{{s.label}}" aria-label="{{s.label}}"><i class="fas {{s.icone}}"></i></button>
           {{/each}}
         </div>
         {{/if}}

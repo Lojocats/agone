@@ -962,10 +962,14 @@ export class AgoneActor extends Actor {
     } else {
       // Données brutes depuis le navigateur de sorts (SORTS_DATA)
       sort = { name: itemIdOrData.name, system: {
-        seuil      : itemIdOrData.seuil      ?? 0,
-        typeMagie  : itemIdOrData.typeMagie  ?? "",
-        compAlt    : itemIdOrData.compAlt    ?? "",
-        attrAlt    : itemIdOrData.attrAlt    ?? "",
+        seuil       : itemIdOrData.seuil       ?? 0,
+        typeMagie   : itemIdOrData.typeMagie   ?? "",
+        compAlt     : itemIdOrData.compAlt     ?? "",
+        attrAlt     : itemIdOrData.attrAlt     ?? "",
+        description : itemIdOrData.description ?? "",
+        portee      : itemIdOrData.portee      ?? "",
+        duree       : itemIdOrData.duree       ?? "",
+        danse       : itemIdOrData.danse       ?? "",
       }};
     }
 

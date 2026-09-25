@@ -309,6 +309,61 @@ export function fichesBatch({ describe, it, assert, before, after }) {
     });
   });
 
+  describe("Fiche personnage : recherche de compétences", function () {
+    this.timeout(DELAI);
+    it("affiche un message quand la recherche ne trouve aucune compétence", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Discrétion", type: "competence", system: { attributLie: "agilite", score: 1 } },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="competences"]').click();
+        const input = sheet.element.querySelector(".comp-search-input");
+        const vide = () => sheet.element.querySelector(".comp-search-empty");
+        assert.ok(input, "champ de recherche");
+        assert.ok(vide().hidden, "message masqué par défaut");
+
+        input.value = "xyzzy-inexistant";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        assert.notOk(vide().hidden, "message affiché quand rien ne correspond");
+
+        input.value = "Discr";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        assert.ok(vide().hidden, "message masqué dès qu'une compétence correspond");
+
+        input.value = "";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        assert.ok(vide().hidden, "message masqué une fois la recherche effacée");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+  });
+
+  describe("Fiche personnage : activation clavier des [role=\"button\"]", function () {
+    this.timeout(DELAI);
+    it("Entrée sur .item-edit (lien sans href) ouvre la fiche de l'objet", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      const [comp] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Discrétion", type: "competence", system: { attributLie: "agilite", score: 1 } },
+      ]);
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        sheet.element.querySelector('.sheet-tabs .item[data-tab="competences"]').click();
+        const lien = sheet.element.querySelector(`.item-edit[data-item-id="${comp.id}"]`);
+        assert.ok(lien, "lien d'édition de la compétence");
+        assert.equal(lien.getAttribute("role"), "button");
+        lien.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+        await attendre(() => comp.sheet.rendered, "fiche de l'objet ouverte");
+        assert.ok(comp.sheet.rendered, "la fiche de la compétence s'est ouverte au clavier");
+      } finally {
+        await comp.sheet?.close({ animate: false });
+        await sheet.close({ animate: false });
+      }
+    });
+  });
+
   describe("Fiche personnage : sauvegarde automatique", function () {
     this.timeout(DELAI);
     it("un champ nommé est enregistré au changement", async () => {

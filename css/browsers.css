@@ -685,7 +685,7 @@
 }
 .agone-browser th.browser-triable::after {
   content: "\f0dc";                 /* fa-sort */
-  font-family: "Font Awesome 6 Pro", "Font Awesome 6 Free";
+  font-family: "Font Awesome 7 Pro", "Font Awesome 6 Pro", "Font Awesome 6 Free";   /* v14 : FA 7, v13 : FA 6 */
   font-weight: 900;
   font-size: 9px;
   margin-left: 4px;

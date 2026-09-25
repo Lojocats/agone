@@ -41,21 +41,21 @@
     <table class="mb-table">
       <thead>
         <tr>
-          <th class="mb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+          <th class="mb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
           <th class="mb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="mb-col-cat">{{localize "AGONE.Categorie"}}</th>
-          <th class="mb-col-ini"  title='{{localize "AGONE.Combat.ModInit"}}'>{{localize "AGONE.ManIni"}}</th>
-          <th class="mb-col-att"  title='{{localize "AGONE.Combat.ModAtt"}}'>{{localize "AGONE.ManAtt"}}</th>
-          <th class="mb-col-def"  title='{{localize "AGONE.Combat.ModDef"}}'>{{localize "AGONE.ManDef"}}</th>
-          <th class="mb-col-dom"  title='{{localize "AGONE.Combat.ModDom"}}'>{{localize "AGONE.ManDom"}}</th>
-          <th class="mb-col-condition" title='{{localize "AGONE.ManCondition"}}'>{{localize "AGONE.ManCondition"}}</th>
+          <th class="mb-col-ini"  data-tooltip='{{localize "AGONE.Combat.ModInit"}}'>{{localize "AGONE.ManIni"}}</th>
+          <th class="mb-col-att"  data-tooltip='{{localize "AGONE.Combat.ModAtt"}}'>{{localize "AGONE.ManAtt"}}</th>
+          <th class="mb-col-def"  data-tooltip='{{localize "AGONE.Combat.ModDef"}}'>{{localize "AGONE.ManDef"}}</th>
+          <th class="mb-col-dom"  data-tooltip='{{localize "AGONE.Combat.ModDom"}}'>{{localize "AGONE.ManDom"}}</th>
+          <th class="mb-col-condition" data-tooltip='{{localize "AGONE.ManCondition"}}'>{{localize "AGONE.ManCondition"}}</th>
           <th class="mb-col-action"></th>
         </tr>
       </thead>
       <tbody>
         {{#each items as |item|}}
         <tr class="mb-row mb-row-{{item.categorie}} {{#if item.hasInActor}}mb-has-item{{/if}}" data-man-idx="{{item.idx}}">
-          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
+          <td class="desc-col">{{#if item.description}}<button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}</td>
           <td class="mb-name">{{item.name}}</td>
           <td class="mb-cat">
             {{#if (eq item.categorie "botte")}}
@@ -77,9 +77,9 @@
           <td class="mb-condition">{{item.condition}}</td>
           <td class="mb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check mb-check" title='{{localize "AGONE.Browser.DejaApprises"}}'></i>
+            <i class="fas fa-check mb-check" data-tooltip='{{localize "AGONE.Browser.DejaApprises"}}'></i>
             {{else}}
-            <button type="button" class="mb-add-btn btn-icon" data-action="addManoeuvre" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <button type="button" class="mb-add-btn btn-icon" data-action="addManoeuvre" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}

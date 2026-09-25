@@ -40,7 +40,7 @@
     <table class="pnb-table">
       <thead>
         <tr>
-          <th class="pnb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+          <th class="pnb-col-toggle"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
           <th class="pnb-col-name">{{localize "AGONE.Nom"}}</th>
           <th class="pnb-col-cat">{{localize "AGONE.Categorie"}}</th>
           <th class="pnb-col-noir">{{localize "AGONE.Noir"}}</th>
@@ -51,7 +51,7 @@
       <tbody>
         {{#each items as |item|}}
         <tr class="pnb-row {{#if item.hasInActor}}pnb-has-item{{/if}}" data-pn-idx="{{item.idx}}">
-          <td class="desc-col"><button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button></td>
+          <td class="desc-col"><button type="button" class="desc-bascule" data-desc="{{item.idx}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button></td>
           <td class="pnb-name">{{item.name}}</td>
           <td class="pnb-cat">
             <span class="pnb-cat-badge pnb-cat-{{item.categorie}}">{{item.categorieLabel}}</span>
@@ -75,9 +75,9 @@
           </td>
           <td class="pnb-action">
             {{#if item.hasInActor}}
-            <i class="fas fa-check pnb-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+            <i class="fas fa-check pnb-check" data-tooltip='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="pnb-add-btn btn-icon" data-action="addPeine" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <button type="button" class="pnb-add-btn btn-icon" data-action="addPeine" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}

@@ -7,7 +7,7 @@
       <h3 class="section-title">{{localize "AGONE.AptitudesMagiques"}}</h3>
       {{#if isGM}}
       <button type="button" class="btn-icon" data-action="openDomainesConfig"
-              title='{{localize "AGONE.DomainesArts.TitreConfig"}}'>
+              data-tooltip='{{localize "AGONE.DomainesArts.TitreConfig"}}' aria-label='{{localize "AGONE.DomainesArts.TitreConfig"}}'>
         <i class="fas fa-cog"></i>
       </button>
       {{/if}}
@@ -38,9 +38,9 @@
           <td class="col-score">
             {{#if d.comp}}
             <span class="arts-scores-pair">
-              <span title='{{localize "AGONE.Ui.ScoreArtsMagiques"}}'>{{d.comp.system.score}}</span>
+              <span data-tooltip='{{localize "AGONE.Ui.ScoreArtsMagiques"}}'>{{d.comp.system.score}}</span>
               <span class="arts-comp-liee-score {{#unless d.compLiee}}arts-comp-liee-manquante{{/unless}}"
-                    title="{{d.nomCompLiee}}{{#unless d.compLiee}} ({{localize "AGONE.Ui.NonPossedee"}}){{/unless}}">
+                    data-tooltip="{{d.nomCompLiee}}{{#unless d.compLiee}} ({{localize "AGONE.Ui.NonPossedee"}}){{/unless}}">
                 / {{d.scoreCompLiee}} <em class="arts-comp-liee-nom">{{d.nomCompLiee}}</em>
               </span>
             </span>
@@ -48,29 +48,29 @@
             <div class="arts-levelup-pair">
               <button type="button" class="levelup-btn" data-action="levelUp"
                       data-type="competence" data-item-id="{{d.comp.id}}" data-cout="{{d.comp.xpCout}}" data-crea-cout="{{d.comp.creaCout}}"
-                      title='{{localize "AGONE.Ui.MonterArtsMagiques" cout=d.comp.coutAffiche}}'>
+                      data-tooltip='{{localize "AGONE.Ui.MonterArtsMagiques" cout=d.comp.coutAffiche}}'>
                 <i class="fas fa-arrow-up"></i> {{localize "AGONE.Ui.ArtsCout" cout=d.comp.coutAffiche}}
               </button>
               <button type="button" class="leveldown-btn" data-action="levelDown"
                       data-type="competence" data-item-id="{{d.comp.id}}"
-                      title='{{localize "AGONE.RetrograderNiveau"}}'
+                      data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                       {{#unless d.comp.system.score}}disabled{{/unless}}>
                 <i class="fas fa-arrow-down"></i> {{d.comp.coutAfficheDown}}
               </button>
               {{#if d.compLiee}}
               <button type="button" class="levelup-btn levelup-btn-liee" data-action="levelUp"
                       data-type="competence" data-item-id="{{d.compLiee.id}}" data-cout="{{d.compLiee.xpCout}}" data-crea-cout="{{d.compLiee.creaCout}}"
-                      title='{{localize "AGONE.MonterNiveau"}} {{d.nomCompLiee}} ({{d.compLiee.coutAffiche}})'>
+                      data-tooltip='{{localize "AGONE.MonterNiveau"}} {{d.nomCompLiee}} ({{d.compLiee.coutAffiche}})'>
                 <i class="fas fa-arrow-up"></i> {{d.nomCompLiee}} ({{d.compLiee.coutAffiche}})
               </button>
               <button type="button" class="leveldown-btn" data-action="levelDown"
                       data-type="competence" data-item-id="{{d.compLiee.id}}"
-                      title='{{localize "AGONE.RetrograderNiveau"}}'
+                      data-tooltip='{{localize "AGONE.RetrograderNiveau"}}'
                       {{#unless d.compLiee.system.score}}disabled{{/unless}}>
                 <i class="fas fa-arrow-down"></i> {{d.compLiee.coutAfficheDown}}
               </button>
               {{else}}
-              <span class="arts-comp-liee-manquante arts-levelup-absent" title='{{localize "AGONE.Ui.NonPossedeeNom" nom=d.nomCompLiee}}'>
+              <span class="arts-comp-liee-manquante arts-levelup-absent" data-tooltip='{{localize "AGONE.Ui.NonPossedeeNom" nom=d.nomCompLiee}}'>
                 <i class="fas fa-arrow-up"></i> {{d.nomCompLiee}} —
               </span>
               {{/if}}
@@ -87,7 +87,8 @@
                     data-art="{{d.artVal}}" data-score-arts="{{d.scoreArtsMag}}"
                     data-score-comp="{{d.scoreCompLiee}}" data-nom-comp="{{d.nomCompLiee}}"
                     data-score-eff="{{d.scoreEffectif}}" data-bonus-ame="{{d.bonusAmeVal}}"
-                    title='{{localize "AGONE.JeterAptitudeMagie"}} &mdash; {{d.domaine}}'>
+                    data-tooltip='{{localize "AGONE.JeterAptitudeMagie"}} &mdash; {{d.domaine}}'
+                    aria-label='{{localize "AGONE.JeterAptitudeMagie"}} — {{d.domaine}}'>
               <i class="fas fa-dice-d10"></i>
             </button>
             {{else}}&mdash;{{/if}}
@@ -101,13 +102,14 @@
                     data-cre="{{d.creVal}}" data-score-arts="{{d.scoreArtsMag}}"
                     data-score-comp="{{d.scoreCompLiee}}" data-nom-comp="{{d.nomCompLiee}}"
                     data-score-eff="{{d.scoreEffectif}}" data-bonus-ame="{{d.bonusAmeVal}}"
-                    title='{{localize "AGONE.JeterImprovisation"}} &mdash; {{d.domaine}}'>
+                    data-tooltip='{{localize "AGONE.JeterImprovisation"}} &mdash; {{d.domaine}}'
+                    aria-label='{{localize "AGONE.JeterImprovisation"}} — {{d.domaine}}'>
               <i class="fas fa-dice-d10"></i>
             </button>
             {{else}}&mdash;{{/if}}
           </td>
           <td>
-            {{#if d.comp}}<a class="item-edit" data-item-id="{{d.comp.id}}"><i class="fas fa-edit"></i></a>{{/if}}
+            {{#if d.comp}}<a class="item-edit" data-item-id="{{d.comp.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>{{/if}}
           </td>
         </tr>
         {{/each}}
@@ -121,14 +123,14 @@
   <div class="sorts-block">
     <div class="section-header">
       <h3>{{localize "AGONE.Sorts"}}</h3>
-      <button type="button" class="compendium-browse btn-icon" data-pack="agone.sorts" title='{{localize "AGONE.ParcourirSorts"}}'>
+      <button type="button" class="compendium-browse btn-icon" data-pack="agone.sorts" data-tooltip='{{localize "AGONE.ParcourirSorts"}}' aria-label='{{localize "AGONE.ParcourirSorts"}}'>
         <i class="fas fa-search"></i>
       </button>
-      <button type="button" class="item-create" data-type="sort" title='{{localize "AGONE.AjouterSort"}}'>
+      <button type="button" class="item-create" data-type="sort" data-tooltip='{{localize "AGONE.AjouterSort"}}' aria-label='{{localize "AGONE.AjouterSort"}}'>
         <i class="fas fa-plus"></i>
       </button>
       <button type="button" class="btn-icon tri-toggle-btn" data-action="triSortsToggle"
-              title='{{#if triSortsEstType}}{{localize "AGONE.TrierParSeuil"}}{{else}}{{localize "AGONE.TrierParType"}}{{/if}}'>
+              data-tooltip='{{#if triSortsEstType}}{{localize "AGONE.TrierParSeuil"}}{{else}}{{localize "AGONE.TrierParType"}}{{/if}}'>
         <i class="fas fa-sort"></i> {{#if triSortsEstType}}{{localize "AGONE.Type"}}{{else}}{{localize "AGONE.Seuil"}}{{/if}}
       </button>
     </div>
@@ -218,7 +220,7 @@
           {{#each group.sorts as |sort|}}
           <div class="sort-card item-row" data-item-id="{{sort.id}}" draggable="true">
             <div class="sort-card-top">
-              {{#if sort.system.description}}<button type="button" class="desc-bascule" data-desc="{{sort.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{/if}}
+              {{#if sort.system.description}}<button type="button" class="desc-bascule" data-desc="{{sort.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{/if}}
               <button type="button" class="roll-btn sort-card-name item-name" data-action="rollSort"
                       data-item-id="{{sort.id}}">{{sort.name}}</button>
             </div>
@@ -236,9 +238,9 @@
             <div class="item-desc-content desc-pliable" data-desc-de="{{sort.id}}" hidden>{{{sort.system.description}}}</div>
             {{/if}}
             <div class="sort-card-actions">
-              <a class="item-edit" data-item-id="{{sort.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
-              <a class="item-delete" data-item-id="{{sort.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
-              <span class="sort-card-drag-handle" title='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
+              <a class="item-edit" data-item-id="{{sort.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
+              <a class="item-delete" data-item-id="{{sort.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+              <span class="sort-card-drag-handle" data-tooltip='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
             </div>
           </div>
           {{/each}}
@@ -255,7 +257,7 @@
   <div class="danseurs-block">
     <div class="section-header">
       <h3>{{localize "AGONE.Danseurs"}}</h3>
-      <button type="button" class="item-create" data-type="danseur" title='{{localize "AGONE.NouveauDanseur"}}'>
+      <button type="button" class="item-create" data-type="danseur" data-tooltip='{{localize "AGONE.NouveauDanseur"}}' aria-label='{{localize "AGONE.NouveauDanseur"}}'>
         <i class="fas fa-plus"></i>
       </button>
     </div>
@@ -271,39 +273,39 @@
             {{d.ptsDepense}} /
             <input class="danseur-inline-num danseur-pts-max-input" type="number"
                    data-item-id="{{d.id}}" data-field="ptsCreationMax"
-                   value="{{d.ptsBudget}}" min="4" title='{{localize "AGONE.DanseurPtsCreationMax"}}'>
+                   value="{{d.ptsBudget}}" min="4" data-tooltip='{{localize "AGONE.DanseurPtsCreationMax"}}'>
             {{localize "AGONE.Ui.PtsRestants"}} <strong>{{d.ptsRestants}}</strong>
           </span>
           {{else}}
-          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" title='{{localize "AGONE.Ui.MemoireTitre"}}'>{{localize "AGONE.Ui.MemAbr" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</span>
-          <span class="danseur-stat" title='{{localize "AGONE.Endurance"}}'>{{localize "AGONE.Ui.EndAbr"}}
+          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" data-tooltip='{{localize "AGONE.Ui.MemoireTitre"}}'>{{localize "AGONE.Ui.MemAbr" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</span>
+          <span class="danseur-stat" data-tooltip='{{localize "AGONE.Endurance"}}'>{{localize "AGONE.Ui.EndAbr"}}
             <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0">
             /{{d.system.enduranceMax}}
           </span>
-          <span class="danseur-stat" title="{{localize "AGONE.Ui.BonusEmpriseDanseur"}}">EMP+{{d.system.bonusEmprise}}</span>
-          <span class="danseur-stat danseur-pot-emp" title="{{localize "AGONE.Ui.PotEmpriseTitre"}}">{{localize "AGONE.Ui.PotAbr"}}{{d.potentielEmprise}}</span>
-          <span class="danseur-stat danseur-pot-impro" title="{{localize "AGONE.Ui.PotImproTitre"}}">{{localize "AGONE.Ui.ImproAbr"}}{{d.potentielImpro}}</span>
-          <span class="danseur-stat" title='{{localize "AGONE.Empathie"}}'>{{localize "AGONE.Ui.EmpAbr"}} {{d.system.empathie}}</span>
+          <span class="danseur-stat" data-tooltip="{{localize "AGONE.Ui.BonusEmpriseDanseur"}}">EMP+{{d.system.bonusEmprise}}</span>
+          <span class="danseur-stat danseur-pot-emp" data-tooltip="{{localize "AGONE.Ui.PotEmpriseTitre"}}">{{localize "AGONE.Ui.PotAbr"}}{{d.potentielEmprise}}</span>
+          <span class="danseur-stat danseur-pot-impro" data-tooltip="{{localize "AGONE.Ui.PotImproTitre"}}">{{localize "AGONE.Ui.ImproAbr"}}{{d.potentielImpro}}</span>
+          <span class="danseur-stat" data-tooltip='{{localize "AGONE.Empathie"}}'>{{localize "AGONE.Ui.EmpAbr"}} {{d.system.empathie}}</span>
 
           {{/if}}
         </div>
         <div class="danseur-actions">
           {{#unless d.system.modeCreation}}
-          <button type="button" class="danseur-roll-btn" data-action="rollEmprise" data-item-id="{{d.id}}" title='{{localize "AGONE.JeterEmprise"}}'>
+          <button type="button" class="danseur-roll-btn" data-action="rollEmprise" data-item-id="{{d.id}}" data-tooltip='{{localize "AGONE.JeterEmprise"}}'>
             <i class="fas fa-dice-d10"></i> {{localize "AGONE.Emprise"}}
           </button>
-          <button type="button" class="danseur-roll-btn" data-action="rollImprovisation" data-item-id="{{d.id}}" title='{{localize "AGONE.JeterImprovisation"}}'>
+          <button type="button" class="danseur-roll-btn" data-action="rollImprovisation" data-item-id="{{d.id}}" data-tooltip='{{localize "AGONE.JeterImprovisation"}}'>
             <i class="fas fa-dice-d10"></i> {{localize "AGONE.Impro"}}
           </button>
-          <button type="button" class="danseur-recrea-btn btn-icon" data-action="reactiverCreationDanseur" data-item-id="{{d.id}}" title='{{localize "AGONE.DanseurReactiverCrea"}}'>
+          <button type="button" class="danseur-recrea-btn btn-icon" data-action="reactiverCreationDanseur" data-item-id="{{d.id}}" data-tooltip='{{localize "AGONE.DanseurReactiverCrea"}}' aria-label='{{localize "AGONE.DanseurReactiverCrea"}}'>
             <i class="fas fa-table"></i>
           </button>
           {{else}}
-          <button type="button" class="danseur-valider-btn" data-action="validerCreationDanseur" data-item-id="{{d.id}}" title='{{localize "AGONE.DanseurValiderCrea"}}'>
+          <button type="button" class="danseur-valider-btn" data-action="validerCreationDanseur" data-item-id="{{d.id}}" data-tooltip='{{localize "AGONE.DanseurValiderCrea"}}'>
             <i class="fas fa-check"></i> {{localize "AGONE.Valider"}}
           </button>
           {{/unless}}
-          <a class="item-delete" data-item-id="{{d.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          <a class="item-delete" data-item-id="{{d.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
         </div>
       </div>
 
@@ -316,14 +318,15 @@
           <button type="button" class="danseur-niv-btn" data-action="danseurNiveauDown"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   {{#unless cn.canDown}}disabled{{/unless}}>−</button>
-          <span class="danseur-niv-num" title='{{localize "AGONE.Ui.CoutPts" cout=cn.cout}}'>{{cn.niv}}</span>
+          <span class="danseur-niv-num" data-tooltip='{{localize "AGONE.Ui.CoutPts" cout=cn.cout}}'>{{cn.niv}}</span>
           <button type="button" class="danseur-niv-btn" data-action="danseurNiveauUp"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   {{#unless cn.canUp}}disabled{{/unless}}>+</button>
           <button type="button" class="danseur-niv-btn danseur-roll-indiv-btn" data-action="danseurRollStatIndiv"
                   data-item-id="{{d.id}}" data-stat="{{cn.nivField}}"
                   data-stat-key="{{cn.stat}}" data-label="{{cn.label}}" data-prefix="{{cn.prefix}}"
-                  title='{{localize "AGONE.Ui.Jet3d10Pour" stat=cn.label}}'><i class="fas fa-dice"></i></button>
+                  data-tooltip='{{localize "AGONE.Ui.Jet3d10Pour" stat=cn.label}}'
+                  aria-label='{{localize "AGONE.Ui.Jet3d10Pour" stat=cn.label}}'><i class="fas fa-dice"></i></button>
           <span class="danseur-crea-arrow">&#8594;</span>
           <span class="danseur-crea-val">{{cn.prefix}}{{cn.val}}</span>
           {{#if cn.nextVal}}<span class="danseur-next-val">({{localize "AGONE.Ui.NivAbr"}}{{cn.nextNiv}} &#8594; {{cn.prefix}}{{cn.nextVal}})</span>{{/if}}
@@ -342,19 +345,19 @@
           <input type="number" class="danseur-inline-num danseur-exp-stat-input" min="0"
                  data-item-id="{{../id}}" data-field="{{lu.expField}}"
                  value="{{lu.localExp}}"
-                 title='{{localize "AGONE.Ui.XPReservePour" stat=lu.label}}'>
+                 data-tooltip='{{localize "AGONE.Ui.XPReservePour" stat=lu.label}}'>
           <button type="button" class="leveldown-btn" data-action="levelDownDanseur"
                   data-item-id="{{../id}}" data-stat="{{lu.nivField}}" data-exp-field="{{lu.expField}}"
                   data-cout-down="{{lu.coutDown}}" data-label="{{lu.label}}"
                   {{#unless lu.canDown}}disabled{{/unless}}
-                  title='{{localize "AGONE.Ui.RetrograderStat" stat=lu.label cout=lu.coutDown}}'>
+                  data-tooltip='{{localize "AGONE.Ui.RetrograderStat" stat=lu.label cout=lu.coutDown}}'>
             <i class="fas fa-arrow-down"></i> {{lu.coutDown}} XP
           </button>
           <button type="button" class="levelup-btn" data-action="levelUpDanseur"
                   data-item-id="{{../id}}" data-stat="{{lu.nivField}}" data-exp-field="{{lu.expField}}"
                   data-cout="{{lu.cout}}" data-label="{{lu.label}}"
                   {{#unless lu.canUp}}disabled{{/unless}}
-                  title='{{localize "AGONE.Ui.MonterStat" stat=lu.label cout=lu.cout}}'>
+                  data-tooltip='{{localize "AGONE.Ui.MonterStat" stat=lu.label cout=lu.cout}}'>
             <i class="fas fa-arrow-up"></i> {{lu.cout}} XP
           </button>
         </div>
@@ -370,8 +373,8 @@
           <div class="slot-main">
             <button type="button" class="slot-name" data-action="rollSortDanseur"
                     data-sort-id="{{s.id}}" data-danseur-id="{{d.id}}"
-                    title='{{localize "AGONE.Ui.LancerSortDanseur" sort=s.name actuelle=../system.enduranceActuelle max=../system.enduranceMax}}'>{{s.name}}</button>
-          <button type="button" class="slot-remove" data-sort-id="{{s.id}}" title='{{localize "AGONE.Retirer"}}'>x</button>
+                    data-tooltip='{{localize "AGONE.Ui.LancerSortDanseur" sort=s.name actuelle=../system.enduranceActuelle max=../system.enduranceMax}}'>{{s.name}}</button>
+          <button type="button" class="slot-remove" data-sort-id="{{s.id}}" data-tooltip='{{localize "AGONE.Retirer"}}'>x</button>
           </div>
           <div class="slot-meta">
             {{#if s.seuil}}<span>{{localize "AGONE.Seuil"}} : {{s.seuil}}</span>{{/if}}
@@ -403,10 +406,11 @@
   <div class="pouvoirs-block">
     <div class="section-header">
       <h3>{{localize "AGONE.PouvoirsFlamme"}}</h3>
-      <button type="button" class="compendium-browse btn-icon" data-pack="agone.pouvoirs" title='{{localize "AGONE.ParcourirPouvoirs"}}'>
+      <button type="button" class="compendium-browse btn-icon" data-pack="agone.pouvoirs" data-tooltip='{{localize "AGONE.ParcourirPouvoirs"}}' aria-label='{{localize "AGONE.ParcourirPouvoirs"}}'>
         <i class="fas fa-search"></i>
       </button>
-      <button type="button" class="item-create" data-type="pouvoir">
+      <button type="button" class="item-create" data-type="pouvoir"
+              data-tooltip='{{localize "AGONE.AjouterPouvoir"}}' aria-label='{{localize "AGONE.AjouterPouvoir"}}'>
         <i class="fas fa-plus"></i>
       </button>
     </div>
@@ -415,11 +419,11 @@
     <ul class="pouvoirs-list">
       {{#each pouvoirs as |pouvoir|}}
       <li class="pouvoir-row item-row" data-item-id="{{pouvoir.id}}">
-        {{#if pouvoir.system.description}}<button type="button" class="desc-bascule" data-desc="{{pouvoir.id}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
+        {{#if pouvoir.system.description}}<button type="button" class="desc-bascule" data-desc="{{pouvoir.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
         <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
-        <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" title='{{localize "AGONE.EnvoyerChat"}}'>{{pouvoir.name}}</button>
-        <a class="item-edit" data-item-id="{{pouvoir.id}}"><i class="fas fa-edit"></i></a>
-        <a class="item-delete" data-item-id="{{pouvoir.id}}"><i class="fas fa-trash"></i></a>
+        <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.EnvoyerChat"}}'>{{pouvoir.name}}</button>
+        <a class="item-edit" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
+        <a class="item-delete" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
       </li>
       {{#if pouvoir.system.description}}
       <li class="pouvoir-desc-li desc-pliable" data-desc-de="{{pouvoir.id}}" hidden>

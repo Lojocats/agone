@@ -22,7 +22,7 @@
         <div class="agone-chips">
           <label class="agone-chip"><input type="checkbox" class="ab-all-type" {{#if allTypesSelected}}checked{{/if}}><span>{{localize "AGONE.Browser.Tous"}}</span></label>
           {{#each allTypes}}
-          <label class="agone-chip" title="{{this.label}}"><input type="checkbox" class="ab-type-check" value="{{this.value}}" {{#if this.active}}checked{{/if}}><span>{{this.value}}</span></label>
+          <label class="agone-chip" data-tooltip="{{this.label}}"><input type="checkbox" class="ab-type-check" value="{{this.value}}" {{#if this.active}}checked{{/if}}><span>{{this.value}}</span></label>
           {{/each}}
         </div>
       </div>
@@ -72,9 +72,9 @@
           <th class="ab-col-style">{{localize "AGONE.StyleArme"}}</th>
           <th class="ab-col-tai">{{localize "AGONE.Combat.Tai"}}</th>
           <th class="ab-col-type">{{localize "AGONE.TypeArme"}}</th>
-          <th class="ab-col-init" title='{{localize "AGONE.InitBonus"}}'>{{localize "AGONE.Combat.Init"}}</th>
-          <th class="ab-col-atk" title='{{localize "AGONE.AttackBonus"}}'>{{localize "AGONE.Combat.Atk"}}</th>
-          <th class="ab-col-def" title='{{localize "AGONE.DefenseBonus"}}'>{{localize "AGONE.Combat.Def"}}</th>
+          <th class="ab-col-init" data-tooltip='{{localize "AGONE.InitBonus"}}'>{{localize "AGONE.Combat.Init"}}</th>
+          <th class="ab-col-atk" data-tooltip='{{localize "AGONE.AttackBonus"}}'>{{localize "AGONE.Combat.Atk"}}</th>
+          <th class="ab-col-def" data-tooltip='{{localize "AGONE.DefenseBonus"}}'>{{localize "AGONE.Combat.Def"}}</th>
           <th class="ab-col-dom">{{localize "AGONE.Combat.Dom"}}</th>
           <th class="ab-col-portee">{{localize "AGONE.Portee"}}</th>
           <th class="ab-col-req">{{localize "AGONE.Browser.ForAgiReq"}}</th>
@@ -86,11 +86,11 @@
         <tr class="ab-row {{#if arme.hasInActor}}ab-has-item{{/if}}" data-arme-idx="{{arme.idx}}">
           <td class="ab-name">
             {{arme.name}}
-            {{#if arme.description}}<span class="ab-desc-tip" title="{{arme.description}}"><i class="fas fa-info-circle"></i></span>{{/if}}
+            {{#if arme.description}}<span class="ab-desc-tip" data-tooltip="{{arme.description}}"><i class="fas fa-info-circle"></i></span>{{/if}}
           </td>
           <td class="ab-style">{{arme.styleLabel}}</td>
           <td class="ab-tai">{{arme.tai}}</td>
-          <td class="ab-type" title="{{arme.typeLabel}}">{{arme.type}}</td>
+          <td class="ab-type" data-tooltip="{{arme.typeLabel}}">{{arme.type}}</td>
           <td class="ab-init">{{#if (gt arme.initBonus 0)}}+{{/if}}{{arme.initBonus}}</td>
           <td class="ab-atk">{{#if (gt arme.attackBonus 0)}}+{{/if}}{{arme.attackBonus}}</td>
           <td class="ab-def">{{#if (gt arme.defenseBonus 0)}}+{{/if}}{{arme.defenseBonus}}</td>
@@ -99,9 +99,9 @@
           <td class="ab-req">{{arme.reqFor}} / {{arme.reqAgi}}</td>
           <td class="ab-action">
             {{#if arme.hasInActor}}
-            <i class="fas fa-check ab-check" title='{{localize "AGONE.Browser.DejaPosse"}}'></i>
+            <i class="fas fa-check ab-check" data-tooltip='{{localize "AGONE.Browser.DejaPosse"}}'></i>
             {{else}}
-            <button type="button" class="ab-add-btn btn-icon" data-action="addArme" title='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
+            <button type="button" class="ab-add-btn btn-icon" data-action="addArme" data-tooltip='{{localize "AGONE.Browser.AjouterPersonnage"}}' aria-label='{{localize "AGONE.Browser.AjouterPersonnage"}}'>
               <i class="fas fa-plus"></i>
             </button>
             {{/if}}

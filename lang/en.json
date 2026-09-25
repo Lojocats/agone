@@ -140,6 +140,7 @@
     "MalusCompNonApprise": "Unskilled (penalty -3)",
     "FiltrerCompetences":  "Filter skills\u2026",
     "EffacerRecherche":    "Clear search",
+    "CompetenceRechercheAucunResultat": "No skill matches",
     "CompetencesNonAcquises": "Unlearned skills",
     "JeterCompetenceNonAcquise": "Roll this skill (unskilled, penalty -3)",
     "ApprendreCompetence": "Learn this skill (add to sheet)",
@@ -368,6 +369,7 @@
     "AjouterSort":        "Add a spell",
     "CompetencesMagie":   "Magic skills",
     "Pouvoirs":           "Powers",
+    "AjouterPouvoir":     "Add a power",
     "AucunPouvoir":       "No power",
     "CategoriePouvoirs":  "Category",
     "PouvoirFlamme":      "Flame Power",
@@ -455,6 +457,7 @@
 
     "Equipement":       "Equipment",
     "Equipements":      "Equipments",
+    "AjouterEquipement":"Add an equipment",
     "Charge":           "Load",
     "ChargeMax":        "Max load",
     "ChargeActuelle":   "Current load",

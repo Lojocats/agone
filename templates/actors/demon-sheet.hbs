@@ -1,7 +1,7 @@
 <form class="agone sheet actor demon" autocomplete="off">
   <header class="sheet-header">
     <div class="header-portrait">
-      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" />
+      <img class="profile-img" src="{{actor.img}}" data-edit="img" data-tooltip="{{actor.name}}" />
     </div>
     <div class="header-fields">
       <h1 class="charname">
@@ -63,7 +63,7 @@
               <label style="font-size:0.8em;font-weight:normal;">{{localize "AGONE.Exp"}}</label>
               <input type="number" name="system.experience" value="{{system.experience}}" class="stat-num" min="0" style="width:42px;" />
               <button type="button" class="btn-icon{{#if showLevelUp}} active{{/if}}" data-action="toggleLevelUpDemon"
-                      title='{{localize "AGONE.ToggleLevelUpDemon"}}'>
+                      data-tooltip='{{localize "AGONE.ToggleLevelUpDemon"}}' aria-label='{{localize "AGONE.ToggleLevelUpDemon"}}'>
                 <i class="fas fa-star"></i>
               </button>
             </h3>
@@ -253,7 +253,7 @@
             <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.StatsCombat"}}</h3>
             <div class="cstats-grid">
               <div class="cstat-item">
-                <button type="button" class="cstat-roll" data-action="rollInitiative" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
+                <button type="button" class="cstat-roll" data-action="rollInitiative" data-tooltip='{{localize "AGONE.JeterInitiative"}}' aria-label='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
                 <span class="cstat-score">{{system.initiative}}</span>
                 <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
               </div>
@@ -282,15 +282,15 @@
           <div class="combat-card-header">
             <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.Armes"}}</h3>
             <div class="card-btns">
-              <button type="button" class="compendium-browse btn-icon" data-pack="agone.armes" title='{{localize "AGONE.ParcourirArmes"}}'><i class="fas fa-search"></i></button>
-              <button type="button" class="item-create btn-icon" data-type="arme" title='{{localize "AGONE.AjouterArme"}}'><i class="fas fa-plus"></i></button>
+              <button type="button" class="compendium-browse btn-icon" data-pack="agone.armes" data-tooltip='{{localize "AGONE.ParcourirArmes"}}' aria-label='{{localize "AGONE.ParcourirArmes"}}'><i class="fas fa-search"></i></button>
+              <button type="button" class="item-create btn-icon" data-type="arme" data-tooltip='{{localize "AGONE.AjouterArme"}}' aria-label='{{localize "AGONE.AjouterArme"}}'><i class="fas fa-plus"></i></button>
             </div>
           </div>
           {{#if armes.length}}
           <table class="armes-table">
             <thead>
               <tr>
-                <th class="col-equipe" title="{{localize 'AGONE.Equipe'}}"><i class="fas fa-hand-paper"></i></th>
+                <th class="col-equipe" data-tooltip="{{localize 'AGONE.Equipe'}}"><i class="fas fa-hand-paper"></i></th>
                 <th class="col-arme-name">{{localize "AGONE.Nom"}}</th>
                 <th class="col-tai">{{localize "AGONE.TAI"}}</th>
                 <th class="col-type">{{localize "AGONE.Type"}}</th>
@@ -318,19 +318,19 @@
                 <td class="col-init">
                   <div class="arme-cell">
                     <span class="arme-score">{{arme.system.initTotal}}</span>
-                    <button type="button" class="roll-btn-small roll-init-btn" data-action="rollInitiative" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
+                    <button type="button" class="roll-btn-small roll-init-btn" data-action="rollInitiative" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.JeterInitiative"}}' aria-label='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
                   </div>
                 </td>
                 <td class="col-atk">
                   <div class="arme-cell">
                     <span class="arme-score">{{arme.system.attackTotal}}</span>
-                    <button type="button" class="roll-btn-small roll-atk-btn" data-action="rollAttaque" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterAttaque"}}'><i class="fas fa-dice-d10"></i></button>
+                    <button type="button" class="roll-btn-small roll-atk-btn" data-action="rollAttaque" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.JeterAttaque"}}' aria-label='{{localize "AGONE.JeterAttaque"}}'><i class="fas fa-dice-d10"></i></button>
                   </div>
                 </td>
                 <td class="col-def">
                   <div class="arme-cell">
                     <span class="arme-score">{{arme.system.defenseTotal}}</span>
-                    <button type="button" class="roll-btn-small roll-def-btn" data-action="rollParade" data-item-id="{{arme.id}}" title='{{localize "AGONE.JeterParade"}}'><i class="fas fa-shield-alt"></i></button>
+                    <button type="button" class="roll-btn-small roll-def-btn" data-action="rollParade" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.JeterParade"}}' aria-label='{{localize "AGONE.JeterParade"}}'><i class="fas fa-shield-alt"></i></button>
                   </div>
                 </td>
                 <td class="col-dom">
@@ -338,8 +338,8 @@
                   {{#if ../system.bd}}<span class="dom-bd">+{{../system.bd}}</span>{{/if}}
                 </td>
                 <td class="col-row-actions">
-                  <a class="item-edit" data-item-id="{{arme.id}}" title='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
-                  <a class="item-delete" data-item-id="{{arme.id}}" title='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+                  <a class="item-edit" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
+                  <a class="item-delete" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
                 </td>
               </tr>
               {{/each}}

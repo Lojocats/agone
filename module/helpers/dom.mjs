@@ -45,3 +45,18 @@ function withCurrentTarget(event, target) {
 export function listen(root, selector, type, handler) {
   root.querySelectorAll(selector).forEach(el => el.addEventListener(type, handler));
 }
+
+/**
+ * Rend les `[role="button"]` activables au clavier (Entrée ou Espace), comme un vrai
+ * `<button>`. Nécessaire pour les `<a>`/`<span>` sans `href` qui portent ce rôle (icônes
+ * seules dont le style natif de bouton de Foundry casserait la mise en page).
+ * @param {HTMLElement} root
+ * @param {AbortSignal} [signal] Retire l'écouteur au rendu suivant
+ */
+export function activerClavier(root, signal) {
+  delegate(root, "keydown", '[role="button"]', (event, target) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    target.click();
+  }, { signal });
+}

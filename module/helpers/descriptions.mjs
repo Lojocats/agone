@@ -44,12 +44,12 @@ export function afficherDescription(root, cle, ouvrir) {
 export function lierDescriptions(root, ouvertes, { signal, ligneCliquable = false } = {}) {
   const libelle = game.i18n.localize("AGONE.VoirDescription");
   for (const bouton of root.querySelectorAll(".desc-bascule[data-desc]")) {
-    bouton.title ||= libelle;
+    bouton.dataset.tooltip ||= libelle;
     bouton.closest("tr, li, .item-row")?.classList.add("desc-ligne");
     afficherDescription(root, bouton.dataset.desc, ouvertes.has(bouton.dataset.desc));
   }
   for (const bouton of root.querySelectorAll(".desc-bascule-tout")) {
-    bouton.title ||= game.i18n.localize("AGONE.DescriptionsToutes");
+    bouton.dataset.tooltip ||= game.i18n.localize("AGONE.DescriptionsToutes");
     majBoutonTout(bouton);
   }
   if (ligneCliquable) root.classList.add("desc-lignes-cliquables");

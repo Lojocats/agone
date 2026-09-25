@@ -2,7 +2,7 @@
 
   {{#if isOwner}}
   <div class="companions-drop-zone{{#if companions.length}} has-items{{/if}}"
-       title="{{localize 'AGONE.CompagnonDropHint'}}">
+       data-tooltip="{{localize 'AGONE.CompagnonDropHint'}}">
     <i class="fas fa-user-plus"></i> {{localize "AGONE.CompagnonDropHint"}}
   </div>
   {{/if}}
@@ -14,7 +14,7 @@
 
       <!-- Portrait + type badge -->
       <div class="cmp-portrait-wrap">
-        <img class="cmp-portrait" src="{{img}}" title="{{localize 'AGONE.Ouvrir'}} {{name}}" />
+        <img class="cmp-portrait" src="{{img}}" data-tooltip="{{localize 'AGONE.Ouvrir'}} {{name}}" />
         <span class="cmp-type-badge cmp-type-{{type}}">{{type}}</span>
       </div>
 
@@ -30,11 +30,11 @@
           {{#if ../isOwner}}
           <div class="cmp-actions">
             <button type="button" class="companion-open cmp-btn" data-uuid="{{uuid}}"
-                    title="{{localize 'AGONE.Ouvrir'}}">
+                    data-tooltip="{{localize 'AGONE.Ouvrir'}}" aria-label="{{localize 'AGONE.Ouvrir'}}">
               <i class="fas fa-external-link-alt"></i>
             </button>
             <button type="button" class="companion-remove cmp-btn cmp-btn-remove" data-uuid="{{uuid}}"
-                    title="{{localize 'AGONE.Retirer'}}">
+                    data-tooltip="{{localize 'AGONE.Retirer'}}" aria-label="{{localize 'AGONE.Retirer'}}">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -57,9 +57,9 @@
         <!-- Blessures graves -->
         {{#if (or bg1 bg2 bg3)}}
         <div class="cmp-bg-row">
-          <span class="cmp-bg-dot {{#if bg1}}bg-active{{/if}}" title="BG 1 (-2)">1</span>
-          <span class="cmp-bg-dot {{#if bg2}}bg-active{{/if}}" title="BG 2 (-6)">2</span>
-          <span class="cmp-bg-dot {{#if bg3}}bg-active{{/if}}" title="BG 3 (-12)">3</span>
+          <span class="cmp-bg-dot {{#if bg1}}bg-active{{/if}}" data-tooltip="BG 1 (-2)">1</span>
+          <span class="cmp-bg-dot {{#if bg2}}bg-active{{/if}}" data-tooltip="BG 2 (-6)">2</span>
+          <span class="cmp-bg-dot {{#if bg3}}bg-active{{/if}}" data-tooltip="BG 3 (-12)">3</span>
         </div>
         {{/if}}
 

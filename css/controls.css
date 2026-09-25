@@ -2,6 +2,17 @@
    AGONE – Boutons, Tableaux, Inputs, Actions d'items
    ============================================================ */
 
+/* ── Focus clavier : anneau doré cohérent sur tous les contrôles ── */
+.agone button:focus-visible,
+.agone [role="button"]:focus-visible,
+.agone a:focus-visible,
+.agone .roll-btn-small:focus-visible,
+.agone .btn-icon:focus-visible,
+.agone .sheet-tabs .item:focus-visible {
+  outline: 2px solid var(--agone-gold, #c9a227);
+  outline-offset: 1px;
+}
+
 /* ── Boutons de jet ──────────────────────────────────────── */
 .agone .roll-btn,
 .agone button.roll-btn {
@@ -448,6 +459,14 @@
   padding: 0 2px;
 }
 .agone .comp-search-clear:hover { opacity: 1; color: var(--agone-red); background: transparent; }
+.agone .comp-search-empty {
+  margin: 8px 2px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--agone-brown);
+  opacity: 0.75;
+  text-align: center;
+}
 
 /* ── Compétences non acquises ────────────────────────────── */
 .agone .comps-na-section {

@@ -3,6 +3,25 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.7] — 2026-09-25
+
+### Ajouté
+- **Navigation au clavier** : tous les boutons des fiches, des fiches d'objet et des navigateurs sont atteignables avec Tab et s'activent avec Entrée ou Espace, y compris les icônes modifier et supprimer. Le bouton qui a le focus est entouré d'un contour doré.
+- **Recherche de compétences sans résultat** : quand la recherche ne trouve aucune compétence, la fiche l'indique par un message au lieu d'afficher une liste vide.
+
+### Corrigé
+- Mode sombre : le bouton Fumble des cartes de jet, les couleurs de saison du calendrier, les pastilles de type (démon, compagnon, PNJ…) et le bouton de bonus de PdV à la création restent lisibles sur fond sombre. Le mode clair est inchangé.
+- Mode sombre : dans le tableau des paliers de l'onglet Ténèbres, les paliers non atteints étaient presque invisibles (numéro, peine, case et bienfait). Ils restent atténués mais lisibles.
+- Mode sombre : le texte brun était peu lisible sur fond sombre, dans les fiches comme dans les cartes de jet du chat (seuil, détails du calcul, badges et description du sort). Le brun du thème sombre est éclairci, la description et les badges des cartes de jet prennent la couleur du texte courant, et les mentions volontairement pâles (valeurs nulles, « aucun… ») restent lisibles.
+- Un sort lancé en improvisé depuis le navigateur de sorts, sans être sur la fiche, n'affichait sur la carte de jet ni sa description ni ses badges (portée, durée, danse).
+- Foundry v14 : les icônes de tri des en-têtes de colonnes des navigateurs de compendium s'affichaient comme des carrés vides.
+
+### Modifié
+- **Infobulles uniformisées** : les infobulles des boutons et icônes utilisent désormais celles de Foundry (plus rapides et au style du thème) au lieu des bulles natives du navigateur. Les boutons composés d'une seule icône ont un libellé lu par les lecteurs d'écran.
+- Fenêtres : la fiche d'objet s'ouvre plus grande (560 × 620) pour les longues descriptions, et les navigateurs de compendium s'ouvrent tous à la même taille (sauf celui des manœuvres, plus large).
+- README : accessibilité et navigation au clavier.
+- Tests : boutons icône sans libellé accessible, règle de focus, couleurs du mode sombre sans valeur codée en dur, tailles des fenêtres, contraste des couleurs de texte du mode sombre, police des icônes de tri (tests unitaires) ; message de recherche de compétences vide, activation au clavier d'un bouton modifier, description et badges d'un sort improvisé depuis le navigateur (Quench).
+
 ## [1.9.6] — 2026-09-24
 
 ### Corrigé

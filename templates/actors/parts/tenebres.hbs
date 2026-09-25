@@ -6,21 +6,21 @@
     <div class="tene-stat-item">
       <label>{{localize "AGONE.Tenebres"}}</label>
       <input type="number" name="system.tenebres" value="{{system.tenebres}}" class="stat-num" min="0" max="100" />
-      <div class="tene-progress-track" title="{{system.tenebres}} / 100">
+      <div class="tene-progress-track" data-tooltip="{{system.tenebres}} / 100">
         <div class="tene-progress-bar" style="width:{{system.tenebres}}%"></div>
       </div>
       <span class="hint">{{localize "AGONE.Sur100"}}</span>
     </div>
     <div class="tene-stat-separator"></div>
     <div class="tene-stat-item">
-      <label title="{{localize "AGONE.Tenebres"}} ÷ 10">{{localize "AGONE.Noirceur"}}</label>
+      <label data-tooltip="{{localize "AGONE.Tenebres"}} ÷ 10">{{localize "AGONE.Noirceur"}}</label>
       <span class="derived-val tene-noirceur">{{system.noirceur}}</span>
     </div>
     <div class="tene-stat-separator"></div>
     <!-- Bouton Conjuration Démonologie -->
     <div class="tene-stat-item">
       <button type="button" class="tene-roll-btn" data-action="rollConjurationDemonologie"
-              title='{{localize "AGONE.Ui.ConjurationFormule"}}'>
+              data-tooltip='{{localize "AGONE.Ui.ConjurationFormule"}}'>
         <i class="fas fa-dice-d10"></i> {{localize "AGONE.Ui.Conjuration"}}
       </button>
     </div>
@@ -29,7 +29,7 @@
     <div class="tene-stat-item tene-mode-toggle">
       <button type="button" class="tene-mode-btn {{#if tenebresModeManuel}}active{{/if}}"
               data-action="toggleTenebresModeManuel"
-              title='{{#if tenebresModeManuel}}{{localize "AGONE.Ui.ModeAutoTitre"}}{{else}}{{localize "AGONE.Ui.ModeManuelTitre"}}{{/if}}'>
+              data-tooltip='{{#if tenebresModeManuel}}{{localize "AGONE.Ui.ModeAutoTitre"}}{{else}}{{localize "AGONE.Ui.ModeManuelTitre"}}{{/if}}'>
         <i class="fas fa-{{#if tenebresModeManuel}}lock-open{{else}}lock{{/if}}"></i>
         {{#if tenebresModeManuel}}{{localize "AGONE.Ui.Manuel"}}{{else}}{{localize "AGONE.Ui.Auto"}}{{/if}}
       </button>
@@ -46,7 +46,7 @@
         <thead>
           <tr>
             {{#if tenebresModeManuel}}<th class="col-check"></th>{{/if}}
-            <th class="col-chevron"><button type="button" class="desc-bascule-tout" aria-expanded="false"><i class="fas fa-angles-down"></i></button></th>
+            <th class="col-chevron"><button type="button" class="desc-bascule-tout" aria-expanded="false" aria-label="{{localize 'AGONE.DescriptionsToutes'}}"><i class="fas fa-angles-down"></i></button></th>
             <th class="col-palier">{{localize "AGONE.Palier"}}</th>
             <th class="col-peine">{{localize "AGONE.Peines"}}</th>
             <th class="col-bienfait">{{localize "AGONE.Bienfaits"}}</th>
@@ -55,11 +55,11 @@
         <tbody>
           {{#each tableauPaliers as |p|}}
           <tr class="palier-row{{#if p.atteint}} palier-reached{{/if}}">
-            {{#if ../tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if p.atteint}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="{{p.seuil}}" title='{{localize "AGONE.Ui.CocherPalier"}}'><i class="fas fa-{{#if p.atteint}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
-            <td class="col-chevron"><button type="button" class="desc-bascule" data-desc="palier:{{p.seuil}}" aria-expanded="false"><i class="fas fa-chevron-right"></i></button></td>
+            {{#if ../tenebresModeManuel}}<td class="col-check"><button type="button" class="palier-check-btn {{#if p.atteint}}checked{{/if}}" data-action="togglePalierManuel" data-seuil="{{p.seuil}}" data-tooltip='{{localize "AGONE.Ui.CocherPalier"}}' aria-label='{{localize "AGONE.Ui.CocherPalier"}}'><i class="fas fa-{{#if p.atteint}}check-square{{else}}square{{/if}}"></i></button></td>{{/if}}
+            <td class="col-chevron"><button type="button" class="desc-bascule" data-desc="palier:{{p.seuil}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button></td>
             <td class="col-palier">{{p.seuil}}</td>
             <td class="col-peine" data-tooltip="{{p.tooltipPeine}}"><span class="peine-dot"></span>{{p.peineNom}}</td>
-            <td class="col-bienfait{{#if p.bienfaitNom}} bienfait-yes{{/if}}"{{#if p.bienfaitNom}} data-tooltip="{{p.tooltipBienfait}}"{{/if}}>{{#if p.bienfaitNom}}{{#if ../tenebresModeManuel}}<button type="button" class="bienfait-check-btn {{#if p.bienfaitCoche}}checked{{/if}}" data-action="toggleBienfaitManuel" data-seuil="{{p.seuil}}" title='{{localize "AGONE.Ui.CocherBienfait"}}'><i class="fas fa-{{#if p.bienfaitCoche}}check-square{{else}}square{{/if}}"></i></button>{{/if}}{{p.bienfaitNom}}{{/if}}</td>
+            <td class="col-bienfait{{#if p.bienfaitNom}} bienfait-yes{{/if}}"{{#if p.bienfaitNom}} data-tooltip="{{p.tooltipBienfait}}"{{/if}}>{{#if p.bienfaitNom}}{{#if ../tenebresModeManuel}}<button type="button" class="bienfait-check-btn {{#if p.bienfaitCoche}}checked{{/if}}" data-action="toggleBienfaitManuel" data-seuil="{{p.seuil}}" data-tooltip='{{localize "AGONE.Ui.CocherBienfait"}}' aria-label='{{localize "AGONE.Ui.CocherBienfait"}}'><i class="fas fa-{{#if p.bienfaitCoche}}check-square{{else}}square{{/if}}"></i></button>{{/if}}{{p.bienfaitNom}}{{/if}}</td>
           </tr>
           <tr class="palier-desc-row desc-pliable" data-desc-de="palier:{{p.seuil}}" hidden>
             {{#if ../tenebresModeManuel}}<td></td>{{/if}}
@@ -94,14 +94,14 @@
         <div class="section-header">
           <h3 class="section-title">{{localize "AGONE.Demons"}}</h3>
           {{#if isOwner}}
-          <button type="button" data-action="createDemonActor" title='{{localize "AGONE.NouveauDemon"}}'>
+          <button type="button" data-action="createDemonActor" data-tooltip='{{localize "AGONE.NouveauDemon"}}' aria-label='{{localize "AGONE.NouveauDemon"}}'>
             <i class="fas fa-plus"></i>
           </button>
           {{/if}}
         </div>
 
         {{#if isOwner}}
-        <div class="demons-drop-zone" title="{{localize 'AGONE.DemonDropHint'}}">
+        <div class="demons-drop-zone" data-tooltip="{{localize 'AGONE.DemonDropHint'}}">
           <i class="fas fa-skull"></i> {{localize "AGONE.DemonDropHint"}}
         </div>
         {{/if}}
@@ -113,7 +113,7 @@
 
             <!-- Portrait -->
             <div class="cmp-portrait-wrap">
-              <img class="cmp-portrait" src="{{img}}" title="{{localize 'AGONE.Ouvrir'}} {{name}}" />
+              <img class="cmp-portrait" src="{{img}}" data-tooltip="{{localize 'AGONE.Ouvrir'}} {{name}}" />
               <span class="cmp-type-badge cmp-type-demon">{{localize "AGONE.Demon"}}</span>
             </div>
 
@@ -134,11 +134,11 @@
                 {{#if ../isOwner}}
                 <div class="cmp-actions">
                   <button type="button" class="demon-actor-open cmp-btn" data-uuid="{{uuid}}"
-                          title="{{localize 'AGONE.Ouvrir'}}">
+                          data-tooltip="{{localize 'AGONE.Ouvrir'}}" aria-label="{{localize 'AGONE.Ouvrir'}}">
                     <i class="fas fa-external-link-alt"></i>
                   </button>
                   <button type="button" class="demon-actor-remove cmp-btn cmp-btn-remove" data-uuid="{{uuid}}"
-                          title="{{localize 'AGONE.Retirer'}}">
+                          data-tooltip="{{localize 'AGONE.Retirer'}}" aria-label="{{localize 'AGONE.Retirer'}}">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>

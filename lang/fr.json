@@ -140,6 +140,7 @@
     "MalusCompNonApprise": "Compétence non apprise (malus -3)",
     "FiltrerCompetences":  "Filtrer les compétences…",
     "EffacerRecherche":    "Effacer la recherche",
+    "CompetenceRechercheAucunResultat": "Aucune compétence ne correspond",
     "CompetencesNonAcquises": "Compétences non acquises",
     "JeterCompetenceNonAcquise": "Lancer cette compétence (non apprise, malus -3)",
     "ApprendreCompetence": "Apprendre cette compétence (ajouter à la fiche)",
@@ -368,6 +369,7 @@
     "AjouterSort":        "Ajouter un sort",
     "CompetencesMagie":   "Compétences magiques",
     "Pouvoirs":           "Pouvoirs",
+    "AjouterPouvoir":     "Ajouter un pouvoir",
     "AucunPouvoir":       "Aucun pouvoir",
     "CategoriePouvoirs":  "Catégorie",
     "PouvoirFlamme":      "Pouvoir de Flamme",
@@ -455,6 +457,7 @@
 
     "Equipement":       "Équipement",
     "Equipements":      "Équipements",
+    "AjouterEquipement":"Ajouter un équipement",
     "Charge":           "Charge",
     "ChargeMax":        "Charge max.",
     "ChargeActuelle":   "Charge actuelle",
