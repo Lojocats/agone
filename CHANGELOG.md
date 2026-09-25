@@ -3,6 +3,19 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.9] — 2026-09-25
+
+### Ajouté
+- **Panneau de création et de progression** en haut de la fiche personnage. Pendant la création, il affiche les points de caractéristiques et de compétences restants sous forme de jauges (en or à zéro, en rouge en cas de dépassement), le nombre de caractéristiques sous le minimum racial (détaillées en infobulle) et le bouton « Valider la création », jusqu'ici rangé dans l'onglet Paramètres. Après la création, il affiche l'XP disponible, le total des réserves locales et l'interrupteur « Progression ». Il n'apparaît qu'aux joueurs qui peuvent modifier la fiche.
+- **Récapitulatif avant de valider la création** : la confirmation liste les points non dépensés par budget, les caractéristiques encore sous le minimum racial (simple avertissement, la validation reste possible) et les malus raciaux qui vont s'appliquer.
+- **Réserves d'XP locales visibles** : un petit compteur à côté du score de chaque caractéristique indique la réserve locale disponible.
+
+### Modifié
+- **Achats plus clairs** : les boutons d'amélioration indiquent leur unité (« ↑ 2 pts » en création, « ↑ 35 XP » en progression, avec deux couleurs distinctes). Ils sont désactivés quand l'achat est impossible (budget épuisé, maximum racial atteint, plus aucune XP ni réserve locale suffisante), et leur infobulle en donne la raison. Quand il reste de l'XP mais pas assez, le bouton reste actif et son infobulle propose de verser cette XP dans la réserve locale. Les caractéristiques sous le minimum racial sont plus visibles.
+- **Flamme et Flamme noire en couleur** : leurs libellés et valeurs s'affichent en orange feu et en violet (teintes claires sur le fond foncé de l'en-tête, adaptées au mode sombre), et leurs valeurs ont un léger halo, dans l'en-tête, l'onglet Attributs, l'onglet Flamme et la fiche PNJ. La Flamme noire de l'en-tête n'a plus une couleur différente de celle de l'onglet Attributs.
+- README : panneau de création et de progression.
+- Tests : panneau en création et hors création, bouton désactivé à budget épuisé ou sans XP, bouton actif pour la mise en réserve quand l'XP est insuffisante, récapitulatif de création, validation (Quench) ; nouveau partial chargé, couleurs de la Flamme et de la Flamme noire (tests unitaires).
+
 ## [1.9.8] — 2026-09-25
 
 ### Ajouté

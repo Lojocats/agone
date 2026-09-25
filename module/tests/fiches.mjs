@@ -112,6 +112,110 @@ export function fichesBatch({ describe, it, assert, before, after }) {
     });
   }
 
+  describe("Fiche personnage : panneau de progression", function () {
+    this.timeout(DELAI);
+
+    it("le panneau affiche les points restants en création et l'XP hors création", async () => {
+      const enCreation = await tests.acteur("personnage", { ...PERSO, modeCreation: true });
+      const sheetCreation = await ouvrir(enCreation.sheet);
+      try {
+        const panneau = sheetCreation.element.querySelector(".panneau-progression");
+        assert.ok(panneau, "panneau affiché");
+        assert.ok(panneau.classList.contains("en-creation"), "mode création signalé");
+        const jauges = [...panneau.querySelectorAll(".panneau-jauge-val")];
+        assert.equal(jauges[0].textContent.trim(),
+          String(enCreation.system.ptsCreationCarac.max - enCreation.system.ptsCreationCarac.depense));
+        assert.equal(jauges[1].textContent.trim(),
+          String(enCreation.system.ptsCreationComp.max - enCreation.system.ptsCreationComp.depense));
+      } finally {
+        await sheetCreation.close({ animate: false });
+      }
+
+      const horsCreation = await tests.acteur("personnage",
+        { ...PERSO, modeCreation: false, experience: { courante: 12, totale: 12 } });
+      const sheetXP = await ouvrir(horsCreation.sheet);
+      try {
+        const panneau = sheetXP.element.querySelector(".panneau-progression");
+        assert.ok(panneau, "panneau affiché");
+        assert.notOk(panneau.classList.contains("en-creation"));
+        assert.include(panneau.querySelector(".panneau-xp-item").textContent, "12");
+      } finally {
+        await sheetXP.close({ animate: false });
+      }
+    });
+
+    it("un bouton ↑ devient disabled quand le budget est à 0", async () => {
+      const actor = await tests.acteur("personnage", { ...PERSO, modeCreation: true });
+      await actor.update({ "system.ptsCreationCarac.depense": actor.system.ptsCreationCarac.max });
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        const bouton = sheet.element.querySelector('[data-action="levelUp"][data-type="carac"][data-key="agilite"]');
+        assert.ok(bouton, "bouton de montée agilité");
+        assert.ok(bouton.disabled, "désactivé, budget de création épuisé");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("hors création, mode progression : bouton ↑ désactivé si XP + réserve locale insuffisants, actif sinon", async () => {
+      const actor = await tests.acteur("personnage",
+        { ...PERSO, modeCreation: false, modeLevelUp: true, experience: { courante: 0, totale: 0 } });
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        const bouton = () => sheet.element.querySelector('[data-action="levelUp"][data-type="carac"][data-key="agilite"]');
+        assert.ok(bouton(), "bouton de montée agilité");
+        assert.ok(bouton().disabled, "désactivé, XP et réserve locale insuffisants");
+
+        const cout = Number(bouton().dataset.cout);
+        await actor.update({ "system.agilite.exp": cout });
+        await attendre(() => !bouton().disabled, "actif une fois la réserve locale suffisante");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("mode progression, XP insuffisante mais non nulle : bouton ↑ actif pour verser l'XP en réserve locale", async () => {
+      const actor = await tests.acteur("personnage",
+        { ...PERSO, modeCreation: false, modeLevelUp: true, experience: { courante: 1, totale: 0 } });
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        const bouton = sheet.element.querySelector('[data-action="levelUp"][data-type="carac"][data-key="agilite"]');
+        assert.isAbove(Number(bouton.dataset.cout), 1, "coût supérieur à l'XP courante");
+        assert.notOk(bouton.disabled, "actif : le clic propose la mise en réserve");
+        assert.include(bouton.dataset.tooltip, game.i18n.format("AGONE.VerserReserveTooltip",
+          { reserve: 1, cout: bouton.dataset.cout, actuel: 1 }), "infobulle de mise en réserve");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("_recapCreation() liste les points non dépensés et une caractéristique sous le minimum racial", async () => {
+      const actor = await tests.acteur("personnage",
+        { ...PERSO, modeCreation: true, peuple: "Ogre", force: { score: 2 } });
+      const sheet = await ouvrir(actor.sheet);
+      try {
+        const recap = sheet._recapCreation();
+        assert.isAbove(recap.ptsCaracRestant, 0, "points de caractéristiques non dépensés");
+        assert.isAbove(recap.ptsCompRestant, 0, "points de compétences non dépensés");
+        assert.ok(recap.sousMinimum.some(c => c.key === "force"), "force sous le minimum racial (Ogre)");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+
+    it("la validation (confirmation acceptée) fait sortir du mode création", async () => {
+      const actor = await tests.acteur("personnage", { ...PERSO, modeCreation: true });
+      const sheet = await ouvrir(actor.sheet);
+      sheet._confirmChild = async () => true; // confirmation automatique
+      try {
+        sheet.element.querySelector('[data-action="validerCreation"]').click();
+        await attendre(() => actor.system.modeCreation === false, "sortie du mode création");
+      } finally {
+        await sheet.close({ animate: false });
+      }
+    });
+  });
+
   describe("Fiche personnage : descriptions pliables", function () {
     this.timeout(DELAI);
     it("le chevron ouvre la description, qui le reste après une mise à jour, même en lecture seule", async () => {

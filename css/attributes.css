@@ -134,6 +134,21 @@
   font-weight: 700;
 }
 
+/* Couleurs de la Flamme (orange feu) et de la Flamme noire (violet sombre), partout où elles
+   apparaissent. Classe doublée pour passer devant les couleurs des boîtes (.flamme-box label…). */
+.agone .txt-flamme.txt-flamme { color: var(--agone-txt-orange, #a85000); }
+.agone .txt-flamme-noire.txt-flamme-noire { color: var(--agone-txt-violet, #3d1f8a); }
+/* fixe : le fond de l'en-tête de fiche est foncé dans les deux thèmes, d'où des teintes claires */
+.agone .sheet-header .txt-flamme.txt-flamme { color: #f0a040; }
+.agone .sheet-header .txt-flamme-noire.txt-flamme-noire { color: #c9a0f0; }
+/* Halo des valeurs de Flamme et de Flamme noire */
+.agone .flamme-glow.txt-flamme {
+  text-shadow: 0 0 6px rgba(240,140,30,0.65), 0 0 12px rgba(240,140,30,0.35);
+}
+.agone .flamme-glow.txt-flamme-noire {
+  text-shadow: 0 0 6px rgba(150,90,230,0.7), 0 0 12px rgba(150,90,230,0.35);
+}
+
 /* ── Caractéristiques ────────────────────────────────────── */
 .agone .carac-grid {
   display: flex;

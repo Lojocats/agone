@@ -21,12 +21,12 @@
           <span class="derived">{{system.ph.max}}</span>
         </div>
         <div class="stat-box">
-          <label>{{localize "AGONE.Flamme"}}</label>
-          <span class="derived big">{{system.flamme}}</span>
+          <label class="txt-flamme">{{localize "AGONE.Flamme"}}</label>
+          <span class="derived big txt-flamme flamme-glow">{{system.flamme}}</span>
         </div>
         <div class="stat-box">
-          <label>{{localize "AGONE.FlammeNoire"}}</label>
-          <span class="derived big flamme-noire">{{system.flammeNoire}}</span>
+          <label class="txt-flamme-noire">{{localize "AGONE.FlammeNoire"}}</label>
+          <span class="derived big txt-flamme-noire flamme-glow">{{system.flammeNoire}}</span>
         </div>
         <div class="stat-box">
           <label>{{localize "AGONE.MV"}}</label>
@@ -43,13 +43,10 @@
           <input type="number" name="system.experience.totale" value="{{system.experience.totale}}" class="stat-num" />
         </div>
       </div>
-      {{#if modeCreation}}
-      <div class="creation-mode-indicator">
-        <span class="creation-badge"><i class="fas fa-pen-nib"></i> {{localize "AGONE.EnModeCreation"}}</span>
-      </div>
-      {{/if}}
     </div>
   </header>
+
+  {{> systems/agone/templates/actors/parts/panneau-progression.hbs}}
 
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="attributs">{{localize "AGONE.Attributs"}}</a>

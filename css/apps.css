@@ -4,6 +4,12 @@
    Fiche PNJ · Compagnons · Parametres · Drag-drop
    ============================================================ */
 
+/* ── Récapitulatif de validation de création (DialogV2, hors .agone) ────── */
+p.agone-recap-avertissement {
+  color: var(--agone-txt-rouge, #800000);
+  font-weight: 600;
+}
+
 /* ── Bouton Mode Sombre (barre de scène) ────────────────────────────────── */
 /* Foundry v14 : toggle tools get aria-pressed="true" when active           */
 #scene-controls-tools button[data-tool="darkMode"][aria-pressed="true"] i,

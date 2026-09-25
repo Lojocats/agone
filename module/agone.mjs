@@ -266,6 +266,7 @@ Hooks.once("init", () => {
     "systems/agone/templates/actors/parts/companions.hbs",
     "systems/agone/templates/actors/parts/caracs-simples.hbs",
     "systems/agone/templates/actors/parts/parametres.hbs",
+    "systems/agone/templates/actors/parts/panneau-progression.hbs",
     "systems/agone/templates/apps/manoeuvres-browser.hbs",
     "systems/agone/templates/apps/peuples-browser.hbs",
     "systems/agone/templates/apps/pouvoirs-browser.hbs",

@@ -78,6 +78,11 @@ describe("Templates Handlebars", () => {
     });
   }
 
+  test("panneau-progression.hbs est enregistré dans loadTemplates", () => {
+    const agone = lire("module/agone.mjs");
+    assert.match(agone, /["']systems\/agone\/templates\/actors\/parts\/panneau-progression\.hbs["']/);
+  });
+
   test("tout template ou partial cité existe", () => {
     const cites = new Set();
     for (const f of [...templates, ...modules]) {
@@ -232,6 +237,23 @@ describe("CSS", () => {
       assert.ok(bloc, `règle .${sel} introuvable dans ${f}`);
       assert.match(bloc, /height:\s*auto/, `.${sel} doit avoir height: auto`);
     }
+  });
+
+  test("Flamme et Flamme noire : libellés colorés par jetons du thème", () => {
+    const css = lire("css/attributes.css");
+    assert.match(css, /\.txt-flamme\.txt-flamme\s*\{\s*color:\s*var\(--agone-txt-orange,/);
+    assert.match(css, /\.txt-flamme-noire\.txt-flamme-noire\s*\{\s*color:\s*var\(--agone-txt-violet,/);
+    for (const f of ["templates/actors/parts/attributs.hbs", "templates/actors/personnage-sheet.hbs"]) {
+      const hbs = lire(f);
+      assert.match(hbs, /class="txt-flamme">\{\{localize "AGONE\.Flamme"\}\}/, `${f} : libellé Flamme`);
+      assert.match(hbs, /class="txt-flamme-noire">\{\{localize "AGONE\.FlammeNoire"\}\}/, `${f} : libellé Flamme noire`);
+      // Même valeur de Flamme noire (classes identiques, halo compris) dans l'en-tête et l'onglet Attributs
+      assert.match(hbs, /txt-flamme-noire flamme-glow"[^>]*>\{\{system\.flammeNoire\}\}/, `${f} : valeur de Flamme noire`);
+    }
+    // Plus de règle .flamme-noire propre à l'en-tête qui écraserait la couleur commune
+    assert.doesNotMatch(lire("css/header.css"), /\.flamme-noire\s*[,{]/);
+    assert.match(css, /\.flamme-glow\.txt-flamme\s*\{[^}]*text-shadow/);
+    assert.match(css, /\.flamme-glow\.txt-flamme-noire\s*\{[^}]*text-shadow/);
   });
 
   test("paliers de Ténèbres non atteints : pas d'opacité sur la ligne entière en mode sombre", () => {

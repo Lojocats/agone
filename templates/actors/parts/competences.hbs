@@ -81,10 +81,11 @@
             </div>
             {{#if @root.showLevelUp}}
             <div class="comp-card-levelbtns">
-              <button type="button" class="levelup-btn" data-action="levelUp"
+              <button type="button" class="levelup-btn {{@root.levelupClass}}" data-action="levelUp" data-unite="{{@root.coutUnite}}"
                       data-type="competence" data-item-id="{{comp.id}}"
                       data-cout="{{comp.xpCout}}" data-crea-cout="{{comp.creaCout}}"
-                      data-tooltip='{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}})'>
+                      data-tooltip='{{#if comp.achatRaison}}{{comp.achatRaison}}{{else}}{{localize "AGONE.MonterNiveau"}} ({{comp.coutAffiche}}){{/if}}'
+                      {{#if comp.achatDisabled}}disabled{{/if}}>
                 <i class="fas fa-arrow-up"></i> {{comp.coutAffiche}}
               </button>
               <button type="button" class="leveldown-btn" data-action="levelDown"

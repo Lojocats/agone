@@ -15,8 +15,8 @@
           <input type="number" name="system.pdv.max" value="{{system.pdv.max}}" class="stat-num" />
         </div>
         <div class="stat-box">
-          <label>{{localize "AGONE.Flamme"}}</label>
-          <span class="stat-num">{{system.flamme}}</span>
+          <label class="txt-flamme">{{localize "AGONE.Flamme"}}</label>
+          <span class="stat-num txt-flamme flamme-glow">{{system.flamme}}</span>
         </div>
         <div class="stat-box">
           <label>{{localize "AGONE.MV"}}</label>
@@ -64,8 +64,8 @@
             <span class="cstat-label">{{localize "AGONE.Ame"}}</span>
           </div>
           <div class="cstat-item">
-            <span class="cstat-score">{{system.flamme}}</span>
-            <span class="cstat-label">{{localize "AGONE.Flamme"}}</span>
+            <span class="cstat-score txt-flamme flamme-glow">{{system.flamme}}</span>
+            <span class="cstat-label txt-flamme">{{localize "AGONE.Flamme"}}</span>
           </div>
           <div class="cstat-item">
             <span class="cstat-score">{{system.art}}</span>

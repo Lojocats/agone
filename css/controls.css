@@ -58,6 +58,12 @@
 }
 
 /* Score sous le minimum racial requis */
+.agone .carac-row.carac-min-requis {
+  border-left: 3px solid var(--agone-txt-rouge, #c04040);
+  background: rgba(var(--agone-rouge-rgb, 180,40,40), 0.08);
+  padding-left: 4px;
+  border-radius: 3px;
+}
 .agone .carac-row.carac-min-requis .stat-num:not(.exp) {
   border-color: var(--agone-txt-rouge, #c04040);
   background: rgba(var(--agone-rouge-rgb, 180,40,40), 0.12);
@@ -157,6 +163,38 @@
 .agone .levelup-btn:hover:not(:disabled) {
   opacity: 1;
   background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
+}
+/* Unité affichée après le coût : « pts » en création (or), « XP » en montée de niveau (bleu) */
+.agone .levelup-btn::after {
+  content: " " attr(data-unite);
+  font-size: 9px;
+  opacity: 0.8;
+}
+.agone .levelup-btn.levelup-crea {
+  border-color: var(--agone-gold, #c9a227);
+  color: var(--agone-txt-orange, #a06010);
+}
+.agone .levelup-btn.levelup-xp {
+  border-color: var(--agone-txt-bleu, #4a6ea0);
+  color: var(--agone-txt-bleu, #4a6ea0);
+}
+.agone .levelup-btn.levelup-xp:hover:not(:disabled) {
+  background: rgba(var(--agone-bleu-rgb, 74,110,160), 0.15);
+}
+
+/* Compteur de réserve locale (XP en attente sur une caractéristique) */
+.agone .reserve-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--agone-txt-bleu, #4a6ea0);
+  background: rgba(var(--agone-bleu-rgb, 74,110,160), 0.12);
+  border: 1px solid rgba(var(--agone-bleu-rgb, 74,110,160), 0.3);
+  border-radius: 3px;
+  padding: 0 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ── Bouton level-down (rétrogradation) ─────────────────── */

@@ -202,6 +202,96 @@ export const ProgressionMixin = Base => class extends Base {
     context.caracEffectiveMin  = caracEffectiveMin;
     context.caracAtMaxCreation = caracAtMaxCreation;
 
+    // ── Achetabilité des boutons ↑ : création (budget + max racial) ou XP (XP courant + réserve locale) ──
+    const xpDispo = (localExp) => (localExp ?? 0) + (system.experience?.courante ?? 0);
+    // Achat en XP : impossible seulement sans aucune XP courante ; sinon le clic propose de verser
+    // l'XP courante dans la réserve locale (voir _onLevelUp), le bouton reste donc actif.
+    const etatXp = (cout, localExp) => {
+      const courante = system.experience?.courante ?? 0;
+      const dispo    = xpDispo(localExp);
+      if (cout <= dispo) return { disabled: false, raison: null };
+      if (courante > 0) return {
+        disabled: false,
+        raison: game.i18n.format("AGONE.VerserReserveTooltip", { reserve: courante, cout, actuel: dispo }),
+      };
+      return { disabled: true, raison: game.i18n.format("AGONE.PasAssezXP", { cout, actuel: dispo }) };
+    };
+    context.achatCarac = {};
+    for (const k of caracsKeys) {
+      if (system.modeCreation) {
+        const disabled = caracAtMax[k] || context.creaCout[k] > context.ptsCreationCaracRestant;
+        context.achatCarac[k] = {
+          disabled,
+          raison: !disabled ? null : caracAtMax[k]
+            ? game.i18n.localize("AGONE.MaxRacialAtteint")
+            : game.i18n.format("AGONE.PasAssezPtsCrea", { cout: context.creaCout[k], actuel: context.ptsCreationCaracRestant }),
+        };
+      } else {
+        context.achatCarac[k] = etatXp(context.xpCout[k], system[k]?.exp);
+      }
+    }
+    context.achatAspect = {};
+    for (const k of ['corps', 'esprit', 'ame']) {
+      context.achatAspect[k] = etatXp(context.xpCout[k], system[k]?.exp);
+    }
+    for (const c of context.competences) {
+      const scoreMax = (c.system.score ?? 0) >= 10;
+      if (scoreMax) {
+        c.achatDisabled = true;
+        c.achatRaison   = game.i18n.localize("AGONE.MaxCompetenceAtteint");
+      } else if (system.modeCreation) {
+        c.achatDisabled = c.creaCout > context.ptsCreationCompRestant;
+        c.achatRaison   = c.achatDisabled
+          ? game.i18n.format("AGONE.PasAssezPtsCrea", { cout: c.creaCout, actuel: context.ptsCreationCompRestant })
+          : null;
+      } else {
+        const etat = etatXp(c.xpCout, c.system.exp);
+        c.achatDisabled = etat.disabled;
+        c.achatRaison   = etat.raison;
+      }
+    }
+
+    // ── Réserves locales : badge par caractéristique + total pour le panneau ────────────────────
+    context.reserveCarac = {};
+    let reserveTotale = 0;
+    for (const k of [...caracsKeys, 'corps', 'esprit', 'ame']) {
+      const exp = system[k]?.exp ?? 0;
+      reserveTotale += exp;
+      if (exp > 0) context.reserveCarac[k] = { valeur: exp, tooltip: game.i18n.format("AGONE.ReserveLocaleTooltip", { n: exp }) };
+    }
+    for (const c of context.competences) reserveTotale += c.system.exp ?? 0;
+
+    // ── Panneau d'état (haut de fiche, visible par qui peut modifier la fiche) ──────────────────
+    if (system.modeCreation) {
+      const sousMin = caracsKeys.filter(k => caracBelowMin[k]);
+      context.panneau = {
+        enCreation:       true,
+        caracRestant:     context.ptsCreationCaracRestant,
+        caracMax:         system.ptsCreationCarac.max,
+        caracJaugeClass:  context.ptsCreationCaracRestant < 0 ? "jauge-negative" : context.ptsCreationCaracRestant === 0 ? "jauge-zero" : "",
+        compRestant:      context.ptsCreationCompRestant,
+        compMax:          system.ptsCreationComp.max,
+        compJaugeClass:   context.ptsCreationCompRestant < 0 ? "jauge-negative" : context.ptsCreationCompRestant === 0 ? "jauge-zero" : "",
+        sousMinimumCount: sousMin.length,
+        sousMinimumListe: sousMin.length
+          ? game.i18n.format("AGONE.SousMinimumRacialTooltip", {
+              liste: sousMin.map(k => game.i18n.localize(`AGONE.Attribut.${k.charAt(0).toUpperCase() + k.slice(1)}`)).join(", "),
+            })
+          : "",
+      };
+    } else {
+      context.panneau = {
+        enCreation:   false,
+        xpCourante:   system.experience?.courante ?? 0,
+        reserveTotale,
+        modeLevelUp:  !!system.modeLevelUp,
+      };
+    }
+
+    // ── Coût affiché : unité et couleur (création = pts, or / XP = XP, bleu) ────────────────────
+    context.coutUnite    = system.modeCreation ? game.i18n.localize("AGONE.UnitePoints") : game.i18n.localize("AGONE.UniteXP");
+    context.levelupClass = system.modeCreation ? "levelup-crea" : "levelup-xp";
+
     // ── Tooltips détaillés pour les stats dérivées ──────────────────────────────────────────────
     {
       // Sources des effets actifs par stat (items porteurs) — { pos: [...], neg: [...] }
@@ -575,12 +665,60 @@ export const ProgressionMixin = Base => class extends Base {
     ui.notifications.info(game.i18n.localize("AGONE.ResetCreationDone"));
   }
 
+  // Récapitulatif affiché avant validation de la création : points non dépensés, caractéristiques
+  // sous le minimum racial (avertissement non bloquant) et malus raciaux en attente d'application.
+  _recapCreation() {
+    const sd = this.actor.system;
+    const caracs  = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'];
+    const aspects = ['corps','esprit','ame'];
+    const label   = (k) => game.i18n.localize(`AGONE.${caracs.includes(k) ? "Attribut." : ""}${k.charAt(0).toUpperCase() + k.slice(1)}`) || k;
+
+    const peupleKey  = CONFIG.AGONE?.peupleNomVersKey?.[sd.peuple] ?? "humain";
+    const peupleData = CONFIG.AGONE?.peuplesData?.[peupleKey] ?? CONFIG.AGONE?.peuplesData?.humain;
+
+    const sousMinimum = [];
+    for (const k of caracs) {
+      const raceMin = peupleData?.[`${k}Min`] ?? null;
+      const score   = sd[k]?.score ?? 0;
+      if (raceMin !== null && score < raceMin) sousMinimum.push({ key: k, label: label(k), score, min: raceMin });
+    }
+
+    const malus = sd.peupleMalusEnAttente ?? {};
+    const malusRaciaux = [];
+    for (const k of [...caracs, ...aspects]) {
+      const m = malus[`${k}Bonus`] ?? 0;
+      if (m !== 0) malusRaciaux.push({ key: k, label: label(k), valeur: m });
+    }
+
+    return {
+      ptsCaracRestant: (sd.ptsCreationCarac?.max ?? 0) - (sd.ptsCreationCarac?.depense ?? 0),
+      ptsCompRestant:  (sd.ptsCreationComp?.max  ?? 0) - (sd.ptsCreationComp?.depense  ?? 0),
+      sousMinimum,
+      malusRaciaux,
+    };
+  }
+
   // Mode création — valider (fin de création)
   async _onValiderCreation(event) {
     event.preventDefault();
+    const recap = this._recapCreation();
+    const sections = [`<p>${game.i18n.localize("AGONE.ValiderCreationConfirm")}</p>`];
+
+    if (recap.ptsCaracRestant > 0 || recap.ptsCompRestant > 0) {
+      sections.push(`<p>${game.i18n.format("AGONE.RecapPtsNonDepenses", { carac: recap.ptsCaracRestant, comp: recap.ptsCompRestant })}</p>`);
+    }
+    if (recap.sousMinimum.length) {
+      const liste = recap.sousMinimum.map(c => `${c.label} (${c.score}/${c.min})`).join(", ");
+      sections.push(`<p class="agone-recap-avertissement">${game.i18n.format("AGONE.RecapSousMinimum", { liste })}</p>`);
+    }
+    if (recap.malusRaciaux.length) {
+      const liste = recap.malusRaciaux.map(m => `${m.label} ${m.valeur > 0 ? "+" : ""}${m.valeur}`).join(", ");
+      sections.push(`<p>${game.i18n.format("AGONE.RecapMalusRaciaux", { liste })}</p>`);
+    }
+
     const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.ValiderCreation"),
-      content: `<p>${game.i18n.localize("AGONE.ValiderCreationConfirm")}</p>`
+      content: sections.join("")
     });
     if (!confirmed) return;
 

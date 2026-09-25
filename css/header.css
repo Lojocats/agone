@@ -55,6 +55,78 @@
 }
 .agone .btn-toggle-creation:hover { background: rgba(120,80,30,0.8); }
 
+/* ── Panneau de progression (haut de fiche, sous l'en-tête) ──────────── */
+.agone .panneau-progression {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px 12px;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
+  border-bottom: 1px solid var(--agone-gold, #c9a227);
+  font-size: 12px;
+}
+.agone .panneau-progression.en-creation {
+  background: rgba(120, 60, 0, 0.12);
+}
+.agone .panneau-jauges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.agone .panneau-jauge {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.agone .panneau-jauge-label {
+  font-weight: 600;
+  color: var(--agone-brown, #5a3e1b);
+}
+.agone .panneau-jauge-val {
+  font-weight: 700;
+  color: var(--agone-txt-vert, #2e7d32);
+}
+.agone .panneau-jauge.jauge-zero .panneau-jauge-val {
+  color: var(--agone-txt-orange, #a06010);
+}
+.agone .panneau-jauge.jauge-negative .panneau-jauge-val {
+  color: var(--agone-txt-rouge, #800000);
+}
+.agone .panneau-sous-min {
+  color: var(--agone-txt-rouge, #800000);
+  font-weight: 600;
+  font-size: 11px;
+}
+.agone .panneau-valider {
+  margin-left: auto;
+  padding: 2px 10px;
+  background: #5a8a30; /* fixe : pastille verte à texte blanc, cohérente avec .btn-valider-creation */
+  color: #fff;
+  border: 1px solid var(--agone-txt-vert, #3a6010);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.agone .panneau-valider:hover { background: #3a6a10; }
+.agone .panneau-xp {
+  display: flex;
+  gap: 10px;
+}
+.agone .panneau-xp-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--agone-brown, #5a3e1b);
+  font-weight: 600;
+}
+.agone .panneau-xp-item.panneau-reserve {
+  color: var(--agone-txt-bleu, #4a6ea0);
+}
+.agone .panneau-toggle-levelup {
+  margin-left: auto;
+}
+
 .agone .header-portrait {
   flex: 0 0 90px;
 }
@@ -135,11 +207,6 @@
   font-size: 20px;
   font-weight: bold;
   color: var(--agone-gold-light);
-}
-.agone .derived.big.flamme-noire,
-.agone .derived-big.flamme-noire {
-  color: var(--agone-noir, #2a2a2a);
-  text-shadow: 0 0 4px rgba(var(--agone-rouge-rgb, 80,0,0), 0.6);
 }
 .agone .derived.sombre {
   color: var(--agone-noir, #2a2a2a);

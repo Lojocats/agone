@@ -1,0 +1,40 @@
+<!-- PARTIAL : PANNEAU D'ÉTAT DE PROGRESSION (visible par qui peut modifier la fiche) -->
+{{#if editable}}
+<div class="panneau-progression{{#if panneau.enCreation}} en-creation{{/if}}">
+  {{#if panneau.enCreation}}
+  <div class="panneau-jauges">
+    <div class="panneau-jauge {{panneau.caracJaugeClass}}" data-tooltip='{{localize "AGONE.PtsCreationCarac"}}'>
+      <span class="panneau-jauge-label">{{localize "AGONE.PtsCreationCarac"}}</span>
+      <span class="panneau-jauge-val">{{panneau.caracRestant}}</span><span class="panneau-jauge-sep">/</span><span class="panneau-jauge-max">{{panneau.caracMax}}</span>
+    </div>
+    <div class="panneau-jauge {{panneau.compJaugeClass}}" data-tooltip='{{localize "AGONE.PtsCreationComp"}}'>
+      <span class="panneau-jauge-label">{{localize "AGONE.PtsCreationComp"}}</span>
+      <span class="panneau-jauge-val">{{panneau.compRestant}}</span><span class="panneau-jauge-sep">/</span><span class="panneau-jauge-max">{{panneau.compMax}}</span>
+    </div>
+  </div>
+  {{#if panneau.sousMinimumCount}}
+  <span class="panneau-sous-min" data-tooltip="{{panneau.sousMinimumListe}}">
+    <i class="fas fa-triangle-exclamation"></i> {{localize "AGONE.SousMinimumRacial"}} : {{panneau.sousMinimumCount}}
+  </span>
+  {{/if}}
+  <button type="button" class="btn-valider-creation panneau-valider" data-action="validerCreation">
+    {{localize "AGONE.ValiderCreation"}}
+  </button>
+  {{else}}
+  <div class="panneau-xp">
+    <span class="panneau-xp-item" data-tooltip='{{localize "AGONE.Exp"}}'>
+      <i class="fas fa-star"></i> {{panneau.xpCourante}} {{localize "AGONE.Exp"}}
+    </span>
+    {{#if panneau.reserveTotale}}
+    <span class="panneau-xp-item panneau-reserve" data-tooltip='{{localize "AGONE.ReserveLocaleTotale"}}'>
+      <i class="fas fa-piggy-bank"></i> {{panneau.reserveTotale}}
+    </span>
+    {{/if}}
+  </div>
+  <button type="button" class="btn-toggle-levelup panneau-toggle-levelup {{#if panneau.modeLevelUp}}active{{/if}}"
+          data-action="toggleLevelUp" data-tooltip='{{localize "AGONE.ModeLevelUp"}}'>
+    <i class="fas fa-arrow-up"></i> {{localize "AGONE.ModeLevelUp"}}
+  </button>
+  {{/if}}
+</div>
+{{/if}}

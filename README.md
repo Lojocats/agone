@@ -31,6 +31,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - **8 caractéristiques primaires** : Agilité, Force, Perception, Résistance, Intelligence, Volonté, Charisme, Créativité
 - **Stats dérivées** automatiques : Mêlée, Tir, Art, Emprise, Initiative, Défense, PdV, Charge
 - Gestion des **bonus raciaux** avec min/max et malus en attente
+- **Panneau de création et de progression** : budgets restants, minimums raciaux, récapitulatif avant validation, XP et réserves locales ; les boutons d'achat indiquent leur coût (points ou XP) et se désactivent quand l'achat est impossible
 - Système d'**avantages & défauts** (Dons) dont les bonus et malus sont des effets actifs modifiables (voir ci-dessous)
 - Suivi des **Ténèbres & Perfidie** avec apparition automatique des démons intérieurs aux paliers
 
