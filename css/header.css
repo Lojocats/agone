@@ -7,9 +7,9 @@
   display: flex;
   gap: 12px;
   padding: 10px 12px;
-  background: linear-gradient(135deg, var(--agone-brown-dark), var(--agone-brown));
-  border-bottom: 3px solid var(--agone-gold);
-  color: var(--agone-parchment);
+  background: linear-gradient(135deg, var(--agone-entete-debut, var(--agone-brown-dark)), var(--agone-entete-fin, var(--agone-brown)));
+  border-bottom: 3px solid var(--agone-entete-filet, var(--agone-gold));
+  color: var(--agone-entete-texte, var(--agone-parchment));
 }
 
 /* ── Barre mode création ─────────────────────────────────── */
@@ -18,22 +18,24 @@
   align-items: center;
   gap: 10px;
   padding: 4px 10px;
-  background: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.25); /* fixe : voile sur le bandeau d'en-tête, sombre dans les deux thèmes */
   border-top: 1px solid var(--agone-gold);
   font-size: 12px;
 }
 .agone .creation-mode-bar.en-creation {
+  /* fixe : bandeau orangé sur l'en-tête sombre, identique dans les deux thèmes */
   background: rgba(120, 60, 0, 0.45);
   border-top-color: #e8a030;
 }
 .agone .creation-badge {
   font-weight: bold;
-  color: #f0c060;
+  color: #f0c060; /* fixe : sur l'en-tête sombre */
   letter-spacing: 0.04em;
 }
 .agone .btn-valider-creation {
   margin-left: auto;
   padding: 2px 10px;
+  /* fixe : pastille verte à texte blanc */
   background: #5a8a30;
   color: #fff;
   border: 1px solid var(--agone-txt-vert, #3a6010);
@@ -44,8 +46,8 @@
 .agone .btn-valider-creation:hover { background: #3a6a10; }
 .agone .btn-toggle-creation {
   padding: 2px 10px;
-  background: rgba(80,50,20,0.6);
-  color: var(--agone-parchment);
+  background: rgba(80,50,20,0.6); /* fixe : sur l'en-tête sombre */
+  color: var(--agone-entete-texte, var(--agone-parchment));
   border: 1px solid var(--agone-gold);
   border-radius: 3px;
   cursor: pointer;
@@ -80,7 +82,7 @@
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--agone-gold-light);
-  color: var(--agone-parchment);
+  color: var(--agone-entete-texte, var(--agone-parchment));
   outline: none;
   padding: 2px 4px;
 }
@@ -147,13 +149,14 @@
 .agone .sheet-tabs {
   display: flex;
   flex-wrap: wrap;
-  background: var(--agone-brown);
-  border-bottom: 2px solid var(--agone-gold);
+  background: var(--agone-entete-fond, var(--agone-brown));
+  border-bottom: 2px solid var(--agone-entete-filet, var(--agone-gold));
   padding: 0 6px;
 }
 .agone .sheet-tabs .item {
+  --agone-accent: var(--agone-gold);
   padding: 6px 12px;
-  color: var(--agone-parchment2);
+  color: var(--agone-entete-texte, var(--agone-parchment2));
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -161,10 +164,27 @@
   border-bottom: 3px solid transparent;
   transition: color 0.2s, border-color 0.2s;
 }
+/* Couleur d'accent par onglet : reprise pour le filet des titres de section (voir ci-dessous) */
+.agone .sheet-tabs .item[data-tab="tenebres"],
+.agone .sheet-tabs .item[data-tab="perfidie"],
+.agone .sheet-body .tab[data-tab="tenebres"],
+.agone .sheet-body .tab[data-tab="perfidie"] {
+  --agone-accent: var(--agone-noir);
+}
+.agone .sheet-tabs .item[data-tab="magie"],
+.agone .sheet-body .tab[data-tab="magie"] {
+  --agone-accent: var(--agone-txt-bleu, #2a50a0);
+}
+.agone .sheet-tabs .item[data-tab="combat"],
+.agone .sheet-body .tab[data-tab="combat"] {
+  --agone-accent: var(--agone-red);
+}
 .agone .sheet-tabs .item:hover { color: var(--agone-gold-light); }
 .agone .sheet-tabs .item.active {
+  /* Le texte reste doré : la barre d'onglets est brune, l'accent (bleu/rouge/noir) y est peu lisible.
+     Seuls le filet actif et les titres de section (ci-dessous) portent la couleur d'accent. */
   color: var(--agone-gold);
-  border-bottom-color: var(--agone-gold);
+  border-bottom-color: var(--agone-accent, var(--agone-gold));
   font-weight: 600;
 }
 
@@ -192,13 +212,16 @@
 }
 
 /* ── Titres de sections ──────────────────────────────────── */
+/* Hiérarchie commune aux trois familles de titres (section-title, section-header h3,
+   combat-card-title en combat.css) : même taille, MedievalSharp + petites capitales,
+   filet dans la couleur d'accent de l'onglet (repli doré hors onglet). */
 .agone .section-title,
 .agone .section-header h3,
 .agone h3.section-title {
   font-family: 'MedievalSharp', 'Crimson Text', serif;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--agone-brown-dark);
-  border-bottom: 1px solid var(--agone-gold);
+  border-bottom: 1px solid var(--agone-accent, var(--agone-gold));
   padding-bottom: 3px;
   margin: 10px 0 6px;
   text-transform: uppercase;
@@ -227,6 +250,7 @@
   display: flex;
   align-items: center;
   padding: 2px 8px;
+  /* fixe : bandeau orangé sur l'en-tête sombre, identique dans les deux thèmes */
   background: rgba(120, 60, 0, 0.35);
   border-top: 1px solid #e8a030;
 }

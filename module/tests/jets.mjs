@@ -170,6 +170,32 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       assert.notInclude(roll.formula, "x", "formule sans explosion");
       assert.equal(horsDes(roll), 2);
     });
+
+    it("carte de jet : classe d'issue succès et badge d'écart au seuil", async () => {
+      const seuilNumeric = 1; // seuil très bas : succès garanti (1d10 fermé + 2 ≥ 3)
+      const roll = await actor._sendRollToChat(await new Roll("1d10x10 + 2").evaluate(), "Test seuil", {
+        seuil:    { label: game.i18n.localize("AGONE.Des.Seuil"), value: seuilNumeric },
+        resultat: game.i18n.localize("AGONE.Des.Succes")
+      }, { rollType: "ferme", seuilNumeric });
+      const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
+      assert.include(msg.content, "roll-issue-succes", "classe d'issue succès sur la carte");
+      const ecartAttendu = `+${roll.total - seuilNumeric}`;
+      assert.include(msg.content, "roll-ecart-succes", "badge d'écart teinté succès");
+      assert.include(msg.content, `>${ecartAttendu}<`, "badge d'écart = total − seuil");
+    });
+
+    it("carte de jet : classe d'issue échec et badge d'écart négatif", async () => {
+      const seuilNumeric = 999; // seuil très haut : échec garanti
+      const roll = await actor._sendRollToChat(await new Roll("1d10x10 + 2").evaluate(), "Test seuil", {
+        seuil:    { label: game.i18n.localize("AGONE.Des.Seuil"), value: seuilNumeric },
+        resultat: game.i18n.localize("AGONE.Des.Echec")
+      }, { rollType: "ferme", seuilNumeric });
+      const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
+      assert.include(msg.content, "roll-issue-echec", "classe d'issue échec sur la carte");
+      const ecartAttendu = `−${seuilNumeric - roll.total}`;
+      assert.include(msg.content, "roll-ecart-echec", "badge d'écart teinté échec");
+      assert.include(msg.content, `>${ecartAttendu}<`, "badge d'écart = total − seuil");
+    });
   });
 
   describe("Personnage — danseurs (Emprise)", function () {

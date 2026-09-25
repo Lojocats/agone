@@ -116,7 +116,7 @@
 
 .agone .sort-impro-btn {
   background: transparent;
-  border: 1px solid rgba(80,45,10,0.30);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.30);
   border-radius: 3px;
   padding: 1px 5px;
   cursor: pointer;
@@ -257,7 +257,7 @@
   border: none;
   cursor: pointer;
   padding: 0 2px;
-  color: rgba(0,0,0,0.75);
+  color: var(--agone-txt-pale, rgba(0,0,0,0.75));
   font-size: 0.72em;
   flex-shrink: 0;
   transition: color 0.15s;
@@ -265,12 +265,12 @@
 .agone .don-desc-toggle:hover { color: var(--agone-gold); }
 .agone li.don-desc-expand {
   padding: 3px 10px 5px 28px;
-  background: rgba(255,240,200,0.7);
+  background: rgba(var(--agone-surface-rgb, 255,240,200), 0.7);
   border-top: 0;
 }
 .agone .don-desc-text {
   font-size: 10.5px;
-  color: rgba(0,0,0,0.75);
+  color: var(--agone-txt-doux, rgba(0,0,0,0.75));
   font-style: italic;
   line-height: 1.4;
 }
@@ -294,7 +294,7 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  color: rgba(80,50,20,0.4);
+  color: var(--agone-txt-pale, rgba(80,50,20,0.4));
   font-size: 0.75em;
   line-height: 1;
   flex-shrink: 0;
@@ -308,7 +308,7 @@
   color: rgba(var(--agone-encre-rgb, 60,35,15), 0.78);
   font-style: italic;
   border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.20);
-  background: rgba(0,0,0,0.04);
+  background: rgba(var(--agone-encre-rgb, 0,0,0), 0.04);
   list-style: none;
 }
 .agone .pouvoir-categorie {
@@ -540,7 +540,7 @@
   gap: 5px;
   padding: 5px 6px;
   background: rgba(var(--agone-or-rgb, 201,162,39), 0.07);
-  border-top: 1px solid rgba(80,45,10,0.2);
+  border-top: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.2);
   border-radius: 0 0 4px 4px;
   font-size: 11px;
 }
@@ -551,8 +551,8 @@
   white-space: nowrap;
 }
 .agone .danseur-levelup-btn {
-  background: rgba(80,45,10,0.10);
-  border: 1px solid rgba(80,45,10,0.35);
+  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.10);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.35);
   color: var(--agone-dark-text, #2a1a08);
   border-radius: 3px;
   padding: 2px 7px;
@@ -577,7 +577,7 @@
   gap: 3px;
   padding: 6px 8px;
   background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
-  border-top: 1px solid rgba(80,45,10,0.15);
+  border-top: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.15);
 }
 .agone .danseur-crea-row {
   display: flex;
@@ -591,8 +591,8 @@
   font-weight: 500;
 }
 .agone .danseur-niv-btn {
-  background: rgba(80,45,10,0.12);
-  border: 1px solid rgba(80,45,10,0.4);
+  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.12);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.4);
   border-radius: 3px;
   width: 22px;
   height: 22px;
@@ -642,7 +642,7 @@
   font-weight: 600;
   padding: 1px 7px;
   border-radius: 10px;
-  background: rgba(80,45,10,0.10);
+  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.10);
   color: var(--agone-brown, #5c3310);
   white-space: nowrap;
 }
@@ -654,7 +654,7 @@
   width: 40px;
   text-align: center;
   background: rgba(var(--agone-surface-rgb, 255,255,255), 0.45);
-  border: 1px solid rgba(80,45,10,0.35);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.35);
   border-radius: 3px;
   color: var(--agone-dark-text, #2a1a08);
   font-size: 12px;
@@ -676,7 +676,7 @@
 .agone .danseur-valider-btn:hover { background: rgba(var(--agone-vert-rgb, 26,107,48), 0.28); }
 .agone .danseur-recrea-btn {
   background: transparent;
-  border: 1px solid rgba(80,45,10,0.30);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.30);
   border-radius: 3px;
   padding: 2px 5px;
   cursor: pointer;
@@ -684,7 +684,7 @@
   font-size: 12px;
   opacity: 0.7;
 }
-.agone .danseur-recrea-btn:hover { opacity: 1; background: rgba(80,45,10,0.08); }
+.agone .danseur-recrea-btn:hover { opacity: 1; background: rgba(var(--agone-brun-rgb, 80,45,10), 0.08); }
 
 /* ── Démons intérieurs ────────────────────────────────────── */
 .agone .demons-block { margin-top: 10px; }
@@ -973,7 +973,7 @@
   padding: 4px 12px 6px 32px;
   color: rgba(var(--agone-encre-rgb, 60,35,15), 0.82);
   font-style: italic;
-  background: rgba(0,0,0,0.06);
+  background: rgba(var(--agone-encre-rgb, 0,0,0), 0.06);
   border-top: 0;
 }
 
@@ -1124,7 +1124,7 @@
   margin: 0;
 }
 .agone .av-title { color: var(--agone-txt-vert, #1a6a35); }
-.agone .av-title i { color: #c9a227; }
+.agone .av-title i { color: var(--agone-gold, #c9a227); }
 .agone .def-title { color: var(--agone-txt-rouge, #7a1a1a); }
 .agone .def-title i { color: var(--agone-txt-rouge, #c04040); }
 
@@ -1153,10 +1153,10 @@
 }
 /* Couleurs par section */
 .agone .av-sect-ame      { background: rgba(var(--agone-violet-rgb, 140,60,160), 0.13); color: var(--agone-txt-violet, #5a106a); border: 1px solid rgba(var(--agone-violet-rgb, 140,60,160), 0.3); }
-.agone .av-sect-corps    { background: rgba(var(--agone-orange-rgb, 180,70,20), 0.12);  color: var(--agone-txt-brun, #7a2a00); border: 1px solid rgba(var(--agone-orange-rgb, 180,70,20), 0.3);  }
+.agone .av-sect-corps    { background: rgba(var(--agone-orange-rgb, 180,70,20), 0.12);  color: var(--agone-txt-orange, #7a2a00); border: 1px solid rgba(var(--agone-orange-rgb, 180,70,20), 0.3);  }
 .agone .av-sect-esprit   { background: rgba(var(--agone-bleu-rgb, 30,100,180), 0.12); color: var(--agone-txt-bleu, #103070); border: 1px solid rgba(var(--agone-bleu-rgb, 30,100,180), 0.3); }
 .agone .av-sect-societe  { background: rgba(var(--agone-vert-rgb, 40,130,60), 0.12);  color: var(--agone-txt-vert, #0a4a1a); border: 1px solid rgba(var(--agone-vert-rgb, 40,130,60), 0.3);  }
-.agone .av-sect-emprise  { background: rgba(var(--agone-orange-rgb, 200,130,0), 0.13);  color: var(--agone-txt-brun, #6a4000); border: 1px solid rgba(var(--agone-orange-rgb, 200,130,0), 0.3);  }
+.agone .av-sect-emprise  { background: rgba(var(--agone-orange-rgb, 200,130,0), 0.13);  color: var(--agone-txt-orange, #6a4000); border: 1px solid rgba(var(--agone-orange-rgb, 200,130,0), 0.3);  }
 .agone .av-sect-arts     { background: rgba(var(--agone-bleu-rgb, 60,120,180), 0.12); color: var(--agone-txt-bleu, #1a3870); border: 1px solid rgba(var(--agone-bleu-rgb, 60,120,180), 0.3); }
 .agone .av-sect-saisons  { background: rgba(var(--agone-bleu-rgb, 30,160,140), 0.12); color: var(--agone-txt-vert, #0a5040); border: 1px solid rgba(var(--agone-bleu-rgb, 30,160,140), 0.3); }
 .agone .av-sect-flamme   { background: rgba(var(--agone-rouge-rgb, 200,60,20), 0.13);  color: var(--agone-txt-rouge, #6a1800); border: 1px solid rgba(var(--agone-rouge-rgb, 200,60,20), 0.3);  }
@@ -1280,7 +1280,7 @@
   gap: 8px;
 }
 .agone .sort-card {
-  background: rgba(255,250,240,0.8);
+  background: rgba(var(--agone-surface-rgb, 255,250,240), 0.8);
   border: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.18);
   border-radius: 6px;
   padding: 7px 8px 6px;
@@ -1298,8 +1298,14 @@
   display: flex;
   align-items: flex-start;
   gap: 3px;
+  /* Réserve la place des actions (position absolute, coin haut-droit) : les noms longs
+     doivent passer à la ligne avant elles, jamais se faire recouvrir. */
+  padding-right: 68px;
 }
 .agone .sort-card-name {
+  /* Foundry fixe la hauteur des boutons : un nom sur deux lignes déborderait */
+  height: auto;
+  min-height: 0;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -1351,31 +1357,43 @@
   border-top: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.12);
   margin-top: 2px;
 }
+/* Fond neutre tant que la carte n'est pas survolée : la place est réservée par .sort-card-top,
+   le fond plein n'apparaît qu'au survol pour ne pas peser en permanence sur la carte. */
 .agone .sort-card-actions {
   position: absolute;
   top: 4px;
   right: 4px;
-  display: none;
+  display: flex;
   gap: 3px;
   align-items: center;
-  background: rgba(255,250,240,0.96);
+  background: transparent;
   border-radius: 4px;
   padding: 2px 3px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.15);
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
 }
-.agone .sort-card:hover .sort-card-actions { display: flex; }
+.agone .sort-card:hover .sort-card-actions,
+.agone .sort-card-actions:focus-within {
+  background: rgba(var(--agone-surface-rgb, 255,250,240), 0.96);
+  border-color: rgba(var(--agone-brun-rgb, 93,58,30), 0.15);
+}
 .agone .sort-card-actions a,
 .agone .sort-card-actions span {
   font-size: 11px;
   color: var(--agone-brown);
   cursor: pointer;
-  opacity: 0.65;
+  opacity: 0.45;
   width: 18px;
   height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.15s;
 }
+.agone .sort-card-drag-handle { cursor: grab; }
+.agone .sort-card-drag-handle:active { cursor: grabbing; }
+.agone .sort-card:hover .sort-card-actions a,
+.agone .sort-card:hover .sort-card-actions span,
 .agone .sort-card-actions a:hover,
 .agone .sort-card-actions span:hover { opacity: 1; }
 /* Indicateurs de drop lors du réordonnancement */

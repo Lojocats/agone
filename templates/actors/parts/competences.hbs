@@ -8,7 +8,7 @@
       <span class="derived sombre">{{ptsCreationCompRestant}}</span>
       <span>/</span>
       <span class="derived sombre">{{system.ptsCreationComp.max}}</span>
-      <button type="button" class="btn-icon reset-crea-btn" data-action="resetComps" data-tooltip='{{localize "AGONE.ResetCreationCompTooltip"}}' aria-label='{{localize "AGONE.ResetCreationCompTooltip"}}'>&#8635;</button>
+      <button type="button" class="btn-icon reset-crea-btn" data-action="resetComps" data-tooltip='{{localize "AGONE.ResetCreationCompTooltip"}}' aria-label='{{localize "AGONE.ResetCreationCompTooltip"}}'><i class="fas fa-arrow-rotate-left"></i></button>
     </div>
     {{/if}}
     <button type="button" class="compendium-browse btn-icon" data-pack="agone.competences" data-tooltip='{{localize "AGONE.ParcourirCompetences"}}' aria-label='{{localize "AGONE.ParcourirCompetences"}}'>
@@ -27,7 +27,7 @@
   <div class="comp-search-wrap">
     <i class="fas fa-search comp-search-icon"></i>
     <input type="text" class="comp-search-input" placeholder='{{localize "AGONE.FiltrerCompetences"}}' autocomplete="off" />
-    <button type="button" class="comp-search-clear btn-icon" data-tooltip='{{localize "AGONE.EffacerRecherche"}}' aria-label='{{localize "AGONE.EffacerRecherche"}}' style="display:none">✕</button>
+    <button type="button" class="comp-search-clear btn-icon" data-tooltip='{{localize "AGONE.EffacerRecherche"}}' aria-label='{{localize "AGONE.EffacerRecherche"}}' style="display:none"><i class="fas fa-xmark"></i></button>
   </div>
   <p class="comp-search-empty" hidden>{{localize "AGONE.CompetenceRechercheAucunResultat"}}</p>
 
@@ -53,7 +53,7 @@
               <span class="comp-card-dom" data-tooltip='{{localize "AGONE.Domaine"}}'><i class="fas fa-tag"></i> {{comp.system.domaine}}</span>
               {{/if}}
               {{#if comp.system.specialite}}
-              <span class="comp-card-spe" data-tooltip='{{localize "AGONE.Specialite"}}'>&#9733; {{comp.system.specialite}}</span>
+              <span class="comp-card-spe" data-tooltip='{{localize "AGONE.Specialite"}}'><i class="fas fa-star"></i> {{comp.system.specialite}}</span>
               {{/if}}
             </div>
           </div>

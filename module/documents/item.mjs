@@ -49,14 +49,22 @@ export class AgoneItem extends Item {
     const descHTML = sd.description
       ? await foundry.applications.ux.TextEditor.implementation.enrichHTML(sd.description, { async: true })
       : "";
+    const DEFAULT_ICON = this.constructor.DEFAULT_ICON ?? foundry.documents.BaseItem.DEFAULT_ICON;
+    const img = this.img && this.img !== DEFAULT_ICON ? this.img : null;
 
     // ── Arme ─────────────────────────────────────────────────────────
     if (this.type === "arme") {
-      const STYLE_LABELS = { melee: "Mêlée", jet: "Jet", trait: "Trait", bouclier: "Bouclier" };
+      const STYLE_LABELS = {
+        melee:    game.i18n.localize("AGONE.Melee"),
+        jet:      game.i18n.localize("AGONE.Jet"),
+        trait:    game.i18n.localize("AGONE.Trait"),
+        bouclier: game.i18n.localize("AGONE.Bouclier"),
+      };
       const content = await foundry.applications.handlebars.renderTemplate(
         "systems/agone/templates/chat/item-card.hbs",
         {
           item:       this,
+          img,
           actor:      this.actor ?? null,
           typeLabel:  STYLE_LABELS[sd.style] ?? sd.style,
           styleLabel: STYLE_LABELS[sd.style] ?? sd.style,
@@ -73,12 +81,15 @@ export class AgoneItem extends Item {
 
     // ── Manœuvre / Botte ─────────────────────────────────────────────
     if (this.type === "manoeuvre") {
-      const catLabel  = sd.categorie === "botte" ? "Botte secrète" : "Manœuvre";
+      const catLabel  = sd.categorie === "botte"
+        ? game.i18n.localize("AGONE.BotteSecrete")
+        : game.i18n.localize("AGONE.Manoeuvre");
       const fmtMod = (v) => v === null || v === undefined ? "—" : (v >= 0 ? `+${v}` : `${v}`);
       const content = await foundry.applications.handlebars.renderTemplate(
         "systems/agone/templates/chat/item-card.hbs",
         {
           item:      this,
+          img,
           actor:     this.actor ?? null,
           typeLabel: catLabel,
           hasMods:   sd.ini !== null || sd.att !== null || sd.def !== null || sd.dom !== "0",
@@ -96,23 +107,27 @@ export class AgoneItem extends Item {
 
     // ── Autres types (sort, armure, pouvoir, don…) ───────────────────
     let details = "";
+    let typeLabel = "";
     if (this.type === "armure") {
       details = `${game.i18n.localize("AGONE.Des.ProAbr")} : ${sd.protection ?? 0} | -AGI : ${sd.malusAgi ?? 0}`;
     } else if (this.type === "sort") {
       details = `${game.i18n.localize("AGONE.Seuil")} : ${sd.seuil ?? 0} | ${game.i18n.localize("AGONE.Portee")} : ${sd.portee ?? "-"} | ${game.i18n.localize("AGONE.Duree")} : ${sd.duree ?? "-"}`;
     } else if (this.type === "pouvoir") {
-      const catLabel = sd.categorie === "saisonin" ? "Saisonin" : "Pouvoir de Flamme";
-      details = `<em>${catLabel}</em>`;
+      typeLabel = sd.categorie === "saisonin"
+        ? game.i18n.localize("AGONE.Saisonin")
+        : game.i18n.localize("AGONE.PouvoirFlamme");
     }
-    const content = `
-      <div class="agone chat-item-card">
-        <div class="card-header">
-          <img src="${this.img}" class="item-img" />
-          <h3>${this.name}</h3>
-        </div>
-        ${details ? `<p class="card-details">${details}</p>` : ""}
-        ${descHTML ? `<div class="card-desc">${descHTML}</div>` : ""}
-      </div>`;
+    const content = await foundry.applications.handlebars.renderTemplate(
+      "systems/agone/templates/chat/item-card.hbs",
+      {
+        item: this,
+        img,
+        actor: this.actor ?? null,
+        typeLabel,
+        details,
+        descHTML,
+      }
+    );
     return ChatMessage.create(ChatMessage.applyRollMode(
       { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
       game.settings.get("core", "rollMode")

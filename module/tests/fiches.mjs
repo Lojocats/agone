@@ -46,6 +46,19 @@ export function fichesBatch({ describe, it, assert, before, after }) {
         assert.ok(sheet.element.querySelector(`.tab[data-tab="${dernier.dataset.tab}"]`).classList.contains("active"));
       });
 
+      it("un rendu déclenché par une mise à jour de l'acteur ne rejoue pas l'animation d'entrée de l'onglet", async () => {
+        const liens = [...sheet.element.querySelectorAll(".sheet-tabs .item[data-tab]")];
+        const lien = liens.at(-1);
+        const tab = () => sheet.element.querySelector(`.tab[data-tab="${lien.dataset.tab}"]`);
+        lien.click();
+        assert.ok(tab().classList.contains("agone-entree"), "clic utilisateur : animation d'entrée posée");
+        const ancien = tab();
+        await actor.update({ "flags.agone.testAnimation": Date.now() });
+        await attendre(() => !!tab() && tab() !== ancien, "fiche re-rendue après actor.update");
+        assert.ok(tab().classList.contains("active"), "onglet toujours actif après le rendu");
+        assert.notOk(tab().classList.contains("agone-entree"), "pas de rejeu de l'animation lors d'un rendu automatique");
+      });
+
       it("lecture seule (observateur) : champs et jets désactivés, consultation active", async () => {
         Object.defineProperty(sheet, "isEditable", { configurable: true, get: () => false });
         try {
@@ -364,6 +377,19 @@ export function fichesBatch({ describe, it, assert, before, after }) {
     });
   });
 
+  describe("Fiche personnage : iconographie", function () {
+    this.timeout(DELAI);
+    it("l'onglet Paramètres affiche une icône .fa-gear, plus de caractère ⚙", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      const sheet = await ouvrir(actor.sheet);
+      const lien = sheet.element.querySelector('.sheet-tabs .item[data-tab="parametres"]');
+      assert.ok(lien, "onglet Paramètres");
+      assert.ok(lien.querySelector(".fa-gear"), "icône .fa-gear présente");
+      assert.notOk(lien.textContent.includes("⚙"), "plus de caractère ⚙ dans l'onglet");
+      await sheet.close({ animate: false });
+    });
+  });
+
   describe("Fiche personnage : sauvegarde automatique", function () {
     this.timeout(DELAI);
     it("un champ nommé est enregistré au changement", async () => {
@@ -421,6 +447,28 @@ export function fichesBatch({ describe, it, assert, before, after }) {
         delete sheet.isEditable;
         await sheet.close({ animate: false });
       }
+    });
+  });
+
+  describe("Carte de chat d'item (toChat)", function () {
+    this.timeout(DELAI);
+    let actor;
+    before(async () => { actor = await tests.acteur("personnage", PERSO); });
+
+    it("un pouvoir sans image affiche la carte sans <img>", async () => {
+      const [item] = await actor.createEmbeddedDocuments("Item", [{ name: "Souffle", type: "pouvoir" }]);
+      await item.toChat();
+      const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
+      assert.include(msg.content, "agone-item-card");
+      assert.notInclude(msg.content, "<img");
+    });
+
+    it("un objet avec une image personnalisée l'affiche dans la carte", async () => {
+      const [item] = await actor.createEmbeddedDocuments("Item",
+        [{ name: "Épée", type: "arme", img: "icons/svg/sword.svg" }]);
+      await item.toChat();
+      const msg = game.messages.filter(m => m.speaker?.actor === actor.id).at(-1);
+      assert.include(msg.content, "<img");
     });
   });
 

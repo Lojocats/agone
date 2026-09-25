@@ -1,7 +1,7 @@
 {{! Carte d'item envoyée dans le chat }}
 <div class="agone-item-card agone-item-type-{{item.type}}">
   <div class="item-card-header">
-    <img src="{{item.img}}" class="item-card-img" alt="{{item.name}}" />
+    {{#if img}}<img src="{{img}}" class="item-card-img" alt="{{item.name}}" />{{/if}}
     <div class="item-card-title">
       <h3 class="item-card-name">{{item.name}}</h3>
       {{#if typeLabel}}<span class="item-card-typelabel">{{typeLabel}}</span>{{/if}}
@@ -55,6 +55,11 @@
     {{/if}}
     {{#if item.system.condition}}<p class="item-card-condition"><i class="fas fa-exclamation-circle"></i> {{item.system.condition}}</p>{{/if}}
   </div>
+  {{/if}}
+
+  {{! ── DÉTAILS (sort, armure…) ── }}
+  {{#if details}}
+  <p class="item-card-details">{{{details}}}</p>
   {{/if}}
 
   {{! ── DESCRIPTION ── }}

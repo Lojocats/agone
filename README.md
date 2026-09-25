@@ -107,6 +107,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - **Tracker de combat** : initiative et ordre du tour custom, passage de round, gestion de l'état des combattants
 - **Mode sombre** : par défaut, le thème Agone suit le thème des applications Foundry ; le bouton 🌙 de la barre d'outils Agone fixe un choix clair ou sombre, mémorisé par joueur. Les cartes de jet du chat et les widgets suivent le même thème.
 - **Accessibilité** : navigation complète au clavier (Tab, Entrée, Espace) avec contour de focus, infobulles Foundry sur les boutons et libellés lisibles par les lecteurs d'écran
+- **Cartes de jet** : liseré coloré selon l'issue (succès, échec, critique, fumble) et écart au seuil ; couleur d'accent par onglet sur la fiche personnage ; animations discrètes, désactivées si le système demande moins d'animations
 
 ### Langues & mises à jour
 - Interface en **français** et en **anglais**

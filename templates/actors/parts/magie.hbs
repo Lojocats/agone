@@ -81,7 +81,7 @@
           <td class="col-apt">
             {{#if d.comp}}
             <span class="arts-apt-val">{{d.potentiel}}</span>
-            {{#if d.specialite}}<span class="arts-spe-hint">★ {{d.specialite}}</span>{{/if}}
+            {{#if d.specialite}}<span class="arts-spe-hint"><i class="fas fa-star"></i> {{d.specialite}}</span>{{/if}}
             <button type="button" class="roll-btn-small" data-action="rollArtDomaine"
                     data-domaine="{{d.domaine}}" data-apt="{{d.potentiel}}" data-specialite="{{d.specialite}}"
                     data-art="{{d.artVal}}" data-score-arts="{{d.scoreArtsMag}}"
@@ -96,7 +96,7 @@
           <td class="col-apt">
             {{#if d.comp}}
             <span class="arts-apt-val">{{d.impro}}</span>
-            {{#if d.specialite}}<span class="arts-spe-hint">★ {{d.specialite}}</span>{{/if}}
+            {{#if d.specialite}}<span class="arts-spe-hint"><i class="fas fa-star"></i> {{d.specialite}}</span>{{/if}}
             <button type="button" class="roll-btn-small" data-action="rollImpArtDomaine"
                     data-domaine="{{d.domaine}}" data-apt="{{d.impro}}" data-specialite="{{d.specialite}}"
                     data-cre="{{d.creVal}}" data-score-arts="{{d.scoreArtsMag}}"
@@ -162,7 +162,7 @@
           </div>
         </div>
         <div class="portees-ref-section">
-          <div class="portees-ref-title">🎲 {{localize "AGONE.Ui.MargeQualite"}}</div>
+          <div class="portees-ref-title"><i class="fas fa-dice-d10"></i> {{localize "AGONE.Ui.MargeQualite"}}</div>
           <div class="portee-ref-row">
             <span class="portee-ref-label mq-label">{{localize "AGONE.Ui.MqZero"}}</span>
             <span class="portee-ref-desc">{{localize "AGONE.Ui.MqAucune"}}</span>

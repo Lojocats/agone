@@ -3,6 +3,25 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.8] — 2026-09-25
+
+### Ajouté
+- **Cartes de jet plus lisibles** : un liseré coloré signale l'issue du jet (vert pour un succès, rouge pour un échec, or pour un critique, rouge sombre pour un fumble), le total est plus grand, et un badge indique l'écart au seuil (« +12 », « −3 »). Les badges de sort et d'arme tiennent sur une ligne compacte.
+- **Couleur d'accent par onglet** sur la fiche personnage : Ténèbres et Perfidie en noir bleuté, Magie en bleu, Combat en rouge, les autres en or. Elle souligne l'onglet actif et les titres de section.
+- **Animations discrètes** : apparition des cartes de jet, ouverture des descriptions et changement d'onglet. Elles ne se déclenchent qu'au clic (pas lors des mises à jour de la fiche) et sont désactivées si le système demande moins d'animations.
+
+### Corrigé
+- Jet fermé : la carte de jet pouvait afficher « Succès » avec un total sous le seuil (ou l'inverse), car le résultat était calculé sur un premier jet différent de celui affiché. Le résultat suit maintenant le total affiché.
+- Objets envoyés dans le chat : un objet sans image propre affichait l'icône par défaut de Foundry (le sac) en pleine largeur, et les pouvoirs, sorts, armures et dons avaient une carte sans mise en forme. Tous les objets utilisent maintenant la même carte stylée, sans image quand l'objet n'en a pas.
+
+### Modifié
+- **Mode sombre revu en profondeur** : toutes les couleurs passent par les couleurs du thème au lieu de corrections au cas par cas. Les écrans restent cohérents et lisibles en sombre, y compris le widget du calendrier et les boutons du tracker de combat, dont le texte était sombre sur fond sombre. Le mode clair est inchangé.
+- **Boutons et actions plus faciles à viser** : boutons icône agrandis (26 px), corbeille, crayon et poignée de glisser-déposer visibles en permanence (atténués, pleins au survol de la ligne), survol des lignes marqué. Sur les cartes de compétences et de sorts, les actions ne recouvrent plus le nom. Un nom long passe sur deux lignes sans déborder sur la ligne du domaine.
+- Titres de section harmonisés, scores alignés en colonnes.
+- Icônes : les pictogrammes en caractères (⚙, 🎲, ★, ↻, ✕) sont remplacés par des icônes Font Awesome, nettes et adaptées au thème.
+- README : cartes de jet, accent des onglets, animations.
+- Tests : issue et écart au seuil (fonction pure), absence de couleurs codées en dur et de `!important` dans le mode sombre, pictogrammes interdits dans les templates, accent des onglets, taille des boutons, couleur de l'onglet actif, hauteur des noms de cartes, fichier d'animations et `prefers-reduced-motion` (tests unitaires) ; classe d'issue et badge d'écart des cartes de jet, onglet Paramètres, aucune animation rejouée après une mise à jour de fiche, carte de chat d'un objet avec ou sans image (Quench).
+
 ## [1.9.7] — 2026-09-25
 
 ### Ajouté

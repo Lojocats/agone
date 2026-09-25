@@ -1,4 +1,5 @@
 import { effetsActeur, effetsNeutres } from "../helpers/effets.mjs";
+import { issueJet } from "../helpers/roll-issue.mjs";
 
 /** Libellé localisé des cartes de jet (section AGONE.Des). */
 const _L = (key, data) => data
@@ -1747,12 +1748,20 @@ export class AgoneActor extends Actor {
       if (isMegaFumble) Hooks.callAll("agone.megaFumble", { actor: this, roll: finalRoll, fumbleRoll });
     }
 
-    // Si fumble et seuil numérique fourni, recalculer le résultat sur le total ajusté
-    let finalResultat = resultatLabel;
-    if (isFumble && extra.seuilNumeric !== undefined && resultatLabel !== null) {
-      const adjustedTotal = finalRoll.total - fumblePenalty;
-      finalResultat = _L(adjustedTotal >= extra.seuilNumeric ? "Succes" : "Echec");
-    }
+    // Total sur lequel juger le seuil : ajusté de la pénalité de fumble le cas échéant. Un jet fermé
+    // relance le dé sans explosion (ci-dessus) : ce total final peut différer de celui que l'appelant
+    // a utilisé pour calculer son résultat avant l'appel ; on le recalcule donc toujours ici pour que
+    // le libellé Succès/Échec et le badge d'écart restent cohérents avec le total réellement affiché.
+    const totalPourSeuil = isFumble ? finalRoll.total - fumblePenalty : finalRoll.total;
+    const { issueClass, resultatSucces: succesCoherent, ecartSeuil, ecartSigne } = issueJet({
+      total:    totalPourSeuil,
+      seuil:    extra.seuilNumeric,
+      fumble:   isFumble,
+      critique: isCritique
+    });
+    const finalResultat = (resultatLabel !== null && succesCoherent !== null)
+      ? _L(succesCoherent ? "Succes" : "Echec")
+      : resultatLabel;
 
     const content = await foundry.applications.handlebars.renderTemplate(
       "systems/agone/templates/chat/roll-result.hbs",
@@ -1766,6 +1775,9 @@ export class AgoneActor extends Actor {
         resultat:      finalResultat,
         resultatSucces: finalResultat === _L("Succes"),
         seuil:         seuilValue,
+        issueClass,
+        ecartSeuil,
+        ecartSigne,
         isFumble,
         fumblePenalty,
         fumbleTotal:   finalRoll.total - fumblePenalty,

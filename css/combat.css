@@ -27,10 +27,12 @@
   padding: 8px 10px;
 }
 .agone .combat-card-title {
-  font-size: 12px;
+  font-size: 13px;
   font-variant: small-caps;
   font-weight: 700;
   color: var(--agone-brown-dark);
+  border-bottom: 1px solid var(--agone-accent, var(--agone-gold));
+  padding-bottom: 3px;
   margin: 0 0 7px 0;
   display: flex;
   align-items: center;
@@ -52,9 +54,9 @@
   border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
   border-radius: var(--radius);
   color: var(--agone-brown-dark);
-  width: 22px;
-  height: 22px;
-  font-size: 11px;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
   cursor: pointer;
   opacity: 0.7;
   padding: 0;
@@ -92,7 +94,7 @@
 }
 .agone .pdv-fill {
   height: 100%;
-  background: #4a9a4a;
+  background: #4a9a4a; /* fixe : jauge verte, lisible sur les deux fonds */
   border-radius: 4px;
   transition: width 0.4s, background 0.4s;
 }
@@ -203,7 +205,7 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.agone .cstat-roll:hover { background: var(--agone-gold); color: #fff; }
+.agone .cstat-roll:hover { background: var(--agone-gold); color: #fff; /* fixe : texte blanc sur doré */ }
 .agone .cstat-passive { cursor: default; opacity: 0.5; }
 .agone .cstat-passive:hover { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15); color: var(--agone-brown-dark); }
 .agone .cstat-score { font-size: 14px; font-weight: 700; color: var(--agone-brown-dark); min-width: 20px; text-align: center; }
@@ -237,7 +239,7 @@
   color: var(--agone-brown);
   opacity: 0.5;
 }
-.agone .armure-row.armure-worn .armure-portee-toggle { opacity: 1; color: #4a9a4a; }
+.agone .armure-row.armure-worn .armure-portee-toggle { opacity: 1; color: var(--agone-txt-vert, #4a9a4a); }
 .agone .armure-portee-toggle input { display: none; }
 .agone .armure-name { flex: 1; font-size: 12px; }
 .agone .armure-badge {
@@ -296,7 +298,7 @@
   color: var(--agone-brown);
   opacity: 0.4;
 }
-.agone .arme-equipee .arme-equipe-toggle { opacity: 1; color: #4a9a4a; }
+.agone .arme-equipee .arme-equipe-toggle { opacity: 1; color: var(--agone-txt-vert, #4a9a4a); }
 .agone .arme-equipe-toggle input { display: none; }
 .agone .arme-score-inactive { color: rgba(var(--agone-brun-rgb, 92,58,30), 0.3); font-size: 12px; font-weight: 600; }
 .agone .ab-bouclier-pro { font-size: 10px; font-weight: 700; color: var(--agone-txt-vert, #2e7d32); padding: 1px 4px; background: rgba(var(--agone-vert-rgb, 74,154,74), 0.12); border-radius: 3px; border: 1px solid rgba(var(--agone-vert-rgb, 74,154,74), 0.3); margin-left: 3px; }
@@ -313,8 +315,8 @@
 
 /* Roll buttons colorés (modificateur de couleur uniquement, taille définie dans controls.css) */
 .agone .roll-btn-small { cursor: pointer; }
-.agone .roll-init-btn { background: rgba(200,160,0,0.2); color: var(--agone-txt-jaune, #7a5c00); border: 1px solid rgba(200,160,0,0.4); }
-.agone .roll-init-btn:hover { background: rgba(200,160,0,0.5); }
+.agone .roll-init-btn { background: rgba(var(--agone-or-rgb, 200,160,0), 0.2); color: var(--agone-txt-jaune, #7a5c00); border: 1px solid rgba(var(--agone-or-rgb, 200,160,0), 0.4); }
+.agone .roll-init-btn:hover { background: rgba(var(--agone-or-rgb, 200,160,0), 0.5); }
 .agone .roll-atk-btn { background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.15); color: var(--agone-txt-rouge, #800000); border: 1px solid rgba(var(--agone-rouge-rgb, 160,0,0), 0.3); }
 .agone .roll-atk-btn:hover { background: rgba(var(--agone-rouge-rgb, 160,0,0), 0.35); }
 .agone .roll-def-btn { background: rgba(var(--agone-bleu-rgb, 0,80,160), 0.12); color: var(--agone-txt-bleu, #004080); border: 1px solid rgba(var(--agone-bleu-rgb, 0,80,160), 0.25); }

@@ -13,6 +13,7 @@
      browser-filtres.css – Barre de filtres commune des navigateurs
      identity.css        – Identité, fiche Peuple, fiche Item
      apps.css            – Chat, Calendrier, PNJ, Compagnons, Paramètres
+     animations.css      – Micro-animations (cartes, onglets, survols)
    ============================================================ */
 
 @import 'base.css';
@@ -26,3 +27,4 @@
 @import 'browser-filtres.css';
 @import 'identity.css';
 @import 'apps.css';
+@import 'animations.css';

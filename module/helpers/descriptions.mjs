@@ -58,6 +58,15 @@ export function lierDescriptions(root, ouvertes, { signal, ligneCliquable = fals
     if (ouvrir) ouvertes.add(cle);
     else ouvertes.delete(cle);
     afficherDescription(root, cle, ouvrir);
+    // Animation d'entrée seulement sur l'ouverture par clic (pas lors de la restauration au rendu,
+    // gérée plus haut par afficherDescription() directement, sans passer par basculer()).
+    if (ouvrir) {
+      const desc = root.querySelector(`[data-desc-de="${CSS.escape(cle)}"]`);
+      if (desc) {
+        desc.classList.add("agone-entree");
+        desc.addEventListener("animationend", () => desc.classList.remove("agone-entree"), { once: true });
+      }
+    }
   };
 
   root.addEventListener("click", event => {

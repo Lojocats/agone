@@ -1,5 +1,5 @@
 {{! Template de résultat de jet de dés Agone }}
-<div class="agone-roll-card">
+<div class="agone-roll-card{{#if issueClass}} roll-issue-{{issueClass}}{{/if}}">
   <div class="roll-header">
     <span class="roll-label">{{label}}</span>
     {{#if rollType}}
@@ -14,6 +14,7 @@
       {{#if fumbleTotal}}{{fumbleTotal}}{{else}}{{total}}{{/if}}
     </span>
     {{#if seuil}}<span class="roll-seuil">/ {{seuil}}</span>{{/if}}
+    {{#if ecartSeuil}}<span class="roll-ecart roll-ecart-{{ecartSigne}}" data-tooltip="{{localize 'AGONE.Des.EcartSeuil'}}" aria-label="{{localize 'AGONE.Des.EcartSeuil'}} : {{ecartSeuil}}">{{ecartSeuil}}</span>{{/if}}
     {{#if resultat}}<span class="roll-resultat {{#if resultatSucces}}roll-succes{{else}}roll-echec{{/if}}">{{resultat}}</span>{{/if}}
   </div>
 

@@ -1,0 +1,49 @@
+/* ============================================================
+   AGONE – Micro-animations
+   Apparition des cartes de jet · Ouverture des descriptions
+   Changement d'onglet · Harmonisation des survols
+   Neutralisées sous prefers-reduced-motion
+   ============================================================ */
+
+:root {
+  --agone-duree: 140ms;
+}
+
+/* ── Apparition douce des cartes de jet dans le chat ─────────────────── */
+.agone-roll-card {
+  animation: agone-carte-apparait 180ms ease-out;
+}
+@keyframes agone-carte-apparait {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Entrée sur action utilisateur (onglet cliqué, description ouverte) ── */
+/* La classe .agone-entree n'est posée qu'au clic (voir sheet-helpers.mjs  */
+/* bindTabs() et descriptions.mjs basculer()), jamais lors de la simple    */
+/* restauration d'état à un rendu (autosave, tri, filtre) : sinon la carte */
+/* clignoterait à chaque mise à jour. Elle est retirée à animationend.     */
+.agone-entree {
+  animation: agone-entree-apparait 180ms ease-out;
+}
+@keyframes agone-entree-apparait {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Harmonisation de la durée des survols de boutons ────────────────── */
+.agone :where(button, .item-control, .rollable, a) {
+  transition-property: color, background-color, border-color, opacity;
+  transition-duration: var(--agone-duree);
+}
+
+/* ── Accessibilité : désactivation complète des animations ──────────── */
+@media (prefers-reduced-motion: reduce) {
+  .agone-roll-card,
+  .agone-entree {
+    animation: none;
+  }
+  .agone :where(button, .item-control, .rollable, a) {
+    transition-duration: 0ms;
+  }
+}

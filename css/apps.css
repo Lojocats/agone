@@ -8,6 +8,7 @@
 /* Foundry v14 : toggle tools get aria-pressed="true" when active           */
 #scene-controls-tools button[data-tool="darkMode"][aria-pressed="true"] i,
 #scene-controls-tools button[data-tool="darkMode"][aria-pressed="true"] {
+  /* fixe : barre de scène de Foundry, hors thème Agone */
   color: #e8c964;
   text-shadow: 0 0 8px rgba(232, 201, 100, 0.7);
 }
@@ -33,6 +34,7 @@
 .agone-roll-card {
   background: var(--agone-parchment, #f4e8c1);
   border: 1px solid var(--agone-border, #7d5a2a);
+  border-left: 4px solid transparent;
   border-radius: 6px;
   overflow: hidden;
   font-family: 'Crimson Text', Georgia, serif;
@@ -40,6 +42,15 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   max-width: 320px;
 }
+/* ── Liseré et teinte selon l'issue du jet ──────────────────── */
+.agone-roll-card.roll-issue-succes { border-left-color: var(--agone-txt-vert, #1a6b30); }
+.agone-roll-card.roll-issue-echec { border-left-color: var(--agone-txt-rouge, #7a2010); }
+.agone-roll-card.roll-issue-critique { border-left-color: var(--agone-gold, #c9a227); }
+.agone-roll-card.roll-issue-fumble { border-left-color: var(--agone-fumble-debut, #6a1010); }
+.agone-roll-card.roll-issue-succes .roll-result { background: rgba(var(--agone-vert-rgb, 20,100,40), 0.08); }
+.agone-roll-card.roll-issue-echec .roll-result { background: rgba(var(--agone-rouge-rgb, 139,26,26), 0.08); }
+.agone-roll-card.roll-issue-critique .roll-result { background: rgba(var(--agone-or-rgb, 201,162,39), 0.10); }
+.agone-roll-card.roll-issue-fumble .roll-result { background: rgba(var(--agone-rouge-rgb, 139,26,26), 0.12); }
 .agone-roll-card .roll-header {
   background: var(--agone-brown, #5c3a1e);
   color: var(--agone-parchment, #f4e8c1);
@@ -65,8 +76,8 @@
   gap: 4px;
 }
 .agone-roll-card .roll-total {
-  font-size: 32px;
-  font-weight: bold;
+  font-size: 36px;
+  font-weight: 800;
   text-align: center;
   display: block;
   margin: 8px auto;
@@ -118,11 +129,31 @@
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
+  padding: 3px 4px;
+  border-radius: 4px;
+  transition: background var(--agone-duree, 140ms) ease;
 }
 .agone-roll-card .roll-seuil {
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--agone-brown);
-  opacity: 0.75;
+  opacity: 0.85;
+}
+.agone-roll-card .roll-ecart {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(var(--agone-brun-rgb, 93,58,30), 0.12);
+  color: var(--agone-brown);
+}
+.agone-roll-card .roll-ecart-positif {
+  color: var(--agone-txt-vert, #1a6b30);
+  background: rgba(var(--agone-vert-rgb, 20,100,40), 0.12);
+}
+.agone-roll-card .roll-ecart-negatif {
+  color: var(--agone-txt-rouge, #7a2010);
+  background: rgba(var(--agone-rouge-rgb, 139,26,26), 0.12);
 }
 .agone-roll-card .roll-resultat {
   font-size: 14px;
@@ -456,6 +487,7 @@
   height: 6px;
   margin-top: 3px;
   border-radius: 3px;
+  /* fixe : dégradé nuit → jour → nuit, indépendant du thème */
   background: linear-gradient(to right,
     #1f2a44 0%, #1f2a44 18%, #d9925a 25%, #f2d98a 38%, #f7e7a8 50%,
     #f2d98a 62%, #d9925a 77%, #1f2a44 88%, #1f2a44 100%);
@@ -715,13 +747,14 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  /* fixe : pastille sombre à texte clair, sur la scène, dans les deux thèmes */
   background: rgba(30, 18, 8, 0.78);
   border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.35);
   border-radius: 0 0 8px 8px;
   padding: 4px 16px;
   font-family: 'Crimson Text', Georgia, serif;
   font-size: 13px;
-  color: var(--agone-parchment, #f4e8c1);
+  color: #f4e8c1; /* fixe : voir le fond */
   pointer-events: all;
   box-shadow: 0 2px 10px rgba(0,0,0,0.45);
   white-space: nowrap;
@@ -952,7 +985,7 @@
 }
 .agone .cmp-pdv-fill {
   height: 100%;
-  background: #2a8040;
+  background: #2a8040; /* fixe : jauges de PdV, lisibles sur les deux fonds */
   border-radius: 4px;
   transition: width 0.3s;
 }
@@ -1289,9 +1322,9 @@
   align-items: center;
   gap: 10px;
   padding: 6px 10px;
-  background: linear-gradient(to right, var(--agone-brown-dark, #3b1e0a), var(--agone-brown, #5c3a1e));
-  color: var(--agone-parchment, #f4e8c1);
-  border-bottom: 2px solid var(--agone-gold, #c9a227);
+  background: linear-gradient(to right, var(--agone-entete-debut, var(--agone-brown-dark, #3b1e0a)), var(--agone-entete-fin, var(--agone-brown, #5c3a1e)));
+  color: var(--agone-entete-texte, var(--agone-parchment, #f4e8c1));
+  border-bottom: 2px solid var(--agone-entete-filet, var(--agone-gold, #c9a227));
   flex-shrink: 0;
 }
 .agone-ct-round {
@@ -1344,7 +1377,7 @@
 .agone-ct-btn {
   background: rgba(var(--agone-surface-rgb, 255,255,255), 0.1);
   border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.4);
-  color: var(--agone-parchment, #f4e8c1);
+  color: var(--agone-entete-texte, var(--agone-parchment, #f4e8c1));
   border-radius: var(--radius, 3px);
   width: 26px;
   height: 26px;
@@ -1358,7 +1391,7 @@
 }
 .agone-ct-btn:hover          { background: rgba(var(--agone-or-rgb, 201,162,39), 0.25); }
 .agone-ct-btn--next          { width: 32px; background: rgba(var(--agone-or-rgb, 201,162,39), 0.3); border-color: var(--agone-gold, #c9a227); }
-.agone-ct-btn--start         { width: auto; padding: 0 10px; gap: 5px; color: var(--agone-txt-brun, #4a3b1e); border-color: #8bc34a; background: var(--agone-fond-vert, #b8d98a); font-size: 11px; }
+.agone-ct-btn--start         { width: auto; padding: 0 10px; gap: 5px; color: var(--agone-txt-brun, #4a3b1e); border-color: #8bc34a; /* fixe : liseré vert */ background: var(--agone-fond-vert, #b8d98a); font-size: 11px; }
 .agone-ct-btn--start:hover   { background: var(--agone-ct-start-hover, #a0c46a); }
 
 /* ── Barre d'outils MJ ───────────────────────────────────── */
@@ -1653,6 +1686,7 @@
   transition: opacity 0.15s, background 0.15s, border-color 0.15s;
 }
 .ct-bg-cell:hover             { opacity: 0.85; }
+/* fixe : cases de seuil actives, pastilles sombres à texte clair */
 .ct-bg-cell.ct-bg-active      { opacity: 1; background: #c04040; border-color: var(--agone-txt-rouge, #a03030); color: #fff; }
 .ct-bc-cell.ct-bg-active      { background: #6a0000; border-color: var(--agone-txt-rouge, #900); }
 
@@ -1806,6 +1840,14 @@
   border-left: 2px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.3);
   padding-left: 6px;
   margin: 0;
+}
+.agone-item-card .item-card-details {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--agone-brown, #5c3a1e);
+  opacity: 0.85;
+  margin: 0;
+  padding: 4px 10px 0;
 }
 .agone-item-card .item-card-desc-details {
   border-top: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.15);

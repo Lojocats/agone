@@ -7,16 +7,26 @@
  * Onglets de fiche : restaure l'onglet actif (`sheet._currentTab`) et gère le changement.
  */
 export function bindTabs(sheet, root, on, defaultTab = "attributs") {
-  const activate = tab => {
+  // `animer` : n'ajoute l'animation d'entrée (classe .agone-entree, retirée à animationend) que sur un
+  // clic utilisateur, jamais lors de la restauration de l'onglet actif à chaque rendu (autosave, etc.),
+  // sous peine de clignoter en boucle.
+  const activate = (tab, { animer = false } = {}) => {
     root.querySelectorAll(".sheet-tabs .item[data-tab]").forEach(el => el.classList.toggle("active", el.dataset.tab === tab));
-    root.querySelectorAll(".tab[data-tab]").forEach(el => el.classList.toggle("active", el.dataset.tab === tab));
+    root.querySelectorAll(".tab[data-tab]").forEach(el => {
+      const estActif = el.dataset.tab === tab;
+      el.classList.toggle("active", estActif);
+      if (animer && estActif) {
+        el.classList.add("agone-entree");
+        el.addEventListener("animationend", () => el.classList.remove("agone-entree"), { once: true });
+      }
+    });
   };
   activate(sheet._currentTab ?? defaultTab);
   on("click", ".sheet-tabs .item[data-tab]", (_event, target) => {
     const tab = target.dataset.tab;
     if (!tab) return;
     sheet._currentTab = tab;
-    activate(tab);
+    activate(tab, { animer: true });
   });
 }
 
