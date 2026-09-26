@@ -277,16 +277,23 @@
             {{localize "AGONE.Ui.PtsRestants"}} <strong>{{d.ptsRestants}}</strong>
           </span>
           {{else}}
-          <span class="danseur-stat danseur-mem {{#if d.isFull}}mem-full{{/if}}" data-tooltip='{{localize "AGONE.Ui.MemoireTitre"}}'>{{localize "AGONE.Ui.MemAbr" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</span>
-          <span class="danseur-stat" data-tooltip='{{localize "AGONE.Endurance"}}'>{{localize "AGONE.Ui.EndAbr"}}
-            <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0">
-            /{{d.system.enduranceMax}}
-          </span>
-          <span class="danseur-stat" data-tooltip="{{localize "AGONE.Ui.BonusEmpriseDanseur"}}">EMP+{{d.system.bonusEmprise}}</span>
-          <span class="danseur-stat danseur-pot-emp" data-tooltip="{{localize "AGONE.Ui.PotEmpriseTitre"}}">{{localize "AGONE.Ui.PotAbr"}}{{d.potentielEmprise}}</span>
-          <span class="danseur-stat danseur-pot-impro" data-tooltip="{{localize "AGONE.Ui.PotImproTitre"}}">{{localize "AGONE.Ui.ImproAbr"}}{{d.potentielImpro}}</span>
-          <span class="danseur-stat" data-tooltip='{{localize "AGONE.Empathie"}}'>{{localize "AGONE.Ui.EmpAbr"}} {{d.system.empathie}}</span>
-
+          <div class="danseur-jauge danseur-jauge-mem {{#if d.isFull}}jauge-alerte{{/if}}" data-tooltip='{{localize "AGONE.Ui.MemoireTitre"}}'>
+            <i class="fas fa-brain danseur-jauge-icon"></i>
+            <span class="danseur-jauge-track"><span class="danseur-jauge-fill" style="width: {{d.memoirePct}}%"></span></span>
+            <span class="danseur-jauge-txt">{{localize "AGONE.Ui.MemAbr" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</span>
+          </div>
+          <div class="danseur-jauge danseur-jauge-end {{#if d.enduranceVide}}jauge-alerte{{/if}}" data-tooltip='{{localize "AGONE.Endurance"}}'>
+            <button type="button" class="danseur-jauge-btn" data-action="danseurEndurance" data-delta="-1" data-item-id="{{d.id}}" aria-label='{{localize "AGONE.Ui.EnduranceMoins"}}'>&minus;</button>
+            <span class="danseur-jauge-track"><span class="danseur-jauge-fill" style="width: {{d.endurancePct}}%"></span></span>
+            <input class="danseur-inline-num" type="number" data-item-id="{{d.id}}" data-field="enduranceActuelle" value="{{d.system.enduranceActuelle}}" min="0" max="{{d.system.enduranceMax}}">
+            <span class="danseur-jauge-txt">/{{d.system.enduranceMax}}</span>
+            <button type="button" class="danseur-jauge-btn" data-action="danseurEndurance" data-delta="1" data-item-id="{{d.id}}" aria-label='{{localize "AGONE.Ui.EndurancePlus"}}'>+</button>
+            <button type="button" class="danseur-jauge-recuperer btn-icon" data-action="danseurRecupererEndurance" data-item-id="{{d.id}}" data-tooltip='{{localize "AGONE.Ui.RecupererEndurance"}}' aria-label='{{localize "AGONE.Ui.RecupererEndurance"}}'><i class="fas fa-rotate-left"></i></button>
+          </div>
+          <span class="danseur-pastille" data-tooltip='{{localize "AGONE.Ui.BonusEmpriseDanseur"}}'><i class="fas fa-hand-sparkles"></i> {{localize "AGONE.Ui.EmpriseBonusPastille" valeur=d.system.bonusEmprise}}</span>
+          <span class="danseur-pastille danseur-pot-emp" data-tooltip='{{localize "AGONE.Ui.PotEmpriseTitre"}}'><i class="fas fa-hand-sparkles"></i> {{localize "AGONE.Ui.PotEmprisePastille" valeur=d.potentielEmprise}}</span>
+          <span class="danseur-pastille danseur-pot-impro" data-tooltip='{{localize "AGONE.Ui.PotImproTitre"}}'><i class="fas fa-lightbulb"></i> {{localize "AGONE.Ui.PotImproPastille" valeur=d.potentielImpro}}</span>
+          <span class="danseur-pastille" data-tooltip='{{localize "AGONE.Empathie"}}'><i class="fas fa-heart"></i> {{localize "AGONE.Ui.EmpathiePastille" valeur=d.system.empathie}}</span>
           {{/if}}
         </div>
         <div class="danseur-actions">
@@ -371,13 +378,14 @@
         {{#each d.assignedSorts as |s|}}
         <div class="danseur-slot-sort" data-sort-id="{{s.id}}">
           <div class="slot-main">
+            {{#if s.seuil}}<span class="slot-seuil-badge" data-tooltip='{{localize "AGONE.Seuil"}}'>{{s.seuil}}</span>{{/if}}
             <button type="button" class="slot-name" data-action="rollSortDanseur"
                     data-sort-id="{{s.id}}" data-danseur-id="{{d.id}}"
-                    data-tooltip='{{localize "AGONE.Ui.LancerSortDanseur" sort=s.name actuelle=../system.enduranceActuelle max=../system.enduranceMax}}'>{{s.name}}</button>
-          <button type="button" class="slot-remove" data-sort-id="{{s.id}}" data-tooltip='{{localize "AGONE.Retirer"}}'>x</button>
+                    {{#if ../enduranceVide}}disabled{{/if}}
+                    data-tooltip='{{#if ../enduranceVide}}{{localize "AGONE.Ui.EnduranceEpuisee"}}{{else}}{{localize "AGONE.Ui.LancerSortDanseur" sort=s.name actuelle=../system.enduranceActuelle max=../system.enduranceMax}}{{/if}}'>{{s.name}}</button>
+            <button type="button" class="slot-remove" data-sort-id="{{s.id}}" data-tooltip='{{localize "AGONE.Retirer"}}' aria-label='{{localize "AGONE.Retirer"}}'><i class="fas fa-xmark"></i></button>
           </div>
           <div class="slot-meta">
-            {{#if s.seuil}}<span>{{localize "AGONE.Seuil"}} : {{s.seuil}}</span>{{/if}}
             {{#if s.portee}}<span>{{localize "AGONE.Portee"}} : {{s.portee}}</span>{{/if}}
             {{#if s.duree}}<span>{{localize "AGONE.Duree"}} : {{s.duree}}</span>{{/if}}
             {{#if s.danse}}<span>{{localize "AGONE.Ui.IncantAbr"}} : {{s.danse}}</span>{{/if}}
@@ -394,6 +402,14 @@
         <div class="danseur-drop-hint"><i class="fas fa-arrow-down"></i> {{localize "AGONE.Ui.GlisserSortIci" utilise=d.memoireUtilisee capacite=d.capaciteSeuil}}</div>
         {{/unless}}
       </div>
+      {{#if d.sortsMemorisables.length}}
+      <select class="danseur-memoriser" data-danseur-id="{{d.id}}">
+        <option value="">{{localize "AGONE.Ui.MemoriserSortPlaceholder"}}</option>
+        {{#each d.sortsMemorisables as |sm|}}
+        <option value="{{sm.id}}">{{sm.label}}</option>
+        {{/each}}
+      </select>
+      {{/if}}
     </div>
     {{/each}}
     {{else}}

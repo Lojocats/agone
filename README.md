@@ -68,7 +68,8 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 ### Magie — Emprise & Danseurs
 - Fiches Danseurs avec système de **création par points** (17 pts à répartir, 4 statistiques indépendantes, niveaux 1–7)
 - Jet 3d10 par statistique selon le tableau officiel
-- Suivi de mémoire basé sur la somme des seuils de sorts vs capacité seuil
+- Suivi de mémoire basé sur la somme des seuils de sorts vs capacité seuil, avec jauges de mémoire et d'endurance
+- Mémorisation des sorts par glisser-déposer ou via une liste des sorts qui tiennent en mémoire
 - Jets de sorts via danseurs avec seuil × 2 en improvisation
 - Potentiel d'Emprise selon le type de mage
 

@@ -123,6 +123,27 @@ export function sortsContext(actor, sorts) {
   return { sortTypes, sortsBySeuil, triSortsEstType, sortsGroups };
 }
 
+/**
+ * Jauges et mémorisation d'un Danseur : mémoire (pts Seuil), endurance et sorts mémorisables.
+ * Fonction pure — ne lit ni le DataModel ni `game.i18n`, uniquement les valeurs passées en argument.
+ * @param {object} danseur                  `{ capaciteSeuil, enduranceActuelle, enduranceMax }`
+ * @param {Array<{seuil?: number}>} sortsAssignes  Sorts déjà mémorisés par ce danseur
+ * @param {Array<{id: string, name: string, seuil?: number, danseurNom?: string}>} autresSorts
+ *        Sorts de l'acteur non mémorisés par ce danseur (libres ou mémorisés par un autre danseur)
+ * @returns {{memoireUtilisee: number, isFull: boolean, memoirePct: number, endurancePct: number,
+ *            enduranceVide: boolean, sortsMemorisables: Array}}
+ */
+export function danseurMemoire({ capaciteSeuil = 0, enduranceActuelle = 0, enduranceMax = 0 } = {}, sortsAssignes = [], autresSorts = []) {
+  const memoireUtilisee = sortsAssignes.reduce((sum, s) => sum + (s.seuil ?? 0), 0);
+  const isFull       = capaciteSeuil > 0 && memoireUtilisee >= capaciteSeuil;
+  const memoirePct   = capaciteSeuil > 0 ? Math.max(0, Math.min(100, (memoireUtilisee / capaciteSeuil) * 100)) : 0;
+  const endurancePct = enduranceMax > 0 ? Math.max(0, Math.min(100, (enduranceActuelle / enduranceMax) * 100)) : 0;
+  const enduranceVide = enduranceActuelle <= 0;
+  const restant = capaciteSeuil - memoireUtilisee;
+  const sortsMemorisables = autresSorts.filter(s => (s.seuil ?? 0) <= restant);
+  return { memoireUtilisee, isFull, memoirePct, endurancePct, enduranceVide, sortsMemorisables };
+}
+
 const ASPECTS = [
   { key: "corps",  label: "AGONE.Corps"  },
   { key: "esprit", label: "AGONE.Esprit" },

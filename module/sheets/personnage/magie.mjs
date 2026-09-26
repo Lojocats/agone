@@ -1,4 +1,5 @@
-import { artsMagiquesParDomaine, sortsContext } from "../actor-context.mjs";
+import { artsMagiquesParDomaine, sortsContext, danseurMemoire } from "../actor-context.mjs";
+import { DANSEUR_TABLE } from "../../data/item-data.mjs";
 
 /**
  * Onglet Magie : sorts, danseurs (Emprise), Arts Magiques par domaine, glisser-déposer des sorts.
@@ -16,15 +17,13 @@ export const MagieMixin = Base => class extends Base {
       const assignedSorts = actor.items
         .filter(s => s.type === "sort" && s.system.danseurNom === d.name)
         .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie, seuil: s.system.seuil, portee: s.system.portee, duree: s.system.duree, danse: s.system.danse, description: s.system.description ?? "" }));
+      const autresSorts = actor.items
+        .filter(s => s.type === "sort" && s.system.danseurNom !== d.name)
+        .map(s => ({ id: s.id, name: s.name, seuil: s.system.seuil ?? 0, danseurNom: s.system.danseurNom || "" }));
       const sd = d.system;
 
       // Table officielle Agône (colonnes : niv 1–7)
-      const TBL = {
-        memoire:   [12, 14, 16, 18, 24, 30, 40],
-        emprise:   [ 0,  1,  2,  3,  4,  5,  6],
-        empathie:  [ 2,  3,  4,  5,  6,  7,  8],
-        endurance: [ 1,  2,  3,  4,  5,  6,  7],
-      };
+      const TBL = DANSEUR_TABLE;
 
       // Données en mode création : +/- par stat, coût = niveau
       const ptsBudget   = sd.ptsCreationMax ?? 17;
@@ -59,17 +58,33 @@ export const MagieMixin = Base => class extends Base {
         canDown:  x.niv > 1,
       }));
 
+      const capaciteSeuil = sd.capaciteSeuil ?? (sd.memoireMax * 5);
+      const memoire = danseurMemoire(
+        { capaciteSeuil, enduranceActuelle: sd.enduranceActuelle, enduranceMax: sd.enduranceMax },
+        assignedSorts, autresSorts
+      );
+      const sortsMemorisables = memoire.sortsMemorisables.map(s => ({
+        id: s.id,
+        label: s.danseurNom
+          ? game.i18n.format("AGONE.Ui.SortMemorisableAutre", { sort: s.name, seuil: s.seuil, danseur: s.danseurNom })
+          : game.i18n.format("AGONE.Ui.SortMemorisable", { sort: s.name, seuil: s.seuil }),
+      }));
+
       return {
         id: d.id, name: d.name, img: d.img,
         system: d.system,
         assignedSorts,
         assignedCount: assignedSorts.length,
-        memoireUtilisee: assignedSorts.reduce((sum, s) => sum + (s.seuil ?? 0), 0),
-        isFull: (assignedSorts.reduce((sum, s) => sum + (s.seuil ?? 0), 0)) >= (sd.capaciteSeuil ?? sd.memoireMax * 5),
+        memoireUtilisee: memoire.memoireUtilisee,
+        isFull: memoire.isFull,
+        memoirePct: memoire.memoirePct,
+        endurancePct: memoire.endurancePct,
+        enduranceVide: memoire.enduranceVide,
+        sortsMemorisables,
         creaNiveaux,
         levelUpStats,
         ptsDepense, ptsRestants, ptsBudget,
-        capaciteSeuil: sd.capaciteSeuil ?? (sd.memoireMax * 5),
+        capaciteSeuil,
         potentielEmprise: (context.system.aptitudeEmprise ?? 0) + (sd.bonusEmprise ?? 0),
         potentielImpro: (context.system.creativite?.score ?? 0) + (sd.empathie ?? 0) + (context.system.bonusEsprit ?? 0),
       };
@@ -115,6 +130,11 @@ export const MagieMixin = Base => class extends Base {
     });
     on("click", ".slot-remove", this._onRetireSortDanseur.bind(this));
     on("click", "[data-action='rollSortDanseur']", this._onRollSortDanseur.bind(this));
+    on("change", ".danseur-memoriser", this._onMemoriserSortSelect.bind(this));
+
+    // Jauges endurance : +/- et récupération complète
+    on("click", "[data-action='danseurEndurance']", this._onDanseurEndurance.bind(this));
+    on("click", "[data-action='danseurRecupererEndurance']", this._onDanseurRecupererEndurance.bind(this));
 
     // Drag & drop pour réordonner les sorts dans les slots danseurs
     this._setupDanseurSlotsDrag(root);
@@ -197,11 +217,15 @@ export const MagieMixin = Base => class extends Base {
     try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { return; }
     if (data?.type !== "sort-assign") return;
 
-    const danseurId    = zone.dataset.danseurId;
-    const danseur      = this.actor.items.get(danseurId);
-    const sort         = this.actor.items.get(data.itemId);
+    const danseurId = zone.dataset.danseurId;
+    const danseur    = this.actor.items.get(danseurId);
+    const sort       = this.actor.items.get(data.itemId);
     if (!danseur || !sort) return;
+    await this._memoriserSort(danseur, sort);
+  }
 
+  /** Mémorise un sort chez un danseur, en vérifiant que sa capacité restante le permet. */
+  async _memoriserSort(danseur, sort) {
     const capaciteSeuil  = danseur.system.capaciteSeuil ?? (danseur.system.memoireMax * 5);
     const assignedSorts  = this.actor.items.filter(i =>
       i.type === "sort" && i.system.danseurNom === danseur.name
@@ -214,9 +238,40 @@ export const MagieMixin = Base => class extends Base {
       ui.notifications.warn(
         game.i18n.format("AGONE.DanseurMemoirePleine", { nom: danseur.name, max: capaciteSeuil })
       );
-      return;
+      return false;
     }
     await sort.update({ "system.danseurNom": danseur.name });
+    return true;
+  }
+
+  /** Mémorisation d'un sort via le <select> (alternative au glisser-déposer). */
+  async _onMemoriserSortSelect(event) {
+    const select  = event.currentTarget;
+    const sortId  = select.value;
+    select.value  = "";
+    if (!sortId) return;
+    const danseur = this.actor.items.get(select.dataset.danseurId);
+    const sort    = this.actor.items.get(sortId);
+    if (!danseur || !sort) return;
+    await this._memoriserSort(danseur, sort);
+  }
+
+  // Endurance courante du danseur : +/-, remise à niveau maximal
+  async _onDanseurEndurance(event) {
+    event.preventDefault();
+    const btn     = event.currentTarget;
+    const danseur = this.actor.items.get(btn.dataset.itemId);
+    if (!danseur) return;
+    const delta = Number(btn.dataset.delta) || 0;
+    const next  = Math.max(0, Math.min(danseur.system.enduranceMax, (danseur.system.enduranceActuelle ?? 0) + delta));
+    await danseur.update({ "system.enduranceActuelle": next });
+  }
+
+  async _onDanseurRecupererEndurance(event) {
+    event.preventDefault();
+    const danseur = this.actor.items.get(event.currentTarget.dataset.itemId);
+    if (!danseur) return;
+    await danseur.update({ "system.enduranceActuelle": danseur.system.enduranceMax });
   }
 
   // Réordonnancement des sorts
@@ -485,12 +540,7 @@ export const MagieMixin = Base => class extends Base {
     if (!danseur) return;
 
     const SEUILS = [3, 4, 12, 17, 24, 28, 30];
-    const TBL = {
-      memoire:   [12, 14, 16, 18, 24, 30, 40],
-      emprise:   [ 0,  1,  2,  3,  4,  5,  6],
-      empathie:  [ 2,  3,  4,  5,  6,  7,  8],
-      endurance: [ 1,  2,  3,  4,  5,  6,  7],
-    };
+    const TBL = DANSEUR_TABLE;
 
     const roll  = await new Roll("3d10").evaluate();
     const total = roll.total;

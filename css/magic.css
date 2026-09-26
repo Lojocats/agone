@@ -393,11 +393,75 @@
   background: rgba(var(--agone-surface-rgb, 255,255,255), 0.07);
   outline: none;
 }
-.agone .danseur-stat {
+/* Jauges (mémoire / endurance) */
+.agone .danseur-jauge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
   color: var(--agone-brown);
   white-space: nowrap;
 }
+.agone .danseur-jauge-icon { opacity: 0.7; font-size: 10px; }
+.agone .danseur-jauge-track {
+  display: inline-block;
+  width: 46px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  overflow: hidden;
+}
+.agone .danseur-jauge-fill {
+  display: block;
+  height: 100%;
+  background: var(--agone-gold, #c9a227);
+  border-radius: 3px;
+}
+.agone .danseur-jauge.jauge-alerte .danseur-jauge-fill {
+  background: var(--agone-txt-rouge, #8b1a1a);
+}
+.agone .danseur-jauge.jauge-alerte .danseur-jauge-txt {
+  color: var(--agone-txt-rouge, #8b1a1a);
+  font-weight: 600;
+}
+.agone .danseur-jauge-txt { white-space: nowrap; }
+.agone .danseur-jauge-btn {
+  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.12);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.4);
+  border-radius: 3px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  line-height: 1;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--agone-brown, #5c3310);
+  flex-shrink: 0;
+}
+.agone .danseur-jauge-btn:hover { background: var(--agone-gold, #c9a227); }
+.agone .danseur-jauge-recuperer {
+  background: transparent;
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.3);
+  border-radius: 3px;
+  color: var(--agone-brown, #5c3310);
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0.75;
+}
+.agone .danseur-jauge-recuperer:hover { opacity: 1; background: rgba(var(--agone-brun-rgb, 80,45,10), 0.08); }
+
+/* Pastilles de statistiques (Emprise, Improvisation, Empathie) */
+.agone .danseur-pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--agone-brown);
+  white-space: nowrap;
+}
+.agone .danseur-pastille i { font-size: 10px; opacity: 0.75; }
 .agone .danseur-pot-emp {
   font-weight: 600;
   color: var(--agone-gold, #c9a227);
@@ -469,6 +533,23 @@
   line-height: inherit;
 }
 .agone .slot-name:hover { color: var(--agone-gold); text-decoration: underline; }
+.agone .slot-name[disabled] {
+  color: var(--agone-brown);
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+.agone .slot-seuil-badge {
+  flex-shrink: 0;
+  min-width: 16px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: rgba(var(--agone-or-rgb, 201,162,39), 0.18);
+  color: var(--agone-brown, #5c3310);
+}
 .agone .slot-details {
   margin-top: 2px;
 }
@@ -526,49 +607,21 @@
   padding: 4px;
   font-style: italic;
 }
+.agone .danseur-memoriser {
+  width: 100%;
+  margin-top: 3px;
+  font-size: 11px;
+  padding: 2px 4px;
+  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.45);
+  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.35);
+  border-radius: 3px;
+  color: var(--agone-dark-text, #2a1a08);
+}
 
 /* Drag & drop dans les slots danseurs */
 .agone .danseur-slot-sort.dragging { opacity: 0.4; }
 .agone .danseur-slot-sort.slot-drop-above { box-shadow: inset 0 2px 0 0 var(--agone-gold); }
 .agone .danseur-slot-sort.slot-drop-below { box-shadow: inset 0 -2px 0 0 var(--agone-gold); }
-
-/* Barre de montée de niveau des Danseurs */
-.agone .danseur-levelup-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 6px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.07);
-  border-top: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.2);
-  border-radius: 0 0 4px 4px;
-  font-size: 11px;
-}
-.agone .danseur-xp-pool {
-  color: var(--agone-brown);
-  font-weight: 600;
-  margin-right: 4px;
-  white-space: nowrap;
-}
-.agone .danseur-levelup-btn {
-  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.10);
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.35);
-  color: var(--agone-dark-text, #2a1a08);
-  border-radius: 3px;
-  padding: 2px 7px;
-  font-size: 11px;
-  cursor: pointer;
-  transition: background 0.15s;
-  white-space: nowrap;
-}
-.agone .danseur-levelup-btn:hover {
-  background: var(--agone-gold);
-  border-color: var(--agone-brown);
-}
-.agone .danseur-levelup-btn .lu-cout {
-  opacity: 0.7;
-  font-size: 10px;
-}
 
 /* Mode Création Danseur */
 .agone .danseur-crea-section {

@@ -3,6 +3,18 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.11] — 2026-09-26
+
+### Ajouté
+- **Jauges des danseurs** : chaque danseur affiche une jauge d'endurance (boutons − et +, et bouton « Récupérer » qui la remet au maximum) et une jauge de mémoire (seuils utilisés sur la capacité, en alerte quand elle est pleine).
+- **Mémoriser un sort sans glisser-déposer** : une liste « Mémoriser un sort… » sous les sorts du danseur propose les sorts qui tiennent dans sa mémoire restante (en indiquant ceux déjà confiés à un autre danseur). Elle fonctionne au clavier et sur tablette.
+
+### Modifié
+- **Statistiques des danseurs lisibles** : les abréviations de l'en-tête (EMP+, Pot., Impro., Emp) sont remplacées par des pastilles avec icône et libellé complet traduit.
+- Sorts mémorisés : le seuil s'affiche en badge, le bouton de lancer est désactivé quand l'endurance du danseur est épuisée, et le bouton de retrait a une icône et un libellé accessible.
+- README : jauges et mémorisation des danseurs.
+- Tests : jauges, bornes de l'endurance, bouton Récupérer, mémorisation par la liste et refus au-delà de la capacité, lancer désactivé sans endurance (Quench) ; calcul de mémoire et d'endurance des danseurs (tests unitaires).
+
 ## [1.9.10] — 2026-09-25
 
 ### Modifié

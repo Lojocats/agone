@@ -430,6 +430,87 @@ export function fichesBatch({ describe, it, assert, before, after }) {
     });
   });
 
+  describe("Fiche personnage : onglet Magie, jauges et mémorisation du Danseur", function () {
+    this.timeout(DELAI);
+    let actor, danseur, sortLibre, sortLourd, sheet;
+
+    before(async () => {
+      actor = await tests.acteur("personnage", PERSO);
+      [danseur] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Danseur de test", type: "danseur", system: { modeCreation: false, enduranceNiveau: 3, enduranceActuelle: 1 } },
+      ]);
+      [sortLibre, sortLourd] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Sort libre", type: "sort", system: { typeMagie: "Runes", seuil: 5 } },
+        { name: "Sort trop lourd", type: "sort", system: { typeMagie: "Runes", seuil: 100 } },
+      ]);
+      sheet = await ouvrir(actor.sheet);
+      sheet.element.querySelector('.sheet-tabs .item[data-tab="magie"]').click();
+    });
+    after(async () => { await sheet?.close({ animate: false }); });
+
+    const carte  = () => sheet.element.querySelector(`.danseur-card[data-item-id="${danseur.id}"]`);
+    const moins  = () => carte().querySelector('.danseur-jauge-btn[data-delta="-1"]');
+    const plus   = () => carte().querySelector('.danseur-jauge-btn[data-delta="1"]');
+    const endurance = () => actor.items.get(danseur.id).system.enduranceActuelle;
+
+    it("les jauges de mémoire et d'endurance sont affichées", () => {
+      assert.ok(carte().querySelector(".danseur-jauge-mem"), "jauge de mémoire");
+      assert.ok(carte().querySelector(".danseur-jauge-end"), "jauge d'endurance");
+    });
+
+    it("le bouton − ne descend pas l'endurance sous 0", async () => {
+      moins().click();
+      await attendre(() => endurance() === 0, "endurance décrémentée à 0");
+      moins().click();
+      await new Promise(r => setTimeout(r, 100));
+      assert.equal(endurance(), 0, "reste bornée à 0");
+    });
+
+    it("le bouton + ne monte pas l'endurance au-delà du maximum", async () => {
+      for (const attendu of [1, 2, 3, 3]) {
+        plus().click();
+        await attendre(() => endurance() === attendu, `endurance = ${attendu}`);
+      }
+    });
+
+    it("le bouton Récupérer remet l'endurance au maximum", async () => {
+      moins().click();
+      await attendre(() => endurance() === 2, "endurance décrémentée");
+      carte().querySelector('.danseur-jauge-recuperer').click();
+      await attendre(() => endurance() === 3, "endurance récupérée au maximum");
+    });
+
+    it("un sort qui dépasse la capacité restante n'apparaît pas dans le select de mémorisation", () => {
+      const select = carte().querySelector(`.danseur-memoriser[data-danseur-id="${danseur.id}"]`);
+      assert.ok(select, "select de mémorisation visible (le sort libre y est proposé)");
+      const valeurs = [...select.options].map(o => o.value);
+      assert.ok(valeurs.includes(sortLibre.id), "le sort libre est proposé");
+      assert.notOk(valeurs.includes(sortLourd.id), "le sort trop lourd n'est pas proposé");
+    });
+
+    it("le select de mémorisation assigne le sort choisi (system.danseurNom)", async () => {
+      const select = carte().querySelector(`.danseur-memoriser[data-danseur-id="${danseur.id}"]`);
+      select.value = sortLibre.id;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      await attendre(() => actor.items.get(sortLibre.id).system.danseurNom === danseur.name, "sort mémorisé par le danseur");
+    });
+
+    it("refuse de mémoriser un sort dont le seuil dépasse la capacité restante", async () => {
+      const ok = await sheet._memoriserSort(actor.items.get(danseur.id), actor.items.get(sortLourd.id));
+      assert.notOk(ok, "mémorisation refusée");
+      assert.equal(actor.items.get(sortLourd.id).system.danseurNom, "", "le sort reste libre");
+    });
+
+    it(".slot-name est désactivé quand l'endurance du danseur est épuisée", async () => {
+      for (const attendu of [2, 1, 0]) {
+        moins().click();
+        await attendre(() => endurance() === attendu, `endurance = ${attendu}`);
+      }
+      await attendre(() => carte().querySelector(`.slot-name[data-sort-id="${sortLibre.id}"]`)?.disabled,
+        "le bouton de lancer du sort mémorisé est désactivé");
+    });
+  });
+
   describe("Fiche personnage : recherche de compétences", function () {
     this.timeout(DELAI);
     it("affiche un message quand la recherche ne trouve aucune compétence", async () => {

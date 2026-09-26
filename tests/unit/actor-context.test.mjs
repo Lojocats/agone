@@ -97,6 +97,48 @@ describe("sortsContext", () => {
   });
 });
 
+describe("danseurMemoire", () => {
+  const sortSeuil = (id, seuil, danseurNom = "") => ({ id, name: id, seuil, danseurNom });
+
+  test("mémoire utilisée = somme des seuils des sorts assignés", () => {
+    const r = ctx.danseurMemoire({ capaciteSeuil: 20, enduranceActuelle: 2, enduranceMax: 4 },
+      [sortSeuil("A", 5), sortSeuil("B", 3)], []);
+    assert.equal(r.memoireUtilisee, 8);
+  });
+
+  test("isFull dès que la capacité est atteinte (égalité incluse), pas avant", () => {
+    const atteinte = ctx.danseurMemoire({ capaciteSeuil: 10, enduranceActuelle: 1, enduranceMax: 1 }, [sortSeuil("A", 10)], []);
+    assert.equal(atteinte.isFull, true);
+    const sous = ctx.danseurMemoire({ capaciteSeuil: 10, enduranceActuelle: 1, enduranceMax: 1 }, [sortSeuil("A", 9)], []);
+    assert.equal(sous.isFull, false);
+  });
+
+  test("pourcentages à 0 sans NaN quand la capacité ou l'endurance max valent 0", () => {
+    const r = ctx.danseurMemoire({ capaciteSeuil: 0, enduranceActuelle: 0, enduranceMax: 0 }, [], []);
+    assert.deepEqual([r.memoirePct, r.endurancePct], [0, 0]);
+  });
+
+  test("pourcentages plafonnés à 100 même si la valeur dépasse le maximum", () => {
+    const r = ctx.danseurMemoire({ capaciteSeuil: 10, enduranceActuelle: 20, enduranceMax: 10 }, [sortSeuil("A", 15)], []);
+    assert.deepEqual([r.memoirePct, r.endurancePct], [100, 100]);
+  });
+
+  test("enduranceVide vrai seulement quand l'endurance actuelle est nulle", () => {
+    assert.equal(ctx.danseurMemoire({ enduranceActuelle: 0, enduranceMax: 3 }, [], []).enduranceVide, true);
+    assert.equal(ctx.danseurMemoire({ enduranceActuelle: 1, enduranceMax: 3 }, [], []).enduranceVide, false);
+  });
+
+  test("sortsMemorisables exclut ceux qui dépasseraient la capacité restante, garde ceux d'un autre danseur", () => {
+    const autres = [
+      sortSeuil("Libre", 5),
+      sortSeuil("TropLourd", 20),
+      sortSeuil("AutreDanseur", 4, "Danseur B"),
+    ];
+    const r = ctx.danseurMemoire({ capaciteSeuil: 20, enduranceActuelle: 1, enduranceMax: 1 }, [sortSeuil("Deja", 6)], autres);
+    assert.deepEqual(r.sortsMemorisables.map(s => s.id), ["Libre", "AutreDanseur"]);
+  });
+});
+
 describe("caracsParAspect", () => {
   test("groupes Corps / Esprit / Âme dans l'ordre, groupes vides omis", () => {
     const g = ctx.caracsParAspect({ agilite: 1, charisma: 2 }, { agilite: 1, charisma: 2 }, ["agilite", "charisma"]);
