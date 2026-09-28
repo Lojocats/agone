@@ -3,6 +3,32 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.12] — 2026-09-28
+
+### Ajouté
+- **Fiches compagnon, démon et PNJ plus complètes** : elles reprennent les automatismes de la fiche personnage. Esquive et Défense naturelle se lancent d'un clic sur les trois fiches. Le PNJ gagne des boutons de jet d'Emprise et d'initiative magique. Les compétences, armes, manœuvres et équipements se réordonnent par glisser-déposer.
+- **Manœuvres** sur les fiches PNJ et compagnon (navigateur du compendium, envoi au chat), et **pouvoirs de Flamme** utilisables sur la fiche PNJ.
+- **Compagnon** : onglet Équipement (charge actuelle et surcharge, affichée sans malus aux jets) et bloc Notes. Son armure portée compte désormais (protection et malus d'AGI).
+- Cocher la 3e blessure grave d'un PNJ ou d'un démon lance le jet de VOL, comme pour un personnage (pas pour un compagnon, qui n'a pas de VOL).
+- **Badges de bonus/malus sur les fiches compagnon, démon et PNJ**, comme sur la fiche personnage : un badge par origine (peuple, effets d'items avec leur nom dans l'infobulle, malus d'AGI de l'armure) à côté des caractéristiques, des aspects du PNJ, de l'Art, du BD et des stats de combat. L'infobulle des stats de combat donne aussi leur formule détaillée.
+- **Modificateurs raciaux du PNJ** : une race reconnue dans le champ Race (Nain, Géant, Fée noire…, avec suggestions) applique les bonus et malus du peuple aux caractéristiques et aspects saisis, qui deviennent les valeurs de base. La Fée noire calcule son Art sur la seule Créativité. Les PNJ existants dont la race est reconnue voient donc leurs caractéristiques modifiées.
+- Les effets d'items sur le BD s'appliquent désormais aux démons et aux PNJ.
+
+### Corrigé
+- Fiche personnage : le bouton d'initiative d'une ligne d'arme ignorait le bonus de l'arme.
+- Jet d'Emprise : le bonus Esprit était affiché sur la carte sans être ajouté au total (personnage compris).
+- PNJ : l'Esprit était compté deux fois dans l'Emprise et l'aptitude d'Emprise.
+- PNJ : le malus d'AGI de l'armure n'était pas appliqué en parade, esquive, défense naturelle ni aux compétences d'AGI.
+- Compagnon : une arme de trait tombait à 0 faute de score de Tir.
+- PNJ : le bloc Danseurs permettait de créer des danseurs qui n'apparaissaient nulle part ; il est retiré de la fiche.
+- Jet d'Agilité ou de Perception avec une armure portée (tous les types d'acteur) : le malus d'armure était retiré une seule fois du total au lieu de réduire la caractéristique avant le ×2. Le jet utilise désormais la valeur effective affichée sur la fiche (AGI 12 avec un malus de 4 : 8 × 2 = 16).
+- Dommages des armes : le bonus aux dommages s'affichait comme un « + » vide ; la surcharge s'affichait « --3 ».
+
+### Modifié
+- Santé, stats de combat, armes, armures et manœuvres des fiches compagnon, démon et PNJ partagent désormais les mêmes blocs que la fiche personnage (affichage homogène, plus de styles en ligne).
+- README : fiches compagnon, démon et PNJ.
+- Tests : esquive, défense et malus d'armure des acteurs simples, Emprise et initiative magique du PNJ, jet de VOL à la 3e blessure grave, Tir et armure du compagnon, boutons et cartes des fiches, initiative par arme du personnage (Quench), modificateurs raciaux du PNJ, effet BD, badges d'effets, de race et d'armure sur les fiches simples, malus d'armure appliqué à AGI/PER avant le ×2 (Quench) ; jauges, tri, surcharge et stats de combat des fiches simples, partials chargés, badges, formules et reconnaissance de la race (tests unitaires).
+
 ## [1.9.11] — 2026-09-26
 
 ### Ajouté

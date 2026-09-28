@@ -1,0 +1,18 @@
+<!-- PARTIAL : STATS DE COMBAT DES ACTEURS SIMPLES (contexte statsCombat, voir statsCombatSimples)
+     Une stat avec action est un bouton de jet, sinon une valeur passive. L'infobulle ajoute la formule
+     détaillée ; les badges indiquent les bonus/malus des effets actifs. -->
+<div class="cstats-grid">
+  {{#each statsCombat as |s|}}
+  <div class="cstat-item cstat-{{s.cle}}" data-tooltip="{{localize s.tooltipKey}}{{#if s.formule}}&#10;{{s.formule}}{{/if}}">
+    {{#if s.action}}
+    <button type="button" class="cstat-roll" data-action="{{s.action}}"
+            data-tooltip='{{localize s.actionKey}}' aria-label='{{localize s.actionKey}}'><i class="fas {{s.icone}}"></i></button>
+    {{else}}
+    <span class="cstat-roll cstat-passive"><i class="fas {{s.icone}}"></i></span>
+    {{/if}}
+    <span class="cstat-score">{{s.valeur}}</span>
+    <span class="cstat-label">{{localize s.labelKey}}</span>
+    {{> systems/agone/templates/actors/parts/badges-bonus.hbs badges=s.badges}}
+  </div>
+  {{/each}}
+</div>

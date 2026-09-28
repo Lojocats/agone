@@ -1,5 +1,5 @@
 import { AgoneActorSheet } from "./agone-actor-sheet.mjs";
-import { competencesParScore, artsMagiquesParDomaine, sortsContext, caracsParAspect } from "./actor-context.mjs";
+import { artsMagiquesParDomaine, sortsContext, caracsParAspect, contexteActeurSimple, jaugePct, trierItems } from "./actor-context.mjs";
 
 /**
  * Feuille de PNJ.
@@ -20,43 +20,28 @@ export class PnjSheet extends AgoneActorSheet {
 
   /** @override */
   async _prepareContext(options) {
-    const actor  = this.actor;
-    const system = actor.system;
-    const byName = (a, b) => a.name.localeCompare(b.name, "fr");
-    const competences = actor.items.filter(i => i.type === "competence").sort(byName);
-    const sorts       = actor.items.filter(i => i.type === "sort").sort(byName);
+    const actor   = this.actor;
+    const context = await contexteActeurSimple(actor, this);
+    const system  = context.system;
+    const sorts   = actor.items.filter(i => i.type === "sort").sort((a, b) => a.name.localeCompare(b.name, "fr"));
 
     return {
-      system, actor,
-      source  : actor._source.system,   // valeurs stockées (saisie), sans les effets actifs
-      isOwner : actor.isOwner,
-      isGM    : game.user.isGM,
-      editable: this.isEditable,
+      ...context,
       // Caractéristiques (partial caracs-simples.hbs) : le nom lance le jet
-      caracGroups: caracsParAspect(system, actor._source.system, ["agilite", "force", "perception", "resistance",
-                                            "intelligence", "volonte", "charisma", "creativite"]),
-      caracExtras: [{ key: "bd", labelKey: "AGONE.BD", value: system.bd }],
-      armes   : actor.items.filter(i => i.type === "arme"),
-      armures : actor.items.filter(i => i.type === "armure"),
-      pdvPercent: system.pdv?.max > 0
-        ? Math.round(Math.min(100, (system.pdv.valeur / system.pdv.max) * 100))
-        : 0,
-      // Partial competences.hbs : pas de tri par famille ni de montée de niveau
-      competences,
-      competencesGroups     : competencesParScore(competences),
-      competencesNonAcquises: [],
-      triCompsEstFamille    : false,
-      showLevelUp           : false,
-      showLevelUpComp       : false,
-      showLevelUpAspect     : false,
-      // Partial magie.hbs (sans danseurs) ; la Créativité d'un PNJ est un nombre simple
+      caracGroups: caracsParAspect(system, context.source, ["agilite", "force", "perception", "resistance",
+                                            "intelligence", "volonte", "charisma", "creativite"], { badges: context.badges }),
+      caracExtras: [{ key: "bd", labelKey: "AGONE.BD", value: context.source.bd, badges: context.badges.bd ?? [], total: system.bd }],
+      pdvPercent : jaugePct(system.pdv?.valeur, system.pdv?.max),
+      // Suggestions du champ Race : un peuple reconnu applique ses modificateurs raciaux
+      peuplesNoms: Object.keys(CONFIG.AGONE.peupleNomVersKey),
+      manoeuvres : trierItems(actor, "manoeuvre"),
+      // Partial magie.hbs sans danseurs ; la Créativité d'un PNJ est un nombre simple
       sorts,
       ...sortsContext(actor, sorts),
-      artsMagiquesByDomaine: artsMagiquesParDomaine(system, competences, system.creativite ?? 0),
-      danseurs: [],
-      descriptionHTML: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        system.description ?? "", { async: true, secrets: actor.isOwner }
-      ),
+      artsMagiquesByDomaine: artsMagiquesParDomaine(system, context.competences, system.creativite ?? 0),
+      danseurs    : [],
+      sansDanseurs: true,
+      pouvoirs    : trierItems(actor, "pouvoir"),
     };
   }
 

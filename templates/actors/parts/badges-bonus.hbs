@@ -1,0 +1,3 @@
+{{!-- Badges de bonus/malus d'une stat des fiches simples (peuple, effets actifs des items, armure).
+      Paramètre : badges (voir badgesBonus dans actor-context.mjs). --}}
+{{#each badges as |b|}}<span class="racial-bonus-badge {{b.classe}}" data-tooltip="{{b.tooltip}}">{{b.texte}}</span>{{/each}}

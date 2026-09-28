@@ -156,8 +156,8 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       assert.equal(horsDes(roll), 7);
     });
 
-    it("Emprise brute = Emprise + Résonance", async () => {
-      assert.equal(horsDes(await actor.rollEmpriseAttr(FF)), actor.system.emprise);
+    it("Emprise brute = Emprise + Résonance + bonus Esprit", async () => {
+      assert.equal(horsDes(await actor.rollEmpriseAttr(FF)), actor.system.emprise + actor.system.bonusEsprit);
     });
 
     it("3e blessure grave : VOL × 2 + bonus Âme", async () => {
@@ -240,10 +240,20 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       assert.equal(horsDes(await actor.rollAttribut("creativite", FF)), 5 * 2 + 3 + saisonin);
     });
 
-    it("PNJ : l'armure portée pénalise l'Agilité", async () => {
+    it("PNJ : l'armure portée réduit l'Agilité avant le ×2 (AGI effective affichée sur la fiche)", async () => {
       const actor = await tests.acteur("pnj", { ...PNJ, armure: { protection: 3, malusAgi: 2 } });
       const saisonin = actor._getBonusSaisonin();
-      assert.equal(horsDes(await actor.rollAttribut("agilite", FF)), 4 * 2 + 2 - 2 + saisonin);
+      assert.equal(horsDes(await actor.rollAttribut("agilite", FF)), (4 - 2) * 2 + 2 + saisonin);
+    });
+
+    it("personnage : les malus d'armure réduisent AGI et PER avant le ×2", async () => {
+      const actor = await tests.acteur("personnage", PERSO);
+      await actor.update({ "system.armure.portee": true, "system.armure.malusAgi": 2, "system.armure.malusPer": 1 });
+      const s = actor.system;
+      const autres = s.bonusCorps + (s.malusSurcharge ?? 0) + (s.malusBlessureGrave ?? 0) + actor._getBonusSaisonin();
+      assert.equal(s.armure._malusAgiActif, -2);
+      assert.equal(horsDes(await actor.rollAttribut("agilite", FF)), (s.agilite.score - 2) * 2 + autres);
+      assert.equal(horsDes(await actor.rollAttribut("perception", FF)), (s.perception.score - 1) * 2 + autres);
     });
 
     it("PNJ : compétence avec caractéristique numérique", async () => {
@@ -267,6 +277,61 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       const [arme] = await actor.createEmbeddedDocuments("Item", [{ name: "Hache", type: "arme", system: { attackBonus: 1 } }]);
       const roll = await actor.rollAttaque(arme.id, FF);
       assert.equal(horsDes(roll), actor.system.melee + 1 + actor.system.bonusCorps + actor._getBonusSaisonin());
+    });
+
+    it("compagnon et démon : esquive = AGI + compétence Esquive + bonus Corps", async () => {
+      for (const type of ["compagnon", "demon"]) {
+        const actor = await tests.acteur(type, { agilite: 4 });
+        await actor.createEmbeddedDocuments("Item", [{ name: "Esquive", type: "competence", system: { score: 3 } }]);
+        assert.equal(horsDes(await actor.rollEsquive(FF)), actor.system.esquiveTotal + actor._getBonusSaisonin(), type);
+      }
+    });
+
+    it("PNJ : l'armure portée pénalise aussi la parade et l'esquive (malusAgi)", async () => {
+      const sain = await tests.acteur("pnj", PNJ);
+      const arme = await tests.acteur("pnj", { ...PNJ, armure: { protection: 3, malusAgi: 2 } });
+      const [armeSain]   = await sain.createEmbeddedDocuments("Item", [{ name: "Hache", type: "arme", system: {} }]);
+      const [armeArmure] = await arme.createEmbeddedDocuments("Item", [{ name: "Hache", type: "arme", system: {} }]);
+      const paradeSain   = horsDes(await sain.rollParade(armeSain.id, FF));
+      const paradeArmure = horsDes(await arme.rollParade(armeArmure.id, FF));
+      assert.equal(paradeSain - paradeArmure, 2, "parade");
+      const esquiveSain   = horsDes(await sain.rollEsquive(FF));
+      const esquiveArmure = horsDes(await arme.rollEsquive(FF));
+      assert.equal(esquiveSain - esquiveArmure, 2, "esquive");
+    });
+
+    it("compagnon : l'armure portée pénalise l'Agilité (malusAgi dérivé)", async () => {
+      const actor = await tests.acteur("compagnon", { agilite: 4 });
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Cuirasse", type: "armure", system: { portee: true, protection: 2, malusAgi: 2 } },
+      ]);
+      const saisonin = actor._getBonusSaisonin();
+      assert.equal(horsDes(await actor.rollAttribut("agilite", FF)), (4 - 2) * 2 + saisonin);
+    });
+
+    it("PNJ : Emprise brute = Emprise + Résonance + bonus Esprit", async () => {
+      const actor = await tests.acteur("pnj", PNJ);
+      assert.equal(horsDes(await actor.rollEmpriseAttr(FF)), actor.system.emprise + actor.system.bonusEsprit);
+    });
+
+    it("PNJ : initiative magique = Initiative + 10 (fermée)", async () => {
+      const actor = await tests.acteur("pnj", PNJ);
+      assert.equal(horsDes(await actor.rollInitiativeMagique(FF)), actor.system.initMagique);
+    });
+
+    it("PNJ : 3e blessure grave = VOL × 2 + bonus Âme", async () => {
+      const actor = await tests.acteur("pnj", PNJ);
+      const roll = await actor.rollVolBlessure3();
+      assert.equal(horsDes(roll), actor.system.volonte * 2 + actor.system.bonusAme);
+    });
+
+    it("compagnon : arme de trait (style tir) utilise le Tir plutôt que la Mêlée", async () => {
+      const actor = await tests.acteur("compagnon", { agilite: 3, force: 4, perception: 2 });
+      const [arme] = await actor.createEmbeddedDocuments("Item", [
+        { name: "Arc court", type: "arme", system: { style: "trait", attackBonus: 1 } },
+      ]);
+      const roll = await actor.rollAttaque(arme.id, FF);
+      assert.equal(horsDes(roll), actor.system.tir + 1 + (actor.system.bonusCorps ?? 0) + actor._getBonusSaisonin());
     });
   });
 }

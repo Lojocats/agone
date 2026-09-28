@@ -102,9 +102,8 @@ export const MagieMixin = Base => class extends Base {
     // Sorts, Arts Magiques, mini-filtre et tri (communs avec la fiche PNJ)
     this._bindSortsListeners(on);
 
-    // Emprise & danseurs
+    // Emprise & danseurs (Emprise brute : AgoneActorSheet#_bindJetsCombat)
     on("click", "[data-action='rollEmprise']", this._onRollEmprise.bind(this));
-    on("click", "[data-action='rollEmpriseAttr']", this._onRollEmpriseAttr.bind(this));
     on("click", "[data-action='rollImprovisation']", this._onRollImprovisation.bind(this));
 
     on("click", "[data-action='rollAptitudeMagie']", this._onRollAptitudeMagie.bind(this));
@@ -160,11 +159,6 @@ export const MagieMixin = Base => class extends Base {
   async _onRollEmprise(event) {
     event.preventDefault();
     await this.actor.rollEmprise(event.currentTarget.dataset.itemId);
-  }
-
-  async _onRollEmpriseAttr(event) {
-    event.preventDefault();
-    await this.actor.rollEmpriseAttr();
   }
 
   async _onRollImprovisation(event) {

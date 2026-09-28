@@ -21,7 +21,7 @@ const CIBLES_PNJ = {
   corps: s => s.corps, esprit: s => s.esprit, ame: s => s.ame,
   initiative_bonus: s => s.initiative, melee_bonus: s => s.melee, tir_bonus: s => s.tir,
   defense_bonus: s => s.defenseNaturelle, esquive_bonus: s => s.esquiveTotal,
-  art_bonus: s => s.art, emprise_bonus: s => s.emprise,
+  art_bonus: s => s.art, emprise_bonus: s => s.emprise, bd_bonus: s => s.bd,
 };
 
 const itemAvecEffet = (name, type, changes, effet = {}) => ({

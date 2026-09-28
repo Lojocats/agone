@@ -253,7 +253,8 @@
     {{/if}}
   </div>
 
-  <!-- Danseurs -->
+  <!-- Danseurs (absents des fiches sans danseurs : PNJ) -->
+  {{#unless sansDanseurs}}
   <div class="danseurs-block">
     <div class="section-header">
       <h3>{{localize "AGONE.Danseurs"}}</h3>
@@ -416,6 +417,7 @@
     <p class="empty-list">{{localize "AGONE.AucunDanseur"}}</p>
     {{/if}}
   </div><!-- /danseurs-block -->
+  {{/unless}}
   </div><!-- /magie-main -->
 
   <!-- Pouvoirs de la Flamme / Saisonins -->

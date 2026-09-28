@@ -98,8 +98,36 @@ export function donneesBatch({ describe, it, assert, before, after }) {
       assert.equal(s.defenseNaturelle, 4);
     });
     it("Art = ⌊(CHA + CRÉ) / 2⌋", () => assert.equal(s.art, 3));
-    it("Emprise jorniste = INT + Esprit", () => assert.equal(s.emprise, 3 + 1));
+    it("Emprise jorniste = INT (bonus Esprit ajouté au jet, pas à l'EMP)", () => assert.equal(s.emprise, 3));
     it("Esquive = AGI + compétence + bonus Corps", () => assert.equal(s.esquiveTotal, 4 + 0 + 2));
+    it("Initiative magique = Initiative + 10", () => assert.equal(s.initMagique, s.initiative + 10));
+    it("race non reconnue : aucun modificateur racial", () => {
+      assert.equal(s.peupleKey, null);
+      assert.deepEqual(s.bonusRacial, {});
+    });
+  });
+
+  describe("PNJ — modificateurs raciaux", function () {
+    this.timeout(DELAI);
+    it("race reconnue (sans casse ni accents) : bonus du peuple ajoutés à la saisie, stockage intact", async () => {
+      const actor = await tests.acteur("pnj", { ...PNJ, race: "nain" });
+      const s = actor.system;
+      const p = CONFIG.AGONE.peuplesData.nain;
+      assert.equal(s.peupleKey, "nain");
+      assert.equal(s.resistance, PNJ.resistance + p.resistanceBonus);
+      assert.equal(s.creativite, PNJ.creativite + p.creativiteBonus);
+      assert.equal(actor._source.system.resistance, PNJ.resistance, "valeur saisie inchangée");
+      assert.equal(s.bonusRacial.resistance, p.resistanceBonus);
+    });
+    it("les valeurs dérivées suivent les caractéristiques raciales", async () => {
+      const s = (await tests.acteur("pnj", { ...PNJ, race: "Nain" })).system;
+      assert.equal(s.art, Math.floor((s.charisma + s.creativite) / 2));
+    });
+    it("Fée noire : Art = CRÉ", async () => {
+      const s = (await tests.acteur("pnj", { ...PNJ, race: "Fée noire", typeMage: "jorniste" })).system;
+      assert.equal(s.peupleKey, "feeNoire");
+      assert.equal(s.art, s.creativite);
+    });
   });
 
   describe("Compagnon et démon", function () {
@@ -117,6 +145,20 @@ export function donneesBatch({ describe, it, assert, before, after }) {
       assert.equal(s.seuilBlessureGrave, 4);
       assert.equal(s.seuilBlessureCritique, 6);
       assert.equal(s.initiative, 3);
+    });
+    it("compagnon : Tir = ⌊(AGI + PER) / 2⌋, chargeJour = ⌊chargeMax / 4⌋", async () => {
+      const s = (await tests.acteur("compagnon", { agilite: 3, force: 4, perception: 2, chargeMax: 9 })).system;
+      assert.equal(s.tir, Math.floor((3 + 2) / 2));
+      assert.equal(s.chargeJour, 2);
+    });
+    it("compagnon : armure dérivée des armures portées (protection + malusAgi cumulés, seulement si portée)", async () => {
+      const actor = await tests.acteur("compagnon", { agilite: 3, force: 4, perception: 2 });
+      await actor.createEmbeddedDocuments("Item", [
+        { name: "Cuirasse", type: "armure", system: { portee: true, protection: 2, malusAgi: 1 } },
+        { name: "Gambison", type: "armure", system: { portee: true, protection: 1, malusAgi: 0 } },
+        { name: "Casque",   type: "armure", system: { portee: false, protection: 5, malusAgi: 5 } },
+      ]);
+      assert.deepEqual([actor.system.armure.protection, actor.system.armure.malusAgi], [3, 1]);
     });
   });
 }

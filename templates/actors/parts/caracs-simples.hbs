@@ -10,13 +10,11 @@
               data-tooltip='{{localize "AGONE.JeterDe"}} {{localize c.labelKey}}'>{{localize c.labelKey}}</button>
       {{#if c.derivee}}
       <span class="derived-val" data-tooltip="{{c.derivee}}">{{c.score}}</span>
+      {{> systems/agone/templates/actors/parts/badges-bonus.hbs badges=c.badges}}
       {{else}}
       <input type="number" name="system.{{c.key}}" value="{{c.score}}" class="stat-num" min="0" />
-      {{#if c.bonus}}
-      <span class="racial-bonus-badge {{#if (gt c.bonus 0)}}racial-pos{{else}}racial-neg{{/if}}"
-            data-tooltip='{{localize "AGONE.Effets.Titre"}}'>{{#if (gt c.bonus 0)}}+{{/if}}{{c.bonus}}</span>
-      <span class="derived-val carac-total-val">{{c.total}}</span>
-      {{/if}}
+      {{> systems/agone/templates/actors/parts/badges-bonus.hbs badges=c.badges}}
+      {{#if c.bonus}}<span class="derived-val carac-total-val">{{c.total}}</span>{{/if}}
       {{/if}}
       {{#if c.expField}}{{#if @root.showLevelUp}}
       <input type="number" name="system.{{c.expField}}" value="{{c.localExp}}" class="stat-num exp" min="0"
@@ -46,6 +44,10 @@
     <div class="carac-row">
       <label class="stat-label">{{localize x.labelKey}}</label>
       <input type="number" name="system.{{x.key}}" value="{{x.value}}" class="stat-num" />
+      {{#if x.badges.length}}
+      {{> systems/agone/templates/actors/parts/badges-bonus.hbs badges=x.badges}}
+      <span class="derived-val carac-total-val">{{x.total}}</span>
+      {{/if}}
     </div>
     {{/each}}
   </div>

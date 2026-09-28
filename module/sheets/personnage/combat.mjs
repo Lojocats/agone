@@ -5,13 +5,9 @@ export const CombatMixin = Base => class extends Base {
 
   /** Écouteurs délégués de l'onglet (voir PersonnageSheet#_onRender). */
   _bindCombatListeners(on, root) {
-    // Jets de dés — Combat
-    on("click", "[data-action='rollInitiative']", this._onRollInitiative.bind(this));
-    on("click", "[data-action='rollInitiativeMagique']", this._onRollInitiativeMagique.bind(this));
-    on("click", "[data-action='rollAttaque']", this._onRollAttaque.bind(this));
-    on("click", "[data-action='rollParade']", this._onRollParade.bind(this));
-    on("click", "[data-action='rollEsquive']", this._onRollEsquive.bind(this));
-    on("click", "[data-action='rollDefenseNaturelle']", this._onRollDefenseNaturelle.bind(this));
+    // Jets de combat communs (initiative, attaque, parade, esquive, défense, Emprise,
+    // manœuvres et pouvoirs au chat, jet de VOL à la 3e blessure grave) : AgoneActorSheet#_bindJetsCombat
+    this._bindJetsCombat(on);
     on("click", "[data-action='rollFumble']", this._onRollFumble.bind(this));
     on("click", "[data-action='rollBonusDe']", this._onRollBonusDe.bind(this));
 
@@ -25,54 +21,6 @@ export const CombatMixin = Base => class extends Base {
 
     // Arme équipée (tenue en main) — boucliers : sync actor.bouclier
     on("change", ".arme-equipe", this._onArmeEquipeChange.bind(this));
-
-    // 3e blessure grave → jet de VOL Difficulté 10
-    on("change", "[name='system.blessureGrave3']", async (e) => {
-      if (e.currentTarget.checked) {
-        await this.actor.rollVolBlessure3();
-      }
-    });
-
-    // Envoyer manœuvre/botte dans le chat
-    on("click", "[data-action='rollManoeuvre']", this._onChatManoeuvre.bind(this));
-
-    // Envoyer pouvoir de flamme dans le chat
-    on("click", "[data-action='chatPouvoir']", this._onChatPouvoir.bind(this));
-  }
-
-  async _onRollInitiative(event) {
-    event.preventDefault();
-    const armeId = event.currentTarget.dataset.armeId ?? null;
-    await this.actor.rollInitiative(armeId);
-  }
-
-  async _onRollInitiativeMagique(event) {
-    event.preventDefault();
-    await this.actor.rollInitiativeMagique();
-  }
-
-  async _onRollAttaque(event) {
-    event.preventDefault();
-    const li     = event.currentTarget.closest("[data-item-id]");
-    const armeId = li?.dataset.itemId ?? event.currentTarget.dataset.armeId;
-    await this.actor.rollAttaque(armeId);
-  }
-
-  async _onRollParade(event) {
-    event.preventDefault();
-    const li     = event.currentTarget.closest("[data-item-id]");
-    const armeId = li?.dataset.itemId ?? event.currentTarget.dataset.armeId;
-    await this.actor.rollParade(armeId);
-  }
-
-  async _onRollEsquive(event) {
-    event.preventDefault();
-    await this.actor.rollEsquive();
-  }
-
-  async _onRollDefenseNaturelle(event) {
-    event.preventDefault();
-    await this.actor.rollDefenseNaturelle();
   }
 
   async _onRollFumble(event) {
@@ -183,21 +131,5 @@ export const CombatMixin = Base => class extends Base {
     if (type === "1") malusPer = Math.floor(malusAgi / 2);
     if (type === "2") malusPer = malusAgi;
     await this.actor.update({ "system.armure.malusPer": malusPer });
-  }
-
-  // Envoyer manœuvre/botte dans le chat
-  async _onChatManoeuvre(event) {
-    event.preventDefault();
-    const id   = event.currentTarget.dataset.itemId;
-    const item = this.actor.items.get(id);
-    if (item) await item.toChat();
-  }
-
-  // Envoyer pouvoir de flamme dans le chat
-  async _onChatPouvoir(event) {
-    event.preventDefault();
-    const id   = event.currentTarget.dataset.itemId;
-    const item = this.actor.items.get(id);
-    if (item) await item.toChat();
   }
 };

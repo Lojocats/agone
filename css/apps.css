@@ -914,6 +914,31 @@ p.agone-recap-avertissement {
   border-color: var(--agone-gold, #c9a227);
   box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb, 201,162,39), 0.15);
 }
+/* Espacements des cartes des fiches simples (remplacent les styles en ligne) */
+.agone .npc-card-espace     { margin-top: 8px; }
+.agone .npc-card-espace-bas { margin-bottom: 8px; }
+.agone .npc-bloc-espace     { margin-top: 6px; }
+/* Titre de carte avec saisie de l'XP et bascule de montée de niveau (démon) */
+.agone .npc-titre-xp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.agone .npc-titre-xp .npc-titre-texte { flex: 1; }
+.agone .npc-titre-xp .npc-xp-label {
+  font-size: 0.8em;
+  font-weight: normal;
+}
+.agone .npc-titre-xp .npc-xp-input { width: 42px; }
+/* Onglet Notes en colonne (démon, compagnon) : uniquement quand il est actif */
+.agone .sheet-body .npc-notes-tab.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  overflow-y: auto;
+}
+.agone .npc-notes-tab .editor-container { flex: 1; }
 
 /* ── Onglet Compagnons ───────────────────────────────────── */
 .agone .companions-tab {

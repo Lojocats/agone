@@ -1,0 +1,40 @@
+<!-- PARTIAL : ARMURES (fiche personnage et acteurs simples) -->
+<div class="combat-card armure-card">
+  <div class="combat-card-header">
+    <h3 class="combat-card-title"><i class="fas fa-shield-halved"></i> {{localize "AGONE.Armure.Label"}}</h3>
+    <div class="card-btns">
+      <button type="button" class="compendium-browse btn-icon" data-pack="agone.armures" data-tooltip='{{localize "AGONE.ParcourirArmures"}}' aria-label='{{localize "AGONE.ParcourirArmures"}}'><i class="fas fa-search"></i></button>
+      <button type="button" class="item-create btn-icon" data-type="armure" data-tooltip='{{localize "AGONE.AjouterArmure"}}' aria-label='{{localize "AGONE.AjouterArmure"}}'><i class="fas fa-plus"></i></button>
+    </div>
+  </div>
+  {{#if armures.length}}
+  <div class="armures-list">
+    {{#each armures as |armure|}}
+    <div class="armure-row {{#if armure.system.portee}}armure-worn{{/if}}" data-item-id="{{armure.id}}">
+      <label class="armure-portee-toggle" data-tooltip="{{#if armure.system.portee}}{{localize "AGONE.Equipee"}}{{else}}{{localize "AGONE.Rangee"}}{{/if}}">
+        <input type="checkbox" class="armure-portee" data-item-id="{{armure.id}}" {{#if armure.system.portee}}checked{{/if}}
+               aria-label="{{#if armure.system.portee}}{{localize "AGONE.Equipee"}}{{else}}{{localize "AGONE.Rangee"}}{{/if}}" />
+        <i class="fas {{#if armure.system.portee}}fa-shield-alt{{else}}fa-shield{{/if}}"></i>
+      </label>
+      <span class="armure-name">{{armure.name}}</span>
+      <span class="armure-badge pro-badge">{{localize "AGONE.Combat.Pro"}} {{armure.system.protection}}</span>
+      {{#if armure.system.malusAgi}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusAgi"}} {{armure.system.malusAgi}}</span>{{/if}}
+      {{#if armure.system.malusPer}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusPer"}} {{armure.system.malusPer}}</span>{{/if}}
+      <div class="row-actions">
+        <a class="item-edit" data-item-id="{{armure.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
+        <a class="item-delete" data-item-id="{{armure.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  <div class="armure-totaux">
+    <span class="armure-total-item"><i class="fas fa-shield-alt"></i> {{localize "AGONE.Combat.Pro"}} <strong>{{system.armure.protection}}</strong></span>
+    <span class="armure-total-item malus-total">{{localize "AGONE.Combat.MalusAgi"}} <strong>{{#if system.armure.malusAgi}}{{system.armure.malusAgi}}{{else}}0{{/if}}</strong></span>
+    {{#if (eq actor.type "personnage")}}
+    <span class="armure-total-item malus-total">{{localize "AGONE.Combat.MalusPer"}} <strong>{{#if system.armure.malusPer}}{{system.armure.malusPer}}{{else}}0{{/if}}</strong></span>
+    {{/if}}
+  </div>
+  {{else}}
+  <p class="empty-list">{{localize "AGONE.AucuneArmure"}}</p>
+  {{/if}}
+</div>

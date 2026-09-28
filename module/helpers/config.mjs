@@ -30,6 +30,22 @@ for (const p of PEUPLES_DATA) {
   AGONE.peupleNomVersKey[name] = key;
 }
 
+/**
+ * Clé de peuple correspondant à une race saisie librement (champ `race` du PNJ) : nom ou clé
+ * du peuple, sans tenir compte de la casse, des accents ni des espaces autour.
+ * @param {string} race
+ * @returns {string|null}  null si la race ne correspond à aucun peuple
+ */
+export function peupleDepuisRace(race) {
+  const norm  = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
+  const cible = norm(race);
+  if (!cible) return null;
+  for (const [nom, key] of Object.entries(AGONE.peupleNomVersKey)) {
+    if (norm(nom) === cible || norm(key) === cible) return key;
+  }
+  return null;
+}
+
 
 // Multiplicateurs XP pour la montée de niveau (après création)
 AGONE.xpMultipliers = { aspect: 7, carac: 5, competence: 3, avantage: 10, defaut: 5 };
@@ -257,7 +273,7 @@ AGONE.effets = {
   esquive_bonus:    { label: "AGONE.EsquiveTotal",     simple: true },
   art_bonus:        { label: "AGONE.Art",              simple: true },
   emprise_bonus:    { label: "AGONE.Emprise",          simple: true },
-  bd_bonus:         { label: "AGONE.BD" },
+  bd_bonus:         { label: "AGONE.BD",               simple: true },  // démon et PNJ (pas de BD pour le compagnon)
   tai:              { label: "AGONE.TAI" },
   // Création et Charges
   ptsCreationComp_bonus: { label: "AGONE.Effets.PtsCreationComp" },

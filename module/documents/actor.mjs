@@ -213,11 +213,21 @@ export class AgoneActor extends Actor {
       }
     }
 
-    // Esquive pour PNJ (AGI + compétence Esquive + Bonus Corps)
-    if (this.type === "pnj") {
-      const compEsquivePnj = this.items.find(i => i.type === "competence" && i.name === "Esquive");
-      const scoreEsquivePnj = compEsquivePnj?.system.score ?? 0;
-      systemData.esquiveTotal = systemData.agilite + scoreEsquivePnj + (systemData.bonusCorps ?? 0)
+    // Compagnon : protection et malus d'AGI dérivés des armures portées (transitoire, hors schéma)
+    if (this.type === "compagnon") {
+      const portees = this.items.filter(i => i.type === "armure" && i.system.portee);
+      systemData.armure = {
+        protection: portees.reduce((s, i) => s + (i.system.protection ?? 0), 0),
+        malusAgi:   portees.reduce((s, i) => s + (i.system.malusAgi   ?? 0), 0),
+      };
+    }
+
+    // Esquive des acteurs simples (AGI + compétence Esquive + Bonus Corps + effets), comme le personnage
+    if (this.type !== "personnage") {
+      const compEsquive  = this.items.find(i => i.type === "competence" && i.name === "Esquive");
+      const scoreEsquive = compEsquive?.system.score ?? 0;
+      systemData.esquiveCompScore = scoreEsquive; // transitoire — pour les tooltips
+      systemData.esquiveTotal = this._scoreAttribut("agilite") + scoreEsquive + (systemData.bonusCorps ?? 0)
                               + effetsActeur(this).esquive_bonus;
     }
   }
@@ -367,6 +377,20 @@ export class AgoneActor extends Actor {
     sd.aptitudeEmprise      = sd.emprise + scoreConnDanseurs + sd.bonusEsprit;
   }
 
+  /**
+   * Malus d'AGI dû à l'armure (valeur négative ou nulle).
+   * Personnage : armure et bouclier portés (`_malusAgiActif`) ; autres types : `system.armure.malusAgi`
+   * (stocké en positif pour le PNJ, dérivé de l'armure portée pour le compagnon).
+   */
+  _malusAgiArmure() {
+    const sd = this.system;
+    if (this.type === "personnage") {
+      return (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
+    }
+    const malus = sd.armure?.malusAgi ?? 0;
+    return malus ? -malus : 0;
+  }
+
   /** Score d'une caractéristique : `{ score }` (personnage) ou nombre (compagnon, démon, PNJ). */
   _scoreAttribut(key) {
     const value = this.system[key];
@@ -424,33 +448,29 @@ export class AgoneActor extends Actor {
     if (attrConfig.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
 
     const label = game.i18n.localize(attrConfig.label);
-    const baseScore = attrScore * 2 + bonusAspect;
+    // Le malus d'armure réduit la caractéristique elle-même (AGI/PER effective affichée sur la fiche) : il est doublé
+    const malusArmure = attributKey === "agilite"
+      ? this._malusAgiArmure()
+      : attributKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
+    const scoreEffectif = Math.max(0, attrScore + malusArmure);
+    const baseScore = scoreEffectif * 2 + bonusAspect;
 
     const jet = await this._dialogModificateur(label, options);
     if (!jet) return;
     const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    let malusArmure = 0;
-    if (this.type === "personnage") {
-      malusArmure = attributKey === "agilite"
-        ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
-        : attributKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
-    } else if (attributKey === "agilite") {
-      // PNJ : malus d'AGI de l'armure portée (stocké en valeur positive)
-      malusArmure = -(sd.armure?.malusAgi ?? 0);
-    }
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
     const roll = new Roll(
       "1d10x10 + @base + @malus + @modif",
-      { base: baseScore, malus: malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure, modif: modif + bonusSaisonin }
+      { base: baseScore, malus: (sd.malusSurcharge ?? 0) + malusBlessure, modif: modif + bonusSaisonin }
     );
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {
-      base:   `${_L("AttributX2", { attribut: label })} : ${attrScore * 2}`,
+      base:   `${_L("AttributX2", { attribut: label })} : ${scoreEffectif * 2}`,
       ...(hasAspects ? { aspect: `${_L("BonusAspect")} : ${bonusAspect}` } : {}),
-      modif:  `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
+      modif:  `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, { rollType: jet.rollType });
     return roll;
@@ -486,7 +506,7 @@ export class AgoneActor extends Actor {
     const bonusSpe    = jet.bonusSpe;
     const malusComp0  = compScore === 0 ? -3 : 0;
     const malusArmure = attrKey === "agilite"
-      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
+      ? this._malusAgiArmure()
       : attrKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
@@ -586,7 +606,7 @@ export class AgoneActor extends Actor {
 
     const bonusSaisonin = this._getBonusSaisonin();
     const malusArmure = chosenKey === "agilite"
-      ? (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0)
+      ? this._malusAgiArmure()
       : chosenKey === "perception" ? (sd.armure?._malusPerActif ?? 0) : 0;
     const malusBlessure = sd.malusBlessureGrave ?? 0;
 
@@ -804,7 +824,7 @@ export class AgoneActor extends Actor {
     const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const malusArmure = (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
+    const malusArmure = this._malusAgiArmure();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
@@ -845,7 +865,7 @@ export class AgoneActor extends Actor {
     const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const malusArmure = (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
+    const malusArmure = this._malusAgiArmure();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
@@ -872,7 +892,7 @@ export class AgoneActor extends Actor {
     const { modif } = jet;
 
     const bonusSaisonin = this._getBonusSaisonin();
-    const malusArmure = (sd.armure?._malusAgiActif ?? 0) + (sd.bouclier?._malusAgiActif ?? 0);
+    const malusArmure = this._malusAgiArmure();
     const malusBlessure = sd.malusBlessureGrave ?? 0;
     const roll = new Roll(
       "1d10x10 + @total + @modif",
@@ -1258,7 +1278,9 @@ export class AgoneActor extends Actor {
   }
 
   /**
-   * Jet d'Emprise brut : EMP + Résonance + bonus Esprit.
+   * Jet d'Emprise brut : EMP + Résonance + bonus Esprit (ajouté au total, comme
+   * aptitudeEmprise et le bonus d'aspect de rollAttribut). Identique pour tous les types d'acteur.
+   * Formule : 1d10 explosif + EMP + Résonance + bonus Esprit + modificateurs.
    */
   async rollEmpriseAttr(options = {}) {
     const sd    = this.system;
@@ -1275,8 +1297,8 @@ export class AgoneActor extends Actor {
     if (!jet) return;
     const { modif } = jet;
 
-    const roll = new Roll("1d10x10 + @emp + @res + @modif", {
-      emp: empriseBase, res: scoreResonance, modif
+    const roll = new Roll("1d10x10 + @emp + @res + @esp + @modif", {
+      emp: empriseBase, res: scoreResonance, esp: bonusEsprit, modif
     });
     await roll.evaluate();
     await this._sendRollToChat(roll, label, {

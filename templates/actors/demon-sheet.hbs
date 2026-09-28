@@ -58,10 +58,10 @@
         <!-- Colonne gauche : caractéristiques + stats dérivées -->
         <div class="npc-left-col">
           <div class="combat-card">
-            <h3 class="combat-card-title" style="display:flex;align-items:center;gap:6px;">
-              <span style="flex:1"><i class="fas fa-fist-raised"></i> {{localize "AGONE.Caracteristiques"}}</span>
-              <label style="font-size:0.8em;font-weight:normal;">{{localize "AGONE.Exp"}}</label>
-              <input type="number" name="system.experience" value="{{system.experience}}" class="stat-num" min="0" style="width:42px;" />
+            <h3 class="combat-card-title npc-titre-xp">
+              <span class="npc-titre-texte"><i class="fas fa-fist-raised"></i> {{localize "AGONE.Caracteristiques"}}</span>
+              <label class="npc-xp-label">{{localize "AGONE.Exp"}}</label>
+              <input type="number" name="system.experience" value="{{system.experience}}" class="stat-num npc-xp-input" min="0" />
               <button type="button" class="btn-icon{{#if showLevelUp}} active{{/if}}" data-action="toggleLevelUpDemon"
                       data-tooltip='{{localize "AGONE.ToggleLevelUpDemon"}}' aria-label='{{localize "AGONE.ToggleLevelUpDemon"}}'>
                 <i class="fas fa-star"></i>
@@ -70,34 +70,17 @@
             {{> systems/agone/templates/actors/parts/caracs-simples.hbs}}
           </div>
 
-          <div class="combat-card" style="margin-top:8px;">
+          <div class="combat-card npc-card-espace">
             <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.StatsCombat"}}</h3>
-            <div class="cstats-grid">
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-bolt"></i></span>
-                <span class="cstat-score">{{system.initiative}}</span>
-                <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-sword"></i></span>
-                <span class="cstat-score">{{system.melee}}</span>
-                <span class="cstat-label">{{localize "AGONE.Melee"}}</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-bullseye"></i></span>
-                <span class="cstat-score">{{system.tir}}</span>
-                <span class="cstat-label">{{localize "AGONE.Tir"}}</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-shield-alt"></i></span>
-                <span class="cstat-score">{{system.defenseNaturelle}}</span>
-                <span class="cstat-label">DEF</span>
-              </div>
-            </div>
-            <div class="carac-grid npc-carac-grid" style="margin-top:6px;">
+            {{> systems/agone/templates/actors/parts/cstats-simples.hbs}}
+            <div class="carac-grid npc-carac-grid npc-bloc-espace">
               <div class="carac-row">
                 <label>{{localize "AGONE.BD"}}</label>
-                <input type="number" name="system.bd" value="{{system.bd}}" class="stat-num" />
+                <input type="number" name="system.bd" value="{{source.bd}}" class="stat-num" />
+                {{#if badges.bd.length}}
+                {{> systems/agone/templates/actors/parts/badges-bonus.hbs badges=badges.bd}}
+                <span class="derived-val carac-total-val">{{system.bd}}</span>
+                {{/if}}
               </div>
               <div class="carac-row">
                 <label>{{localize "AGONE.DIF"}}</label>
@@ -108,7 +91,7 @@
                 <input type="number" name="system.chargeMax" value="{{system.chargeMax}}" class="stat-num" />
               </div>
             </div>
-            <div class="cstats-grid" style="margin-top:6px;">
+            <div class="cstats-grid npc-bloc-espace">
               <div class="cstat-item">
                 <span class="cstat-score">{{system.demiCharge}}</span>
                 <span class="cstat-label">DC</span>
@@ -123,53 +106,10 @@
 
         <!-- Colonne droite : Densité/santé + identité -->
         <div class="npc-right-col">
-          <div class="combat-card sante-card">
-            <h3 class="combat-card-title"><i class="fas fa-heartbeat"></i> {{localize "AGONE.EtatSante"}}</h3>
-            <div class="pdv-bar-wrap">
-              <div class="pdv-values">
-                <span class="pdv-current">{{system.densite.valeur}}</span>
-                <span class="pdv-sep">/</span>
-                <span class="pdv-max">{{system.densite.max}}</span>
-                <span class="pdv-label">{{localize "AGONE.Densite"}}</span>
-              </div>
-              {{#if system.densite.max}}
-              <div class="pdv-track">
-                <div class="pdv-fill" style="width:{{pdvPercent}}%;"></div>
-              </div>
-              {{/if}}
-            </div>
-            <div class="blessures-section">
-              <div class="bg-row">
-                <span class="bg-title">{{localize "AGONE.BlessuresGraves"}}</span>
-                <label class="bg-cell {{#if system.blessureGrave1}}bg-active{{/if}}">
-                  <input type="checkbox" name="system.blessureGrave1" {{#if system.blessureGrave1}}checked{{/if}} />
-                  <span class="bg-dot">1</span><span class="bg-pen">-2</span>
-                </label>
-                <label class="bg-cell {{#if system.blessureGrave2}}bg-active{{/if}}">
-                  <input type="checkbox" name="system.blessureGrave2" {{#if system.blessureGrave2}}checked{{/if}} />
-                  <span class="bg-dot">2</span><span class="bg-pen">-6</span>
-                </label>
-                <label class="bg-cell {{#if system.blessureGrave3}}bg-active{{/if}}">
-                  <input type="checkbox" name="system.blessureGrave3" {{#if system.blessureGrave3}}checked{{/if}} />
-                  <span class="bg-dot">3</span><span class="bg-pen">-12</span>
-                </label>
-                {{#if system.malusBlessureGrave}}<span class="bg-total">{{system.malusBlessureGrave}}</span>{{/if}}
-              </div>
-            </div>
-            <div class="cstats-grid" style="margin-top:8px;">
-              <div class="cstat-item">
-                <span class="cstat-score">{{system.seuilBlessureGrave}}</span>
-                <span class="cstat-label">SBG</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-score">{{system.seuilBlessureCritique}}</span>
-                <span class="cstat-label">SBC</span>
-              </div>
-            </div>
-          </div>
+          {{> systems/agone/templates/actors/parts/sante-simple.hbs jauge=system.densite labelJauge=(localize "AGONE.Densite") pct=pdvPercent}}
 
           <!-- Identité -->
-          <div class="combat-card" style="margin-top:8px;">
+          <div class="combat-card npc-card-espace">
             <h3 class="combat-card-title"><i class="fas fa-id-card"></i> {{localize "AGONE.Identite"}}</h3>
             <div class="carac-grid npc-carac-grid">
               <div class="carac-row">
@@ -199,156 +139,17 @@
     <div class="tab" data-group="primary" data-tab="combat">
       <div class="combat-section">
 
-        <!-- LIGNE HAUTE : Santé + Stats Combat -->
+        <!-- LIGNE HAUTE : Densité + Stats Combat -->
         <div class="combat-top-row">
+          {{> systems/agone/templates/actors/parts/sante-simple.hbs jauge=system.densite labelJauge=(localize "AGONE.Densite") pct=pdvPercent}}
 
-          <!-- SANTÉ / DENSITÉ -->
-          <div class="combat-card sante-card">
-            <h3 class="combat-card-title"><i class="fas fa-heartbeat"></i> {{localize "AGONE.EtatSante"}}</h3>
-            <div class="pdv-bar-wrap">
-              <div class="pdv-values">
-                <span class="pdv-current">{{system.densite.valeur}}</span>
-                <span class="pdv-sep">/</span>
-                <span class="pdv-max">{{system.densite.max}}</span>
-                <span class="pdv-label">{{localize "AGONE.Densite"}}</span>
-              </div>
-              {{#if system.densite.max}}
-              <div class="pdv-track">
-                <div class="pdv-fill" style="width:{{pdvPercent}}%;"></div>
-              </div>
-              {{/if}}
-            </div>
-            <div class="blessures-section">
-              <div class="bg-row">
-                <span class="bg-title">{{localize "AGONE.BlessuresGraves"}}</span>
-                <label class="bg-cell {{#if system.blessureGrave1}}bg-active{{/if}}">
-                  <input type="checkbox" name="system.blessureGrave1" {{#if system.blessureGrave1}}checked{{/if}} />
-                  <span class="bg-dot">1</span><span class="bg-pen">-2</span>
-                </label>
-                <label class="bg-cell {{#if system.blessureGrave2}}bg-active{{/if}}">
-                  <input type="checkbox" name="system.blessureGrave2" {{#if system.blessureGrave2}}checked{{/if}} />
-                  <span class="bg-dot">2</span><span class="bg-pen">-6</span>
-                </label>
-                <label class="bg-cell {{#if system.blessureGrave3}}bg-active{{/if}}">
-                  <input type="checkbox" name="system.blessureGrave3" {{#if system.blessureGrave3}}checked{{/if}} />
-                  <span class="bg-dot">3</span><span class="bg-pen">-12</span>
-                </label>
-                {{#if system.malusBlessureGrave}}<span class="bg-total">{{system.malusBlessureGrave}}</span>{{/if}}
-              </div>
-            </div>
-            <div class="cstats-grid" style="margin-top:8px;">
-              <div class="cstat-item">
-                <span class="cstat-score">{{system.seuilBlessureGrave}}</span>
-                <span class="cstat-label">SBG</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-score">{{system.seuilBlessureCritique}}</span>
-                <span class="cstat-label">SBC</span>
-              </div>
-            </div>
-          </div><!-- /.sante-card -->
-
-          <!-- STATS DE COMBAT -->
           <div class="combat-card cstats-card">
             <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.StatsCombat"}}</h3>
-            <div class="cstats-grid">
-              <div class="cstat-item">
-                <button type="button" class="cstat-roll" data-action="rollInitiative" data-tooltip='{{localize "AGONE.JeterInitiative"}}' aria-label='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
-                <span class="cstat-score">{{system.initiative}}</span>
-                <span class="cstat-label">{{localize "AGONE.Initiative"}}</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-sword"></i></span>
-                <span class="cstat-score">{{system.melee}}</span>
-                <span class="cstat-label">{{localize "AGONE.Melee"}}</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-bullseye"></i></span>
-                <span class="cstat-score">{{system.tir}}</span>
-                <span class="cstat-label">{{localize "AGONE.Tir"}}</span>
-              </div>
-              <div class="cstat-item">
-                <span class="cstat-roll cstat-passive"><i class="fas fa-hammer"></i></span>
-                <span class="cstat-score">{{system.bd}}</span>
-                <span class="cstat-label">{{localize "AGONE.BD"}}</span>
-              </div>
-            </div>
-          </div><!-- /.cstats-card -->
-
+            {{> systems/agone/templates/actors/parts/cstats-simples.hbs}}
+          </div>
         </div><!-- /.combat-top-row -->
 
-        <!-- ARMES -->
-        <div class="combat-card armes-card">
-          <div class="combat-card-header">
-            <h3 class="combat-card-title"><i class="fas fa-khanda"></i> {{localize "AGONE.Armes"}}</h3>
-            <div class="card-btns">
-              <button type="button" class="compendium-browse btn-icon" data-pack="agone.armes" data-tooltip='{{localize "AGONE.ParcourirArmes"}}' aria-label='{{localize "AGONE.ParcourirArmes"}}'><i class="fas fa-search"></i></button>
-              <button type="button" class="item-create btn-icon" data-type="arme" data-tooltip='{{localize "AGONE.AjouterArme"}}' aria-label='{{localize "AGONE.AjouterArme"}}'><i class="fas fa-plus"></i></button>
-            </div>
-          </div>
-          {{#if armes.length}}
-          <table class="armes-table">
-            <thead>
-              <tr>
-                <th class="col-equipe" data-tooltip="{{localize 'AGONE.Equipe'}}"><i class="fas fa-hand-paper"></i></th>
-                <th class="col-arme-name">{{localize "AGONE.Nom"}}</th>
-                <th class="col-tai">{{localize "AGONE.TAI"}}</th>
-                <th class="col-type">{{localize "AGONE.Type"}}</th>
-                <th class="col-init"><i class="fas fa-bolt"></i> {{localize "AGONE.Combat.Init"}}</th>
-                <th class="col-atk"><i class="fas fa-dice-d10"></i> {{localize "AGONE.Combat.Atk"}}</th>
-                <th class="col-def"><i class="fas fa-shield-alt"></i> {{localize "AGONE.Combat.Def"}}</th>
-                <th class="col-dom">{{localize "AGONE.Combat.Dom"}}</th>
-                <th class="col-row-actions"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each armes as |arme|}}
-              <tr class="item-row {{#if arme.system.equipe}}arme-equipee{{/if}}" data-item-id="{{arme.id}}">
-                <td class="col-equipe">
-                  <label class="arme-equipe-toggle">
-                    <input type="checkbox" class="arme-equipe" data-item-id="{{arme.id}}" {{#if arme.system.equipe}}checked{{/if}} />
-                    <i class="fas fa-hand-paper arme-equipe-icon"></i>
-                  </label>
-                </td>
-                <td class="col-arme-name">
-                  <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{arme.id}}">{{arme.name}}</span>
-                </td>
-                <td class="col-tai">{{arme.system.tai}}</td>
-                <td class="col-type">{{arme.system.type}}</td>
-                <td class="col-init">
-                  <div class="arme-cell">
-                    <span class="arme-score">{{arme.system.initTotal}}</span>
-                    <button type="button" class="roll-btn-small roll-init-btn" data-action="rollInitiative" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.JeterInitiative"}}' aria-label='{{localize "AGONE.JeterInitiative"}}'><i class="fas fa-bolt"></i></button>
-                  </div>
-                </td>
-                <td class="col-atk">
-                  <div class="arme-cell">
-                    <span class="arme-score">{{arme.system.attackTotal}}</span>
-                    <button type="button" class="roll-btn-small roll-atk-btn" data-action="rollAttaque" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.JeterAttaque"}}' aria-label='{{localize "AGONE.JeterAttaque"}}'><i class="fas fa-dice-d10"></i></button>
-                  </div>
-                </td>
-                <td class="col-def">
-                  <div class="arme-cell">
-                    <span class="arme-score">{{arme.system.defenseTotal}}</span>
-                    <button type="button" class="roll-btn-small roll-def-btn" data-action="rollParade" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.JeterParade"}}' aria-label='{{localize "AGONE.JeterParade"}}'><i class="fas fa-shield-alt"></i></button>
-                  </div>
-                </td>
-                <td class="col-dom">
-                  <span class="dom-base">{{arme.system.dommages}}</span>
-                  {{#if ../system.bd}}<span class="dom-bd">+{{../system.bd}}</span>{{/if}}
-                </td>
-                <td class="col-row-actions">
-                  <a class="item-edit" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-pen"></i></a>
-                  <a class="item-delete" data-item-id="{{arme.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
-                </td>
-              </tr>
-              {{/each}}
-            </tbody>
-          </table>
-          {{else}}
-          <p class="empty-list">{{localize "AGONE.AucuneArme"}}</p>
-          {{/if}}
-        </div><!-- /.armes-card -->
+        {{> systems/agone/templates/actors/parts/armes-card.hbs}}
 
       </div><!-- /.combat-section -->
     </div>
@@ -357,8 +158,8 @@
       {{> systems/agone/templates/actors/parts/competences.hbs}}
     </div>
     <!-- ══ NOTES ════════════════════════════════════════════════════════════ -->
-    <div class="tab" data-group="primary" data-tab="notes" style="display:flex; flex-direction:column; gap:12px; height:100%; overflow-y:auto;">
-      <div class="editor-container" style="flex:1;">
+    <div class="tab npc-notes-tab" data-group="primary" data-tab="notes">
+      <div class="editor-container">
         <h3>{{localize "AGONE.Connivances"}}</h3>
         {{#if editable}}
           <prose-mirror name="system.connivances" value="{{system.connivances}}" document-uuid="{{actor.uuid}}"></prose-mirror>
@@ -366,7 +167,7 @@
           <div class="editor-content">{{{connivancesHTML}}}</div>
         {{/if}}
       </div>
-      <div class="editor-container" style="flex:1;">
+      <div class="editor-container">
         <h3>{{localize "AGONE.Notes"}}</h3>
         {{#if editable}}
           <prose-mirror name="system.notes" value="{{system.notes}}" document-uuid="{{actor.uuid}}"></prose-mirror>

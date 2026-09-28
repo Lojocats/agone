@@ -11,11 +11,13 @@
       </div>
       <div class="charge-row">
         <label>{{localize "AGONE.ChargeActuelle"}}</label>
-        <span class="derived-val {{#if system.malusSurcharge}}surcharge{{/if}}">
+        <span class="derived-val {{#if system.malusSurcharge}}surcharge{{else if malusSurchargeAffiche}}surcharge{{/if}}">
           {{system.chargeActuelle}}
         </span>
         {{#if system.malusSurcharge}}
-        <span class="surcharge-malus">{{localize "AGONE.Surcharge"}} -{{system.malusSurcharge}}</span>
+        <span class="surcharge-malus">{{localize "AGONE.Surcharge"}} {{system.malusSurcharge}}</span>
+        {{else if malusSurchargeAffiche}}
+        <span class="surcharge-malus">{{localize "AGONE.Surcharge"}} {{malusSurchargeAffiche}}</span>
         {{/if}}
       </div>
       <div class="charge-row">
@@ -75,7 +77,8 @@
     {{/if}}
   </div>
 
-  <!-- Monnaie -->
+  <!-- Monnaie (acteurs qui en possèdent : personnage) -->
+  {{#if system.monnaie}}
   <div class="monnaie-block">
     <h3 class="section-title">{{localize "AGONE.Monnaie"}}</h3>
     <div class="monnaie-taux">{{localize "AGONE.Ui.TauxMonnaie"}}</div>
@@ -90,5 +93,6 @@
       </div>
     </div>
   </div>
+  {{/if}}
 
 </div>

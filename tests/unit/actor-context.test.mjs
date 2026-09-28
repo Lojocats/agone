@@ -159,4 +159,204 @@ describe("caracsParAspect", () => {
     const [corps] = ctx.caracsParAspect({ agilite: 2 }, { agilite: 2 }, ["agilite"], { extra: { agilite: { cout: 2 } } });
     assert.equal(corps.caracs[0].cout, 2);
   });
+
+  test("sans badges détaillés : badge générique des effets actifs", () => {
+    const [corps] = ctx.caracsParAspect({ force: 5 }, { force: 3 }, ["force"]);
+    assert.deepEqual(corps.caracs[0].badges.map(b => [b.texte, b.classe]), [["+2", "racial-pos"]]);
+  });
+
+  test("badges détaillés repris tels quels ; malus au jet (armure) compté dans le total", () => {
+    const badges = ctx.badgesBonus({ racial: { agilite: 1 }, malusAgi: -2, armureNom: "Cuirasse" });
+    const [corps] = ctx.caracsParAspect({ agilite: 4 }, { agilite: 3 }, ["agilite"], { badges });
+    const c = corps.caracs[0];
+    assert.deepEqual(c.badges.map(b => b.texte), ["+1", "-2"]);
+    assert.deepEqual([c.score, c.total, c.bonus], [3, 2, -1]);
+  });
+
+  test("caractéristique dérivée : badges affichés, valeur préparée", () => {
+    const badges = { resistance: [{ valeur: 1, texte: "+1", classe: "racial-pos", tooltip: "x" }] };
+    const [corps] = ctx.caracsParAspect({ resistance: 5 }, { resistance: 0 }, ["resistance"], { derivees: { resistance: "RÉS" }, badges });
+    assert.deepEqual([corps.caracs[0].score, corps.caracs[0].badges.length], [5, 1]);
+  });
+});
+
+describe("badgesBonus", () => {
+  test("un badge par origine : peuple, effets (cumulés, sources en infobulle), armure", () => {
+    const b = ctx.badgesBonus({
+      racial : { resistance: 2, charisma: -1 },
+      peuple : "Nain",
+      sources: { resistance: [{ nom: "Anneau", valeur: 1 }, { nom: "Fièvre", valeur: -2 }] },
+      malusAgi: -1, armureNom: "Cotte",
+    });
+    assert.deepEqual(b.resistance.map(x => x.texte), ["+2", "-1"]);
+    assert.equal(b.resistance[0].tooltip, "AGONE.BonusRacialPeuple Nain");
+    assert.equal(b.resistance[1].tooltip, "AGONE.Effets.Titre : +1 (Anneau), −2 (Fièvre)");
+    assert.equal(b.charisma[0].classe, "racial-neg");
+    assert.equal(b.charisma[0].tooltip, "AGONE.MalusRacialPeuple Nain");
+    assert.deepEqual([b.agilite[0].valeur, b.agilite[0].jet, b.agilite[0].tooltip], [-1, true, "AGONE.MalusAgi (Cotte)"]);
+  });
+
+  test("statistiques d'effet dérivées rattachées à la stat de combat affichée", () => {
+    const b = ctx.badgesBonus({ sources: {
+      melee_bonus: [{ nom: "Épée", valeur: 1 }], defense_bonus: [{ nom: "Écu", valeur: 2 }],
+      esquive_bonus: [{ nom: "Bottes", valeur: 1 }], bd_bonus: [{ nom: "Gantelet", valeur: 1 }],
+    } });
+    assert.deepEqual(Object.keys(b).sort(), ["bd", "defenseNaturelle", "esquive", "melee"]);
+  });
+
+  test("valeurs nulles ou qui s'annulent : aucun badge", () => {
+    const b = ctx.badgesBonus({ racial: { force: 0 }, sources: { tir_bonus: [{ nom: "A", valeur: 1 }, { nom: "B", valeur: -1 }] } });
+    assert.deepEqual(b, {});
+  });
+});
+
+describe("formulesStatsSimples", () => {
+  const system = { agilite: 4, force: 3, perception: 2, intelligence: 5, volonte: 3,
+    initiative: 7, initMagique: 17, melee: 4, tir: 3, defenseNaturelle: 4, esquiveTotal: 6, esquiveCompScore: 2, emprise: 4 };
+
+  test("formules détaillées avec la valeur finale", () => {
+    const f = ctx.formulesStatsSimples(system);
+    assert.equal(f.melee, "(FOR 3 + AGI 4×2) ÷ 3 = 4");
+    assert.equal(f.tir, "(AGI 4 + PER 2) ÷ 2 = 3");
+    assert.equal(f.initMagique, "AGONE.Initiative 7 + 10 = 17");
+    assert.equal(f.esquive, "AGI 4 + AGONE.Esquive 2 = 6");
+    assert.equal(f.emprise, "(INT 5 + VOL 3) ÷ 2 = 4");
+  });
+
+  test("bonus des effets actifs de la stat ajouté à la formule", () => {
+    const f = ctx.formulesStatsSimples({ ...system, melee: 5 }, { melee: [{ valeur: 1 }] });
+    assert.equal(f.melee, "(FOR 3 + AGI 4×2) ÷ 3 + 1 = 5");
+  });
+
+  test("emprise selon le type de mage", () => {
+    assert.equal(ctx.formulesStatsSimples({ ...system, typeMage: "jorniste" }).emprise, "INT 5 = 4");
+    assert.equal(ctx.formulesStatsSimples({ ...system, typeMage: "obscurantiste" }).emprise, "VOL 3 = 4");
+  });
+});
+
+describe("jaugePct", () => {
+  test("valeur médiane arrondie", () => {
+    assert.equal(ctx.jaugePct(5, 8), 63);
+  });
+
+  test("max nul ou négatif : 0", () => {
+    assert.equal(ctx.jaugePct(5, 0), 0);
+    assert.equal(ctx.jaugePct(5, -3), 0);
+  });
+
+  test("dépassement au-delà du max : borné à 100", () => {
+    assert.equal(ctx.jaugePct(20, 10), 100);
+  });
+
+  test("valeur négative : bornée à 0", () => {
+    assert.equal(ctx.jaugePct(-5, 10), 0);
+  });
+});
+
+describe("trierItems", () => {
+  const armeA = item("Épée", "arme", {}, { sort: 200 });
+  const armeB = item("Arc", "arme", {}, { sort: 100 });
+  const armeC = item("Écu", "armure", {}, { sort: 50 });
+  const actor = { items: [armeA, armeB, armeC] };
+
+  test("filtre par type puis trie par sort", () => {
+    assert.deepEqual(ctx.trierItems(actor, "arme").map(i => i.name), ["Arc", "Épée"]);
+  });
+
+  test("sort manquant compté comme 0, puis nom (locale fr)", () => {
+    const x = item("Zèbre", "arme", {}, {});
+    const y = item("Âne", "arme", {}, {});
+    assert.deepEqual(ctx.trierItems({ items: [x, y] }, "arme").map(i => i.name), ["Âne", "Zèbre"]);
+  });
+
+  test("type absent : liste vide", () => {
+    assert.deepEqual(ctx.trierItems(actor, "sort"), []);
+  });
+});
+
+describe("malusSurcharge", () => {
+  test("sous la demi-charge : aucun malus", () => {
+    assert.equal(ctx.malusSurcharge(3, 5, 10), 0);
+  });
+
+  test("au-delà de la demi-charge : -1", () => {
+    assert.equal(ctx.malusSurcharge(6, 5, 10), -1);
+  });
+
+  test("au-delà de la charge max : -3", () => {
+    assert.equal(ctx.malusSurcharge(11, 5, 10), -3);
+  });
+
+  test("demi-charge ou charge max nulles : ignorées", () => {
+    assert.equal(ctx.malusSurcharge(100, 0, 0), 0);
+  });
+});
+
+describe("statsCombatSimples", () => {
+  const system = {
+    initiative: 5, melee: 3, tir: 2, defenseNaturelle: 4, esquiveTotal: 6, bd: 7,
+    armure: { protection: 2 }, initMagique: 15, emprise: 8,
+  };
+
+  test("compagnon : ni initMagique/emprise (PNJ), ni protection retirée (armure lue), ni BD retiré", () => {
+    const stats = ctx.statsCombatSimples(system, "compagnon");
+    const cles = stats.map(s => s.cle);
+    assert.ok(!cles.includes("initMagique"));
+    assert.ok(!cles.includes("emprise"));
+    assert.ok(!cles.includes("bd"), "BD absent pour un compagnon");
+    assert.ok(cles.includes("protection"));
+  });
+
+  test("démon : pas de protection ni d'emprise/initMagique, BD présent", () => {
+    const cles = ctx.statsCombatSimples(system, "demon").map(s => s.cle);
+    assert.ok(!cles.includes("protection"));
+    assert.ok(!cles.includes("initMagique"));
+    assert.ok(cles.includes("bd"));
+  });
+
+  test("PNJ : initMagique et emprise présents avec leurs actions de jet", () => {
+    const stats = ctx.statsCombatSimples(system, "pnj");
+    const initMag = stats.find(s => s.cle === "initMagique");
+    const emprise = stats.find(s => s.cle === "emprise");
+    assert.equal(initMag.action, "rollInitiativeMagique");
+    assert.equal(emprise.action, "rollEmpriseAttr");
+  });
+
+  test("esquive et défense naturelle : boutons de jet sur les trois types", () => {
+    for (const type of ["compagnon", "demon", "pnj"]) {
+      const stats = ctx.statsCombatSimples(system, type);
+      assert.equal(stats.find(s => s.cle === "esquive").action, "rollEsquive");
+      assert.equal(stats.find(s => s.cle === "defenseNaturelle").action, "rollDefenseNaturelle");
+    }
+  });
+
+  test("valeur manquante remplacée par 0", () => {
+    const stats = ctx.statsCombatSimples({}, "pnj");
+    assert.equal(stats.find(s => s.cle === "initiative").valeur, 0);
+  });
+
+  test("badges et formule portés par chaque stat", () => {
+    const badges = { melee: [{ valeur: 1, texte: "+1" }] };
+    const stats  = ctx.statsCombatSimples({ ...system, force: 3, agilite: 3 }, "pnj", badges);
+    const melee  = stats.find(s => s.cle === "melee");
+    assert.deepEqual(melee.badges, badges.melee);
+    assert.match(melee.formule, /^\(FOR 3 \+ AGI 3×2\) ÷ 3 \+ 1 = 3$/);
+    assert.deepEqual(stats.find(s => s.cle === "tir").badges, []);
+    assert.equal(stats.find(s => s.cle === "protection").formule, "");
+  });
+});
+
+describe("peupleDepuisRace", () => {
+  test("nom ou clé du peuple, sans casse ni accents", async () => {
+    const { peupleDepuisRace } = await import(fichier("module/helpers/config.mjs"));
+    assert.equal(peupleDepuisRace("Nain"), "nain");
+    assert.equal(peupleDepuisRace("  geant "), "geant");
+    assert.equal(peupleDepuisRace("feeNoire"), "feeNoire");
+  });
+
+  test("race vide ou inconnue : null", async () => {
+    const { peupleDepuisRace } = await import(fichier("module/helpers/config.mjs"));
+    assert.equal(peupleDepuisRace(""), null);
+    assert.equal(peupleDepuisRace("Gobelin"), null);
+  });
 });

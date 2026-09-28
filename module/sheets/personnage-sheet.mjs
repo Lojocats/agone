@@ -31,6 +31,13 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
 
   static RECHERCHE_NON_ACQUISES = true;
 
+  /** Listes réordonnables : celles de la base + avantages & défauts et peines. */
+  static REORDER = [
+    ...AgoneActorSheet.REORDER,
+    [".dons-list .item-row",           ".dons-list"],
+    [".peines-table tbody .item-row",  ".peines-table tbody"],
+  ];
+
   static PARTS = {
     form: {
       template: "systems/agone/templates/actors/personnage-sheet.hbs",
@@ -182,13 +189,8 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     // Items — créer / éditer / supprimer / chat / édition inline / navigateurs
     this._bindItemListeners(on);
 
-    // Réordonnancement items par glisser-déposer
-    this._setupDragReorder(root, ".comp-cards-grid:not(.comp-na-cards) .comp-card", ".comp-cards-grid:not(.comp-na-cards)");
-    this._setupDragReorder(root, ".manoeuvres-table tbody .item-row", ".manoeuvres-table tbody");
-    this._setupDragReorder(root, ".armes-table tbody .item-row", ".armes-table tbody");
-    this._setupDragReorder(root, ".equip-table tbody .item-row", ".equip-table tbody");
-    this._setupDragReorder(root, ".dons-list .item-row", ".dons-list");
-    this._setupDragReorder(root, ".peines-table tbody .item-row", ".peines-table tbody");
+    // Réordonnancement items par glisser-déposer (listes : static REORDER)
+    this._bindDragReorder(root);
 
     // Retirer le peuple actuel
     on("click", ".peuple-clear", this._onClearPeuple.bind(this));
@@ -246,87 +248,6 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
       itemData.system.categorie = btn.dataset.categorie;
     }
     return await Item.create(itemData, { parent: this.actor });
-  }
-
-  _setupDragReorder(root, rowSel, containerSel) {
-    root.querySelectorAll(rowSel).forEach(el => {
-      const handle = el.querySelector(".item-drag-handle");
-      if (!handle) return;
-      handle.addEventListener("mousedown", () => { el._fromDragHandle = true; });
-      el.addEventListener("mouseup", () => { el._fromDragHandle = false; });
-      el.setAttribute("draggable", true);
-      el.addEventListener("dragstart", evt => {
-        if (!el._fromDragHandle) { evt.preventDefault(); return; }
-        el._fromDragHandle = false;
-        const itemId = el.dataset.itemId;
-        if (!itemId) return;
-        evt.dataTransfer.effectAllowed = "move";
-        evt.dataTransfer.setData("text/plain", JSON.stringify({ type: "item-reorder", itemId }));
-        el.classList.add("dragging");
-      });
-      el.addEventListener("dragend", () => el.classList.remove("dragging"));
-    });
-    root.querySelectorAll(containerSel).forEach(container => {
-      container.addEventListener("dragover",  this._onDragOverItemReorder.bind(this));
-      container.addEventListener("dragleave", this._onDragLeaveItemReorder.bind(this));
-      container.addEventListener("drop",      this._onDropItemReorder.bind(this));
-    });
-  }
-
-  _onDragOverItemReorder(event) {
-    let data;
-    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { }
-    if (data?.type !== "item-reorder" && !event.dataTransfer.types.includes("text/plain")) return;
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-    const container = event.currentTarget;
-    const rows = [...container.querySelectorAll(".item-row[data-item-id]")];
-    const targetRow = rows.find(row => {
-      const rect = row.getBoundingClientRect();
-      return event.clientY >= rect.top && event.clientY <= rect.bottom;
-    });
-    container.querySelectorAll(".item-drop-above, .item-drop-below")
-      .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
-    if (!targetRow) return;
-    const rect = targetRow.getBoundingClientRect();
-    targetRow.classList.add(event.clientY < rect.top + rect.height / 2 ? "item-drop-above" : "item-drop-below");
-  }
-
-  _onDragLeaveItemReorder(event) {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      event.currentTarget.querySelectorAll(".item-drop-above, .item-drop-below")
-        .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
-    }
-  }
-
-  async _onDropItemReorder(event) {
-    const container = event.currentTarget;
-    container.querySelectorAll(".item-drop-above, .item-drop-below")
-      .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
-    event.preventDefault();
-    let data;
-    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { return; }
-    if (data?.type !== "item-reorder") return;
-    const draggedItem = this.actor.items.get(data.itemId);
-    if (!draggedItem) return;
-    const rows = [...container.querySelectorAll(".item-row[data-item-id]")];
-    const targetRow = rows.find(row => {
-      const rect = row.getBoundingClientRect();
-      return event.clientY >= rect.top && event.clientY <= rect.bottom;
-    });
-    if (!targetRow || targetRow.dataset.itemId === data.itemId) return;
-    const targetItem = this.actor.items.get(targetRow.dataset.itemId);
-    if (!targetItem || targetItem.type !== draggedItem.type) return;
-    const rect = targetRow.getBoundingClientRect();
-    const sortBefore = event.clientY < rect.top + rect.height / 2;
-    const siblings   = this.actor.items.filter(i => i.type === draggedItem.type && i.id !== draggedItem.id);
-    const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
-    const updates    = sortHelper.performIntegerSort(draggedItem, { target: targetItem, siblings, sortBefore });
-    if (updates.length) {
-      await this.actor.updateEmbeddedDocuments("Item",
-        updates.map(u => ({ _id: u.target.id, sort: u.update.sort }))
-      );
-    }
   }
 
   async _onClearPeuple(event) {

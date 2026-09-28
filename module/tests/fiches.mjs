@@ -1,4 +1,5 @@
 import { attendre, bac, DELAI, PERSO, PNJ, evenement } from "./outils.mjs";
+import { changeEffet } from "../helpers/effets.mjs";
 
 const TYPES_ACTEUR = { personnage: PERSO, compagnon: {}, demon: {}, pnj: PNJ };
 
@@ -107,6 +108,161 @@ export function fichesBatch({ describe, it, assert, before, after }) {
           input.value = "4";
           input.dispatchEvent(new Event("change", { bubbles: true }));
           await attendre(() => actor._source.system.force === 4, "force enregistrée");
+        });
+
+        it("un effet d'item affiche un badge nommant sa source sur la carac et la stat de combat", async () => {
+          const [item] = await actor.createEmbeddedDocuments("Item", [{
+            name: "Anneau de test", type: "equipement",
+            effects: [{ name: "Anneau de test", transfer: true, changes: [changeEffet("agilite", 1), changeEffet("melee_bonus", 2)] }],
+          }]);
+          await sheet.render();
+          try {
+            const ligne = sheet.element.querySelector("[data-action='rollAttribut'][data-carac='agilite']").closest(".carac-row");
+            const badge = ligne.querySelector(".racial-bonus-badge.racial-pos");
+            assert.equal(badge?.textContent.trim(), "+1");
+            assert.include(badge.dataset.tooltip, "Anneau de test");
+            const melee = sheet.element.querySelector(".cstat-melee");
+            assert.equal(melee.querySelector(".racial-bonus-badge")?.textContent.trim(), "+2");
+            assert.include(melee.dataset.tooltip, "= " + actor.system.melee, "formule détaillée dans l'infobulle");
+          } finally {
+            await item.delete();
+            await sheet.render();
+          }
+          assert.notOk(sheet.element.querySelector(".cstat-melee .racial-bonus-badge"), "badge retiré avec l'item");
+        });
+
+        it("boutons rollEsquive et rollDefenseNaturelle présents", () => {
+          assert.ok(sheet.element.querySelector("[data-action='rollEsquive']"), "rollEsquive");
+          assert.ok(sheet.element.querySelector("[data-action='rollDefenseNaturelle']"), "rollDefenseNaturelle");
+        });
+
+        it("une arme créée a une poignée de glisser-déposer (.item-drag-handle)", async () => {
+          const [arme] = await actor.createEmbeddedDocuments("Item", [{ name: "Épée", type: "arme", system: {} }]);
+          await sheet.render();
+          try {
+            const ligne = sheet.element.querySelector(`.armes-table tbody tr[data-item-id="${arme.id}"]`);
+            assert.ok(ligne?.querySelector(".item-drag-handle"));
+          } finally {
+            await arme.delete();
+            await sheet.render();
+          }
+        });
+      }
+
+      if (type === "personnage") {
+        it("le bouton d'initiative d'une ligne d'arme transmet l'id de l'arme (régression)", async () => {
+          const [arme] = await actor.createEmbeddedDocuments("Item", [{ name: "Épée", type: "arme", system: {} }]);
+          await sheet.render();
+          const original = actor.rollInitiative;
+          let recu;
+          actor.rollInitiative = async armeId => { recu = armeId; };
+          try {
+            const bouton = sheet.element.querySelector(`.roll-init-btn[data-item-id="${arme.id}"]`);
+            bouton.click();
+            await attendre(() => recu !== undefined, "rollInitiative appelé");
+            assert.equal(recu, arme.id);
+          } finally {
+            actor.rollInitiative = original;
+            await arme.delete();
+            await sheet.render();
+          }
+        });
+      }
+
+      if (type === "pnj") {
+        it("boutons rollEmpriseAttr et rollInitiativeMagique présents, pas de bloc danseurs", () => {
+          assert.ok(sheet.element.querySelector("[data-action='rollEmpriseAttr']"));
+          assert.ok(sheet.element.querySelector("[data-action='rollInitiativeMagique']"));
+          assert.notOk(sheet.element.querySelector(".danseurs-block"), "PNJ sans danseurs");
+        });
+
+        it("carte Manœuvres affichée", () => {
+          assert.ok(sheet.element.querySelector(".manoeuvres-card"));
+        });
+
+        it("race reconnue : badge racial et total, saisie = valeur de base", async () => {
+          await actor.update({ "system.race": "Nain" });
+          await sheet.render();
+          try {
+            const bonus = CONFIG.AGONE.peuplesData.nain.resistanceBonus;
+            const ligne = sheet.element.querySelector("[data-action='rollAttribut'][data-carac='resistance']").closest(".carac-row");
+            assert.equal(ligne.querySelector("input[name='system.resistance']").value, String(actor._source.system.resistance));
+            const badge = ligne.querySelector(".racial-bonus-badge");
+            assert.equal(badge?.textContent.trim(), `+${bonus}`);
+            assert.include(badge.dataset.tooltip, "Nain");
+            assert.equal(ligne.querySelector(".carac-total-val").textContent.trim(), String(actor.system.resistance));
+          } finally {
+            await actor.update({ "system.race": "" });
+            await sheet.render();
+          }
+        });
+
+        it("malus d'AGI de l'armure : badge et total effectif", async () => {
+          await actor.update({ "system.armure.malusAgi": 2 });
+          await sheet.render();
+          try {
+            const ligne = sheet.element.querySelector("[data-action='rollAttribut'][data-carac='agilite']").closest(".carac-row");
+            assert.equal(ligne.querySelector(".racial-bonus-badge.racial-neg")?.textContent.trim(), "-2");
+            assert.equal(ligne.querySelector(".carac-total-val").textContent.trim(), String(actor.system.agilite - 2));
+          } finally {
+            await actor.update({ "system.armure.malusAgi": 0 });
+            await sheet.render();
+          }
+        });
+
+        it("un pouvoir créé est listé avec l'action chatPouvoir", async () => {
+          const [pouvoir] = await actor.createEmbeddedDocuments("Item", [{ name: "Souffle", type: "pouvoir", system: {} }]);
+          await sheet.render();
+          try {
+            const bouton = sheet.element.querySelector(`.pouvoir-row[data-item-id="${pouvoir.id}"] [data-action='chatPouvoir']`);
+            assert.ok(bouton);
+          } finally {
+            await pouvoir.delete();
+            await sheet.render();
+          }
+        });
+
+        it("cocher la 3e blessure grave lance le jet de VOL (rollVolBlessure3)", async () => {
+          const original = actor.rollVolBlessure3;
+          let appele = false;
+          actor.rollVolBlessure3 = async () => { appele = true; };
+          try {
+            const case3 = sheet.element.querySelector("input[name='system.blessureGrave3']");
+            case3.checked = true;
+            case3.dispatchEvent(new Event("change", { bubbles: true }));
+            await attendre(() => appele, "rollVolBlessure3 appelé");
+          } finally {
+            actor.rollVolBlessure3 = original;
+            await actor.update({ "system.blessureGrave3": false });
+          }
+        });
+      }
+
+      if (type === "compagnon") {
+        it("carte Manœuvres affichée", () => {
+          assert.ok(sheet.element.querySelector(".manoeuvres-card"));
+        });
+
+        it("l'onglet Équipement affiche la charge actuelle", () => {
+          const val = sheet.element.querySelector(".tab[data-tab='equipement'] .charge-row .derived-val");
+          assert.ok(val, "bloc de charge présent");
+          assert.equal(val.textContent.trim(), String(actor.system.chargeActuelle ?? 0));
+        });
+
+        it("cocher la 3e blessure grave ne lance pas de jet de VOL (pas de VOL sur un compagnon)", async () => {
+          const original = actor.rollVolBlessure3;
+          let appele = false;
+          actor.rollVolBlessure3 = async () => { appele = true; };
+          try {
+            const case3 = sheet.element.querySelector("input[name='system.blessureGrave3']");
+            case3.checked = true;
+            case3.dispatchEvent(new Event("change", { bubbles: true }));
+            await new Promise(r => setTimeout(r, 100));
+            assert.notOk(appele);
+          } finally {
+            actor.rollVolBlessure3 = original;
+            await actor.update({ "system.blessureGrave3": false });
+          }
         });
       }
     });

@@ -1,5 +1,5 @@
 import { AgoneActorSheet } from "./agone-actor-sheet.mjs";
-import { competencesParScore, caracsParAspect } from "./actor-context.mjs";
+import { caracsParAspect, contexteActeurSimple, jaugePct, trierItems, malusSurcharge } from "./actor-context.mjs";
 
 /**
  * Feuille de Compagnon / Monture.
@@ -18,36 +18,27 @@ export class CompagnonSheet extends AgoneActorSheet {
     },
   };
 
+  /** Le compagnon n'a pas de VOLonté : pas de jet à la 3e blessure grave. */
+  static JET_VOL_BLESSURE3 = false;
+
   /** @override */
   async _prepareContext(options) {
-    const actor  = this.actor;
-    const system = actor.system;
-    const competences = actor.items.filter(i => i.type === "competence")
-      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    const actor   = this.actor;
+    const context = await contexteActeurSimple(actor, this);
+    const system  = context.system;
 
     return {
-      system, actor,
-      isOwner : actor.isOwner,
-      isGM    : game.user.isGM,
-      editable: this.isEditable,
+      ...context,
       // Caractéristiques (partial caracs-simples.hbs) : le nom lance le jet
-      caracGroups: caracsParAspect(system, actor._source.system, ["agilite", "force", "perception", "resistance"]),
+      caracGroups: caracsParAspect(system, context.source, ["agilite", "force", "perception", "resistance"], { badges: context.badges }),
       caracExtras: [{ key: "chargeMax", labelKey: "AGONE.ChargeMax", value: system.chargeMax }],
-      armes   : actor.items.filter(i => i.type === "arme"),
-      armures : actor.items.filter(i => i.type === "armure"),
-      pdvPercent: system.pdv?.max > 0
-        ? Math.round(Math.min(100, (system.pdv.valeur / system.pdv.max) * 100))
-        : 0,
-      // Partial competences.hbs : pas de tri par famille ni de montée de niveau
-      competences,
-      competencesGroups     : competencesParScore(competences),
-      competencesNonAcquises: [],
-      triCompsEstFamille    : false,
-      showLevelUp           : false,
-      showLevelUpComp       : false,
-      showLevelUpAspect     : false,
-      descriptionHTML: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-        system.description ?? "", { async: true, secrets: actor.isOwner }
+      pdvPercent : jaugePct(system.pdv?.valeur, system.pdv?.max),
+      manoeuvres : trierItems(actor, "manoeuvre"),
+      // Onglet Équipement (partial equipement-tab.hbs) : surcharge affichée, sans malus appliqué aux jets
+      equipements          : trierItems(actor, "equipement"),
+      malusSurchargeAffiche: malusSurcharge(system.chargeActuelle ?? 0, system.demiCharge ?? 0, system.chargeMax ?? 0),
+      notesHTML: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        system.notes ?? "", { async: true, secrets: actor.isOwner }
       ),
     };
   }

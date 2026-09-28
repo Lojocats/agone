@@ -1,5 +1,5 @@
 import { AgoneActorSheet } from "./agone-actor-sheet.mjs";
-import { competencesParScore, caracsParAspect } from "./actor-context.mjs";
+import { caracsParAspect, contexteActeurSimple, jaugePct } from "./actor-context.mjs";
 
 // Caractéristiques achetables du démon (échelle 0–5) ; la RÉSistance est dérivée de la Densité
 const CARACS_DEMON = ["agilite", "force", "perception", "intelligence", "volonte", "charisma", "creativite"];
@@ -30,17 +30,16 @@ export class DemonSheet extends AgoneActorSheet {
 
   /** @override */
   async _prepareContext(options) {
-    const actor  = this.actor;
-    const system = actor.system;
+    const actor   = this.actor;
+    const context = await contexteActeurSimple(actor, this);
+    const system  = context.system;
     const levelUp = !!system.modeLevelUp;
     const enrich  = html => foundry.applications.ux.TextEditor.implementation.enrichHTML(
       html ?? "", { async: true, secrets: actor.isOwner }
     );
 
-    const competences = actor.items.filter(i => i.type === "competence")
-      .sort((a, b) => a.name.localeCompare(b.name, "fr"));
     // Coût XP fixe des compétences (affiché sur les boutons du partial)
-    for (const c of competences) {
+    for (const c of context.competences) {
       c.xpCout = c.creaCout = COUT_COMP;
       c.coutAffiche = c.coutAfficheDown = `${COUT_COMP} XP`;
     }
@@ -52,24 +51,16 @@ export class DemonSheet extends AgoneActorSheet {
     ];
 
     return {
-      system, actor,
-      isOwner : actor.isOwner,
-      editable: this.isEditable,
-      armes   : actor.items.filter(i => i.type === "arme"),
-      pdvPercent: system.densite?.max > 0
-        ? Math.round(Math.min(100, (system.densite.valeur / system.densite.max) * 100))
-        : 0,
+      ...context,
+      pdvPercent: jaugePct(system.densite?.valeur, system.densite?.max),
       // Partial competences.hbs : montée de niveau via le mode level-up du démon
-      competences,
-      competencesGroups     : competencesParScore(competences),
-      competencesNonAcquises: [],
-      triCompsEstFamille    : false,
-      showLevelUp           : levelUp,
-      showLevelUpComp       : levelUp,
-      showLevelUpAspect     : levelUp,
+      showLevelUp      : levelUp,
+      showLevelUpComp  : levelUp,
+      showLevelUpAspect: levelUp,
       // Caractéristiques (partial caracs-simples.hbs) : le nom lance le jet ; montée de niveau par XP
-      caracGroups: caracsParAspect(system, actor._source.system, ["agilite", "force", "perception", "resistance", ...CARACS_DEMON.slice(3)], {
+      caracGroups: caracsParAspect(system, context.source, ["agilite", "force", "perception", "resistance", ...CARACS_DEMON.slice(3)], {
         derivees: { resistance: game.i18n.localize("AGONE.ResistanceDemonHint") },
+        badges  : context.badges,
         extra   : Object.fromEntries(CARACS_DEMON.map(k => [k, {
           shortLabel: CONFIG.AGONE.attributs[k].abbr,
           expField  : `${k}Exp`,
@@ -81,7 +72,6 @@ export class DemonSheet extends AgoneActorSheet {
         }])),
       }),
       origineOptions : origines.map(o => ({ ...o, selected: system.origine === o.value })),
-      descriptionHTML: await enrich(system.description),
       connivancesHTML: await enrich(system.connivances),
       notesHTML      : await enrich(system.notes),
     };

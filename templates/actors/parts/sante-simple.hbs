@@ -1,0 +1,49 @@
+<!-- PARTIAL : SANTÉ DES ACTEURS SIMPLES (compagnon, démon, PNJ)
+     Paramètres : jauge (system.pdv | system.densite), labelJauge (libellé court), pct (remplissage 0–100),
+     sansVol (la 3e blessure grave ne déclenche pas de jet de VOL) -->
+<div class="combat-card sante-card {{classeCarte}}">
+  <h3 class="combat-card-title"><i class="fas fa-heartbeat"></i> {{localize "AGONE.EtatSante"}}</h3>
+  <div class="pdv-bar-wrap">
+    <div class="pdv-values">
+      <span class="pdv-current">{{jauge.valeur}}</span>
+      <span class="pdv-sep">/</span>
+      <span class="pdv-max">{{jauge.max}}</span>
+      <span class="pdv-label">{{labelJauge}}</span>
+    </div>
+    {{#if jauge.max}}
+    <div class="pdv-track" data-tooltip="{{jauge.valeur}} / {{jauge.max}}">
+      <div class="pdv-fill" style="width:{{pct}}%;"></div>
+    </div>
+    {{/if}}
+  </div>
+  <div class="blessures-section">
+    <div class="bg-row">
+      <span class="bg-title">{{localize "AGONE.BlessuresGraves"}}</span>
+      <label class="bg-cell {{#if system.blessureGrave1}}bg-active{{/if}}" data-tooltip='{{localize "AGONE.BlessureGrave1Hint"}}'>
+        <input type="checkbox" name="system.blessureGrave1" {{#if system.blessureGrave1}}checked{{/if}} />
+        <span class="bg-dot">1</span><span class="bg-pen">-2</span>
+      </label>
+      <label class="bg-cell {{#if system.blessureGrave2}}bg-active{{/if}}" data-tooltip='{{localize "AGONE.BlessureGrave2Hint"}}'>
+        <input type="checkbox" name="system.blessureGrave2" {{#if system.blessureGrave2}}checked{{/if}} />
+        <span class="bg-dot">2</span><span class="bg-pen">-6</span>
+      </label>
+      <label class="bg-cell {{#if system.blessureGrave3}}bg-active{{/if}}" data-tooltip='{{#if sansVol}}{{localize "AGONE.Ui.BlessureGrave3SansVol"}}{{else}}{{localize "AGONE.BlessureGrave3Hint"}}{{/if}}'>
+        <input type="checkbox" name="system.blessureGrave3" {{#if system.blessureGrave3}}checked{{/if}} />
+        <span class="bg-dot">3</span><span class="bg-pen">-12</span>
+      </label>
+      {{#if system.malusBlessureGrave}}<span class="bg-total">{{system.malusBlessureGrave}}</span>{{/if}}
+    </div>
+  </div>
+  {{#if system.seuilBlessureGrave}}
+  <div class="cstats-grid npc-card-espace">
+    <div class="cstat-item" data-tooltip='{{localize "AGONE.Combat.SeuilBGTooltip"}}'>
+      <span class="cstat-score">{{system.seuilBlessureGrave}}</span>
+      <span class="cstat-label">SBG</span>
+    </div>
+    <div class="cstat-item" data-tooltip='{{localize "AGONE.Combat.SeuilBCTooltip"}}'>
+      <span class="cstat-score">{{system.seuilBlessureCritique}}</span>
+      <span class="cstat-label">SBC</span>
+    </div>
+  </div>
+  {{/if}}
+</div>

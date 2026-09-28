@@ -83,6 +83,13 @@ describe("Templates Handlebars", () => {
     assert.match(agone, /["']systems\/agone\/templates\/actors\/parts\/panneau-progression\.hbs["']/);
   });
 
+  test("partials des fiches simples (sante-simple, cstats-simples, badges-bonus, armures-card, armes-card, manoeuvres-card) enregistrés dans loadTemplates", () => {
+    const agone = lire("module/agone.mjs");
+    for (const nom of ["sante-simple", "cstats-simples", "badges-bonus", "armures-card", "armes-card", "manoeuvres-card"]) {
+      assert.match(agone, new RegExp(`["']systems/agone/templates/actors/parts/${nom}\\.hbs["']`), nom);
+    }
+  });
+
   test("tout template ou partial cité existe", () => {
     const cites = new Set();
     for (const f of [...templates, ...modules]) {

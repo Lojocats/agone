@@ -64,6 +64,20 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
   /** La recherche de compétences parcourt aussi les compétences non acquises (fiche personnage). */
   static RECHERCHE_NON_ACQUISES = false;
 
+  /**
+   * Listes réordonnables par glisser-déposer (poignée `.item-drag-handle`) : [ligne, conteneur].
+   * @type {Array<[string, string]>}
+   */
+  static REORDER = [
+    [".comp-cards-grid:not(.comp-na-cards) .comp-card", ".comp-cards-grid:not(.comp-na-cards)"],
+    [".armes-table tbody .item-row",                    ".armes-table tbody"],
+    [".manoeuvres-table tbody .item-row",               ".manoeuvres-table tbody"],
+    [".equip-table tbody .item-row",                    ".equip-table tbody"],
+  ];
+
+  /** Cocher la 3e blessure grave lance le jet de VOL Difficulté 10. */
+  static JET_VOL_BLESSURE3 = true;
+
   /** L'utilisateur n'a qu'un accès limité à l'acteur (jamais le MJ) : vue réduite. */
   get vueLimitee() {
     return this.document.limited;
@@ -174,18 +188,39 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     on("change", ".smf-check", this._onFiltreTypeSorts.bind(this));
   }
 
-  /** Écouteurs d'édition par défaut : items, jets de combat et compétences. */
+  /** Écouteurs d'édition par défaut : items, réordonnancement, jets de combat et compétences. */
   _bindListeners(on, root) {
     this._bindItemListeners(on);
+    this._bindDragReorder(root);
+    this._bindJetsCombat(on);
     on("click", "[data-action='rollAttribut']", this._onRollAttribut.bind(this));
+    on("change", ".arme-equipe", this._onArmeEquipeChange.bind(this));
+    on("change", ".armure-portee", this._onArmureItemPorteeChange.bind(this));
+    on("click", "[data-action='rollCompetence']", this._onRollCompetence.bind(this));
+  }
+
+  /**
+   * Jets de combat communs à toutes les fiches : initiative (globale ou par arme), initiative magique,
+   * attaque, parade, esquive, défense naturelle, Emprise, envoi au chat des manœuvres et pouvoirs,
+   * et jet de VOL à la 3e blessure grave (si `JET_VOL_BLESSURE3`).
+   */
+  _bindJetsCombat(on) {
     on("click", "[data-action='rollInitiative']", this._onRollInitiative.bind(this));
+    on("click", "[data-action='rollInitiativeMagique']", this._onRollInitiativeMagique.bind(this));
     on("click", "[data-action='rollAttaque']", this._onRollAttaque.bind(this));
     on("click", "[data-action='rollParade']", this._onRollParade.bind(this));
     on("click", "[data-action='rollEsquive']", this._onRollEsquive.bind(this));
     on("click", "[data-action='rollDefenseNaturelle']", this._onRollDefenseNaturelle.bind(this));
-    on("change", ".arme-equipe", this._onArmeEquipeChange.bind(this));
-    on("change", ".armure-portee", this._onArmureItemPorteeChange.bind(this));
-    on("click", "[data-action='rollCompetence']", this._onRollCompetence.bind(this));
+    on("click", "[data-action='rollEmpriseAttr']", this._onRollEmpriseAttr.bind(this));
+    on("click", "[data-action='rollManoeuvre']", this._onItemSendChat.bind(this));
+    on("click", "[data-action='chatPouvoir']", this._onItemSendChat.bind(this));
+    on("change", "[name='system.blessureGrave3']", this._onBlessureGrave3Change.bind(this));
+  }
+
+  /** 3e blessure grave cochée : jet de VOL Difficulté 10 (sauf fiches sans VOL). */
+  async _onBlessureGrave3Change(event) {
+    if (!this.constructor.JET_VOL_BLESSURE3 || !event.currentTarget.checked) return;
+    await this.actor.rollVolBlessure3();
   }
 
   /** Items : créer, supprimer, édition inline, navigateurs (ouverture et chat : _bindViewListeners). */
@@ -267,6 +302,99 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     await this.actor.updateEmbeddedDocuments("Item", batch);
   }
 
+  // ── Réordonnancement par glisser-déposer ───────────────────────────────
+
+  /** Active le réordonnancement de chaque liste de `static REORDER`. */
+  _bindDragReorder(root) {
+    for (const [rowSel, containerSel] of this.constructor.REORDER) this._setupDragReorder(root, rowSel, containerSel);
+  }
+
+  /**
+   * Rend les lignes `rowSel` déplaçables par leur poignée `.item-drag-handle` et
+   * les conteneurs `containerSel` cibles du dépôt (même type d'item uniquement).
+   */
+  _setupDragReorder(root, rowSel, containerSel) {
+    const signal = this._renderSignal?.signal;
+    root.querySelectorAll(rowSel).forEach(el => {
+      const handle = el.querySelector(".item-drag-handle");
+      if (!handle) return;
+      handle.addEventListener("mousedown", () => { el._fromDragHandle = true; }, { signal });
+      el.addEventListener("mouseup", () => { el._fromDragHandle = false; }, { signal });
+      el.setAttribute("draggable", true);
+      el.addEventListener("dragstart", evt => {
+        if (!el._fromDragHandle) { evt.preventDefault(); return; }
+        el._fromDragHandle = false;
+        const itemId = el.dataset.itemId;
+        if (!itemId) return;
+        evt.dataTransfer.effectAllowed = "move";
+        evt.dataTransfer.setData("text/plain", JSON.stringify({ type: "item-reorder", itemId }));
+        el.classList.add("dragging");
+      }, { signal });
+      el.addEventListener("dragend", () => el.classList.remove("dragging"), { signal });
+    });
+    root.querySelectorAll(containerSel).forEach(container => {
+      container.addEventListener("dragover",  this._onDragOverItemReorder.bind(this), { signal });
+      container.addEventListener("dragleave", this._onDragLeaveItemReorder.bind(this), { signal });
+      container.addEventListener("drop",      this._onDropItemReorder.bind(this), { signal });
+    });
+  }
+
+  /** Ligne `.item-row[data-item-id]` du conteneur située sous le pointeur. */
+  _ligneSousPointeur(container, clientY) {
+    return [...container.querySelectorAll(".item-row[data-item-id]")].find(row => {
+      const rect = row.getBoundingClientRect();
+      return clientY >= rect.top && clientY <= rect.bottom;
+    });
+  }
+
+  _effacerMarquesDepot(container) {
+    container.querySelectorAll(".item-drop-above, .item-drop-below")
+      .forEach(el => el.classList.remove("item-drop-above", "item-drop-below"));
+  }
+
+  _onDragOverItemReorder(event) {
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { /* données non JSON */ }
+    if (data?.type !== "item-reorder" && !event.dataTransfer.types.includes("text/plain")) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    const container = event.currentTarget;
+    const targetRow = this._ligneSousPointeur(container, event.clientY);
+    this._effacerMarquesDepot(container);
+    if (!targetRow) return;
+    const rect = targetRow.getBoundingClientRect();
+    targetRow.classList.add(event.clientY < rect.top + rect.height / 2 ? "item-drop-above" : "item-drop-below");
+  }
+
+  _onDragLeaveItemReorder(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) this._effacerMarquesDepot(event.currentTarget);
+  }
+
+  async _onDropItemReorder(event) {
+    const container = event.currentTarget;
+    this._effacerMarquesDepot(container);
+    event.preventDefault();
+    let data;
+    try { data = JSON.parse(event.dataTransfer.getData("text/plain")); } catch { return; }
+    if (data?.type !== "item-reorder") return;
+    const draggedItem = this.actor.items.get(data.itemId);
+    if (!draggedItem) return;
+    const targetRow = this._ligneSousPointeur(container, event.clientY);
+    if (!targetRow || targetRow.dataset.itemId === data.itemId) return;
+    const targetItem = this.actor.items.get(targetRow.dataset.itemId);
+    if (!targetItem || targetItem.type !== draggedItem.type) return;
+    const rect = targetRow.getBoundingClientRect();
+    const sortBefore = event.clientY < rect.top + rect.height / 2;
+    const siblings   = this.actor.items.filter(i => i.type === draggedItem.type && i.id !== draggedItem.id);
+    const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
+    const updates    = sortHelper.performIntegerSort(draggedItem, { target: targetItem, siblings, sortBefore });
+    if (updates.length) {
+      await this.actor.updateEmbeddedDocuments("Item",
+        updates.map(u => ({ _id: u.target.id, sort: u.update.sort }))
+      );
+    }
+  }
+
   // ── Navigateurs & dialogues enfants ────────────────────────────────────
 
   async _onBrowseCompendium(event) {
@@ -338,9 +466,19 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     if (arme) await this.actor.rollParade(arme.id);
   }
 
+  async _onRollInitiativeMagique(event) {
+    event.preventDefault();
+    await this.actor.rollInitiativeMagique();
+  }
+
   async _onRollEsquive(event) {
     event.preventDefault();
     await this.actor.rollEsquive();
+  }
+
+  async _onRollEmpriseAttr(event) {
+    event.preventDefault();
+    await this.actor.rollEmpriseAttr();
   }
 
   async _onRollDefenseNaturelle(event) {

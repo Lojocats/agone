@@ -87,7 +87,12 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 ### Compagnons, Démons & PNJ
 - Fiches dédiées pour compagnons, démons et PNJ, construites sur la même base que la fiche personnage
 - Caractéristiques **regroupées par aspect** (Corps, Esprit, Âme) : cliquer sur une caractéristique lance le jet, comme pour un personnage
-- Onglet Magie des PNJ (sorts, Arts Magiques, filtres et tri)
+- Badges de bonus/malus (peuple, effets d'items, malus d'AGI de l'armure) et formules détaillées des stats de combat, comme sur la fiche personnage
+- PNJ : une race reconnue (Nain, Géant…) applique automatiquement les modificateurs raciaux du peuple
+- Jets de combat en un clic (initiative, attaque, parade, esquive, défense naturelle), manœuvres (PNJ et compagnon), jet de VOL automatique à la 3e blessure grave (PNJ et démon)
+- Onglet Magie des PNJ (sorts, Arts Magiques, filtres et tri, pouvoirs de Flamme), jets d'Emprise et d'initiative magique
+- Compagnon : onglet Équipement avec la charge, armure portée prise en compte
+- Réordonnancement des compétences, armes, manœuvres et équipements par glisser-déposer
 - Liés à la fiche personnage (onglet Compagnons)
 
 ### Permissions des fiches
