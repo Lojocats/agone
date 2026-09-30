@@ -321,7 +321,7 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       ]);
       const roll1 = await actor3.rollSort(sort.id, { impro: true, fastForward: true });
       assert.ok(roll1, "premier jet lancé");
-      assert.equal(horsDes(roll1), actor3.system.creativite.score + 4 + actor3.system.bonusAme, "improvisation = CRÉ + Arts + bonus Âme");
+      assert.equal(horsDes(roll1), actor3.system.art + 4 + actor3.system.bonusAme, "sort improvisé : même aptitude ART + Arts + bonus Âme (seuil × 2)");
       assert.equal(dernierMessage(actor3).flags.agone.relance.options.impro, true, "impro mémorisé dans les drapeaux");
 
       const roll2 = await actor3.relancerMessage(dernierMessage(actor3));
@@ -392,12 +392,16 @@ export function jetsBatch({ describe, it, assert, before, after }) {
 
     it("mode de jet conservé : un jet secret (gmroll) reste chuchoté de la même façon après relance", async () => {
       const actor7 = await tests.acteur("personnage", { ...PERSO, ph: { valeur: 2, max: 2 } });
-      const modeOriginal = game.settings.get("core", "rollMode");
-      await game.settings.set("core", "rollMode", "gmroll");
+      // v14 : core.rollMode est déprécié et ne relaie core.messageMode que de façon asynchrone ;
+      // on règle directement le réglage réel (messageMode en v14, rollMode en v13).
+      const v14 = game.settings.settings.has("core.messageMode");
+      const cle = v14 ? "messageMode" : "rollMode";
+      const modeOriginal = game.settings.get("core", cle);
+      await game.settings.set("core", cle, v14 ? "gm" : "gmroll");
       try {
         await actor7.rollAttribut("force", FF);
       } finally {
-        await game.settings.set("core", "rollMode", modeOriginal);
+        await game.settings.set("core", cle, modeOriginal);
       }
       const msg1 = dernierMessage(actor7);
       assert.equal(msg1.flags.agone.relance.rollMode, "gmroll", "mode de jet mémorisé dans les drapeaux");
@@ -498,7 +502,12 @@ export function jetsBatch({ describe, it, assert, before, after }) {
       const rollBonus = await actorS.rollSort(sortSeuil.id, { fastForward: true, heroisme: true });
       assert.ok(rollBonus, "jet bonusé lancé");
       assert.equal(actorS.system.ph.valeur, 1, "1 point d'Héroïsme dépensé");
-      assert.include(dernierMessage(actorS).content, "roll-issue-succes",
+      // Un 1 au dé est un fumble (pénalité) et un 10 un critique : seul le jet « normal » est concluant.
+      const de = rollBonus.dice[0].results[0].result;
+      const contenu = dernierMessage(actorS).content;
+      if (de === 1) assert.include(contenu, "roll-issue-fumble", "dé = 1 : fumble prioritaire");
+      else if (de === 10) assert.include(contenu, "roll-issue-critique", "dé = 10 : critique prioritaire");
+      else assert.include(contenu, "roll-issue-succes",
         "le seuil (échec garanti sans bonus) devient un succès grâce au bonus recalculé");
     });
 

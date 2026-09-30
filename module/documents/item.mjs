@@ -1,3 +1,5 @@
+import { appliquerModeJet } from "../helpers/mode-jet.mjs";
+
 /**
  * AgoneItem — Classe Item étendue pour le système Agone
  */
@@ -73,9 +75,8 @@ export class AgoneItem extends Item {
           descHTML,
         }
       );
-      return ChatMessage.create(ChatMessage.applyRollMode(
-        { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
-        game.settings.get("core", "rollMode")
+      return ChatMessage.create(appliquerModeJet(
+        { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content }
       ));
     }
 
@@ -99,9 +100,8 @@ export class AgoneItem extends Item {
           descHTML,
         }
       );
-      return ChatMessage.create(ChatMessage.applyRollMode(
-        { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
-        game.settings.get("core", "rollMode")
+      return ChatMessage.create(appliquerModeJet(
+        { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content }
       ));
     }
 
@@ -128,9 +128,8 @@ export class AgoneItem extends Item {
         descHTML,
       }
     );
-    return ChatMessage.create(ChatMessage.applyRollMode(
-      { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content },
-      game.settings.get("core", "rollMode")
+    return ChatMessage.create(appliquerModeJet(
+      { speaker: ChatMessage.getSpeaker({ actor: this.actor }), content }
     ));
   }
 }

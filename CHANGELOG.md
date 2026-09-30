@@ -3,6 +3,15 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.14] — 2026-09-30
+
+### Corrigé
+- Foundry v14 : le mode de jet choisi dans le chat (MJ, aveugle, privé) était ignoré par les jets, les envois d'objets et les maladresses, qui partaient tous en public. Le système lit désormais le nouveau réglage de v14, et reste compatible avec v13.
+- Les méthodes de jet renvoient désormais le jet réellement affiché dans le chat (avec le +5 d'Héroïsme ou le relancer d'un jet fermé), et non un jet intermédiaire. Les macros et modules qui lisent le résultat obtiennent donc le bon total.
+
+### Modifié
+- Tests : bonus d'Héroïsme lu sur le jet renvoyé, formule du sort improvisé (ART, seuil × 2), sorts du Danseur retrouvés par leur nom, mode de jet réglé via `core.messageMode` en v14, jet de sort bonifié tolérant au fumble et au critique (Quench) ; conversion des modes de jet v13/v14 (tests unitaires).
+
 ## [1.9.13] — 2026-09-30
 
 ### Ajouté

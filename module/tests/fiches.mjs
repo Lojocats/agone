@@ -595,10 +595,13 @@ export function fichesBatch({ describe, it, assert, before, after }) {
       [danseur] = await actor.createEmbeddedDocuments("Item", [
         { name: "Danseur de test", type: "danseur", system: { modeCreation: false, enduranceNiveau: 3, enduranceActuelle: 1 } },
       ]);
-      [sortLibre, sortLourd] = await actor.createEmbeddedDocuments("Item", [
+      // Retrouvés par nom : l'ordre renvoyé par createEmbeddedDocuments n'est pas garanti
+      const sorts = await actor.createEmbeddedDocuments("Item", [
         { name: "Sort libre", type: "sort", system: { typeMagie: "Runes", seuil: 5 } },
         { name: "Sort trop lourd", type: "sort", system: { typeMagie: "Runes", seuil: 100 } },
       ]);
+      sortLibre = sorts.find(s => s.name === "Sort libre");
+      sortLourd = sorts.find(s => s.name === "Sort trop lourd");
       sheet = await ouvrir(actor.sheet);
       sheet.element.querySelector('.sheet-tabs .item[data-tab="magie"]').click();
     });

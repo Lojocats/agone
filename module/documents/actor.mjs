@@ -1,6 +1,7 @@
 import { effetsActeur, effetsNeutres } from "../helpers/effets.mjs";
 import { issueJet } from "../helpers/roll-issue.mjs";
 import { resoudreDomaineArts } from "../helpers/domaines-arts.mjs";
+import { appliquerModeJet, modeHistorique, modeJetCourant } from "../helpers/mode-jet.mjs";
 
 /** Libellé localisé des cartes de jet (section AGONE.Des). */
 const _L = (key, data) => data
@@ -482,13 +483,13 @@ export class AgoneActor extends Actor {
       { base: baseScore, malus: (sd.malusSurcharge ?? 0) + malusBlessure, modif: modif + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       base:   `${_L("AttributX2", { attribut: label })} : ${scoreEffectif * 2}`,
       ...(hasAspects ? { aspect: `${_L("BonusAspect")} : ${bonusAspect}` } : {}),
       modif:  `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, { rollType: jet.rollType, relance: this._infoRelance("rollAttribut", [attributKey], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -535,7 +536,7 @@ export class AgoneActor extends Actor {
       }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       competence: `${label} : ${compScore}${compScore === 0 ? ` (${game.i18n.localize("AGONE.MalusCompNonApprise")})` : ""}`,
       attribut:  `${game.i18n.localize(attrConfig.label ?? attrKey)} : ${attrScore}`,
       aspect:    `${_L("BonusAspect")} : ${bonusAspect}${bonusSpe ? ` + ${_L("Specialite")} : +${bonusSpe}` : ""}`,
@@ -543,7 +544,7 @@ export class AgoneActor extends Actor {
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {}),
       ...(compData.notes    ? { notes:    compData.notes } : {})
     }, { rollType: jet.rollType, relance: this._infoRelance("rollCompetence", [itemId], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   // Jet d'une compétence non acquise (score 0, malus -3 automatique)
@@ -638,7 +639,7 @@ export class AgoneActor extends Actor {
       }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       competence: `${label} : 0 (${game.i18n.localize("AGONE.MalusCompNonApprise")})`,
       attribut:  `${game.i18n.localize(chosenCfg.label ?? chosenKey)} : ${chosenScore}`,
       aspect:    `${_L("BonusAspect")} : ${bonusAspect}`,
@@ -649,7 +650,7 @@ export class AgoneActor extends Actor {
       relance: this._infoRelance("rollCompetenceSansItem", [nom, attributLie, domaine], { relance },
         { attrChosen: chosenKey, modif, type: rollType, heroisme: !relance && !!result.heroisme }),
     });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -718,7 +719,7 @@ export class AgoneActor extends Actor {
 
     // Mettre à jour le tracker de combat
     await this._setInitiativeInCombat(Math.max(0, (jetFinal ?? roll).total));
-    return roll;
+    return jetFinal ?? roll;
   }
 
   /**
@@ -748,7 +749,7 @@ export class AgoneActor extends Actor {
 
     // Mettre à jour le tracker de combat
     await this._setInitiativeInCombat(Math.max(0, (jetFinal ?? roll).total));
-    return roll;
+    return jetFinal ?? roll;
   }
 
   /**
@@ -798,7 +799,7 @@ export class AgoneActor extends Actor {
       { total, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       style:     `${baseAttackLabel} : ${baseAttack}`,
       competence:`${_L("Competence")} : ${scoreComp}`,
       arme:      `${_L("BonusArme")} : ${attackBonus}`,
@@ -817,7 +818,7 @@ export class AgoneActor extends Actor {
         style:         style,
       }
     });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -853,7 +854,7 @@ export class AgoneActor extends Actor {
       { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       melee:     `MÊL : ${melee}`,
       competence:`${_L("Competence")} : ${scoreComp}`,
       arme:      `${_L("BonusArme")} : ${defenseBonus}`,
@@ -872,7 +873,7 @@ export class AgoneActor extends Actor {
         style:         arme.system.style ?? "melee",
       }
     });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -894,12 +895,12 @@ export class AgoneActor extends Actor {
       { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       base:  `${_L("Esquive")} : ${total}`,
       modif: `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, { rollType: jet.rollType, relance: this._infoRelance("rollEsquive", [], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -921,12 +922,12 @@ export class AgoneActor extends Actor {
       { total, modif: modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       base:  `${_L("DefenseNaturelle")} : ${total}`,
       modif: `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, { rollType: jet.rollType, relance: this._infoRelance("rollDefenseNaturelle", [], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -986,9 +987,8 @@ export class AgoneActor extends Actor {
       }
     );
 
-    await ChatMessage.create(ChatMessage.applyRollMode(
-      { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [roll] },
-      game.settings.get("core", "rollMode")
+    await ChatMessage.create(appliquerModeJet(
+      { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [roll] }
     ));
     return roll;
   }
@@ -1191,7 +1191,7 @@ export class AgoneActor extends Actor {
     else if (impro)                            seuilCalc = `(${seuilBase} × 2, ${imp})`;
     else if (seuilBonus > 0)                   seuilCalc = `(${seuilBase} + ${seuilBonus} ${_L("Augmente")})`;
     const seuilLabel = `${_L("Seuil")} : ${seuilFinal}${seuilCalc ? ` ${seuilCalc}` : ""}`;
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       aptitude: aptitudeLabel,
       seuil:    seuilLabel,
       resultat: _L(succes ? "Succes" : "Echec"),
@@ -1208,7 +1208,7 @@ export class AgoneActor extends Actor {
         danse:     sort.system.danse     ?? "",
       }
     });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1283,7 +1283,7 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
 
     const succes = roll.total >= seuil;
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       sort:      { label: _L("Sort"),      value: sortData.name },
       seuil:     impro
         ? { label: _L("Seuil"), value: `${seuil} (${seuilBase} × 2, ${_L("Improvise")})` }
@@ -1308,7 +1308,7 @@ export class AgoneActor extends Actor {
     });
 
     if (!estRelance) await danseur.update({ "system.enduranceActuelle": newEnd });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1336,13 +1336,13 @@ export class AgoneActor extends Actor {
       apt: aptitude, bd: bonusDanseur, modif
     });
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       danseur:   { label: _L("Danseur"),          value: danseur.name },
       endurance: { label: _L("EnduranceDanseur"), value: `${danseur.system.enduranceActuelle ?? 0} / ${danseur.system.enduranceMax ?? 0}` },
       ...details,
       modif:     { label: _L("BonusMalus"),       value: modif >= 0 ? `+${modif}` : modif },
     }, { rollType: jet.rollType, relance: this._infoRelance("rollEmprise", [danseurId], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1369,13 +1369,13 @@ export class AgoneActor extends Actor {
       emp: empriseBase, res: scoreResonance, esp: bonusEsprit, modif
     });
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       empBase:   { label: _L("EmpriseBase"), value: empriseBase, tooltip: this._empriseSourceLabel() },
       resonance: { label: compResonance?.name ?? _L("Resonance"), value: `+${scoreResonance}` },
       ...(bonusEsprit ? { esprit: { label: _L("BonusEsprit"), value: `+${bonusEsprit}` } } : {}),
       modif:     { label: _L("BonusMalus"),  value: modif >= 0 ? `+${modif}` : modif },
     }, { rollType: jet.rollType, relance: this._infoRelance("rollEmpriseAttr", [], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1389,11 +1389,11 @@ export class AgoneActor extends Actor {
     const { modif } = jet;
     const roll = new Roll("1d10x10 + @apt + @modif", { apt, modif });
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       aptitude: `${label} : ${apt}`,
       modif:    `${_L("BonusMalus")} : ${modif}`,
     }, { rollType: jet.rollType, relance: this._infoRelance("rollAptitudeMagie", [], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1407,11 +1407,11 @@ export class AgoneActor extends Actor {
     const { modif } = jet;
     const roll = new Roll("1d10x10 + @apt + @modif", { apt, modif });
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       aptitude: `${label} : ${apt}`,
       modif:    `${_L("BonusMalus")} : ${modif}`,
     }, { rollType: jet.rollType, relance: this._infoRelance("rollAptitudeConjuration", [], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1429,12 +1429,12 @@ export class AgoneActor extends Actor {
     const noirceur  = this.system.noirceur ?? 0;
     const roll = new Roll("1d10x10 + @noirceur + @comp + @modif", { noirceur, comp: scoreComp, modif });
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       noirceur:    `${_L("Noirceur")} : ${noirceur}`,
       demonologie: `${_L("Demonologie")} : ${scoreComp}`,
       modif:       `${_L("BonusMalus")} : ${modif}`,
     }, { rollType: jet.rollType, relance: this._infoRelance("rollConjurationDemonologie", [], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   /**
@@ -1469,11 +1469,11 @@ export class AgoneActor extends Actor {
       : `${compLabel}:${d.scoreArts}`;
     const spe     = bonusSpe ? ` + ${_L("SpeAbr")}(+${bonusSpe})` : "";
     const formule = `${base} + ${arts} + ${_L(bonusLabel)}(${bonusVal})${spe}`;
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       aptitude: `${formule} : ${d.apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
       modif:    `${_L("BonusMalus")} : ${modif}`,
     }, { rollType: jet.rollType, relance: this._infoRelance("rollArtDomaine", [d], options, jet, { impro }) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   async rollImprovisationDanseur(danseurId, options = {}) {
@@ -1496,7 +1496,7 @@ export class AgoneActor extends Actor {
 
     const roll = new Roll("1d10x10 + @apt + @modif", { apt: aptitude, modif });
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetPoste = await this._sendRollToChat(roll, label, {
       danseur:   { label: _L("Danseur"),                      value: danseur.name },
       endurance: { label: _L("EnduranceDanseur"),            value: `${endAct} / ${endMax}` },
       cre:       { label: _L("CreativiteCre"),              value: cre },
@@ -1506,7 +1506,7 @@ export class AgoneActor extends Actor {
       aptTotal:  { label: _L("TotalImprovisation"),          value: aptitude },
       modif:     { label: _L("BonusMalus"),                value: modif >= 0 ? `+${modif}` : modif },
     }, { rollType: jet.rollType, relance: this._infoRelance("rollImprovisationDanseur", [danseurId], options, jet) });
-    return roll;
+    return jetPoste ?? roll;
   }
 
   // ==============================
@@ -1907,7 +1907,7 @@ export class AgoneActor extends Actor {
 
     // Drapeaux : type de jet (style du message) et paramètres de relance (point d'Héroïsme)
     // Une relance reprend le mode de jet du message d'origine (un jet secret reste secret)
-    const rollMode = extra.relance?.rollMode ?? game.settings.get("core", "rollMode");
+    const rollMode = modeHistorique(extra.relance?.rollMode) ?? modeJetCourant();
     const flags = { agone: { rollType } };
     if (extra.relance?.methode) {
       const { methode, args = [], options = {}, dialog = null, heroisme = null } = extra.relance;
@@ -1918,7 +1918,7 @@ export class AgoneActor extends Actor {
     }
     if (bonusHeroisme) flags.agone.issuHeroisme = "bonus";
 
-    await ChatMessage.create(ChatMessage.applyRollMode(
+    await ChatMessage.create(appliquerModeJet(
       { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [finalRoll], flags },
       rollMode
     ));
