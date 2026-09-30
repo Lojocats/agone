@@ -161,6 +161,26 @@ p.agone-recap-avertissement {
   color: var(--agone-txt-rouge, #7a2010);
   background: rgba(var(--agone-rouge-rgb, 139,26,26), 0.12);
 }
+/* Relance (point d'Héroïsme) : ancien jet grisé, badges dans l'en-tête */
+.agone-relance-faite .agone-roll-card {
+  opacity: 0.55;
+  filter: grayscale(0.85);
+}
+.agone-roll-card .roll-relance-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.7);
+  color: var(--agone-parchment, #f4e8c1);
+  background: rgba(var(--agone-noir-rgb, 0,0,0), 0.25);
+}
+.agone-roll-card .roll-relance-badge.relance-nouvelle {
+  color: var(--agone-gold, #c9a227);
+}
 .agone-roll-card .roll-resultat {
   font-size: 14px;
   font-weight: 700;

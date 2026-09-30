@@ -31,6 +31,8 @@
         <tr>
           <th>{{localize "AGONE.DomainesArts.Domaine"}}</th>
           <th>{{localize "AGONE.DomainesArts.CompLiee"}}</th>
+          <th>{{localize "AGONE.DomainesArts.Attribut"}}</th>
+          <th>{{localize "AGONE.DomainesArts.Competence"}}</th>
           <th>{{localize "AGONE.DomainesArts.TypeSort"}}</th>
           <th></th>
         </tr>
@@ -43,6 +45,18 @@
             <input type="text" class="dac-comp-input" value="{{d.compLiee}}"
                    placeholder='{{localize "AGONE.DomainesArts.CompLieePlaceholder"}}'
                    data-action="editCompLiee" data-idx="{{idx}}" />
+          </td>
+          <td>
+            <select class="dac-comp-input" data-action="editAttribut" data-idx="{{idx}}">
+              {{#each ../attributOptions as |opt|}}
+              <option value="{{opt.key}}" {{#if (eq opt.key d.attribut)}}selected{{/if}}>{{opt.label}}</option>
+              {{/each}}
+            </select>
+          </td>
+          <td>
+            <input type="text" class="dac-comp-input" value="{{d.competence}}" list="dac-competence-noms"
+                   placeholder='{{localize "AGONE.DomainesArts.CompetencePlaceholder"}}'
+                   data-action="editCompetence" data-idx="{{idx}}" />
           </td>
           <td><code class="dac-type-key">{{d.nom}}</code></td>
           <td>
@@ -72,6 +86,19 @@
         <label>{{localize "AGONE.DomainesArts.CompLiee"}}</label>
         <input type="text" class="dac-new-comp" placeholder='{{localize "AGONE.DomainesArts.CompLieePlaceholder"}}' />
       </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.DomainesArts.Attribut"}}</label>
+        <select class="dac-new-attribut">
+          {{#each attributOptions as |opt|}}
+          <option value="{{opt.key}}">{{opt.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{localize "AGONE.DomainesArts.Competence"}}</label>
+        <input type="text" class="dac-new-competence" list="dac-competence-noms"
+               placeholder='{{localize "AGONE.DomainesArts.CompetencePlaceholder"}}' />
+      </div>
       <div class="dac-add-hint">
         <i class="fas fa-info-circle"></i>
         {{localize "AGONE.DomainesArts.TypeSortHint"}}
@@ -81,5 +108,11 @@
       </button>
     </div>
   </section>
+
+  <datalist id="dac-competence-noms">
+    {{#each competenceNoms as |nom|}}
+    <option value="{{nom}}"></option>
+    {{/each}}
+  </datalist>
 
 </div>

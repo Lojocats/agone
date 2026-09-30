@@ -1,10 +1,25 @@
 import { effetsActeur, effetsNeutres } from "../helpers/effets.mjs";
 import { issueJet } from "../helpers/roll-issue.mjs";
+import { resoudreDomaineArts } from "../helpers/domaines-arts.mjs";
 
 /** Libellé localisé des cartes de jet (section AGONE.Des). */
 const _L = (key, data) => data
   ? game.i18n.format(`AGONE.Des.${key}`, data)
   : game.i18n.localize(`AGONE.Des.${key}`);
+
+/** Méthodes de jet rejouables depuis le chat (relance avec un point d'Héroïsme). */
+export const METHODES_RELANCE = new Set([
+  "rollAttribut", "rollCompetence", "rollCompetenceSansItem", "rollInitiative", "rollInitiativeMagique",
+  "rollAttaque", "rollParade", "rollEsquive", "rollDefenseNaturelle", "rollVolBlessure3",
+  "rollSort", "rollSortDanseur", "rollEmprise", "rollEmpriseAttr", "rollAptitudeMagie",
+  "rollAptitudeConjuration", "rollConjurationDemonologie", "rollArtDomaine", "rollImprovisationDanseur",
+]);
+
+/** Identifiants des messages en cours de relance (verrou contre la double dépense). */
+const RELANCES_EN_COURS = new Set();
+
+/** Bonus au total accordé par un point d'Héroïsme (alternative à la relance). */
+export const BONUS_HEROISME = 5;
 
 /**
  * AgoneActor — Classe Actor étendue pour le système Agone
@@ -472,7 +487,7 @@ export class AgoneActor extends Actor {
       ...(hasAspects ? { aspect: `${_L("BonusAspect")} : ${bonusAspect}` } : {}),
       modif:  `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollAttribut", [attributKey], options, jet) });
     return roll;
   }
 
@@ -527,12 +542,12 @@ export class AgoneActor extends Actor {
       modif:     `${_L("BonusMalus")} : ${modif + malusArmure + malusComp0 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {}),
       ...(compData.notes    ? { notes:    compData.notes } : {})
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollCompetence", [itemId], options, jet) });
     return roll;
   }
 
   // Jet d'une compétence non acquise (score 0, malus -3 automatique)
-  async rollCompetenceSansItem(nom, attributLie, domaine, { fastForward = false } = {}) {
+  async rollCompetenceSansItem(nom, attributLie, domaine, { fastForward = false, relance = null, heroisme = false } = {}) {
     const sd     = this.system;
     const attrKey = attributLie ?? "agilite"; // défaut pour la présélection dans le dialog
 
@@ -549,7 +564,9 @@ export class AgoneActor extends Actor {
       .join("");
 
     // fastForward : caractéristique liée, sans modificateur, jet ouvert (tests, macros)
-    const result = fastForward ? { attrChosen: attrKey, modif: 0, type: "ouvert" } : await foundry.applications.api.DialogV2.wait({
+    // relance (point d'Héroïsme) : mêmes choix que le jet d'origine
+    const result = relance?.dialog ? { ...relance.dialog, heroisme: false }
+      : fastForward ? { attrChosen: attrKey, modif: 0, type: "ouvert", heroisme: !!heroisme } : await foundry.applications.api.DialogV2.wait({
       window:  { title: label },
       content: `
         <form>
@@ -566,7 +583,7 @@ export class AgoneActor extends Actor {
             <div class="form-group form-check">
               <input type="checkbox" id="typeJet" name="typeJet" checked />
               <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
-            </div>
+            </div>${this._ligneHeroisme()}
           </div>
         </form>
       `,
@@ -580,6 +597,7 @@ export class AgoneActor extends Actor {
             attrChosen: button.form.elements.attrChosen.value,
             modif:      parseInt(button.form.elements.modif.value) || 0,
             type:       button.form.elements.typeJet.checked ? "ouvert" : "ferme",
+            heroisme: !!button.form.elements.heroisme?.checked,
           })
         },
         {
@@ -626,7 +644,11 @@ export class AgoneActor extends Actor {
       aspect:    `${_L("BonusAspect")} : ${bonusAspect}`,
       modif:     `${_L("BonusMalus")} : ${modif + malusArmure - 3 + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
-    }, { rollType: rollType });
+    }, {
+      rollType,
+      relance: this._infoRelance("rollCompetenceSansItem", [nom, attributLie, domaine], { relance },
+        { attrChosen: chosenKey, modif, type: rollType, heroisme: !relance && !!result.heroisme }),
+    });
     return roll;
   }
 
@@ -675,12 +697,12 @@ export class AgoneActor extends Actor {
       { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetFinal = await this._sendRollToChat(roll, label, {
       base:  `${_L("Initiative")} : ${base}`,
       modif: `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
-      rollType: jet.rollType,
+      rollType: jet.rollType, relance: this._infoRelance("rollInitiative", [armeId], options, jet),
       ...(armeInit ? {
         arme:        armeInit,
         typeJet:     "initiative",
@@ -695,7 +717,7 @@ export class AgoneActor extends Actor {
     });
 
     // Mettre à jour le tracker de combat
-    await this._setInitiativeInCombat(Math.max(0, roll.total));
+    await this._setInitiativeInCombat(Math.max(0, (jetFinal ?? roll).total));
     return roll;
   }
 
@@ -718,14 +740,14 @@ export class AgoneActor extends Actor {
       { base, modif: modif + (sd.malusSurcharge ?? 0) + malusBlessure + bonusSaisonin }
     );
     await roll.evaluate();
-    await this._sendRollToChat(roll, label, {
+    const jetFinal = await this._sendRollToChat(roll, label, {
       base:  `${_L("InitiativeMagique")} : ${base}`,
       modif: `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollInitiativeMagique", [], options, jet) });
 
     // Mettre à jour le tracker de combat
-    await this._setInitiativeInCombat(Math.max(0, roll.total));
+    await this._setInitiativeInCombat(Math.max(0, (jetFinal ?? roll).total));
     return roll;
   }
 
@@ -784,7 +806,7 @@ export class AgoneActor extends Actor {
       modif:     `${_L("BonusMalus")} : ${modif + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
-      rollType: jet.rollType,
+      rollType: jet.rollType, relance: this._infoRelance("rollAttaque", [armeId], options, jet),
       arme,
       typeJet: "attaque",
       description: arme.system.description ?? "",
@@ -839,7 +861,7 @@ export class AgoneActor extends Actor {
       modif:     `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
-      rollType: jet.rollType,
+      rollType: jet.rollType, relance: this._infoRelance("rollParade", [armeId], options, jet),
       arme,
       typeJet: "parade",
       description: arme.system.description ?? "",
@@ -876,7 +898,7 @@ export class AgoneActor extends Actor {
       base:  `${_L("Esquive")} : ${total}`,
       modif: `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollEsquive", [], options, jet) });
     return roll;
   }
 
@@ -903,7 +925,7 @@ export class AgoneActor extends Actor {
       base:  `${_L("DefenseNaturelle")} : ${total}`,
       modif: `${_L("BonusMalus")} : ${modif + malusArmure + (sd.malusSurcharge ?? 0) + malusBlessure}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollDefenseNaturelle", [], options, jet) });
     return roll;
   }
 
@@ -911,7 +933,7 @@ export class AgoneActor extends Actor {
    * Jet de VOL à Difficulté 10 pour la 3e blessure grave
    * (sans malus de blessures selon la règle)
    */
-  async rollVolBlessure3() {
+  async rollVolBlessure3(options = {}) {
     const sd = this.system;
     const volScore = this._scoreAttribut("volonte");
     const bonusAme = sd.bonusAme ?? 0;
@@ -927,7 +949,7 @@ export class AgoneActor extends Actor {
       volonte: `${game.i18n.localize("AGONE.Attribut.Volonte")} x2 : ${volScore * 2}`,
       ame:     `${game.i18n.localize("AGONE.BonusAme")} : ${bonusAme}`,
       diff:    `${game.i18n.localize("AGONE.Difficulte")} : ${DIFFICULTE}`,
-    }, { rollType: "ouvert" });
+    }, { rollType: "ouvert", relance: this._infoRelance("rollVolBlessure3", [], options) });
 
     // Fumble (dé = 1) = échec automatique, sinon on compare le total
     const firstFace = finalRoll?.dice[0]?.results?.[0]?.result ?? null;
@@ -1014,40 +1036,82 @@ export class AgoneActor extends Actor {
     let typeMagieResolved = typeMagie;
     const compAltNomGuard = sort.system.compAlt?.trim() ?? "";
     if (!compAltNomGuard && typeMagie && !TYPES_TO_DOMAINE[typeMagie] && !EMPRISE_TYPES.has(typeMagie)) {
-      const selectedType = await this._promptMagicTypeFallback(typeMagie);
+      // Relance (point d'Héroïsme) : réutiliser le type choisi lors du jet d'origine
+      const selectedType = (options.relance && options.typeMagie) || await this._promptMagicTypeFallback(typeMagie);
       if (!selectedType) return null;
       typeMagieResolved = selectedType;
     }
 
     if (!compAltNomGuard) {
       const domaineCible = TYPES_TO_DOMAINE[typeMagieResolved] ?? null;
-      const hasArts = this.items.some(i =>
-        i.type === "competence" &&
-        i.name === "Arts Magiques" &&
-        (domaineCible === null ? true : i.system.domaine === domaineCible)
-      );
-      if (!hasArts) {
-        const domainLabel = domaineCible ?? (typeMagieResolved || "—");
-        ui.notifications.warn(game.i18n.format("AGONE.Notif.PasArtsMagiques", { acteur: this.name, domaine: domainLabel }));
-        return null;
+      const domaineCustomGuard = domaineCible ? _customDomaines.find(d => d.nom === domaineCible) : null;
+      const { competence: compNomGuard } = resoudreDomaineArts(domaineCustomGuard, Object.keys(CONFIG.AGONE.attributs));
+      if (compNomGuard) {
+        // Domaine custom lié à une compétence précise : elle remplace l'exigence d'Arts Magiques
+        const hasComp = this.items.some(i => i.type === "competence" && i.name === compNomGuard);
+        if (!hasComp) {
+          ui.notifications.warn(game.i18n.format("AGONE.Notif.PasCompetenceDomaine",
+            { acteur: this.name, competence: compNomGuard, domaine: domaineCible }));
+          return null;
+        }
+      } else {
+        const hasArts = this.items.some(i =>
+          i.type === "competence" &&
+          i.name === "Arts Magiques" &&
+          (domaineCible === null ? true : i.system.domaine === domaineCible)
+        );
+        if (!hasArts) {
+          const domainLabel = domaineCible ?? (typeMagieResolved || "—");
+          ui.notifications.warn(game.i18n.format("AGONE.Notif.PasArtsMagiques", { acteur: this.name, domaine: domainLabel }));
+          return null;
+        }
       }
     }
 
     const seuilBase = sort.system.seuil ?? 0;
 
     // Aptitude : utilise le score de la compétence "Arts Magiques" du domaine exact du sort
+    // (ou, pour un domaine custom, l'attribut et/ou la compétence redéfinis)
     const domaineCibleApt = TYPES_TO_DOMAINE[typeMagieResolved] ?? null;
     let aptitude;
     let aptitudeDomainLabel;
     if (domaineCibleApt) {
-      const compArtsExact = this.items.find(i =>
-        i.type === "competence" &&
-        i.name === "Arts Magiques" &&
-        i.system.domaine === domaineCibleApt
-      );
-      const scoreExact = compArtsExact?.system.score ?? 0;
-      aptitude = (sd.art ?? 0) + scoreExact + (sd.bonusAme ?? 0);
-      aptitudeDomainLabel = `${_L("ArtsMagiquesDomaine", { domaine: domaineCibleApt })} : ${aptitude}`;
+      const domaineCustomApt = _customDomaines.find(d => d.nom === domaineCibleApt);
+      const { attribut, competence: compNomApt } = resoudreDomaineArts(domaineCustomApt, Object.keys(CONFIG.AGONE.attributs));
+
+      let baseScore, baseLabel;
+      if (attribut === "art") {
+        baseScore = (sd.art ?? 0) + (sd.bonusAme ?? 0);
+        baseLabel = "ART";
+      } else {
+        const attrCfg = CONFIG.AGONE.attributs[attribut] ?? {};
+        let bonusAspect = 0;
+        if (attrCfg.aspect === "corps")  bonusAspect = sd.bonusCorps  ?? 0;
+        if (attrCfg.aspect === "esprit") bonusAspect = sd.bonusEsprit ?? 0;
+        if (attrCfg.aspect === "ame")    bonusAspect = sd.bonusAme    ?? 0;
+        baseScore = this._scoreAttribut(attribut) + bonusAspect;
+        baseLabel = attrCfg.abbr ?? attribut.toUpperCase();
+      }
+
+      let compScore, compLabel;
+      if (compNomApt) {
+        const compCustomItem = this.items.find(i => i.type === "competence" && i.name === compNomApt);
+        compScore = compCustomItem?.system.score ?? 0;
+        compLabel = compNomApt;
+      } else {
+        const compArtsExact = this.items.find(i =>
+          i.type === "competence" &&
+          i.name === "Arts Magiques" &&
+          i.system.domaine === domaineCibleApt
+        );
+        compScore = compArtsExact?.system.score ?? 0;
+        compLabel = _L("ArtsMagiquesDomaine", { domaine: domaineCibleApt });
+      }
+
+      aptitude = baseScore + compScore;
+      aptitudeDomainLabel = (attribut === "art" && !compNomApt)
+        ? `${compLabel} : ${aptitude}`
+        : `${baseLabel} + ${compLabel} : ${aptitude}`;
     } else {
       // Pas de domaine précis (jorniste / obscurantiste / eclipsiste)
       aptitude = sd.aptitudeArtsMagiques ?? sd.art ?? 0;
@@ -1134,7 +1198,7 @@ export class AgoneActor extends Actor {
       modif:    `${_L("BonusMalus")} : ${modif}`,
       ...(bonusSaisonin > 0 ? { saisonin: `${_L("BonusSaisonin")} : +${bonusSaisonin}` } : {})
     }, {
-      rollType: jet.rollType,
+      rollType: jet.rollType, relance: this._infoRelance("rollSort", [itemIdOrData], options, jet, { impro, typeMagie: typeMagieResolved }),
       seuilNumeric: seuilFinal,
       description: sort.system.description ?? "",
       sortMeta: {
@@ -1192,7 +1256,9 @@ export class AgoneActor extends Actor {
     const danseur = this.items.get(danseurId);
     if (!danseur) return;
 
-    if ((danseur.system.enduranceActuelle ?? 0) <= 0) {
+    // Une relance (point d'Héroïsme) ne consomme pas à nouveau d'endurance
+    const estRelance = !!options.relance;
+    if (!estRelance && (danseur.system.enduranceActuelle ?? 0) <= 0) {
       ui.notifications.warn(game.i18n.format("AGONE.Notif.DanseurEpuise", { danseur: danseur.name }));
       return;
     }
@@ -1205,7 +1271,7 @@ export class AgoneActor extends Actor {
 
     const { aptitude, bonusDanseur, details } = this._aptitudeEmpriseDanseur(danseur);
     const endBefore = danseur.system.enduranceActuelle ?? 0;
-    const newEnd    = Math.max(0, endBefore - 1);
+    const newEnd    = estRelance ? endBefore : Math.max(0, endBefore - 1);
 
     const jet = await this._dialogModificateur(label, options);
     if (!jet) return;
@@ -1224,11 +1290,13 @@ export class AgoneActor extends Actor {
         : { label: _L("Seuil"), value: seuil, tooltip: _L("SeuilTooltip") },
       resultat:  { label: _L("Resultat"),  value: _L(succes ? "Succes" : "Echec") },
       danseur:   { label: _L("Danseur"),   value: danseur.name },
-      endurance: { label: _L("Endurance"), value: `${endBefore} → ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
+      endurance: { label: _L("Endurance"), value: estRelance
+        ? `${endBefore} / ${danseur.system.enduranceMax ?? 0}`
+        : `${endBefore} → ${newEnd} / ${danseur.system.enduranceMax ?? 0}` },
       ...details,
       modif:     { label: _L("BonusMalus"), value: modif >= 0 ? `+${modif}` : modif },
     }, {
-      rollType: jet.rollType,
+      rollType: jet.rollType, relance: this._infoRelance("rollSortDanseur", [danseurId, sortData], options, jet, { impro }),
       seuilNumeric: seuil,
       description: sortData.description ?? "",
       sortMeta: {
@@ -1239,7 +1307,7 @@ export class AgoneActor extends Actor {
       }
     });
 
-    await danseur.update({ "system.enduranceActuelle": newEnd });
+    if (!estRelance) await danseur.update({ "system.enduranceActuelle": newEnd });
     return roll;
   }
 
@@ -1273,7 +1341,7 @@ export class AgoneActor extends Actor {
       endurance: { label: _L("EnduranceDanseur"), value: `${danseur.system.enduranceActuelle ?? 0} / ${danseur.system.enduranceMax ?? 0}` },
       ...details,
       modif:     { label: _L("BonusMalus"),       value: modif >= 0 ? `+${modif}` : modif },
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollEmprise", [danseurId], options, jet) });
     return roll;
   }
 
@@ -1306,7 +1374,7 @@ export class AgoneActor extends Actor {
       resonance: { label: compResonance?.name ?? _L("Resonance"), value: `+${scoreResonance}` },
       ...(bonusEsprit ? { esprit: { label: _L("BonusEsprit"), value: `+${bonusEsprit}` } } : {}),
       modif:     { label: _L("BonusMalus"),  value: modif >= 0 ? `+${modif}` : modif },
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollEmpriseAttr", [], options, jet) });
     return roll;
   }
 
@@ -1324,7 +1392,7 @@ export class AgoneActor extends Actor {
     await this._sendRollToChat(roll, label, {
       aptitude: `${label} : ${apt}`,
       modif:    `${_L("BonusMalus")} : ${modif}`,
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollAptitudeMagie", [], options, jet) });
     return roll;
   }
 
@@ -1342,7 +1410,7 @@ export class AgoneActor extends Actor {
     await this._sendRollToChat(roll, label, {
       aptitude: `${label} : ${apt}`,
       modif:    `${_L("BonusMalus")} : ${modif}`,
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollAptitudeConjuration", [], options, jet) });
     return roll;
   }
 
@@ -1365,14 +1433,18 @@ export class AgoneActor extends Actor {
       noirceur:    `${_L("Noirceur")} : ${noirceur}`,
       demonologie: `${_L("Demonologie")} : ${scoreComp}`,
       modif:       `${_L("BonusMalus")} : ${modif}`,
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollConjurationDemonologie", [], options, jet) });
     return roll;
   }
 
   /**
    * Jet d'Art Magique pour un domaine : potentiel (ART) ou improvisation (CRÉ).
    * @param {object} d  Composantes affichées dans l'onglet Magie
-   *   ({ domaine, apt, specialite, art, cre, scoreArts, scoreComp, nomComp, scoreEff, bonusAme })
+   *   ({ domaine, apt, specialite, art, baseAbbr, baseBonus, baseBonusLabel, compLabel, cre,
+   *      scoreArts, scoreComp, nomComp, scoreEff, bonusAme })
+   *   `baseAbbr` (défaut "ART") : abréviation de l'attribut de base du potentiel (domaine custom)
+   *   `baseBonus`/`baseBonusLabel` (défaut bonusAme/"BonusAme") : bonus d'aspect du potentiel et sa clé i18n
+   *   `compLabel` (défaut "Arts") : nom affiché pour la compétence de score (Arts Magiques ou remplacement custom)
    * @param {object} [options]
    * @param {boolean} [options.impro=false]  Improvisation (CRÉ) au lieu du potentiel (ART)
    */
@@ -1386,16 +1458,21 @@ export class AgoneActor extends Actor {
     await roll.evaluate();
 
     // Formule détaillée visible dans le chat
-    const base    = impro ? `CRÉ(${d.cre})` : `ART(${d.art})`;
+    // Potentiel : attribut de base (ART, ou celui du domaine custom) + bonus d'aspect associé.
+    // Improvisation : toujours CRÉ + bonus Âme (inchangé par le domaine custom).
+    const compLabel  = d.compLabel || "Arts";
+    const bonusLabel = impro ? "BonusAme" : (d.baseBonusLabel || "BonusAme");
+    const bonusVal   = impro ? d.bonusAme : (d.baseBonus ?? d.bonusAme);
+    const base    = impro ? `CRÉ(${d.cre})` : `${d.baseAbbr || "ART"}(${d.art})`;
     const arts    = d.nomComp
-      ? `min(Arts:${d.scoreArts}, ${d.nomComp}:${d.scoreComp})→${d.scoreEff}`
-      : `Arts:${d.scoreArts}`;
+      ? `min(${compLabel}:${d.scoreArts}, ${d.nomComp}:${d.scoreComp})→${d.scoreEff}`
+      : `${compLabel}:${d.scoreArts}`;
     const spe     = bonusSpe ? ` + ${_L("SpeAbr")}(+${bonusSpe})` : "";
-    const formule = `${base} + ${arts} + ${_L("BonusAme")}(${d.bonusAme})${spe}`;
+    const formule = `${base} + ${arts} + ${_L(bonusLabel)}(${bonusVal})${spe}`;
     await this._sendRollToChat(roll, label, {
       aptitude: `${formule} : ${d.apt}${bonusSpe ? ` +${bonusSpe}` : ""}`,
       modif:    `${_L("BonusMalus")} : ${modif}`,
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollArtDomaine", [d], options, jet, { impro }) });
     return roll;
   }
 
@@ -1428,7 +1505,7 @@ export class AgoneActor extends Actor {
                    tooltip: _L("BonusEspritTooltip", { esprit: this._scoreAttribut("esprit"), noir: sd.esprit?.noir ?? 0 }) },
       aptTotal:  { label: _L("TotalImprovisation"),          value: aptitude },
       modif:     { label: _L("BonusMalus"),                value: modif >= 0 ? `+${modif}` : modif },
-    }, { rollType: jet.rollType });
+    }, { rollType: jet.rollType, relance: this._infoRelance("rollImprovisationDanseur", [danseurId], options, jet) });
     return roll;
   }
 
@@ -1505,8 +1582,10 @@ export class AgoneActor extends Actor {
    * @param {boolean} [options.fastForward=false]  Lancer sans dialogue (modificateur 0, jet ouvert)
    * @returns {Promise<{modif: number, seuilBonus: number, instantane: boolean, rollType: string}|null>}
    */
-  async _dialogSort(label, seuilBase = 0, impro = false, { fastForward = false } = {}) {
-    if (fastForward) return { modif: 0, seuilBonus: 0, instantane: false, rollType: "ouvert" };
+  async _dialogSort(label, seuilBase = 0, impro = false, { fastForward = false, relance = null, heroisme = false } = {}) {
+    // Relance (point d'Héroïsme) : réutiliser les choix du jet d'origine sans rouvrir le dialogue
+    if (relance?.dialog) return { ...relance.dialog, heroisme: false };
+    if (fastForward) return { modif: 0, seuilBonus: 0, instantane: false, rollType: "ouvert", heroisme: !!heroisme };
 
     const seuilInfo = impro
       ? `${seuilBase} × 2 = ${seuilBase * 2} (${_L("Improvise")})`
@@ -1533,7 +1612,7 @@ export class AgoneActor extends Actor {
             <div class="form-group form-check">
               <input type="checkbox" id="typeJet" name="typeJet" checked />
               <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
-            </div>
+            </div>${this._ligneHeroisme()}
           </div>
         </form>
       `,
@@ -1548,6 +1627,7 @@ export class AgoneActor extends Actor {
             seuilBonus:  parseInt(button.form.elements.seuilBonus.value) || 0,
             type:        button.form.elements.typeJet.checked ? "ouvert" : "ferme",
             instantane:  button.form.elements.sortInstantane.checked,
+            heroisme: !!button.form.elements.heroisme?.checked,
           })
         },
         {
@@ -1560,7 +1640,7 @@ export class AgoneActor extends Actor {
     });
 
     if (!result || typeof result === "string") return null;
-    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus), instantane: !!result.instantane, rollType: result.type };
+    return { modif: result.modif, seuilBonus: Math.max(0, result.seuilBonus), instantane: !!result.instantane, rollType: result.type, heroisme: !!result.heroisme };
   }
 
   /**
@@ -1574,8 +1654,10 @@ export class AgoneActor extends Actor {
    * @param {boolean} [options.fastForward=false]   Lancer sans dialogue (modificateur 0, jet ouvert)
    * @returns {Promise<{modif: number, rollType: string, bonusSpe: number}|null>}
    */
-  async _dialogModificateur(label, { specialite = "", fastForward = false } = {}) {
-    if (fastForward) return { modif: 0, rollType: "ouvert", bonusSpe: 0 };
+  async _dialogModificateur(label, { specialite = "", fastForward = false, relance = null, heroisme = false } = {}) {
+    // Relance (point d'Héroïsme) : réutiliser les choix du jet d'origine sans rouvrir le dialogue
+    if (relance?.dialog) return { ...relance.dialog, heroisme: false };
+    if (fastForward) return { modif: 0, rollType: "ouvert", bonusSpe: 0, heroisme: !!heroisme };
 
     const speRow = specialite ? `
               <div class="form-group form-check">
@@ -1596,7 +1678,7 @@ export class AgoneActor extends Actor {
             <div class="form-group form-check">
               <input type="checkbox" id="typeJet" name="typeJet" checked />
               <label for="typeJet">${game.i18n.localize("AGONE.JetOuvert")}</label>
-            </div>${speRow}
+            </div>${this._ligneHeroisme()}${speRow}
           </div>
         </form>
       `,
@@ -1610,6 +1692,7 @@ export class AgoneActor extends Actor {
             modif:    parseInt(button.form.elements.modif.value) || 0,
             type:     button.form.elements.typeJet.checked ? "ouvert" : "ferme",
             bonusSpe: specialite && button.form.elements.bonusSpe?.checked ? 1 : 0,
+            heroisme: !!button.form.elements.heroisme?.checked,
           })
         },
         {
@@ -1622,7 +1705,7 @@ export class AgoneActor extends Actor {
     });
 
     if (!result || typeof result === "string") return null;
-    return { modif: result.modif, rollType: result.type, bonusSpe: result.bonusSpe ?? 0 };
+    return { modif: result.modif, rollType: result.type, bonusSpe: result.bonusSpe ?? 0, heroisme: !!result.heroisme };
   }
 
   async _promptMagicTypeFallback(unknownType) {
@@ -1723,6 +1806,12 @@ export class AgoneActor extends Actor {
       finalRoll = r;
     }
 
+    // Point d'Héroïsme choisi dans le dialogue (jamais sur une relance) : dépensé ici, au moment où
+    // le jet est réellement envoyé (un jet abandonné ne coûte rien), puis +BONUS_HEROISME à la formule
+    const bonusHeroisme = (extra.relance?.dialog?.heroisme && !extra.relance?.heroisme)
+      ? await this._depenserHeroisme() : 0;
+    if (bonusHeroisme) finalRoll = await this._jetAvecBonus(finalRoll, bonusHeroisme);
+
     // Valeur brute du dé (premier dé de la formule)
     const diceResult = finalRoll.dice[0]?.total ?? "?";
     const diceLabel  = _L(rollType === "ferme" ? "DeFerme" : "DeOuvert");
@@ -1743,7 +1832,9 @@ export class AgoneActor extends Actor {
         return idx !== -1
           ? { label: v.slice(0, idx), value: v.slice(idx + 3) }
           : { label: v, value: "" };
-      })
+      }),
+      ...(extra.relance?.heroisme === "relance" ? [{ label: game.i18n.localize("AGONE.Relance.Detail"), value: game.i18n.localize("AGONE.Relance.Cout") }] : []),
+      ...(bonusHeroisme ? [{ label: game.i18n.localize("AGONE.Relance.DetailBonus"), value: `+${bonusHeroisme}` }] : [])
     ];
 
     // Résultat succès/échec (affiché hors details)
@@ -1814,10 +1905,157 @@ export class AgoneActor extends Actor {
       }
     );
 
+    // Drapeaux : type de jet (style du message) et paramètres de relance (point d'Héroïsme)
+    // Une relance reprend le mode de jet du message d'origine (un jet secret reste secret)
+    const rollMode = extra.relance?.rollMode ?? game.settings.get("core", "rollMode");
+    const flags = { agone: { rollType } };
+    if (extra.relance?.methode) {
+      const { methode, args = [], options = {}, dialog = null, heroisme = null } = extra.relance;
+      flags.agone.relance = { methode, args, options, dialog, rollMode, fait: false };
+      // Carte issue d'un point d'Héroïsme : plus aucune action d'Héroïsme possible
+      if (heroisme) flags.agone.issuHeroisme = heroisme;
+      if (heroisme === "relance") flags.agone.estRelance = true;
+    }
+    if (bonusHeroisme) flags.agone.issuHeroisme = "bonus";
+
     await ChatMessage.create(ChatMessage.applyRollMode(
-      { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [finalRoll] },
-      game.settings.get("core", "rollMode")
+      { speaker: ChatMessage.getSpeaker({ actor: this }), content, rolls: [finalRoll], flags },
+      rollMode
     ));
+    // Relance : renvoyer à relancerMessage le jet réellement affiché
+    if (extra.relance?.sortie) extra.relance.sortie.roll = finalRoll;
     return finalRoll;
+  }
+
+  /**
+   * Paramètres d'un jet à conserver dans le message pour une relance ultérieure.
+   * @param {string} methode   Nom de la méthode de jet (voir METHODES_RELANCE)
+   * @param {Array}  args      Arguments sérialisables (ids, données brutes, jamais de documents)
+   * @param {object} options   Options reçues par la méthode (détecte une relance en cours)
+   * @param {object|null} dialog  Résultat du dialogue (modif, rollType, bonusSpe, seuilBonus…)
+   * @param {object} [optionsJet]  Options propres au jet à rejouer (ex. { impro })
+   */
+  _infoRelance(methode, args, options = {}, dialog = null, optionsJet = {}) {
+    const r = options.relance;
+    return {
+      methode, args, options: optionsJet, dialog,
+      heroisme: r ? "relance" : null,
+      ...(r?.rollMode ? { rollMode: r.rollMode } : {}),
+      ...(r?.sortie ? { sortie: r.sortie } : {}),
+    };
+  }
+
+  /**
+   * Jet déjà évalué augmenté d'un bonus fixe (terme numérique ajouté), sans relancer les dés.
+   * @param {Roll} roll
+   * @param {number} bonus
+   * @returns {Promise<Roll>}
+   */
+  async _jetAvecBonus(roll, bonus) {
+    const ajout = (await new Roll(`0 + ${bonus}`).evaluate()).terms.slice(1);
+    return Roll.fromTerms([...roll.terms, ...ajout]);
+  }
+
+  /** Case « Dépenser 1 point d'Héroïsme : +5 » des dialogues de jet (vide sans point disponible). */
+  _ligneHeroisme() {
+    if (!this._peutHeroisme()) return "";
+    return `
+            <div class="form-group form-check">
+              <input type="checkbox" id="heroisme" name="heroisme" />
+              <label for="heroisme">${game.i18n.format("AGONE.Relance.CaseBonus", { bonus: BONUS_HEROISME, valeur: this.system.ph.valeur })}</label>
+            </div>`;
+  }
+
+  /** Le dialogue de jet peut-il proposer de dépenser un point d'Héroïsme ? */
+  _peutHeroisme() {
+    return (this.system.ph?.valeur ?? 0) >= 1;
+  }
+
+  /**
+   * Dépense 1 point d'Héroïsme pour le bonus de jet.
+   * @returns {Promise<number>} BONUS_HEROISME, ou 0 s'il ne reste aucun point
+   */
+  async _depenserHeroisme() {
+    if (!this._peutHeroisme()) {
+      ui.notifications.warn(game.i18n.localize("AGONE.Relance.PasDePoint"));
+      return 0;
+    }
+    await this.update({ "system.ph.valeur": this.system.ph.valeur - 1 });
+    return BONUS_HEROISME;
+  }
+
+  /**
+   * Mode de jet d'un message : drapeau enregistré, sinon déduit de whisper/blind.
+   * @param {ChatMessage} message
+   * @returns {string}
+   */
+  static _rollModeMessage(message) {
+    const enregistre = message.flags?.agone?.relance?.rollMode;
+    if (enregistre) return enregistre;
+    if (message.blind) return "blindroll";
+    const whisper = message.whisper ?? [];
+    if (!whisper.length) return "publicroll";
+    return (whisper.length === 1 && whisper[0] === game.user.id) ? "selfroll" : "gmroll";
+  }
+
+  /**
+   * Relance un jet depuis le chat en dépensant 1 point d'Héroïsme (une seule fois par jet d'origine,
+   * jamais sur une relance ni sur un jet déjà bonifié) : mêmes paramètres et choix de dialogue, nouveaux dés.
+   * @param {ChatMessage} message
+   * @returns {Promise<Roll|null>}  Le jet réellement affiché, ou null
+   */
+  async relancerMessage(message) {
+    const relance = message?.flags?.agone?.relance;
+    if (!relance?.methode || relance.fait || !METHODES_RELANCE.has(relance.methode)) return null;
+    if (message.flags.agone.issuHeroisme || message.flags.agone.estRelance) return null;
+    if (typeof this[relance.methode] !== "function") return null;
+    if (message.speaker?.actor !== this.id) return null;
+    if (RELANCES_EN_COURS.has(message.id)) return null;
+
+    const ph = this.system.ph;
+    if (!ph) return null;
+    if ((ph.valeur ?? 0) < 1) {
+      ui.notifications.warn(game.i18n.localize("AGONE.Relance.PasDePoint"));
+      return null;
+    }
+
+    RELANCES_EN_COURS.add(message.id);
+    try {
+      // Marquer d'abord : si c'est impossible, on abandonne sans dépenser de point
+      try {
+        await message.update({ "flags.agone.relance.fait": true, "flags.agone.heroisme": "relance" });
+      } catch (err) {
+        console.warn("Agone | Impossible de marquer le message comme relancé", err);
+        return null;
+      }
+
+      const args = foundry.utils.deepClone(relance.args ?? []);
+      const sortie = {};
+      const opts = {
+        ...(relance.options ?? {}),
+        relance: {
+          sortie,
+          // Une relance ne rejoue jamais la dépense d'un point d'Héroïsme choisie dans le dialogue
+          dialog: relance.dialog ? { ...relance.dialog, heroisme: false } : null,
+          rollMode: AgoneActor._rollModeMessage(message),
+        },
+        fastForward: true,
+      };
+      let roll = null;
+      try {
+        const retour = await this[relance.methode](...args, opts);
+        // Jet réellement affiché (un jet fermé est relancé dans _sendRollToChat)
+        roll = retour ? (sortie.roll ?? retour) : null;
+      } finally {
+        // Jet impossible (objet supprimé, garde…) : l'ancien message redevient utilisable, aucun point dépensé
+        if (!roll) {
+          await message.update({ "flags.agone.relance.fait": false, "flags.agone.heroisme": null }).catch(() => {});
+        }
+      }
+      if (roll) await this.update({ "system.ph.valeur": Math.max(0, (this.system.ph?.valeur ?? 1) - 1) });
+      return roll;
+    } finally {
+      RELANCES_EN_COURS.delete(message.id);
+    }
   }
 }

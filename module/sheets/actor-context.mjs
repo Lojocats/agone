@@ -2,6 +2,7 @@
  * Données de contexte partagées par les fiches d'acteur (personnage, compagnon, démon, PNJ).
  */
 import { sourcesEffets } from "../helpers/effets.mjs";
+import { resoudreDomaineArts } from "../helpers/domaines-arts.mjs";
 
 /**
  * Compétences regroupées par score décroissant (un groupe par niveau).
@@ -34,21 +35,44 @@ const ACCORD_INSTRUMENTS = ["harpe", "flute", "viole", "tambour", "cistre"];
  * @param {number} creativite   Score de Créativité (sa forme diffère selon le type d'acteur)
  */
 export function artsMagiquesParDomaine(system, competences, creativite) {
-  const art      = system.art ?? 0;
-  const bonusAme = system.bonusAme ?? 0;
-  const ligne = (domaine, displayLabel, instrument, comp, compLiee, nomCompLiee) => {
+  const art         = system.art ?? 0;
+  const bonusAme    = system.bonusAme ?? 0;
+  const bonusCorps  = system.bonusCorps  ?? 0;
+  const bonusEsprit = system.bonusEsprit ?? 0;
+
+  // Score d'un attribut, quelle que soit la forme de `system` (personnage : {score}, acteur simple : nombre)
+  const scoreAttribut = key => {
+    const value = system[key];
+    return (typeof value === "object" ? value?.score : value) ?? 0;
+  };
+  // Bonus d'aspect associé à un attribut, et sa clé de libellé i18n. Clé d'aspect inconnue (ne devrait
+  // pas arriver, resoudreDomaineArts valide déjà contre CONFIG.AGONE.attributs) : aucun bonus, aligné sur rollSort.
+  const bonusAspectInfo = attribut => {
+    const aspect = CONFIG.AGONE.attributs[attribut]?.aspect;
+    if (aspect === "corps")  return { valeur: bonusCorps,  labelKey: "BonusCorps"  };
+    if (aspect === "esprit") return { valeur: bonusEsprit, labelKey: "BonusEsprit" };
+    if (aspect === "ame")    return { valeur: bonusAme,    labelKey: "BonusAme"    };
+    return { valeur: 0, labelKey: "BonusAme" };
+  };
+
+  const ligne = (domaine, displayLabel, instrument, comp, compLiee, nomCompLiee,
+    baseVal = art, baseBonus = bonusAme, baseAbbr = "ART", baseBonusLabel = "BonusAme", compLabel = "Arts") => {
     const scoreArts     = comp ? (comp.system.score ?? 0) : 0;
     const scoreCompLiee = compLiee ? (compLiee.system.score ?? 0) : 0;
     // Sans compétence liée définie, le score Arts Magiques s'applique directement
     const scoreEffectif = comp ? (nomCompLiee ? Math.min(scoreArts, scoreCompLiee) : scoreArts) : 0;
     return {
       domaine, displayLabel, instrument, comp,
-      potentiel:    comp ? art + scoreEffectif + bonusAme : null,
+      potentiel:    comp ? baseVal + scoreEffectif + baseBonus : null,
       impro:        comp ? creativite + scoreEffectif + bonusAme : null,
       specialite:   comp?.system.specialite ?? "",
       nomCompLiee, compLiee, scoreCompLiee,
       scoreArtsMag: scoreArts, scoreEffectif,
-      artVal: art, creVal: creativite, bonusAmeVal: bonusAme,
+      // bonusAmeVal : bonus Âme « pur », utilisé par l'improvisation (CRÉ + … + bonusAme, inchangé par le domaine)
+      // baseBonusVal/baseBonusLabel : bonus d'aspect du potentiel (BonusAme par défaut, ou Corps/Esprit
+      // si le domaine custom redéfinit l'attribut de base)
+      artVal: baseVal, creVal: creativite, bonusAmeVal: bonusAme,
+      baseAbbr, baseBonusVal: baseBonus, baseBonusLabel, compLabel,
     };
   };
 
@@ -68,15 +92,28 @@ export function artsMagiquesParDomaine(system, competences, creativite) {
 
   const domainesCustom = game.settings.get("agone", "domainesArtsCustom") ?? [];
   const domaines = [
-    ...DOMAINES_ARTS_STD,
-    ...domainesCustom.map(d => ({ nom: d.nom, compLiee: d.compLiee ?? "" })),
+    ...DOMAINES_ARTS_STD.map(d => ({ ...d, custom: null })),
+    ...domainesCustom.map(d => ({ nom: d.nom, compLiee: d.compLiee ?? "", custom: d })),
   ];
   return [
     ...accordEntries,
-    ...domaines.map(({ nom, compLiee: nomCompLiee }) => {
+    ...domaines.map(({ nom, compLiee: nomCompLiee, custom }) => {
+      const { attribut, competence: compNomCustom } = resoudreDomaineArts(custom, Object.keys(CONFIG.AGONE.attributs));
+      const baseVal = attribut === "art" ? art : scoreAttribut(attribut);
+      const { valeur: baseBon, labelKey: baseBonLabel } = attribut === "art"
+        ? { valeur: bonusAme, labelKey: "BonusAme" }
+        : bonusAspectInfo(attribut);
+      const baseAbbr = attribut === "art" ? "ART" : (CONFIG.AGONE.attributs[attribut]?.abbr ?? attribut.toUpperCase());
+
+      // Compétence personnalisée : remplace directement le score d'Arts Magiques (pas de min avec compLiee)
+      if (compNomCustom) {
+        const compCustom = competences.find(c => c.name === compNomCustom);
+        return ligne(nom, nom, "", compCustom, null, "", baseVal, baseBon, baseAbbr, baseBonLabel, compNomCustom);
+      }
+
       const comp     = competences.find(c => c.name === "Arts Magiques" && c.system.domaine === nom);
       const compLiee = competences.find(c => c.name === nomCompLiee);
-      return ligne(nom, nom, "", comp, compLiee, nomCompLiee);
+      return ligne(nom, nom, "", comp, compLiee, nomCompLiee, baseVal, baseBon, baseAbbr, baseBonLabel);
     }),
   ];
 }

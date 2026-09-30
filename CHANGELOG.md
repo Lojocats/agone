@@ -3,6 +3,20 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.9.13] — 2026-09-30
+
+### Ajouté
+- **Points d'Héroïsme** : deux usages, un seul par jet. **+5 au jet** : case « Dépenser 1 point d'Héroïsme : +5 » dans la fenêtre du jet, à cocher avant le résultat (proposée seulement s'il reste un point ; le point n'est dépensé que si le jet part). **Relance** : clic droit sur une carte de jet dans le chat, puis « Relancer (1 point d'Héroïsme) » ; le jet est refait avec exactement les mêmes paramètres (modificateur, type de jet, spécialité…) sans rouvrir la fenêtre, et garde son mode (un jet MJ reste MJ). L'ancienne carte est grisée avec la mention « Relancé ». Un jet fait avec le +5 ou issu d'une relance ne peut pas être relancé. Le point de la relance n'est dépensé que si le nouveau jet aboutit. Une relance de sort de danseur ne consomme pas d'endurance une seconde fois. La relance concerne tous les jets sauf le jet de maladresse.
+- **Domaines d'Arts Magiques personnalisés sur une autre base que l'ART** : dans la fenêtre MJ des domaines, chaque domaine personnalisé peut remplacer l'ART par un attribut (avec son bonus d'aspect) et Arts Magiques par une autre compétence. Le jet de sort, le potentiel de l'onglet Magie et sa carte de chat utilisent cette base. Les domaines standards et existants ne changent pas.
+
+### Corrigé
+- Initiative en jet fermé : l'ordre du combat pouvait reprendre un autre total que celui affiché sur la carte.
+
+### Modifié
+- Fiches : sur les cartes de compétences et de sorts, les boutons éditer/supprimer/déplacer passent sur leur propre ligne en bas de la carte, et le nom prend toute la largeur. Dans les listes d'avantages, de défauts, de pouvoirs et d'armures, ils passent sous le nom seulement quand il est trop long.
+- README : relance et +5 par point d'Héroïsme, domaines personnalisés.
+- Tests : relance et +5 d'Héroïsme (drapeaux, exclusivité, bonus avant le jet, dépense, refus, double relance, verrou, échec remboursé, mode de jet, danseur, type de magie mémorisé) et domaines personnalisés (base attribut/compétence, refus, potentiel et carte) (Quench) ; résolution des domaines, liste des méthodes relançables, disposition des actions de ligne (tests unitaires).
+
 ## [1.9.12] — 2026-09-28
 
 ### Ajouté

@@ -220,6 +220,7 @@
 }
 .agone .armure-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   padding: 3px 6px;
@@ -241,7 +242,7 @@
 }
 .agone .armure-row.armure-worn .armure-portee-toggle { opacity: 1; color: var(--agone-txt-vert, #4a9a4a); }
 .agone .armure-portee-toggle input { display: none; }
-.agone .armure-name { flex: 1; font-size: 12px; }
+.agone .armure-name { flex: 1; min-width: 80px; font-size: 12px; }
 .agone .armure-badge {
   padding: 1px 5px;
   border-radius: 3px;

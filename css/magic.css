@@ -243,6 +243,7 @@
 }
 .agone .don-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 3px 6px;
@@ -250,7 +251,7 @@
   border-radius: var(--radius);
   font-size: 13px;
 }
-.agone .don-name { flex: 1; }
+.agone .don-name { flex: 1; min-width: 80px; }
 .agone .don-cout { font-size: 11px; color: var(--agone-brown); }
 .agone .don-desc-toggle {
   background: none;
@@ -283,6 +284,7 @@
 }
 .agone .pouvoir-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 4px 6px;
@@ -331,6 +333,7 @@
   color: var(--agone-dark-text, #2a1a08);
   text-align: left;
   flex: 1;
+  min-width: 80px;
 }
 .agone .pouvoir-name-btn:hover {
   text-decoration: underline;
@@ -1351,9 +1354,6 @@
   display: flex;
   align-items: flex-start;
   gap: 3px;
-  /* Réserve la place des actions (position absolute, coin haut-droit) : les noms longs
-     doivent passer à la ligne avant elles, jamais se faire recouvrir. */
-  padding-right: 68px;
 }
 .agone .sort-card-name {
   /* Foundry fixe la hauteur des boutons : un nom sur deux lignes déborderait */
@@ -1410,25 +1410,19 @@
   border-top: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.12);
   margin-top: 2px;
 }
-/* Fond neutre tant que la carte n'est pas survolée : la place est réservée par .sort-card-top,
-   le fond plein n'apparaît qu'au survol pour ne pas peser en permanence sur la carte.
-   La boîte reste dans le DOM et hit-testable en tout temps (elle n'est plus display:none hors
-   survol depuis la 1.9.8) : pointer-events:none l'empêche de capter les clics/survols en dehors
-   de ses icônes (chevron ou tout autre contenu sous son emprise), qui restent cliquables via
-   pointer-events:auto sur .agone .sort-card-actions a/span. */
+/* Actions sur leur propre ligne, sous le nom et les infos du sort : jamais de largeur réservée
+   sur le nom, fond neutre tant que la carte n'est pas survolée. */
 .agone .sort-card-actions {
-  position: absolute;
-  top: 4px;
-  right: 4px;
   display: flex;
   gap: 3px;
   align-items: center;
+  justify-content: flex-end;
+  margin-top: 2px;
   background: transparent;
   border-radius: 4px;
   padding: 2px 3px;
   border: 1px solid transparent;
   transition: background 0.15s, border-color 0.15s;
-  pointer-events: none;
 }
 .agone .sort-card:hover .sort-card-actions,
 .agone .sort-card-actions:focus-within {
@@ -1447,7 +1441,6 @@
   align-items: center;
   justify-content: center;
   transition: opacity 0.15s;
-  pointer-events: auto;
 }
 .agone .sort-card-drag-handle { cursor: grab; }
 .agone .sort-card-drag-handle:active { cursor: grabbing; }

@@ -278,6 +278,10 @@
       "Personnalises":        "Domaines personnalisés",
       "Domaine":              "Domaine",
       "CompLiee":             "Compétence liée (prérequis)",
+      "Attribut":             "Attribut de base",
+      "AttributArt":          "ART (défaut)",
+      "Competence":           "Compétence (remplace Arts Magiques)",
+      "CompetencePlaceholder":"ex : Herboristerie (laisser vide pour Arts Magiques)",
       "TypeSort":             "Clé typeMagie",
       "TypeSortHint":         "La clé de sort est le nom du domaine (insensible à la casse et aux accents).",
       "Ajouter":              "Ajouter le domaine",
@@ -1048,6 +1052,7 @@
       "SortAjoute":               "{nom} ajouté à {acteur}.",
       "AucunDanseurDisponible":   "{acteur} n'a aucun danseur disponible pour lancer ce sort d'emprise.",
       "PasArtsMagiques": "{acteur} ne possède pas Arts Magiques ({domaine}) pour lancer ce sort.",
+      "PasCompetenceDomaine": "{acteur} ne possède pas la compétence « {competence} » requise pour le domaine {domaine}.",
       "PasInstrument": "{acteur} ne possède pas la compétence pour l'instrument « {instrument} » (Accord).",
       "DanseurEpuise": "{danseur} n'a plus d'endurance et ne peut pas lancer de sort.",
       "BienfaitAcquis": "Bienfait « {bienfait} » acquis."
@@ -1188,6 +1193,18 @@
       "Defauts":    "défauts : {liste}",
       "Dont":       "dont {sources}",
       "BonusCorps": "Bonus Corps : Corps {corps} − Noir {noir} = {bonus}"
+    },
+
+    "Relance": {
+      "Menu":       "Relancer (1 point d'Héroïsme)",
+      "PasDePoint": "Plus aucun point d'Héroïsme disponible.",
+      "Relance":    "Relancé",
+      "Badge":      "Relance (point d'Héroïsme)",
+      "Detail":     "Relance",
+      "Cout":       "−1 point d'Héroïsme",
+      "CaseBonus":    "Dépenser 1 point d'Héroïsme : +{bonus} (reste {valeur})",
+      "DetailBonus":  "Héroïsme",
+      "BadgeBonus":   "Bonus d'Héroïsme (+5)"
     },
 
     "Migration": {

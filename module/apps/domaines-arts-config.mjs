@@ -1,11 +1,15 @@
 import { listen } from "../helpers/dom.mjs";
+import { resoudreDomaineArts } from "../helpers/domaines-arts.mjs";
 
 /**
  * DomainesArtsConfig — Application GM pour gérer les domaines d'Arts Magiques personnalisés.
  *
  * Chaque domaine custom stocke :
- *   - nom      : string — nom du domaine (affiché dans la table et utilisé pour la compétence "Arts Magiques")
- *   - compLiee : string — nom de la compétence mondaine liée (ex. "Chant")
+ *   - nom        : string — nom du domaine (affiché dans la table et utilisé pour la compétence "Arts Magiques")
+ *   - compLiee   : string — nom de la compétence mondaine liée (ex. "Chant"), utilisée en min avec Arts Magiques
+ *   - attribut   : string — "" ou "art" (défaut, ART) ou une clé de CONFIG.AGONE.attributs (base du potentiel)
+ *   - competence : string — "" (défaut, compétence "Arts Magiques" du domaine) ou le nom d'une compétence
+ *                  dont le score remplace celui d'Arts Magiques (voir `resoudreDomaineArts`)
  *
  * La clé de sort (typeMagie) est dérivée automatiquement : nom.trim().toLowerCase() sans accents.
  *
@@ -40,9 +44,19 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
 
   async _prepareContext(options) {
     const custom = game.settings.get("agone", "domainesArtsCustom") ?? [];
+    const attributOptions = [
+      { key: "art", label: game.i18n.localize("AGONE.DomainesArts.AttributArt") },
+      ...Object.entries(CONFIG.AGONE.attributs).map(([key, cfg]) => ({
+        key, label: `${game.i18n.localize(cfg.label)} (${cfg.abbr})`,
+      })),
+    ];
+    const competenceNoms = [...new Set(CONFIG.AGONE.competences.map(c => c.name))]
+      .sort((a, b) => a.localeCompare(b, "fr"));
     return {
       domainesStandard: this.constructor.STANDARD_DOMAINES,
-      domainesCustom:   custom,
+      domainesCustom:   custom.map(d => ({ ...d, ...resoudreDomaineArts(d) })),
+      attributOptions,
+      competenceNoms,
     };
   }
 
@@ -52,8 +66,10 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
 
     // Ajouter un domaine
     listen(root, "[data-action='addDomaine']", "click", async () => {
-      const nom      = root.querySelector(".dac-new-nom")?.value?.trim() ?? "";
-      const compLiee = root.querySelector(".dac-new-comp")?.value?.trim() ?? "";
+      const nom        = root.querySelector(".dac-new-nom")?.value?.trim() ?? "";
+      const compLiee   = root.querySelector(".dac-new-comp")?.value?.trim() ?? "";
+      const attribut   = root.querySelector(".dac-new-attribut")?.value?.trim() || "art";
+      const competence = root.querySelector(".dac-new-competence")?.value?.trim() ?? "";
 
       if (!nom) {
         ui.notifications.warn(game.i18n.localize("AGONE.DomainesArts.NomObligatoire"));
@@ -70,10 +86,32 @@ export class DomainesArtsConfig extends foundry.applications.api.HandlebarsAppli
         return;
       }
 
-      custom.push({ nom, compLiee });
+      custom.push({ nom, compLiee, attribut, competence });
       await game.settings.set("agone", "domainesArtsCustom", custom);
       this._invalidateSheets();
       this.render(false);
+    });
+
+    // Modifier l'attribut de base du potentiel d'un domaine custom
+    listen(root, "[data-action='editAttribut']", "change", async (e) => {
+      const idx      = Number(e.currentTarget.dataset.idx);
+      const attribut = e.currentTarget.value.trim() || "art";
+      const custom   = [...(game.settings.get("agone", "domainesArtsCustom") ?? [])];
+      if (!custom[idx]) return;
+      custom[idx] = { ...custom[idx], attribut };
+      await game.settings.set("agone", "domainesArtsCustom", custom);
+      this._invalidateSheets();
+    });
+
+    // Modifier la compétence qui remplace le score d'Arts Magiques d'un domaine custom
+    listen(root, "[data-action='editCompetence']", "change", async (e) => {
+      const idx        = Number(e.currentTarget.dataset.idx);
+      const competence = e.currentTarget.value.trim();
+      const custom     = [...(game.settings.get("agone", "domainesArtsCustom") ?? [])];
+      if (!custom[idx]) return;
+      custom[idx] = { ...custom[idx], competence };
+      await game.settings.set("agone", "domainesArtsCustom", custom);
+      this._invalidateSheets();
     });
 
     // Modifier la compétence liée d'un domaine custom

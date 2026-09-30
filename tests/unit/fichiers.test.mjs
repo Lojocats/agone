@@ -125,18 +125,53 @@ describe("Templates Handlebars", () => {
     assert.doesNotMatch(css, /\.sort-card-top \.desc-bascule\s*\{\s*margin-left:\s*auto/, "le chevron n'est plus poussé à droite, sous .sort-card-actions");
   });
 
-  test("carte de sort : la boîte d'actions ne capte pas les clics en dehors de ses icônes", () => {
-    // .sort-card-actions est toujours dans le DOM (display: flex même hors survol depuis la 1.9.8),
-    // donc hit-testable en permanence : sans pointer-events:none, elle recouvre le chevron et tout
-    // autre contenu sous son emprise, même transparente. Les icônes restent cliquables via
-    // pointer-events:auto.
+  test("carte de sort : la boîte d'actions est sur sa propre ligne, pas superposée au reste de la carte", () => {
+    // Depuis la 1.9.13, .sort-card-actions n'est plus en position absolute dans le coin
+    // haut-droit (qui recouvrait le chevron et nécessitait le hack pointer-events) : elle suit
+    // le flux normal, en dernière ligne de la carte, donc ne peut plus rien recouvrir.
     const css = readFileSync(join(racine, "css/magic.css"), "utf8");
     const actions = css.match(/\.agone \.sort-card-actions\s*\{[^}]*\}/)?.[0];
     assert.ok(actions, ".sort-card-actions trouvée");
-    assert.match(actions, /pointer-events:\s*none/, ".sort-card-actions ne capte pas les clics hors de ses icônes");
-    const icones = css.match(/\.agone \.sort-card-actions a,\s*\n\.agone \.sort-card-actions span\s*\{[^}]*\}/)?.[0];
-    assert.ok(icones, "règle des icônes de .sort-card-actions trouvée");
-    assert.match(icones, /pointer-events:\s*auto/, "les icônes de .sort-card-actions restent cliquables");
+    assert.doesNotMatch(actions, /position:\s*absolute/, ".sort-card-actions ne doit plus être positionnée par-dessus la carte");
+  });
+
+  test("carte de compétence : actions sous la carte, pas de largeur réservée sur l'en-tête", () => {
+    const controls = readFileSync(join(racine, "css/controls.css"), "utf8");
+    const compActions = controls.match(/\.agone \.comp-card-actions\s*\{[^}]*\}/)?.[0];
+    assert.ok(compActions, ".comp-card-actions trouvée");
+    assert.doesNotMatch(compActions, /position:\s*absolute/, ".comp-card-actions ne doit plus être positionnée par-dessus la carte");
+
+    const compHeader = controls.match(/\.agone \.comp-card-header\s*\{[^}]*\}/)?.[0];
+    assert.ok(compHeader, ".comp-card-header trouvée");
+    assert.doesNotMatch(compHeader, /padding-right/, ".comp-card-header ne réserve plus de place pour les actions");
+
+    const magie = readFileSync(join(racine, "css/magic.css"), "utf8");
+    const sortTop = magie.match(/\.agone \.sort-card-top\s*\{[^}]*\}/)?.[0];
+    assert.ok(sortTop, ".sort-card-top trouvée");
+    assert.doesNotMatch(sortTop, /padding-right/, ".sort-card-top ne réserve plus de place pour les actions");
+  });
+
+  test("lignes de dons, pouvoirs et armures : passent à la ligne plutôt que de déborder sur un nom long", () => {
+    const magie  = readFileSync(join(racine, "css/magic.css"), "utf8");
+    const combat = readFileSync(join(racine, "css/combat.css"), "utf8");
+    for (const [nom, css] of [["don-row", magie], ["pouvoir-row", magie], ["armure-row", combat]]) {
+      const bloc = css.match(new RegExp(`\\.agone \\.${nom}\\s*\\{[^}]*\\}`))?.[0];
+      assert.ok(bloc, `.${nom} trouvée`);
+      assert.match(bloc, /flex-wrap:\s*wrap/, `.${nom} doit passer à la ligne (flex-wrap)`);
+    }
+  });
+
+  test("dons et pouvoirs : boutons éditer/supprimer regroupés dans .row-actions", () => {
+    const avantages = readFileSync(join(racine, "templates/actors/parts/avantages.hbs"), "utf8");
+    const magie     = readFileSync(join(racine, "templates/actors/parts/magie.hbs"), "utf8");
+    for (const [nom, src] of [["avantages.hbs", avantages], ["magie.hbs", magie]]) {
+      const blocs = [...src.matchAll(/<div class="row-actions">[\s\S]*?<\/div>/g)].map(m => m[0]);
+      assert.ok(blocs.length > 0, `${nom} : au moins une .row-actions trouvée`);
+      for (const bloc of blocs) {
+        assert.match(bloc, /item-edit/, `${nom} : .row-actions contient item-edit`);
+        assert.match(bloc, /item-delete/, `${nom} : .row-actions contient item-delete`);
+      }
+    }
   });
 
   test("carte de jet : classes d'issue et badge d'écart au seuil", () => {

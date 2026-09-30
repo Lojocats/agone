@@ -396,6 +396,17 @@
 .agone .item-delete:hover { opacity: 1; }
 .agone .item-delete:hover { color: var(--agone-red); }
 
+/* Actions (éditer/supprimer) d'une ligne flexible (don, pouvoir, armure…) : collées à droite
+   tant qu'il y a la place, repoussées sur leur propre ligne quand le nom est trop long
+   (le conteneur passe alors en flex-wrap). */
+.agone .row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 /* ── Liste vide ──────────────────────────────────────────── */
 .agone .empty-list {
   color: var(--agone-brown);
@@ -645,9 +656,6 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  /* Réserve la place des actions (position absolute, coin haut-droit) : les noms longs
-     doivent passer à la ligne avant elles, jamais se faire recouvrir. */
-  padding-right: 72px;
 }
 .agone .comp-card-meta {
   display: flex;
@@ -732,19 +740,17 @@
   gap: 3px;
   flex-wrap: wrap;
 }
-/* Actions : visibles en permanence en léger, fond neutre tant que la carte n'est pas survolée
-   (la place est réservée par .comp-card-header, le fond plein n'apparaît qu'au survol/focus) */
+/* Actions sur leur propre ligne, sous le nom et le corps de la carte : jamais de largeur
+   réservée sur le nom, visibles en permanence en léger, fond plein au survol/focus. */
 .agone .comp-card-actions {
-  position: absolute;
-  top: 4px;
-  right: 4px;
   display: flex;
   gap: 2px;
   align-items: center;
+  justify-content: flex-end;
+  margin-top: 2px;
   background: transparent;
   border-radius: 3px;
   padding: 1px 3px;
-  z-index: 2;
   opacity: 0.45;
   transition: opacity 0.15s, background 0.15s;
 }

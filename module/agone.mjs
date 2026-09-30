@@ -657,9 +657,58 @@ Hooks.once("ready", async () => {
 
 // Couleur de fond des messages de jet en chat
 Hooks.on("renderChatMessageHTML", (message, html) => {
-  if (message.flags?.agone?.rollType) {
+  const flags = message.flags?.agone;
+  if (flags?.rollType) {
     html.classList.add("agone-roll");
   }
+  // Relance (point d'Héroïsme) : ancien jet grisé, nouveau jet signalé (lu depuis les drapeaux)
+  const entete = html.querySelector(".agone-roll-card .roll-header");
+  const badge = (classe, cle, icone) => {
+    if (!entete) return;
+    const span = document.createElement("span");
+    span.className = `roll-relance-badge ${classe}`;
+    span.innerHTML = `<i class="fas ${icone}"></i> ${game.i18n.localize(cle)}`;
+    entete.append(span);
+  };
+  if (flags?.relance?.fait) {
+    html.classList.add("agone-relance-faite");
+    badge("relance-faite", "AGONE.Relance.Relance", "fa-rotate-left");
+  }
+  const issu = flags?.issuHeroisme ?? (flags?.estRelance ? "relance" : null);
+  if (issu === "bonus") badge("relance-nouvelle", "AGONE.Relance.BadgeBonus", "fa-star");
+  else if (issu) badge("relance-nouvelle", "AGONE.Relance.Badge", "fa-star");
+});
+
+/**
+ * Acteur d'un message de jet relançable par l'utilisateur courant (null sinon).
+ * @param {ChatMessage} message
+ * @returns {Actor|null}
+ */
+function acteurRelancable(message) {
+  const flags = message?.flags?.agone;
+  const relance = flags?.relance;
+  // L'ancien message doit pouvoir être marqué (auteur ou MJ) ; une carte issue d'un point d'Héroïsme ne propose rien
+  if (!relance?.methode || relance.fait || !message.isOwner) return null;
+  if (flags.issuHeroisme || flags.estRelance) return null;
+  const actor = ChatMessage.getSpeakerActor(message.speaker);
+  if (!actor?.isOwner || actor.system?.ph?.valeur === undefined) return null;
+  return actor;
+}
+
+// Menu contextuel du chat : relancer un jet Agone en dépensant 1 point d'Héroïsme
+Hooks.on("getChatMessageContextOptions", (_application, options) => {
+  const message = li => game.messages.get((li instanceof HTMLElement ? li : li?.[0])?.dataset.messageId);
+  const visible = li => !!acteurRelancable(message(li));
+  const relancer = li => {
+    const msg = message(li);
+    return acteurRelancable(msg)?.relancerMessage(msg);
+  };
+  const icon = '<i class="fas fa-rotate-left"></i>';
+  const label = "AGONE.Relance.Menu";
+  // v14 : label / visible / onClick ; v13 : name / condition / callback
+  options.push(game.release.generation >= 14
+    ? { label, icon, visible, onClick: (_event, li) => relancer(li) }
+    : { name: label, icon, condition: visible, callback: relancer });
 });
 
 // Boutons Agone dans la barre d'outils

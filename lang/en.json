@@ -278,6 +278,10 @@
       "Personnalises":        "Custom domains",
       "Domaine":              "Domain",
       "CompLiee":             "Linked skill (prerequisite)",
+      "Attribut":             "Base attribute",
+      "AttributArt":          "ART (default)",
+      "Competence":           "Skill (replaces Magic Arts)",
+      "CompetencePlaceholder":"e.g.: Herbalism (leave empty for Magic Arts)",
       "TypeSort":             "Magic type key",
       "TypeSortHint":         "The spell key is the domain name (case and accent insensitive).",
       "Ajouter":              "Add domain",
@@ -1049,6 +1053,7 @@
       "SortAjoute":               "{nom} added to {acteur}.",
       "AucunDanseurDisponible":   "{acteur} has no dancer available to cast this emprise spell.",
       "PasArtsMagiques": "{acteur} lacks Magic Arts ({domaine}) to cast this spell.",
+      "PasCompetenceDomaine": "{acteur} lacks the skill \"{competence}\" required for the {domaine} domain.",
       "PasInstrument": "{acteur} lacks the skill for the instrument \"{instrument}\" (Accord).",
       "DanseurEpuise": "{danseur} has no endurance left and cannot cast spells.",
       "BienfaitAcquis": "Boon \"{bienfait}\" acquired."
@@ -1189,6 +1194,18 @@
       "Defauts":    "flaws: {liste}",
       "Dont":       "including {sources}",
       "BonusCorps": "Body bonus: Body {corps} − Dark {noir} = {bonus}"
+    },
+
+    "Relance": {
+      "Menu":       "Reroll (1 Hero Point)",
+      "PasDePoint": "No Hero Points left.",
+      "Relance":    "Rerolled",
+      "Badge":      "Reroll (Hero Point)",
+      "Detail":     "Reroll",
+      "Cout":       "−1 Hero Point",
+      "CaseBonus":    "Spend 1 Hero Point: +{bonus} ({valeur} left)",
+      "DetailBonus":  "Heroism",
+      "BadgeBonus":   "Heroism bonus (+5)"
     },
 
     "Migration": {

@@ -63,6 +63,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - 3 obédiences : **Jorniste, Obscurantiste, Éclipsiste**
 - Calcul de l'aptitude par domaine exact lors du lancer
 - Support des compétences alternatives (compAlt)
+- Domaines personnalisés (fenêtre MJ), avec un attribut et une compétence de base au choix à la place de l'ART et d'Arts Magiques
 - **Fée Noire** : Art = CRÉ uniquement
 
 ### Magie — Emprise & Danseurs
@@ -83,6 +84,7 @@ https://raw.githubusercontent.com/Lojocats/agone/main/system.json
 - Détection automatique des **fumbles** et **critiques**
 - Cartes de chat enrichies avec détail des calculs, en français et en anglais
 - Notes de compétences affichées dans le chat
+- **Points d'Héroïsme** : +5 au jet (case de la fenêtre de jet) ou relance par clic droit sur la carte (mêmes paramètres), l'un ou l'autre
 
 ### Compagnons, Démons & PNJ
 - Fiches dédiées pour compagnons, démons et PNJ, construites sur la même base que la fiche personnage

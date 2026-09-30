@@ -84,9 +84,11 @@
             {{#if d.specialite}}<span class="arts-spe-hint"><i class="fas fa-star"></i> {{d.specialite}}</span>{{/if}}
             <button type="button" class="roll-btn-small" data-action="rollArtDomaine"
                     data-domaine="{{d.domaine}}" data-apt="{{d.potentiel}}" data-specialite="{{d.specialite}}"
-                    data-art="{{d.artVal}}" data-score-arts="{{d.scoreArtsMag}}"
+                    data-art="{{d.artVal}}" data-base-abbr="{{d.baseAbbr}}" data-score-arts="{{d.scoreArtsMag}}"
                     data-score-comp="{{d.scoreCompLiee}}" data-nom-comp="{{d.nomCompLiee}}"
                     data-score-eff="{{d.scoreEffectif}}" data-bonus-ame="{{d.bonusAmeVal}}"
+                    data-base-bonus="{{d.baseBonusVal}}" data-base-bonus-label="{{d.baseBonusLabel}}"
+                    data-comp-label="{{d.compLabel}}"
                     data-tooltip='{{localize "AGONE.JeterAptitudeMagie"}} &mdash; {{d.domaine}}'
                     aria-label='{{localize "AGONE.JeterAptitudeMagie"}} — {{d.domaine}}'>
               <i class="fas fa-dice-d10"></i>
@@ -102,6 +104,7 @@
                     data-cre="{{d.creVal}}" data-score-arts="{{d.scoreArtsMag}}"
                     data-score-comp="{{d.scoreCompLiee}}" data-nom-comp="{{d.nomCompLiee}}"
                     data-score-eff="{{d.scoreEffectif}}" data-bonus-ame="{{d.bonusAmeVal}}"
+                    data-comp-label="{{d.compLabel}}"
                     data-tooltip='{{localize "AGONE.JeterImprovisation"}} &mdash; {{d.domaine}}'
                     aria-label='{{localize "AGONE.JeterImprovisation"}} — {{d.domaine}}'>
               <i class="fas fa-dice-d10"></i>
@@ -440,8 +443,10 @@
         {{#if pouvoir.system.description}}<button type="button" class="desc-bascule" data-desc="{{pouvoir.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
         <span class="pouvoir-categorie tag-{{pouvoir.system.categorie}}">{{pouvoir.system.categorie}}</span>
         <button type="button" class="pouvoir-name-btn btn-text" data-action="chatPouvoir" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.EnvoyerChat"}}'>{{pouvoir.name}}</button>
-        <a class="item-edit" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
-        <a class="item-delete" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+        <div class="row-actions">
+          <a class="item-edit" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
+          <a class="item-delete" data-item-id="{{pouvoir.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+        </div>
       </li>
       {{#if pouvoir.system.description}}
       <li class="pouvoir-desc-li desc-pliable" data-desc-de="{{pouvoir.id}}" hidden>

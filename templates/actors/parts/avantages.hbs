@@ -72,8 +72,10 @@
           {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-pos">+{{don.system.cout}}</span>
-          <a class="btn-icon item-edit" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Modifier"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
-          <a class="btn-icon item-delete" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          <div class="row-actions">
+            <a class="btn-icon item-edit" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Modifier"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
+            <a class="btn-icon item-delete" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          </div>
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
@@ -111,8 +113,10 @@
           {{#if don.system.description}}<button type="button" class="desc-bascule" data-desc="{{don.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button>{{else}}<span class="desc-bascule-vide"></span>{{/if}}
           <span class="don-name">{{don.name}}</span>
           <span class="don-cout av-cout-neg">{{don.system.cout}}</span>
-          <a class="btn-icon item-edit" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Modifier"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
-          <a class="btn-icon item-delete" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          <div class="row-actions">
+            <a class="btn-icon item-edit" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Modifier"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Modifier"}}'><i class="fas fa-edit"></i></a>
+            <a class="btn-icon item-delete" data-item-id="{{don.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
+          </div>
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>

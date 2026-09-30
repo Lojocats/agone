@@ -512,16 +512,20 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     const ds  = event.currentTarget.dataset;
     const num = v => parseInt(v) || 0;
     await this.actor.rollArtDomaine({
-      domaine   : ds.domaine ?? "",
-      specialite: ds.specialite ?? "",
-      nomComp   : ds.nomComp ?? "",
-      apt       : num(ds.apt),
-      art       : num(ds.art),
-      cre       : num(ds.cre),
-      scoreArts : num(ds.scoreArts),
-      scoreComp : num(ds.scoreComp),
-      scoreEff  : num(ds.scoreEff),
-      bonusAme  : num(ds.bonusAme),
+      domaine        : ds.domaine ?? "",
+      specialite     : ds.specialite ?? "",
+      nomComp        : ds.nomComp ?? "",
+      compLabel      : ds.compLabel || "Arts",
+      apt            : num(ds.apt),
+      art            : num(ds.art),
+      baseAbbr       : ds.baseAbbr || "ART",
+      baseBonus      : num(ds.baseBonus),
+      baseBonusLabel : ds.baseBonusLabel || "BonusAme",
+      cre            : num(ds.cre),
+      scoreArts      : num(ds.scoreArts),
+      scoreComp      : num(ds.scoreComp),
+      scoreEff       : num(ds.scoreEff),
+      bonusAme       : num(ds.bonusAme),
     }, { impro });
   }
 
