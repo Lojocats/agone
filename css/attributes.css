@@ -48,7 +48,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 4px;
+  /* Bloc étroit : le badge de réserve passe à la ligne au lieu de déborder sur l'aspect voisin */
+  flex-wrap: wrap;
 }
+.agone .aspect-stat .reserve-badge { margin-left: auto; }
 .agone .aspect-stat label {
   font-size: 11px;
   color: var(--agone-brown);
