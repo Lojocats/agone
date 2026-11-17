@@ -3,6 +3,11 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.10.0] — 2026-11-17
+
+### Corrigé
+- Fiche de personnage : le badge de réserve d'expérience (tirelire) d'un aspect débordait sur le bloc voisin quand la fiche était étroite. Il passe désormais à la ligne, dans son propre bloc.
+
 ## [1.9.14] — 2026-09-30
 
 ### Corrigé
