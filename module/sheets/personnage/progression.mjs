@@ -1,4 +1,5 @@
 import { sourcesEffets } from "../../helpers/effets.mjs";
+import { coutCreationNiveau, coutCreationTotal, achatForce, bornesRaciales } from "../../helpers/creation.mjs";
 
 /**
  * Onglet Attributs & progression : valeurs brutes / bonus, coûts XP et création, montée et rétrogradation,
@@ -12,19 +13,12 @@ export const ProgressionMixin = Base => class extends Base {
     const system = actor.system;
 
     const peupleKey  = CONFIG.AGONE?.peupleNomVersKey?.[system.peuple] ?? "humain";
-    const peupleData = CONFIG.AGONE?.peuplesData?.[peupleKey] ?? CONFIG.AGONE?.peuplesData?.humain;
 
     // Coûts XP pour la montée de niveau (multiplicateurs, après création)
     const m   = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
-    const tbl = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
-    // Coût incrémental selon la table d'achat création : utilise le score BRUT (hors bonus racial)
-    // rawScore = score stocké - bonus positif appliqué. Indice dans la table = niveau brut actuel.
-    // Au-delà de la table, on extrapole en continuant le delta croissant.
-    const lastDelta = tbl.length >= 2 ? tbl[tbl.length - 1] - tbl[tbl.length - 2] : 1;
-    const creaDelta = (rawScore) => {
-      if (rawScore + 1 < tbl.length) return tbl[rawScore + 1] - tbl[rawScore];
-      return lastDelta + (rawScore - (tbl.length - 2));
-    };
+    // Coût incrémental selon la table d'achat création (helpers/creation.mjs) : utilise le score BRUT
+    // (hors bonus racial). rawScore = score stocké - bonus positif appliqué.
+    const creaDelta = coutCreationNiveau;
     const posBonus  = (k) => system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
     const avBonus   = (k) => system[k]?.avantageBonus ?? 0;
     const rawCarac  = (k) => Math.max(0, system[k].score - posBonus(k) - avBonus(k));
@@ -185,8 +179,8 @@ export const ProgressionMixin = Base => class extends Base {
       const bonus    = system.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
       const posBonus = Math.max(0, bonus);
       const rawScore = system[k].score - bonus;
-      const raceMax  = peupleData?.[`${k}Max`] ?? null;
-      const raceMin  = peupleData?.[`${k}Min`] ?? null;
+      // Bornes de l'item Peuple appliqué (enregistrées sur l'acteur), à défaut celles de la table du peuple
+      const { min: raceMin, max: raceMax } = bornesRaciales(system, k);
       // raceMax est un plafond sur le score BRUT (achat) → total max = raceMax + posBonus
       caracAtMax[k]         = raceMax !== null && rawScore >= raceMax;
       // raceMin est un plancher sur le score TOTAL → comparer directement avec le score stocké
@@ -407,9 +401,7 @@ export const ProgressionMixin = Base => class extends Base {
 
     // Vérification du max racial (caracs seulement — seuil sur score brut hors bonus)
     if (type === "carac") {
-      const pKeyRace  = CONFIG.AGONE?.peupleNomVersKey?.[sd.peuple] ?? "humain";
-      const pDatRace  = CONFIG.AGONE?.peuplesData?.[pKeyRace] ?? {};
-      const maxRacial = pDatRace[`${key}Max`] ?? null;
+      const maxRacial = bornesRaciales(sd, key).max;
       const bonusApp  = sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0;
       const avBonus   = sd[key]?.avantageBonus ?? 0;
       const rawScore  = (sd[key]?.score ?? 0) - avBonus - bonusApp;
@@ -541,9 +533,6 @@ export const ProgressionMixin = Base => class extends Base {
       return ui.notifications.warn(game.i18n.localize("AGONE.ScoreDejaZero"));
     }
 
-    const tbl       = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
-    const lastDelta = tbl.length >= 2 ? tbl[tbl.length - 1] - tbl[tbl.length - 2] : 1;
-    const creaDelta = (s) => s + 1 < tbl.length ? tbl[s + 1] - tbl[s] : lastDelta + (s - (tbl.length - 2));
     const m         = CONFIG.AGONE.xpMultipliers ?? { aspect: 7, carac: 5, competence: 5 };
 
     // ── MODE CRÉATION ────────────────────────────────────────
@@ -554,14 +543,13 @@ export const ProgressionMixin = Base => class extends Base {
       const pool      = (type === "carac") ? sd.ptsCreationCarac : sd.ptsCreationComp;
       const bonus     = (type === "carac") ? (sd.peupleBonusApplique?.[`${key}Bonus`] ?? 0) : 0;
       const rawScore  = Math.max(0, sourceScore - bonus);
-      const raceMin   = (type === "carac") ? (sd[key]?.raceMin ?? 0) : 0;
-      const posBonus  = Math.max(0, bonus);
-      const forcedRaw = Math.max(bonus < 0 ? -bonus : 0, Math.max(0, raceMin - posBonus));
+      const raceMin   = (type === "carac") ? bornesRaciales(sd, key).min : null;
+      const forcedRaw = achatForce(bonus, raceMin);
 
       if (rawScore <= forcedRaw) {
         return ui.notifications.warn(game.i18n.localize("AGONE.RemboursementImpossible"));
       }
-      const remboursement = creaDelta(rawScore - 1);
+      const remboursement = coutCreationNiveau(rawScore - 1);
 
       if (type === "carac") {
         await this.actor.update({
@@ -623,19 +611,14 @@ export const ProgressionMixin = Base => class extends Base {
     const sd = this.actor.system;
     const caracs  = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'];
     const aspects = ['corps','esprit','ame'];
-    const _cTbl  = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
-    const _cLast = _cTbl.length >= 2 ? _cTbl[_cTbl.length-1] - _cTbl[_cTbl.length-2] : 1;
-    const _cCost = (n) => n <= 0 ? 0 : (n < _cTbl.length ? _cTbl[n] : _cTbl[_cTbl.length-1] + (n - _cTbl.length + 1) * _cLast);
     let initCost = 0;
     const upd = {};
 
     for (const k of caracs) {
       const bonus    = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
-      const raceMin  = sd[k]?.raceMin ?? 0;
-      const posBonus  = Math.max(0, bonus);
-      const forcedRaw = Math.max(bonus < 0 ? -bonus : 0, Math.max(0, raceMin - posBonus));
+      const forcedRaw = achatForce(bonus, bornesRaciales(sd, k).min);
       upd[`system.${k}.score`] = Math.max(0, bonus + forcedRaw);
-      initCost += _cCost(forcedRaw);
+      initCost += coutCreationTotal(forcedRaw);
     }
     upd["system.ptsCreationCarac.depense"] = initCost;
     for (const asp of aspects) {
@@ -673,12 +656,9 @@ export const ProgressionMixin = Base => class extends Base {
     const aspects = ['corps','esprit','ame'];
     const label   = (k) => game.i18n.localize(`AGONE.${caracs.includes(k) ? "Attribut." : ""}${k.charAt(0).toUpperCase() + k.slice(1)}`) || k;
 
-    const peupleKey  = CONFIG.AGONE?.peupleNomVersKey?.[sd.peuple] ?? "humain";
-    const peupleData = CONFIG.AGONE?.peuplesData?.[peupleKey] ?? CONFIG.AGONE?.peuplesData?.humain;
-
     const sousMinimum = [];
     for (const k of caracs) {
-      const raceMin = peupleData?.[`${k}Min`] ?? null;
+      const raceMin = bornesRaciales(sd, k).min;
       const score   = sd[k]?.score ?? 0;
       if (raceMin !== null && score < raceMin) sousMinimum.push({ key: k, label: label(k), score, min: raceMin });
     }
@@ -781,9 +761,7 @@ export const ProgressionMixin = Base => class extends Base {
     // Validation uniquement pour les stats primaires (les dérivées n'ont pas de plancher)
     const PRIMAIRES = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite','corps','esprit','ame'];
     const sd  = this.actor.system;
-    const tbl = CONFIG.AGONE?.tableAchatCreation ?? [0,1,2,3,4,5,7,10,14,19,25];
-    const lastDelta = tbl[tbl.length-1] - tbl[tbl.length-2];
-    const creaTotal = (n) => n <= 0 ? 0 : n < tbl.length ? tbl[n] : tbl[tbl.length-1] + (n - (tbl.length - 1)) * lastDelta;
+    const creaTotal = coutCreationTotal;
 
     const update = { "system.bonusAttributsSupp": tentative };
 

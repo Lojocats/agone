@@ -9,7 +9,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 4px 16px;
   padding: 6px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  background: rgba(var(--agone-brun-rgb), 0.06);
   border-radius: var(--radius);
   margin-bottom: 10px;
 }
@@ -46,7 +46,7 @@
   align-items: center;
   gap: 3px;
   padding: 6px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.1);
+  background: rgba(var(--agone-or-rgb), 0.1);
   border: 1px solid var(--agone-gold);
   border-radius: var(--radius);
 }
@@ -58,80 +58,17 @@
 }
 .agone .monnaie-row input { width: 60px; text-align: center; }
 
-/* ── Sorts & Magie ───────────────────────────────────────── */
-.agone .aptitudes-grid {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 10px;
-}
-.agone .aptitude-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border-radius: var(--radius);
-  border: 1px solid var(--agone-border);
-}
-.agone .aptitude-row label { font-size: 12px; }
-
 /* ── Sorts ────────────────────────────────────────────────── */
-.agone .sorts-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-top: 4px;
-}
-.agone .sorts-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  color: var(--agone-brown);
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  text-align: left;
-  border-bottom: 1px solid var(--agone-border);
-}
-.agone .sorts-table tbody td {
-  padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.12);
-  vertical-align: middle;
-  font-size: 12px;
-}
-.agone .sort-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.07); }
-.agone .sort-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 .agone .sort-desc-row td.sort-description-cell {
   padding: 4px 12px 8px 28px;
   font-size: 12px;
   font-style: italic;
   color: var(--color-text-dark-secondary, #555);
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
+  background: rgba(var(--agone-brun-rgb), 0.04);
   border-top: none;
   line-height: 1.5;
 }
 
-.agone .sort-impro-btn {
-  background: transparent;
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.30);
-  border-radius: 3px;
-  padding: 1px 5px;
-  cursor: pointer;
-  color: var(--agone-brown, #5c3310);
-  font-size: 11px;
-  opacity: 0.75;
-  margin-right: 2px;
-  vertical-align: middle;
-  line-height: 1.4;
-}
-.agone .sort-impro-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-brown, #5c3310);
-  opacity: 1;
-}
 
 /* ── Références de portée des sorts ─────────────────────── */
 .agone .portees-ref {
@@ -140,8 +77,8 @@
   gap: 3px;
   margin-bottom: 8px;
   padding: 7px 10px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
-  border: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.15);
+  background: rgba(var(--agone-brun-rgb), 0.05);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.15);
   border-radius: var(--radius);
   font-size: 11px;
 }
@@ -159,7 +96,7 @@
   color: var(--agone-brown);
   opacity: 0.7;
   margin-bottom: 3px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.15);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.15);
   padding-bottom: 2px;
 }
 .agone .portee-ref-row {
@@ -186,18 +123,23 @@
   gap: 6px;
   margin-bottom: 8px;
   padding: 5px 8px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  background: rgba(var(--agone-brun-rgb), 0.06);
   border-radius: var(--radius);
-  border: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.2);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.2);
 }
 .agone .smf-search-wrap {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.2);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.2);
   border-radius: var(--radius);
   padding: 2px 8px;
+}
+/* Le champ n'a ni cadre ni contour : le focus se lit sur son enveloppe */
+.agone .smf-search-wrap:focus-within {
+  border-color: var(--agone-gold);
+  box-shadow: 0 0 4px rgba(var(--agone-or-rgb), 0.4);
 }
 .agone .smf-search-wrap i { opacity: 0.5; font-size: 11px; }
 .agone .smf-search {
@@ -247,31 +189,15 @@
   align-items: center;
   gap: 8px;
   padding: 3px 6px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
+  background: rgba(var(--agone-brun-rgb), 0.05);
   border-radius: var(--radius);
   font-size: 13px;
 }
 .agone .don-name { flex: 1; min-width: 80px; }
 .agone .don-cout { font-size: 11px; color: var(--agone-brown); }
-.agone .don-desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0 2px;
-  color: var(--agone-txt-pale, rgba(0,0,0,0.75));
-  font-size: 0.72em;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-.agone .don-desc-toggle:hover { color: var(--agone-gold); }
-.agone li.don-desc-expand {
-  padding: 3px 10px 5px 28px;
-  background: rgba(var(--agone-surface-rgb, 255,240,200), 0.7);
-  border-top: 0;
-}
 .agone .don-desc-text {
   font-size: 10.5px;
-  color: var(--agone-txt-doux, rgba(0,0,0,0.75));
+  color: var(--agone-txt-doux);
   font-style: italic;
   line-height: 1.4;
 }
@@ -288,30 +214,8 @@
   align-items: center;
   gap: 8px;
   padding: 4px 6px;
-  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
+  border-bottom: 1px dotted rgba(var(--agone-brun-rgb), 0.25);
   font-size: 13px;
-}
-.agone .pouvoir-desc-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--agone-txt-pale, rgba(80,50,20,0.4));
-  font-size: 0.75em;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-.agone .pouvoir-desc-toggle:hover { color: var(--agone-brown); }
-.agone .pouvoir-desc-expand {
-  display: none;
-  padding: 2px 6px 6px 28px;
-  font-size: 11px;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.78);
-  font-style: italic;
-  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.20);
-  background: rgba(var(--agone-encre-rgb, 0,0,0), 0.04);
-  list-style: none;
 }
 .agone .pouvoir-categorie {
   font-size: 10px;
@@ -321,7 +225,6 @@
   background: var(--agone-brown);
   color: var(--agone-parchment);
 }
-.agone .pouvoir-name { flex: 1; }
 
 /* Bouton nom-pouvoir cliquable */
 .agone .pouvoir-name-btn {
@@ -330,7 +233,7 @@
   padding: 0;
   cursor: pointer;
   font-size: inherit;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
   text-align: left;
   flex: 1;
   min-width: 80px;
@@ -347,7 +250,7 @@
   gap: 16px;
   align-items: start;
 }
-@media (max-width: 700px) {
+@container agone-fiche (max-width: 700px) {
   .agone .magie-main { grid-template-columns: 1fr; }
 }
 .agone .danseurs-block { margin-top: 0; }
@@ -355,7 +258,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  background: rgba(var(--agone-brun-rgb), 0.06);
   border: 1px solid var(--agone-border);
   border-radius: var(--radius);
   padding: 8px;
@@ -392,8 +295,8 @@
 }
 .agone .danseur-nom:hover,
 .agone .danseur-nom:focus {
-  border-color: var(--agone-gold, #b8860b);
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.07);
+  border-color: var(--agone-gold);
+  background: rgba(var(--agone-surface-rgb), 0.07);
   outline: none;
 }
 /* Jauges (mémoire / endurance) */
@@ -411,26 +314,26 @@
   width: 46px;
   height: 6px;
   border-radius: 3px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  background: rgba(var(--agone-brun-rgb), 0.15);
   overflow: hidden;
 }
 .agone .danseur-jauge-fill {
   display: block;
   height: 100%;
-  background: var(--agone-gold, #c9a227);
+  background: var(--agone-gold);
   border-radius: 3px;
 }
 .agone .danseur-jauge.jauge-alerte .danseur-jauge-fill {
-  background: var(--agone-txt-rouge, #8b1a1a);
+  background: var(--agone-txt-rouge);
 }
 .agone .danseur-jauge.jauge-alerte .danseur-jauge-txt {
-  color: var(--agone-txt-rouge, #8b1a1a);
+  color: var(--agone-txt-rouge);
   font-weight: 600;
 }
 .agone .danseur-jauge-txt { white-space: nowrap; }
 .agone .danseur-jauge-btn {
-  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.12);
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.4);
+  background: rgba(var(--agone-brun-rgb), 0.12);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.4);
   border-radius: 3px;
   width: 16px;
   height: 16px;
@@ -438,22 +341,22 @@
   line-height: 1;
   font-size: 12px;
   cursor: pointer;
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
   flex-shrink: 0;
 }
-.agone .danseur-jauge-btn:hover { background: var(--agone-gold, #c9a227); }
+.agone .danseur-jauge-btn:hover { background: var(--agone-gold); }
 .agone .danseur-jauge-recuperer {
   background: transparent;
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.3);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
   border-radius: 3px;
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
   width: 18px;
   height: 18px;
   font-size: 10px;
   cursor: pointer;
   opacity: 0.75;
 }
-.agone .danseur-jauge-recuperer:hover { opacity: 1; background: rgba(var(--agone-brun-rgb, 80,45,10), 0.08); }
+.agone .danseur-jauge-recuperer:hover { opacity: 1; background: rgba(var(--agone-brun-rgb), 0.08); }
 
 /* Pastilles de statistiques (Emprise, Improvisation, Empathie) */
 .agone .danseur-pastille {
@@ -467,22 +370,22 @@
 .agone .danseur-pastille i { font-size: 10px; opacity: 0.75; }
 .agone .danseur-pot-emp {
   font-weight: 600;
-  color: var(--agone-gold, #c9a227);
-  border-left: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.25);
+  color: var(--agone-gold);
+  border-left: 1px solid rgba(var(--agone-brun-rgb), 0.25);
   padding-left: 4px;
 }
 .agone .danseur-pot-impro {
   font-weight: 600;
   color: var(--agone-brown);
   opacity: 0.85;
-  border-left: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.25);
+  border-left: 1px solid rgba(var(--agone-brun-rgb), 0.25);
   padding-left: 4px;
 }
 .agone .danseur-roll-btn {
   background: var(--agone-brown);
   border: 1px solid var(--agone-gold);
   color: var(--agone-parchment);
-  border-radius: var(--radius, 4px);
+  border-radius: var(--radius);
   padding: 2px 8px;
   font-size: 11px;
   cursor: pointer;
@@ -491,20 +394,20 @@
 }
 .agone .danseur-roll-btn:hover {
   background: var(--agone-gold);
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
 }
 .agone .danseur-slots {
   display: flex;
   flex-direction: column;
   gap: 3px;
   min-height: 30px;
-  border: 1px dashed rgba(var(--agone-brun-rgb, 93,58,30), 0.3);
+  border: 1px dashed rgba(var(--agone-brun-rgb), 0.3);
   border-radius: var(--radius);
   padding: 4px;
   transition: background 0.15s, border-color 0.15s;
 }
 .agone .danseur-slots.drag-over {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.1);
+  background: rgba(var(--agone-or-rgb), 0.1);
   border-color: var(--agone-gold);
   border-style: solid;
 }
@@ -513,7 +416,7 @@
   flex-direction: column;
   gap: 3px;
   padding: 3px 6px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
+  background: rgba(var(--agone-brun-rgb), 0.1);
   border-radius: 3px;
   font-size: 12px;
 }
@@ -550,8 +453,8 @@
   font-weight: 600;
   padding: 0 4px;
   border-radius: 8px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.18);
-  color: var(--agone-brown, #5c3310);
+  background: rgba(var(--agone-or-rgb), 0.18);
+  color: var(--agone-brown);
 }
 .agone .slot-details {
   margin-top: 2px;
@@ -574,19 +477,13 @@
   color: var(--agone-brown);
   line-height: 1.4;
   padding: 2px 4px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  background: rgba(var(--agone-brun-rgb), 0.06);
   border-radius: 2px;
 }
 .agone .slot-description p { margin: 0 0 2px; }
-.agone .slot-type {
-  font-size: 10px;
-  color: var(--agone-brown);
-  opacity: 0.75;
-  white-space: nowrap;
-}
 .agone .slot-remove {
   background: transparent;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
   color: var(--agone-brown);
   border-radius: 3px;
   width: 18px;
@@ -601,7 +498,7 @@
   transition: background 0.1s;
   flex-shrink: 0;
 }
-.agone .slot-remove:hover { background: rgba(var(--agone-rouge-rgb, 180,40,40), 0.15); border-color: var(--agone-txt-rouge, #c04040); color: var(--agone-txt-rouge, #c04040); }
+.agone .slot-remove:hover { background: rgba(var(--agone-rouge-rgb), 0.15); border-color: var(--agone-txt-rouge-clair); color: var(--agone-txt-rouge-clair); }
 .agone .danseur-drop-hint {
   font-size: 11px;
   color: var(--agone-brown);
@@ -615,10 +512,10 @@
   margin-top: 3px;
   font-size: 11px;
   padding: 2px 4px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.45);
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.35);
+  background: rgba(var(--agone-surface-rgb), 0.45);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.35);
   border-radius: 3px;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
 }
 
 /* Drag & drop dans les slots danseurs */
@@ -632,8 +529,8 @@
   flex-direction: column;
   gap: 3px;
   padding: 6px 8px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
-  border-top: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.15);
+  background: rgba(var(--agone-or-rgb), 0.06);
+  border-top: 1px solid rgba(var(--agone-brun-rgb), 0.15);
 }
 .agone .danseur-crea-row {
   display: flex;
@@ -643,12 +540,12 @@
 }
 .agone .danseur-crea-label {
   min-width: 72px;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
   font-weight: 500;
 }
 .agone .danseur-niv-btn {
-  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.12);
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.4);
+  background: rgba(var(--agone-brun-rgb), 0.12);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.4);
   border-radius: 3px;
   width: 22px;
   height: 22px;
@@ -659,11 +556,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
 }
 .agone .danseur-niv-btn:hover:not([disabled]) {
-  background: var(--agone-gold, #c9a227);
-  border-color: var(--agone-brown, #5c3310);
+  background: var(--agone-gold);
+  border-color: var(--agone-brown);
 }
 .agone .danseur-niv-btn[disabled] {
   opacity: 0.3;
@@ -674,22 +571,22 @@
   text-align: center;
   font-weight: bold;
   font-size: 13px;
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
 }
 .agone .danseur-crea-arrow {
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
   opacity: 0.55;
   font-size: 13px;
 }
 .agone .danseur-crea-val {
   font-weight: 600;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
   min-width: 24px;
   font-size: 13px;
 }
 .agone .danseur-next-val {
   font-size: 10px;
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
   opacity: 0.6;
   margin-left: 2px;
 }
@@ -698,21 +595,21 @@
   font-weight: 600;
   padding: 1px 7px;
   border-radius: 10px;
-  background: rgba(var(--agone-brun-rgb, 80,45,10), 0.10);
-  color: var(--agone-brown, #5c3310);
+  background: rgba(var(--agone-brun-rgb), 0.10);
+  color: var(--agone-brown);
   white-space: nowrap;
 }
 .agone .danseur-pts-badge.pts-deficit {
-  background: rgba(var(--agone-rouge-rgb, 180,30,30), 0.12);
-  color: var(--agone-txt-rouge, #8b1a1a);
+  background: rgba(var(--agone-rouge-rgb), 0.12);
+  color: var(--agone-txt-rouge);
 }
 .agone .danseur-inline-num {
   width: 40px;
   text-align: center;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.45);
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.35);
+  background: rgba(var(--agone-surface-rgb), 0.45);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.35);
   border-radius: 3px;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
   font-size: 12px;
   padding: 1px 2px;
   -moz-appearance: textfield;
@@ -720,121 +617,30 @@
 .agone .danseur-inline-num::-webkit-outer-spin-button,
 .agone .danseur-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
 .agone .danseur-valider-btn {
-  background: rgba(var(--agone-vert-rgb, 26,107,48), 0.13);
-  border: 1px solid rgba(var(--agone-vert-rgb, 26,107,48), 0.45);
-  color: var(--agone-txt-vert, #1a6b30);
+  background: rgba(var(--agone-vert-rgb), 0.13);
+  border: 1px solid rgba(var(--agone-vert-rgb), 0.45);
+  color: var(--agone-txt-vert);
   border-radius: 3px;
   padding: 2px 8px;
   font-size: 11px;
   cursor: pointer;
   white-space: nowrap;
 }
-.agone .danseur-valider-btn:hover { background: rgba(var(--agone-vert-rgb, 26,107,48), 0.28); }
+.agone .danseur-valider-btn:hover { background: rgba(var(--agone-vert-rgb), 0.28); }
 .agone .danseur-recrea-btn {
   background: transparent;
-  border: 1px solid rgba(var(--agone-brun-rgb, 80,45,10), 0.30);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.30);
   border-radius: 3px;
   padding: 2px 5px;
   cursor: pointer;
-  color: var(--agone-brown, #5c3310);
+  color: var(--agone-brown);
   font-size: 12px;
   opacity: 0.7;
 }
-.agone .danseur-recrea-btn:hover { opacity: 1; background: rgba(var(--agone-brun-rgb, 80,45,10), 0.08); }
+.agone .danseur-recrea-btn:hover { opacity: 1; background: rgba(var(--agone-brun-rgb), 0.08); }
 
 /* ── Démons intérieurs ────────────────────────────────────── */
 .agone .demons-block { margin-top: 10px; }
-.agone .demon-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  background: rgba(var(--agone-rouge-rgb, 60,15,30), 0.06);
-  border: 1px solid rgba(var(--agone-rouge-rgb, 120,30,60), 0.25);
-  border-radius: var(--radius, 4px);
-  padding: 8px;
-  margin-bottom: 8px;
-}
-.agone .demon-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.agone .demon-info {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-}
-.agone .demon-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.agone .demon-nom { font-weight: 600; font-size: 13px; color: var(--agone-txt-rouge, #5a1530); }
-.agone .demon-stat {
-  font-size: 11px;
-  color: rgba(var(--agone-rouge-rgb, 90,21,48), 0.85);
-  white-space: nowrap;
-}
-.agone .demon-creation-badge {
-  font-size: 11px;
-  font-style: italic;
-  color: rgba(var(--agone-rouge-rgb, 90,21,48), 0.75);
-}
-.agone .demon-stats-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-}
-.agone .demon-stat-row {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 11px;
-  white-space: nowrap;
-}
-.agone .demon-stat-row label {
-  color: rgba(var(--agone-rouge-rgb, 90,21,48), 0.8);
-  font-size: 11px;
-  white-space: nowrap;
-}
-.agone .demon-inline-num {
-  width: 40px;
-  text-align: center;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.45);
-  border: 1px solid rgba(var(--agone-rouge-rgb, 120,30,60), 0.30);
-  border-radius: 3px;
-  color: var(--agone-dark-text, #2a1a08);
-  font-size: 12px;
-  padding: 1px 2px;
-  -moz-appearance: textfield;
-}
-.agone .demon-inline-num::-webkit-outer-spin-button,
-.agone .demon-inline-num::-webkit-inner-spin-button { -webkit-appearance: none; }
-.agone .demon-valider-btn {
-  background: rgba(var(--agone-vert-rgb, 26,107,48), 0.13);
-  border: 1px solid rgba(var(--agone-vert-rgb, 26,107,48), 0.45);
-  color: var(--agone-txt-vert, #1a6b30);
-  border-radius: 3px;
-  padding: 2px 8px;
-  font-size: 11px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.agone .demon-valider-btn:hover { background: rgba(var(--agone-vert-rgb, 26,107,48), 0.28); }
-.agone .demon-recrea-btn {
-  background: transparent;
-  border: 1px solid rgba(var(--agone-rouge-rgb, 120,30,60), 0.30);
-  border-radius: 3px;
-  padding: 2px 5px;
-  cursor: pointer;
-  color: rgba(var(--agone-rouge-rgb, 90,21,48), 0.8);
-  font-size: 12px;
-  opacity: 0.7;
-}
-.agone .demon-recrea-btn:hover { opacity: 1; background: rgba(var(--agone-rouge-rgb, 120,30,60), 0.08); }
 
 /* ── Arts Magiques ───────────────────────────────────────── */
 .agone .arts-domaines-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12px; }
@@ -846,7 +652,7 @@
 .agone .arts-spe-hint {
   display: block;
   font-size: 10px;
-  color: var(--agone-txt-brun, #8a5a00);
+  color: var(--agone-txt-brun-roux);
   font-style: italic;
   line-height: 1.2;
   margin-bottom: 1px;
@@ -859,7 +665,7 @@
 }
 .agone .arts-comp-liee-score {
   font-size: 10px;
-  color: var(--agone-brown, #8a6a30);
+  color: var(--agone-brown);
   white-space: nowrap;
 }
 .agone .arts-comp-liee-nom {
@@ -868,7 +674,7 @@
   opacity: 0.75;
 }
 .agone .arts-comp-liee-manquante {
-  color: var(--agone-txt-rouge, #a05050);
+  color: var(--agone-txt-rouge-clair);
   opacity: 0.7;
 }
 .agone .arts-levelup-pair {
@@ -883,8 +689,8 @@
   white-space: nowrap;
 }
 .agone .arts-levelup-pair .levelup-btn-liee {
-  background: var(--agone-fond-brun, #e8d8b8);
-  border-color: var(--agone-txt-brun, #8a6a3a);
+  background: var(--agone-fond-brun-fonce);
+  border-color: var(--agone-txt-brun-clair);
 }
 .agone .arts-levelup-absent {
   font-size: 0.72em;
@@ -899,10 +705,6 @@
 .agone .man-col-dom     { width: 68px; text-align: center; font-size: 0.78em; white-space: nowrap; }
 .agone .man-col-actions { width: 46px; text-align: right; white-space: nowrap; }
 
-.agone .man-has-desc, .agone .peine-has-desc {
-  font-size: 9px;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.45);
-}
 
 /* ── Descriptions pliables (helpers/descriptions.mjs) ───────────────────────── */
 .agone .desc-bascule,
@@ -923,7 +725,7 @@
   line-height: 1;
   font-size: 9px;
   cursor: pointer;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.45);
+  color: rgba(var(--agone-encre-rgb), 0.45);
   border-radius: 50%;
 }
 .agone .desc-bascule-tout { font-size: 10px; }
@@ -936,15 +738,15 @@
 .agone .desc-bascule:focus-visible,
 .agone .desc-bascule-tout:focus-visible,
 .agone .desc-bascule[aria-expanded="true"] {
-  color: var(--agone-gold, #c9a227);
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+  color: var(--agone-gold);
+  background: rgba(var(--agone-or-rgb), 0.12);
 }
 .agone .desc-bascule-vide { display: inline-block; width: 16px; flex: 0 0 16px; }
 .agone .desc-pliable[hidden] { display: none !important; }
 .agone .desc-pliable { animation: agone-desc-ouvre 0.15s ease-out; }
 @keyframes agone-desc-ouvre { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
 .agone .desc-ligne.desc-ouverte > td,
-.agone li.desc-ligne.desc-ouverte { background: rgba(var(--agone-or-rgb, 201,162,39), 0.06); }
+.agone li.desc-ligne.desc-ouverte { background: rgba(var(--agone-or-rgb), 0.06); }
 .agone.desc-lignes-cliquables .desc-ligne:has(.desc-bascule) { cursor: pointer; }
 .agone .desc-col,
 .agone .man-col-toggle,
@@ -956,7 +758,7 @@
   color: var(--agone-brown);
   line-height: 1.45;
   padding: 3px 6px;
-  border-left: 2px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.2);
+  border-left: 2px solid rgba(var(--agone-brun-rgb), 0.2);
   margin-left: 4px;
 }
 .agone .item-desc-content p { margin: 0 0 3px; }
@@ -981,7 +783,7 @@
 .agone .man-condition {
   font-size: 0.72em;
   font-style: italic;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.5);
+  color: rgba(var(--agone-encre-rgb), 0.5);
   margin-top: 1px;
   line-height: 1.2;
 }
@@ -999,38 +801,28 @@
   flex-shrink: 0;
 }
 .agone .man-badge-manoeuvre {
-  background: rgba(var(--agone-bleu-rgb, 80,110,200), 0.14);
-  color: var(--agone-txt-bleu, #2a50a0);
-  border: 1px solid rgba(var(--agone-bleu-rgb, 80,110,200), 0.4);
+  background: rgba(var(--agone-bleu-rgb), 0.14);
+  color: var(--agone-txt-bleu);
+  border: 1px solid rgba(var(--agone-bleu-rgb), 0.4);
 }
 .agone .man-badge-botte {
-  background: rgba(var(--agone-orange-rgb, 200,120,40), 0.16);
-  color: var(--agone-txt-brun, #7a3a00);
-  border: 1px solid rgba(var(--agone-orange-rgb, 200,120,40), 0.4);
+  background: rgba(var(--agone-orange-rgb), 0.16);
+  color: var(--agone-txt-brun-roux);
+  border: 1px solid rgba(var(--agone-orange-rgb), 0.4);
 }
 
 /* Valeur numérique colorée */
 .agone .man-val         { display: inline-block; min-width: 24px; text-align: center; border-radius: 3px; padding: 0 2px; }
-.agone .man-val-pos     { color: var(--agone-txt-vert, #1a7a1a); background: rgba(var(--agone-vert-rgb, 30,140,30), 0.08); }
-.agone .man-val-neg     { color: var(--agone-txt-rouge, #a01818); background: rgba(var(--agone-rouge-rgb, 180,30,30), 0.08); }
-.agone .man-val-zero    { color: rgba(var(--agone-encre-rgb, 60,35,15), 0.4); }
-.agone .man-val-var     { color: rgba(var(--agone-encre-rgb, 60,35,15), 0.4); font-style: italic; font-size: 0.9em; }
+.agone .man-val-pos     { color: var(--agone-txt-vert); background: rgba(var(--agone-vert-rgb), 0.08); }
+.agone .man-val-neg     { color: var(--agone-txt-rouge); background: rgba(var(--agone-rouge-rgb), 0.08); }
+.agone .man-val-zero    { color: rgba(var(--agone-encre-rgb), 0.4); }
+.agone .man-val-var     { color: rgba(var(--agone-encre-rgb), 0.4); font-style: italic; font-size: 0.9em; }
 
 /* Valeur DOM */
 .agone .man-dom {
   font-family: var(--font-mono, monospace);
   font-size: 0.78em;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.75);
-}
-
-/* Ligne expand description */
-.agone tr.man-desc-expand td.man-desc-cell {
-  font-size: 11px;
-  padding: 4px 12px 6px 32px;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.82);
-  font-style: italic;
-  background: rgba(var(--agone-encre-rgb, 0,0,0), 0.06);
-  border-top: 0;
+  color: rgba(var(--agone-encre-rgb), 0.75);
 }
 
 /* ============================================================
@@ -1039,9 +831,9 @@
 
 /* ── Carte Charges ───────────────────────────────────────── */
 .agone .charges-card {
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
-  border-radius: var(--radius, 4px);
+  background: rgba(var(--agone-surface-rgb), 0.35);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.25);
+  border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 12px;
 }
@@ -1050,18 +842,18 @@
   align-items: center;
   gap: 8px;
   padding: 5px 10px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.15);
 }
-.agone .charges-card-header i { color: var(--agone-gold, #c9a227); font-size: 13px; }
+.agone .charges-card-header i { color: var(--agone-gold); font-size: 13px; }
 .agone .charges-card-title {
   font-family: 'MedievalSharp', Georgia, serif;
   font-size: 13px;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
 }
 .agone .charges-card-subtitle {
   font-size: 11px;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.65;
   font-style: italic;
   margin-left: 4px;
@@ -1081,19 +873,19 @@
   align-items: center;
   min-width: 50px;
   padding: 4px 8px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.05);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
+  background: rgba(var(--agone-brun-rgb), 0.05);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.12);
   border-radius: 4px;
 }
 .agone .charges-stat--main {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.1);
-  border-color: rgba(var(--agone-or-rgb, 201,162,39), 0.3);
+  background: rgba(var(--agone-or-rgb), 0.1);
+  border-color: rgba(var(--agone-or-rgb), 0.3);
 }
 .agone .charges-stat--solde { min-width: 56px; }
 .agone .charges-stat-label {
   font-size: 9px;
   text-transform: uppercase;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.7;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -1102,32 +894,32 @@
 .agone .charges-stat-val {
   font-size: 16px;
   font-weight: bold;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
   line-height: 1.1;
 }
 .agone .charges-stat-input {
   width: 46px;
   text-align: center;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
   border-radius: 3px;
   padding: 1px 3px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.55);
+  background: rgba(var(--agone-surface-rgb), 0.55);
   font-size: 15px;
   font-weight: bold;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
   font-family: 'Crimson Text', Georgia, serif;
 }
 .agone .charges-stat-input:focus {
   outline: none;
-  border-color: var(--agone-gold, #c9a227);
-  box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb, 201,162,39), 0.15);
+  border-color: var(--agone-gold);
+  box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb), 0.15);
 }
 
 /* Séparateur opérateur (+, -, =) */
 .agone .charges-stat-sep {
   font-size: 14px;
   font-weight: bold;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.5;
   padding: 0 2px;
   align-self: center;
@@ -1138,15 +930,15 @@
 }
 
 /* Couleurs des valeurs */
-.agone .charges-plus  { color: var(--agone-txt-vert, #2a7a35); }
-.agone .charges-moins { color: var(--agone-txt-rouge, #8a2020); }
-.agone .charges-disponibles { color: var(--agone-brown, #5c3a1e); }
-.agone .charges-ok     { color: var(--agone-txt-vert, #2a7a35); }
-.agone .charges-deficit{ color: var(--agone-txt-rouge, #8a1a1a); }
+.agone .charges-plus  { color: var(--agone-txt-vert); }
+.agone .charges-moins { color: var(--agone-txt-rouge); }
+.agone .charges-disponibles { color: var(--agone-brown); }
+.agone .charges-ok     { color: var(--agone-txt-vert); }
+.agone .charges-deficit{ color: var(--agone-txt-rouge); }
 
 .agone .charges-note {
   font-size: 11px;
-  color: var(--agone-txt-brun, #7a4500);
+  color: var(--agone-txt-brun-roux);
   margin: 6px 0 0;
   display: flex;
   align-items: center;
@@ -1160,7 +952,7 @@
   gap: 0 12px;
   align-items: start;
 }
-@media (max-width: 580px) {
+@container agone-fiche (max-width: 580px) {
   .agone .av-def-grid { grid-template-columns: 1fr; }
 }
 
@@ -1171,7 +963,7 @@
   gap: 6px;
   padding: 4px 6px;
   margin-bottom: 4px;
-  border-bottom: 2px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  border-bottom: 2px solid rgba(var(--agone-brun-rgb), 0.15);
 }
 .agone .av-col-title {
   flex: 1;
@@ -1179,21 +971,21 @@
   font-size: 13px;
   margin: 0;
 }
-.agone .av-title { color: var(--agone-txt-vert, #1a6a35); }
-.agone .av-title i { color: var(--agone-gold, #c9a227); }
-.agone .def-title { color: var(--agone-txt-rouge, #7a1a1a); }
-.agone .def-title i { color: var(--agone-txt-rouge, #c04040); }
+.agone .av-title { color: var(--agone-txt-vert); }
+.agone .av-title i { color: var(--agone-gold); }
+.agone .def-title { color: var(--agone-txt-rouge); }
+.agone .def-title i { color: var(--agone-txt-rouge-clair); }
 
 /* Don-row dans l'onglet avantages (surcharge magic.css) */
 .agone .av-col .don-row,
 .agone .def-col .don-row {
   gap: 5px;
   background: transparent;
-  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  border-bottom: 1px dotted rgba(var(--agone-brun-rgb), 0.15);
   padding: 3px 4px;
 }
 .agone .av-col .don-row:hover,
-.agone .def-col .don-row:hover { background: rgba(var(--agone-or-rgb, 201,162,39), 0.06); }
+.agone .def-col .don-row:hover { background: rgba(var(--agone-or-rgb), 0.06); }
 
 /* Badge de section thématique */
 .agone .av-section-badge {
@@ -1208,15 +1000,15 @@
   flex-shrink: 0;
 }
 /* Couleurs par section */
-.agone .av-sect-ame      { background: rgba(var(--agone-violet-rgb, 140,60,160), 0.13); color: var(--agone-txt-violet, #5a106a); border: 1px solid rgba(var(--agone-violet-rgb, 140,60,160), 0.3); }
-.agone .av-sect-corps    { background: rgba(var(--agone-orange-rgb, 180,70,20), 0.12);  color: var(--agone-txt-orange, #7a2a00); border: 1px solid rgba(var(--agone-orange-rgb, 180,70,20), 0.3);  }
-.agone .av-sect-esprit   { background: rgba(var(--agone-bleu-rgb, 30,100,180), 0.12); color: var(--agone-txt-bleu, #103070); border: 1px solid rgba(var(--agone-bleu-rgb, 30,100,180), 0.3); }
-.agone .av-sect-societe  { background: rgba(var(--agone-vert-rgb, 40,130,60), 0.12);  color: var(--agone-txt-vert, #0a4a1a); border: 1px solid rgba(var(--agone-vert-rgb, 40,130,60), 0.3);  }
-.agone .av-sect-emprise  { background: rgba(var(--agone-orange-rgb, 200,130,0), 0.13);  color: var(--agone-txt-orange, #6a4000); border: 1px solid rgba(var(--agone-orange-rgb, 200,130,0), 0.3);  }
-.agone .av-sect-arts     { background: rgba(var(--agone-bleu-rgb, 60,120,180), 0.12); color: var(--agone-txt-bleu, #1a3870); border: 1px solid rgba(var(--agone-bleu-rgb, 60,120,180), 0.3); }
-.agone .av-sect-saisons  { background: rgba(var(--agone-bleu-rgb, 30,160,140), 0.12); color: var(--agone-txt-vert, #0a5040); border: 1px solid rgba(var(--agone-bleu-rgb, 30,160,140), 0.3); }
-.agone .av-sect-flamme   { background: rgba(var(--agone-rouge-rgb, 200,60,20), 0.13);  color: var(--agone-txt-rouge, #6a1800); border: 1px solid rgba(var(--agone-rouge-rgb, 200,60,20), 0.3);  }
-.agone .av-sect-charge    { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);   color: var(--agone-txt-brun, #4a2800); border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25); }
+.agone .av-sect-ame      { background: rgba(var(--agone-violet-rgb), 0.13); color: var(--agone-txt-violet); border: 1px solid rgba(var(--agone-violet-rgb), 0.3); }
+.agone .av-sect-corps    { background: rgba(var(--agone-orange-rgb), 0.12);  color: var(--agone-txt-orange-fonce); border: 1px solid rgba(var(--agone-orange-rgb), 0.3);  }
+.agone .av-sect-esprit   { background: rgba(var(--agone-bleu-rgb), 0.12); color: var(--agone-txt-bleu); border: 1px solid rgba(var(--agone-bleu-rgb), 0.3); }
+.agone .av-sect-societe  { background: rgba(var(--agone-vert-rgb), 0.12);  color: var(--agone-txt-vert); border: 1px solid rgba(var(--agone-vert-rgb), 0.3);  }
+.agone .av-sect-emprise  { background: rgba(var(--agone-orange-rgb), 0.13);  color: var(--agone-txt-orange-fonce); border: 1px solid rgba(var(--agone-orange-rgb), 0.3);  }
+.agone .av-sect-arts     { background: rgba(var(--agone-bleu-rgb), 0.12); color: var(--agone-txt-bleu); border: 1px solid rgba(var(--agone-bleu-rgb), 0.3); }
+.agone .av-sect-saisons  { background: rgba(var(--agone-bleu-rgb), 0.12); color: var(--agone-txt-vert); border: 1px solid rgba(var(--agone-bleu-rgb), 0.3); }
+.agone .av-sect-flamme   { background: rgba(var(--agone-rouge-rgb), 0.13);  color: var(--agone-txt-rouge); border: 1px solid rgba(var(--agone-rouge-rgb), 0.3);  }
+.agone .av-sect-charge    { background: rgba(var(--agone-brun-rgb), 0.1);   color: var(--agone-txt-brun); border: 1px solid rgba(var(--agone-brun-rgb), 0.25); }
 
 /* Badge sur défaut : version plus atténuée */
 .agone .av-defaut-sect { opacity: 0.75; }
@@ -1225,27 +1017,24 @@
 .agone .av-cout-pos {
   font-size: 11px;
   font-weight: 700;
-  color: var(--agone-txt-vert, #1a6a35);
+  color: var(--agone-txt-vert);
   white-space: nowrap;
   flex-shrink: 0;
 }
 .agone .av-cout-neg {
   font-size: 11px;
   font-weight: 700;
-  color: var(--agone-txt-rouge, #8a1a1a);
+  color: var(--agone-txt-rouge);
   white-space: nowrap;
   flex-shrink: 0;
 }
-
-/* Placeholder pour aligner les lignes sans bouton description */
-.agone .don-desc-placeholder { width: 22px; flex-shrink: 0; }
 
 /* ── Bonus/Malus d'attributs supplémentaires ──────────────── */
 .agone .bonus-supp-section {
   margin-top: 16px;
   padding: 10px 12px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  background: rgba(var(--agone-brun-rgb), 0.04);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.15);
   border-radius: 6px;
 }
 .agone .bonus-supp-header {
@@ -1271,12 +1060,12 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 3px 6px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.2);
   color: var(--agone-brown);
   opacity: 0.7;
 }
 .agone .bonus-supp-table tbody tr {
-  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
+  border-bottom: 1px dotted rgba(var(--agone-brun-rgb), 0.1);
 }
 .agone .bonus-supp-table tbody tr:last-child { border-bottom: none; }
 .agone .bonus-supp-table td { padding: 3px 4px; vertical-align: middle; }
@@ -1286,9 +1075,9 @@
   width: 100%;
   font-size: 12px;
   padding: 2px 4px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.25);
   border-radius: 3px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.7);
+  background: rgba(var(--agone-surface-rgb), 0.7);
   color: var(--agone-brown);
 }
 .agone .bonus-supp-val { width: 54px; text-align: center; }
@@ -1308,7 +1097,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 6px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.2);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.2);
   padding-bottom: 3px;
 }
 .agone .sort-group-count {
@@ -1326,8 +1115,8 @@
   text-transform: uppercase;
   white-space: nowrap;
   letter-spacing: 0.4px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.30);
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.30);
+  background: rgba(var(--agone-brun-rgb), 0.10);
   color: var(--agone-brown);
 }
 .agone .sorts-cards-container {
@@ -1336,8 +1125,8 @@
   gap: 8px;
 }
 .agone .sort-card {
-  background: rgba(var(--agone-surface-rgb, 255,250,240), 0.8);
-  border: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.18);
+  background: rgba(var(--agone-surface-rgb), 0.8);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.18);
   border-radius: 6px;
   padding: 7px 8px 6px;
   display: flex;
@@ -1347,8 +1136,8 @@
   transition: box-shadow 0.15s, border-color 0.15s;
 }
 .agone .sort-card:hover {
-  box-shadow: 0 2px 8px rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
-  border-color: rgba(var(--agone-brun-rgb, 92,58,30), 0.35);
+  box-shadow: 0 2px 8px rgba(var(--agone-brun-rgb), 0.15);
+  border-color: rgba(var(--agone-brun-rgb), 0.35);
 }
 .agone .sort-card-top {
   display: flex;
@@ -1375,8 +1164,8 @@
 .agone .sort-card-name:hover { text-decoration: underline; }
 .agone .sort-type-badge {
   display: inline-block;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.20);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.20);
   border-radius: 8px;
   font-size: 9px;
   padding: 1px 6px;
@@ -1399,17 +1188,6 @@
   opacity: 0.75;
   margin-right: 2px;
 }
-.agone .sort-desc-panel {
-  font-size: 11px;
-  font-style: italic;
-  color: var(--color-text-dark-secondary, #555);
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
-  border-radius: 4px;
-  padding: 5px 7px;
-  line-height: 1.5;
-  border-top: 1px solid rgba(var(--agone-brun-rgb, 93,58,30), 0.12);
-  margin-top: 2px;
-}
 /* Actions sur leur propre ligne, sous le nom et les infos du sort : jamais de largeur réservée
    sur le nom, fond neutre tant que la carte n'est pas survolée. */
 .agone .sort-card-actions {
@@ -1426,8 +1204,8 @@
 }
 .agone .sort-card:hover .sort-card-actions,
 .agone .sort-card-actions:focus-within {
-  background: rgba(var(--agone-surface-rgb, 255,250,240), 0.96);
-  border-color: rgba(var(--agone-brun-rgb, 93,58,30), 0.15);
+  background: rgba(var(--agone-surface-rgb), 0.96);
+  border-color: rgba(var(--agone-brun-rgb), 0.15);
 }
 .agone .sort-card-actions a,
 .agone .sort-card-actions span {

@@ -33,13 +33,13 @@ export class PeinesBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-peines-browser",
+    id      : "agone-peines-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "peines-browser"],
     actions : { addPeine: PeinesBrowser.#onAddPeine },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/peines-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/peines-browser.hbs", scrollable: [".pnb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -47,9 +47,8 @@ export class PeinesBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
-    const actorPeineNames = new Set(
-      this.actor.items.filter(i => i.type === "peine").map(i => i.name)
-    );
+    const actorPeineNames = this._nomsPossedes();
+    const catLabels = _buildCatLabels();
 
     let items = PEINES_PERFIDIE_DATA.map((d, idx) => {
       const bienfaitInfo = descriptionBienfaitPeine({ system: { bienfait: d.bienfait, bienfaitDescription: "" } });
@@ -57,7 +56,7 @@ export class PeinesBrowser extends AgoneBrowser {
         idx          : String(idx),
         name         : d.name,
         categorie    : d.categorie,
-        categorieLabel: _buildCatLabels()[d.categorie] ?? d.categorie,
+        categorieLabel: catLabels[d.categorie] ?? d.categorie,
         noirEffect   : d.noirEffect,   // "corps" | "ame" | ""
         noirLabel    : d.noirEffect === "corps" ? game.i18n.localize("AGONE.Corps") : d.noirEffect === "ame" ? game.i18n.localize("AGONE.Ame") : "—",
         noirEffectLabel: d.noirEffect === "corps" ? game.i18n.localize("AGONE.PerfidieCorpsNoir1")
@@ -92,7 +91,7 @@ export class PeinesBrowser extends AgoneBrowser {
       filterCategorie : this._filterCategorie,
       filterNoir      : this._filterNoir,
       filterPossede   : this._filterPossede,
-      categories      : Object.entries(_buildCatLabels()).map(([k, v]) => ({ key: k, label: v })),
+      categories      : Object.entries(catLabels).map(([k, v]) => ({ key: k, label: v })),
     };
   }
 

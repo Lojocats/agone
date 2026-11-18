@@ -65,7 +65,7 @@
       <ul class="dons-list">
         {{#each avantages as |don|}}
         <li class="don-row item-row" data-item-id="{{don.id}}">
-          <span class="item-drag-handle col-drag"><i class="fas fa-grip-vertical"></i></span>
+          <span class="item-drag-handle col-drag" data-tooltip='{{localize "AGONE.Deplacer"}}' aria-label='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}}">{{don._avSectionLabel}}</span>
           {{/if}}
@@ -79,7 +79,7 @@
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
-          <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
+          <div class="item-desc-content don-desc-text">{{{lookup @root.descriptionsHTML don.id}}}</div>
         </li>
         {{/if}}
         {{/each}}
@@ -106,7 +106,7 @@
       <ul class="dons-list">
         {{#each defauts as |don|}}
         <li class="don-row item-row" data-item-id="{{don.id}}">
-          <span class="item-drag-handle col-drag"><i class="fas fa-grip-vertical"></i></span>
+          <span class="item-drag-handle col-drag" data-tooltip='{{localize "AGONE.Deplacer"}}' aria-label='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
           {{#if don._avSectionLabel}}
           <span class="av-section-badge av-sect-{{don._avSection}} av-defaut-sect">{{don._avSectionLabel}}</span>
           {{/if}}
@@ -120,7 +120,7 @@
         </li>
         {{#if don.system.description}}
         <li class="don-desc-li desc-pliable" data-desc-de="{{don.id}}" hidden>
-          <div class="item-desc-content don-desc-text">{{{don.system.description}}}</div>
+          <div class="item-desc-content don-desc-text">{{{lookup @root.descriptionsHTML don.id}}}</div>
         </li>
         {{/if}}
         {{/each}}

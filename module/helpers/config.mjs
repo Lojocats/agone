@@ -122,7 +122,7 @@ AGONE.attributs = {
 };
 
 // Malus de blessures graves [0 BG, 1 BG, 2 BG, 3 BG]
-AGONE.malusBlessuresGraves = [0, -1, -3, -6];
+AGONE.malusBlessuresGraves = [0, -2, -6, -12];
 
 // Liste des compétences { name, domaine (catégorie), attributLie }
 AGONE.competences = [
@@ -198,32 +198,32 @@ AGONE.saisons = {
 
 // ── Météo ────────────────────────────────────────────────────────────────────
 AGONE.meteoTypes = [
-  { id: "",           icon: "—",  label: "—"                    },
-  { id: "ensoleille", icon: "☀️", label: "AGONE.Meteo.ensoleille"            },
-  { id: "nuageux",    icon: "⛅", label: "AGONE.Meteo.nuageux"               },
-  { id: "pluie",      icon: "🌧️", label: "AGONE.Meteo.pluie"                 },
-  { id: "orage",      icon: "⛈️", label: "AGONE.Meteo.orage"                 },
-  { id: "brouillard", icon: "🌫️", label: "AGONE.Meteo.brouillard"             },
-  { id: "neige",      icon: "❄️", label: "AGONE.Meteo.neige"                 },
-  { id: "grele",      icon: "🌨️", label: "AGONE.Meteo.grele"                 },
-  { id: "blizzard",   icon: "🌪️", label: "AGONE.Meteo.blizzard"              },
-  { id: "chaleur",    icon: "🔆", label: "AGONE.Meteo.chaleur"    },
-  { id: "nuit",       icon: "🌙", label: "AGONE.Meteo.nuit"           },
-  { id: "automne",    icon: "🍂", label: "AGONE.Meteo.automne"         },
-  { id: "cendres",    icon: "🌋", label: "AGONE.Meteo.cendres"       },
-  { id: "brumechaleur",icon: "🌅",label: "AGONE.Meteo.brumechaleur"       },
+  { id: "",           icon: "fas fa-minus",  label: "—"                    },
+  { id: "ensoleille", icon: "fas fa-sun", label: "AGONE.Meteo.ensoleille"            },
+  { id: "nuageux",    icon: "fas fa-cloud-sun", label: "AGONE.Meteo.nuageux"               },
+  { id: "pluie",      icon: "fas fa-cloud-rain", label: "AGONE.Meteo.pluie"                 },
+  { id: "orage",      icon: "fas fa-cloud-bolt", label: "AGONE.Meteo.orage"                 },
+  { id: "brouillard", icon: "fas fa-smog", label: "AGONE.Meteo.brouillard"             },
+  { id: "neige",      icon: "fas fa-snowflake", label: "AGONE.Meteo.neige"                 },
+  { id: "grele",      icon: "fas fa-cloud-meatball", label: "AGONE.Meteo.grele"                 },
+  { id: "blizzard",   icon: "fas fa-wind", label: "AGONE.Meteo.blizzard"              },
+  { id: "chaleur",    icon: "fas fa-temperature-high", label: "AGONE.Meteo.chaleur"    },
+  { id: "nuit",       icon: "fas fa-moon", label: "AGONE.Meteo.nuit"           },
+  { id: "automne",    icon: "fas fa-leaf", label: "AGONE.Meteo.automne"         },
+  { id: "cendres",    icon: "fas fa-volcano", label: "AGONE.Meteo.cendres"       },
+  { id: "brumechaleur",icon: "fas fa-sun-haze",label: "AGONE.Meteo.brumechaleur"       },
 ];
 
 // ── Phases de lune (cycle 28 jours) ─────────────────────────────────────────
 AGONE.phasesLune = [
-  { icon: "🌑", label: "AGONE.Lune.Nouvelle"     },
-  { icon: "🌒", label: "AGONE.Lune.PremierCroissant" },
-  { icon: "🌓", label: "AGONE.Lune.PremierQuartier"  },
-  { icon: "🌔", label: "AGONE.Lune.GibbeuseCroissante" },
-  { icon: "🌕", label: "AGONE.Lune.Pleine"       },
-  { icon: "🌖", label: "AGONE.Lune.GibbeuseDecroissante" },
-  { icon: "🌗", label: "AGONE.Lune.DernierQuartier"  },
-  { icon: "🌘", label: "AGONE.Lune.DernierCroissant" },
+  { icon: "far fa-circle", label: "AGONE.Lune.Nouvelle"     },
+  { icon: "fas fa-moon fa-flip-horizontal", label: "AGONE.Lune.PremierCroissant" },
+  { icon: "fas fa-circle-half-stroke fa-flip-horizontal", label: "AGONE.Lune.PremierQuartier"  },
+  { icon: "fas fa-circle-three-quarters-stroke fa-flip-horizontal", label: "AGONE.Lune.GibbeuseCroissante" },
+  { icon: "fas fa-circle", label: "AGONE.Lune.Pleine"       },
+  { icon: "fas fa-circle-three-quarters-stroke", label: "AGONE.Lune.GibbeuseDecroissante" },
+  { icon: "fas fa-circle-half-stroke", label: "AGONE.Lune.DernierQuartier"  },
+  { icon: "fas fa-moon", label: "AGONE.Lune.DernierCroissant" },
 ];
 
 // ── Calendrier d'Harmonde (10 mois x 30 jours) ──────────────────────────────

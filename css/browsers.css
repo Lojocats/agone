@@ -8,7 +8,7 @@
    SORTS BROWSER
    ══════════════════════════════════════════════════════════ */
 .sorts-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -23,34 +23,25 @@
   font-size: 13px;
 }
 .sorts-browser .sb-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.sorts-browser .sb-table tbody tr.sb-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .sorts-browser .sb-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
-}
-.sorts-browser .sb-table .sb-desc-row td {
-  padding: 4px 12px 8px 28px;
-  font-size: 12px;
-  font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
-  color: var(--color-text-dark-secondary, #555);
-  line-height: 1.5;
 }
 .sorts-browser .sb-impro-btn,
 .sorts-browser .sb-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
@@ -59,15 +50,15 @@
 }
 .sorts-browser .sb-impro-btn:hover,
 .sorts-browser .sb-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
 
 /* ══════════════════════════════════════════════════════════
    ARMES BROWSER
    ══════════════════════════════════════════════════════════ */
 .armes-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -82,48 +73,39 @@
   font-size: 13px;
 }
 .armes-browser .ab-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.armes-browser .ab-table tbody tr.ab-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .armes-browser .ab-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
 }
-.armes-browser .ab-table .ab-desc-row td {
-  padding: 4px 12px 8px 28px;
-  font-size: 12px;
-  font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
-  color: var(--color-text-dark-secondary, #555);
-  line-height: 1.5;
-}
 .armes-browser .ab-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   cursor: pointer;
 }
 .armes-browser .ab-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
 
 /* ══════════════════════════════════════════════════════════
    ARMURES BROWSER
    ══════════════════════════════════════════════════════════ */
 .armures-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -138,48 +120,39 @@
   font-size: 13px;
 }
 .armures-browser .arb-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.armures-browser .arb-table tbody tr.arb-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .armures-browser .arb-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
 }
-.armures-browser .arb-table .arb-desc-row td {
-  padding: 4px 12px 8px 28px;
-  font-size: 12px;
-  font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
-  color: var(--color-text-dark-secondary, #555);
-  line-height: 1.5;
-}
 .armures-browser .arb-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   cursor: pointer;
 }
 .armures-browser .arb-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
 
 /* ══════════════════════════════════════════════════════════
    AVANTAGES BROWSER
    ══════════════════════════════════════════════════════════ */
 .avantages-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -194,34 +167,27 @@
   font-size: 13px;
 }
 .avantages-browser .avb-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.avantages-browser .avb-table tbody tr.avb-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .avantages-browser .avb-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
 }
 .avantages-browser .avb-table .avb-desc-row td {
   padding: 4px 12px 8px 28px;
   font-size: 12px;
   font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
+  background: rgba(var(--agone-brun-rgb), 0.04);
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
-}
-.avantages-browser .avb-table .avb-prerequis-row td {
-  padding: 2px 12px 6px 28px;
-  font-size: 11px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
-  color: var(--agone-txt-brun, #6a4a00);
 }
 .avantages-browser .avb-badge {
   display: inline-block;
@@ -231,71 +197,29 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(var(--agone-bleu-rgb, 80,110,200), 0.14);
-  color: var(--agone-txt-bleu, #2a40a0);
-  border: 1px solid rgba(var(--agone-bleu-rgb, 80,110,200), 0.35);
+  background: rgba(var(--agone-bleu-rgb), 0.14);
+  color: var(--agone-txt-bleu);
+  border: 1px solid rgba(var(--agone-bleu-rgb), 0.35);
 }
 .avantages-browser .avb-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   cursor: pointer;
 }
 .avantages-browser .avb-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
-
-/* ══════════════════════════════════════════════════════════
-   CHARGES-COMPTEUR (popup)
-   ══════════════════════════════════════════════════════════ */
-.charges-compteur.window-app .window-content {
-  background: var(--agone-parchment, #f4e8c1);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-family: 'Crimson Text', Georgia, serif;
-}
-.charges-compteur .charges-titre {
-  font-family: 'MedievalSharp', Georgia, serif;
-  font-size: 14px;
-  color: var(--agone-brown, #5c3a1e);
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  padding-bottom: 4px;
-  margin-bottom: 4px;
-}
-.charges-compteur .charges-ligne {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-.charges-compteur .charges-ligne label {
-  flex: 1;
-  color: var(--agone-dark-text, #2a1a08);
-}
-.charges-compteur .charges-input {
-  width: 54px;
-  text-align: center;
-  padding: 2px 4px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.35);
-  border-radius: 3px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.55);
-  font-size: 13px;
-  color: var(--agone-dark-text, #2a1a08);
-}
-.charges-compteur .charges-ok { color: var(--agone-txt-vert, #2a6a28); font-weight: 600; }
-.charges-compteur .charges-deficit { color: var(--agone-red, #8b1a1a); font-weight: 600; }
 
 /* ══════════════════════════════════════════════════════════
    MANŒUVRES BROWSER
    ══════════════════════════════════════════════════════════ */
 .manoeuvres-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -310,26 +234,25 @@
   font-size: 13px;
 }
 .manoeuvres-browser .mb-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.manoeuvres-browser .mb-table tbody tr.mb-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .manoeuvres-browser .mb-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
 }
 .manoeuvres-browser .mb-table .mb-desc-row td {
   padding: 4px 12px 8px 28px;
   font-size: 12px;
   font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
+  background: rgba(var(--agone-brun-rgb), 0.04);
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
@@ -341,9 +264,9 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(var(--agone-bleu-rgb, 80,110,200), 0.14);
-  color: var(--agone-txt-bleu, #2a50a0);
-  border: 1px solid rgba(var(--agone-bleu-rgb, 80,110,200), 0.4);
+  background: rgba(var(--agone-bleu-rgb), 0.14);
+  color: var(--agone-txt-bleu);
+  border: 1px solid rgba(var(--agone-bleu-rgb), 0.4);
 }
 .manoeuvres-browser .mb-badge-botte {
   display: inline-block;
@@ -353,22 +276,22 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(var(--agone-orange-rgb, 200,120,40), 0.16);
-  color: var(--agone-txt-brun, #7a3a00);
-  border: 1px solid rgba(var(--agone-orange-rgb, 200,120,40), 0.4);
+  background: rgba(var(--agone-orange-rgb), 0.16);
+  color: var(--agone-txt-brun-roux);
+  border: 1px solid rgba(var(--agone-orange-rgb), 0.4);
 }
 .manoeuvres-browser .mb-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   cursor: pointer;
 }
 .manoeuvres-browser .mb-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
 
 /* Largeurs des colonnes */
@@ -393,7 +316,7 @@
 .manoeuvres-browser .mb-dom {
   font-size: 12px;
   font-weight: 600;
-  color: var(--agone-txt-brun, #7a3a00);
+  color: var(--agone-txt-brun-roux);
 }
 .manoeuvres-browser .mb-condition {
   font-size: 11px;
@@ -417,7 +340,7 @@
    COMPÉTENCES BROWSER
    ══════════════════════════════════════════════════════════ */
 .competences-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -437,28 +360,19 @@
   font-size: 13px;
 }
 .competences-browser .cb-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.competences-browser .cb-table tbody tr.cb-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .competences-browser .cb-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
-}
-.competences-browser .cb-table .cb-desc-row td {
-  padding: 4px 12px 8px 28px;
-  font-size: 12px;
-  font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
-  color: var(--color-text-dark-secondary, #555);
-  line-height: 1.5;
 }
 .competences-browser .cb-fam-badge {
   display: inline-block;
@@ -468,9 +382,9 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
-  color: var(--agone-brown, #5c3a1e);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  background: rgba(var(--agone-brun-rgb), 0.12);
+  color: var(--agone-brown);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
 }
 .competences-browser .cb-count-badge {
   display: inline-block;
@@ -479,29 +393,29 @@
   padding: 1px 6px;
   font-weight: 700;
   white-space: nowrap;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  color: var(--agone-txt-jaune, #7a5a00);
-  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.4);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  color: var(--agone-txt-jaune);
+  border: 1px solid rgba(var(--agone-or-rgb), 0.4);
 }
 .competences-browser .cb-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   cursor: pointer;
 }
 .competences-browser .cb-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
 
 /* ══════════════════════════════════════════════════════════
    PEUPLES BROWSER
    ══════════════════════════════════════════════════════════ */
 .peuples-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -510,91 +424,11 @@
   overflow-y: auto;
 }
 
-.peuples-browser .pb-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 10px;
-}
-.peuples-browser .pb-card {
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.5);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
-  border-radius: var(--radius, 4px);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: box-shadow 0.15s;
-}
-.peuples-browser .pb-card:hover { box-shadow: 0 2px 8px rgba(var(--agone-brun-rgb, 92,58,30), 0.2); }
-.peuples-browser .pb-card-name {
-  font-family: 'MedievalSharp', Georgia, serif;
-  font-size: 14px;
-  color: var(--agone-brown, #5c3a1e);
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
-  padding-bottom: 4px;
-}
-.peuples-browser .pb-card-desc {
-  font-size: 12px;
-  color: var(--agone-dark-text, #2a1a08);
-  line-height: 1.5;
-  flex: 1;
-  font-style: italic;
-}
-.peuples-browser .pb-badge-saison {
-  display: inline-block;
-  border-radius: 10px;
-  font-size: 9px;
-  padding: 1px 6px;
-  font-weight: 700;
-  text-transform: uppercase;
-  white-space: nowrap;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.12);
-  color: var(--agone-brown, #5c3a1e);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-}
-.peuples-browser .pb-card-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px 8px;
-  font-size: 11px;
-  color: var(--agone-brown, #5c3a1e);
-}
-.peuples-browser .pb-stat-pill {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
-  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.3);
-  border-radius: 10px;
-  padding: 1px 6px;
-  white-space: nowrap;
-}
-.peuples-browser .pb-select-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
-  border-radius: 3px;
-  padding: 3px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  align-self: flex-end;
-  transition: background 0.15s;
-}
-.peuples-browser .pb-select-btn:hover {
-  background: var(--agone-gold, #c9a227);
-  color: var(--agone-dark-text, #2a1a08);
-  border-color: var(--agone-brown, #5c3a1e);
-}
-.peuples-browser .pb-no-results {
-  text-align: center;
-  padding: 20px;
-  font-style: italic;
-  color: var(--agone-brown, #5c3a1e);
-  opacity: 0.7;
-}
-
 /* ══════════════════════════════════════════════════════════
    POUVOIRS BROWSER
    ══════════════════════════════════════════════════════════ */
 .pouvoirs-browser .window-content {
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -609,26 +443,25 @@
   font-size: 13px;
 }
 .pouvoirs-browser .pvb-table thead th {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.1);
+  color: var(--agone-brown);
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: left;
-  border-bottom: 1px solid var(--agone-border, #7d5a2a);
+  border-bottom: 1px solid var(--agone-border);
 }
-.pouvoirs-browser .pvb-table tbody tr.pvb-main-row:hover td { background: rgba(var(--agone-or-rgb, 201,162,39), 0.08); }
 .pouvoirs-browser .pvb-table tbody td {
   padding: 3px 8px;
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.10);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.10);
   vertical-align: middle;
 }
 .pouvoirs-browser .pvb-table .pvb-desc-row td {
   padding: 4px 12px 8px 28px;
   font-size: 12px;
   font-style: italic;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.04);
+  background: rgba(var(--agone-brun-rgb), 0.04);
   color: var(--color-text-dark-secondary, #555);
   line-height: 1.5;
 }
@@ -640,9 +473,9 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(var(--agone-orange-rgb, 200,80,20), 0.14);
-  color: var(--agone-txt-rouge, #802000);
-  border: 1px solid rgba(var(--agone-orange-rgb, 200,80,20), 0.35);
+  background: rgba(var(--agone-orange-rgb), 0.14);
+  color: var(--agone-txt-rouge);
+  border: 1px solid rgba(var(--agone-orange-rgb), 0.35);
 }
 .pouvoirs-browser .pvb-badge-saisonin {
   display: inline-block;
@@ -652,22 +485,22 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  background: rgba(var(--agone-vert-rgb, 60,130,80), 0.14);
-  color: var(--agone-txt-vert, #1a5a30);
-  border: 1px solid rgba(var(--agone-vert-rgb, 60,130,80), 0.35);
+  background: rgba(var(--agone-vert-rgb), 0.14);
+  color: var(--agone-txt-vert);
+  border: 1px solid rgba(var(--agone-vert-rgb), 0.35);
 }
 .pouvoirs-browser .pvb-add-btn {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
-  color: var(--agone-brown, #5c3a1e);
+  background: rgba(var(--agone-brun-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
+  color: var(--agone-brown);
   border-radius: 3px;
   padding: 1px 6px;
   font-size: 11px;
   cursor: pointer;
 }
 .pouvoirs-browser .pvb-add-btn:hover {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.15);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.15);
+  border-color: var(--agone-gold);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -700,16 +533,16 @@
   max-height: 40%;
   overflow-y: auto;
   margin-top: 8px;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
-  border-radius: var(--radius, 4px);
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.25);
+  border-radius: var(--radius);
+  background: rgba(var(--agone-surface-rgb), 0.35);
 }
 .agone-browser .browser-perso > summary {
   cursor: pointer;
   padding: 4px 8px;
   font-weight: 600;
   color: var(--agone-brown);
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
+  background: rgba(var(--agone-or-rgb), 0.12);
 }
 .agone-browser .browser-perso-count {
   font-weight: normal;
@@ -719,7 +552,7 @@
   margin: 6px 8px;
   font-size: 12px;
   font-style: italic;
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.7);
+  color: rgba(var(--agone-encre-rgb), 0.7);
 }
 .agone-browser .browser-perso-table {
   width: 100%;
@@ -728,7 +561,7 @@
 }
 .agone-browser .browser-perso-table td {
   padding: 3px 8px;
-  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  border-bottom: 1px dotted rgba(var(--agone-brun-rgb), 0.2);
   vertical-align: middle;
 }
 .agone-browser .browser-perso-nom {
@@ -747,7 +580,7 @@
   font-size: 10px;
 }
 .agone-browser .browser-perso-source {
-  color: rgba(var(--agone-encre-rgb, 60,35,15), 0.65);
+  color: rgba(var(--agone-encre-rgb), 0.65);
   font-style: italic;
   white-space: nowrap;
 }
@@ -756,23 +589,23 @@
   white-space: nowrap;
 }
 .agone-browser .browser-perso-possede {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.08);
+  background: rgba(var(--agone-or-rgb), 0.08);
 }
 
 /* ── Recherche : correspondances surlignées, résultats approchants ── */
 .agone-browser mark.agone-surligne {
   padding: 0 1px;
   border-radius: 2px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.45);
+  background: rgba(var(--agone-or-rgb), 0.45);
   color: inherit;
 }
 .agone-browser .browser-recherche-approx {
   margin: 4px 0;
   padding: 4px 8px;
-  border-left: 3px solid var(--agone-txt-orange, #c07820);
+  border-left: 3px solid var(--agone-txt-orange-clair);
   border-radius: 3px;
-  background: rgba(var(--agone-orange-rgb, 180,100,0), 0.1);
+  background: rgba(var(--agone-orange-rgb), 0.1);
   font-size: 12px;
   font-style: italic;
-  color: var(--agone-txt-orange, #a06010);
+  color: var(--agone-txt-orange);
 }

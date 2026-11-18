@@ -1,5 +1,5 @@
 /**
- * Onglets Combat & Équipement : jets de combat, arme équipée, calcul d'armure, manœuvres et pouvoirs.
+ * Onglets Combat & Équipement : jets de combat, arme équipée, armure portée, manœuvres et pouvoirs.
  */
 export const CombatMixin = Base => class extends Base {
 
@@ -8,24 +8,14 @@ export const CombatMixin = Base => class extends Base {
     // Jets de combat communs (initiative, attaque, parade, esquive, défense, Emprise,
     // manœuvres et pouvoirs au chat, jet de VOL à la 3e blessure grave) : AgoneActorSheet#_bindJetsCombat
     this._bindJetsCombat(on);
-    on("click", "[data-action='rollFumble']", this._onRollFumble.bind(this));
     on("click", "[data-action='rollBonusDe']", this._onRollBonusDe.bind(this));
 
-    // Armure portée — clic sur checkbox d'item
+    // Armure portée (une seule à la fois) : AgoneActorSheet#_onArmureItemPorteeChange.
+    // Ses valeurs sont lues sur l'item à la préparation des données (helpers/armure.mjs).
     on("change", ".armure-portee", this._onArmureItemPorteeChange.bind(this));
 
-    // Armure portée — calcul auto
-    on("change", "[name='system.armure.portee']", this._onArmurePorteeChange.bind(this));
-    on("change", "[name='system.armure.malusAgi']", this._onArmureMalusChange.bind(this));
-    on("change", "[name='system.armure.type']", this._onArmureMalusChange.bind(this));
-
-    // Arme équipée (tenue en main) — boucliers : sync actor.bouclier
+    // Arme équipée (tenue en main) — un seul bouclier équipé à la fois
     on("change", ".arme-equipe", this._onArmeEquipeChange.bind(this));
-  }
-
-  async _onRollFumble(event) {
-    event.preventDefault();
-    await this.actor.rollFumble();
   }
 
   async _onRollBonusDe(event) {
@@ -38,7 +28,10 @@ export const CombatMixin = Base => class extends Base {
     await this.actor.update({ "system.pdv.bonusDe": roll.total });
   }
 
-  // Arme équipée (tenue en main)
+  /**
+   * Arme équipée (tenue en main). Équiper un bouclier range les autres boucliers ; ses valeurs
+   * (défense, protection, malus d'AGI) sont lues sur l'item à la préparation des données.
+   */
   async _onArmeEquipeChange(event) {
     event.preventDefault();
     const el     = event.currentTarget;
@@ -47,89 +40,14 @@ export const CombatMixin = Base => class extends Base {
     const item   = this.actor.items.get(itemId);
     if (!item) return;
 
-    await item.update({ "system.equipe": equipe });
-
-    // Pour les boucliers : déséquiper les autres et synchroniser actor.bouclier
-    if (item.system.style === "bouclier") {
-      const updateBatch = this.actor.items
-        .filter(i => i.type === "arme" && i.system.style === "bouclier" && i.id !== itemId)
-        .map(i => ({ _id: i.id, "system.equipe": false }));
-      if (updateBatch.length) await this.actor.updateEmbeddedDocuments("Item", updateBatch);
-
-      if (equipe) {
-        await this.actor.update({
-          "system.bouclier.portee":       true,
-          "system.bouclier.nom":          item.name,
-          "system.bouclier.defenseBonus": item.system.defenseBonus ?? 0,
-          "system.bouclier.protection":   item.system.protection   ?? 0,
-          "system.bouclier.malusAgi":     item.system.malusAgi     ?? 0,
-        });
-      } else {
-        await this.actor.update({
-          "system.bouclier.portee":       false,
-          "system.bouclier.nom":          "",
-          "system.bouclier.defenseBonus": 0,
-          "system.bouclier.protection":   0,
-          "system.bouclier.malusAgi":     0,
-        });
+    const batch = [{ _id: itemId, "system.equipe": equipe }];
+    if (equipe && item.system.style === "bouclier") {
+      for (const autre of this.actor.items) {
+        if (autre.type === "arme" && autre.system.style === "bouclier" && autre.id !== itemId && autre.system.equipe) {
+          batch.push({ _id: autre.id, "system.equipe": false });
+        }
       }
     }
-  }
-
-  // Calcul automatique armure
-  async _onArmureItemPorteeChange(event) {
-    event.preventDefault();
-    const el     = event.currentTarget;
-    const itemId = el.dataset.itemId;
-    const portee = el.checked;
-
-    // Dé-équiper toutes les armures d'abord
-    const updateBatch = this.actor.items
-      .filter(i => i.type === "armure")
-      .map(i => ({ _id: i.id, "system.portee": i.id === itemId ? portee : false }));
-    await this.actor.updateEmbeddedDocuments("Item", updateBatch);
-
-    // Synchroniser les stats d'armure de l'acteur
-    if (portee) {
-      const item = this.actor.items.get(itemId);
-      if (item) {
-        await this.actor.update({
-          "system.armure.portee":     true,
-          "system.armure.nom":        item.name,
-          "system.armure.type":       item.system.type,
-          "system.armure.protection": item.system.protection,
-          "system.armure.malusAgi":   item.system.malusAgi,
-          "system.armure.malusPer":   item.system.malusPer
-        });
-      }
-    } else {
-      await this.actor.update({
-        "system.armure.portee":     false,
-        "system.armure.nom":        "",
-        "system.armure.protection": 0,
-        "system.armure.malusAgi":   0,
-        "system.armure.malusPer":   0
-      });
-    }
-  }
-
-  async _onArmurePorteeChange(event) {
-    const portee = event.currentTarget.checked;
-    if (!portee) {
-      await this.actor.update({
-        "system.armure.portee": false
-      });
-    }
-  }
-
-  async _onArmureMalusChange(event) {
-    // Déclenche la mise à jour pour recalculer malusPer
-    const form     = this.element.querySelector("form");
-    const malusAgi = parseInt(form?.querySelector("[name='system.armure.malusAgi']")?.value) || 0;
-    const type     = form?.querySelector("[name='system.armure.type']")?.value;
-    let malusPer = 0;
-    if (type === "1") malusPer = Math.floor(malusAgi / 2);
-    if (type === "2") malusPer = malusAgi;
-    await this.actor.update({ "system.armure.malusPer": malusPer });
+    await this.actor.updateEmbeddedDocuments("Item", batch);
   }
 };

@@ -11,11 +11,13 @@ import { AVANTAGES_EFFETS } from "./compendium-data.mjs";
  */
 export const EFFET_PREFIX = "flags.agone.effets.";
 
-const MODES = () => ({
-  add     : CONST.ACTIVE_EFFECT_MODES.ADD,
-  upgrade : CONST.ACTIVE_EFFECT_MODES.UPGRADE,
-  override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-});
+/**
+ * Modes numériques des modificateurs (valeurs de CONST.ACTIVE_EFFECT_MODES en v13).
+ * Écrites en dur : la constante est dépréciée en v14 (avertissement à chaque lecture), mais le
+ * cœur v14 convertit toujours ces mêmes nombres en types texte (`add`, `upgrade`, `override`)
+ * lors de la migration des `changes` ; la forme persistée reste donc valable.
+ */
+const MODES = Object.freeze({ add: 2, upgrade: 4, override: 5 });
 
 /** Valeurs neutres de chaque statistique (avant application des effets). */
 export function effetsNeutres() {
@@ -27,7 +29,7 @@ export function changeEffet(stat, value) {
   const def = CONFIG.AGONE.effets[stat] ?? {};
   return {
     key  : EFFET_PREFIX + stat,
-    mode : MODES()[def.mode ?? "add"],
+    mode : MODES[def.mode ?? "add"],
     value: String(def.booleen ? true : value),
   };
 }

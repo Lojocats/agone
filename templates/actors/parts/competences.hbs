@@ -67,16 +67,9 @@
                      class="stat-num inline-edit" data-item-id="{{comp.id}}" data-field="system.exp" />{{/if}}
               <select class="comp-card-attr-badge inline-edit" data-item-id="{{comp.id}}" data-field="system.attributLie"
                       data-tooltip='{{localize "AGONE.AttributLie"}}'>
-                <option value="agilite"      {{#if (eq comp.system.attributLie "agilite")}}selected{{/if}}>AGI</option>
-                <option value="force"        {{#if (eq comp.system.attributLie "force")}}selected{{/if}}>FOR</option>
-                <option value="perception"   {{#if (eq comp.system.attributLie "perception")}}selected{{/if}}>PER</option>
-                <option value="resistance"   {{#if (eq comp.system.attributLie "resistance")}}selected{{/if}}>RÉS</option>
-                <option value="intelligence" {{#if (eq comp.system.attributLie "intelligence")}}selected{{/if}}>INT</option>
-                <option value="volonte"      {{#if (eq comp.system.attributLie "volonte")}}selected{{/if}}>VOL</option>
-                <option value="charisma"     {{#if (eq comp.system.attributLie "charisma")}}selected{{/if}}>CHA</option>
-                <option value="creativite"   {{#if (eq comp.system.attributLie "creativite")}}selected{{/if}}>CRÉ</option>
-                <option value="melee"        {{#if (eq comp.system.attributLie "melee")}}selected{{/if}}>MÊL</option>
-                <option value="tir"          {{#if (eq comp.system.attributLie "tir")}}selected{{/if}}>TIR</option>
+                {{#each @root.attributsLies as |a|}}
+                <option value="{{a.value}}" {{#if (eq comp.system.attributLie a.value)}}selected{{/if}}>{{a.label}}</option>
+                {{/each}}
               </select>
             </div>
             {{#if @root.showLevelUp}}
@@ -100,7 +93,8 @@
           <div class="comp-card-actions">
             <a class="item-edit" data-item-id="{{comp.id}}" data-tooltip='{{localize "AGONE.Editer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Editer"}}'><i class="fas fa-edit"></i></a>
             <a class="item-delete" data-item-id="{{comp.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0" aria-label='{{localize "AGONE.Supprimer"}}'><i class="fas fa-trash"></i></a>
-            <span class="item-drag-handle" data-tooltip='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>
+            {{!-- Ordre manuel sans effet dans le tri par famille (alphabétique) : pas de poignée --}}
+            {{#unless @root.triCompsEstFamille}}<span class="item-drag-handle" data-tooltip='{{localize "AGONE.Deplacer"}}' aria-label='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></span>{{/unless}}
           </div>
         </div>
         {{/each}}

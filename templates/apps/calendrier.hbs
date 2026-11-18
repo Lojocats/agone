@@ -5,7 +5,7 @@
     <span class="cal-saison-badge">{{saisonLabel}}</span>
     <h2 class="cal-mois-nom">{{moisData.nom}}</h2>
     <div class="cal-header-right">
-      <span class="cal-moon-badge" data-tooltip="{{moonPhase.label}}">{{moonPhase.icon}}</span>
+      <span class="cal-moon-badge" data-tooltip="{{moonPhase.label}}"><i class="{{moonPhase.icon}}"></i></span>
       <span class="cal-an{{#if isGM}} cal-an-clickable{{/if}}"
             {{#if isGM}}data-open-year-picker="1" data-tooltip='{{localize "AGONE.Calendrier.ChangerAnnee"}}'{{/if}}>
         {{localize "AGONE.Calendrier.An"}} {{date.an}}
@@ -19,7 +19,7 @@
     <div class="cal-resume-infos">
       <span class="cal-periode" data-tooltip="{{periode.label}}"><i class="fas {{periode.icone}}"></i> {{periode.label}}</span>
       <span class="cal-heure"><i class="fas fa-clock"></i> {{timeStr}}</span>
-      <span class="cal-moon-label">{{moonPhase.icon}} {{moonPhase.label}}</span>
+      <span class="cal-moon-label"><i class="{{moonPhase.icon}}"></i> {{moonPhase.label}}</span>
     </div>
     <div class="cal-time-track" data-tooltip="{{timeStr}}">
       <div class="cal-time-marker" style="left:{{progressionJour}}%"></div>
@@ -30,15 +30,16 @@
   <div class="cal-meteo-row">
     <div class="cal-meteo-courante">
       <span class="cal-meteo-titre"><i class="fas fa-cloud-sun-rain"></i> {{localize "AGONE.Calendrier.Meteo"}}</span>
-      <span class="cal-meteo-icon">{{meteoIcon}}</span>
+      <span class="cal-meteo-icon"><i class="{{meteoIcon}}"></i></span>
       <span class="cal-meteo-label">{{meteoLabel}}</span>
     </div>
     {{#if isGM}}
     <div class="cal-meteo-choix">
       {{#each meteoTypes as |m|}}
       <button type="button" class="cal-meteo-btn{{#if (eq m.id @root.meteoId)}} actif{{/if}}" data-meteo="{{m.id}}"
-              data-tooltip="{{#if m.id}}{{localize m.label}}{{else}}{{localize "AGONE.Calendrier.SansMeteo"}}{{/if}}">
-        {{#if m.id}}{{m.icon}}{{else}}<i class="fas fa-ban"></i>{{/if}}
+              data-tooltip="{{#if m.id}}{{localize m.label}}{{else}}{{localize "AGONE.Calendrier.SansMeteo"}}{{/if}}"
+              aria-label="{{#if m.id}}{{localize m.label}}{{else}}{{localize "AGONE.Calendrier.SansMeteo"}}{{/if}}">
+        <i class="{{#if m.id}}{{m.icon}}{{else}}fas fa-ban{{/if}}"></i>
       </button>
       {{/each}}
     </div>
@@ -76,7 +77,7 @@
     <div class="cal-day{{#if j.actif}} today{{/if}}{{#if @root.isGM}} clickable{{/if}}{{#if j.hasNote}} has-note{{/if}}"
          {{#if @root.isGM}}data-jour="{{j.num}}"{{/if}}{{#if j.titre}} data-tooltip="{{j.titre}}"{{/if}}>
       <span class="cal-day-num">{{j.num}}</span>
-      {{#if j.lune}}<span class="cal-day-lune">{{j.lune}}</span>{{/if}}
+      {{#if j.lune}}<span class="cal-day-lune"><i class="{{j.lune}}"></i></span>{{/if}}
     </div>
     {{/each}}
   </div>

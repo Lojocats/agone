@@ -26,13 +26,13 @@ export class CompetencesBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-competences-browser",
+    id      : "agone-competences-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "competences-browser"],
     actions : { addCompetence: CompetencesBrowser.#onAddCompetence },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/competences-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/competences-browser.hbs", scrollable: [".cb-table-wrap", ".browser-perso"] },
   };
 
   get title() {

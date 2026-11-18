@@ -1,14 +1,18 @@
 {
   "name": "agone",
   "private": true,
-  "description": "Système Agone pour Foundry VTT — outillage de développement (lint)",
+  "description": "Système Agone pour Foundry VTT — outillage de développement (lint, tests)",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "lint": "eslint module tests",
     "lint:fix": "eslint module tests --fix",
     "lint:court": "eslint module tests --quiet",
     "test": "node --test \"tests/unit/*.test.mjs\"",
-    "test:court": "node --test --test-reporter=dot \"tests/unit/*.test.mjs\""
+    "test:court": "node --test --test-reporter=dot \"tests/unit/*.test.mjs\"",
+    "test:couverture": "node --test --experimental-test-coverage \"tests/unit/*.test.mjs\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

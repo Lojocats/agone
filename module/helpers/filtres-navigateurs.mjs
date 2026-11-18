@@ -77,6 +77,19 @@ export function conditionManoeuvreCorrespond(condition, filtre, peuples = []) {
   return categoriesConditionManoeuvre(condition, peuples).includes(filtre);
 }
 
+// ── Ajout d'un item ──────────────────────────────────────────────────────────
+
+/**
+ * Données `system` d'un item créé à partir d'une entrée des tables du livre de base :
+ * chaque champ de `defauts` est repris de l'entrée, ou vaut sa valeur par défaut s'il y est absent.
+ * @param {object} entree                 entrée d'une table (ARMES_DATA, SORTS_DATA…)
+ * @param {Record<string, *>} defauts     champs à reprendre et leur valeur par défaut
+ * @returns {Record<string, *>}
+ */
+export function systemDepuis(entree, defauts) {
+  return Object.fromEntries(Object.entries(defauts).map(([champ, defaut]) => [champ, entree?.[champ] ?? defaut]));
+}
+
 // ── Peuples ──────────────────────────────────────────────────────────────────
 
 /** Vrai si le peuple vole (vitesse de vol de base positive). */

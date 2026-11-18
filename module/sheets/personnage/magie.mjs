@@ -1,5 +1,7 @@
 import { artsMagiquesParDomaine, sortsContext, danseurMemoire } from "../actor-context.mjs";
 import { DANSEUR_TABLE } from "../../data/item-data.mjs";
+import { danseurDuSort, sortsDuDanseur } from "../../helpers/danseurs.mjs";
+import { cibleDepot } from "../../helpers/glisser.mjs";
 
 /**
  * Onglet Magie : sorts, danseurs (Emprise), Arts Magiques par domaine, glisser-déposer des sorts.
@@ -13,13 +15,15 @@ export const MagieMixin = Base => class extends Base {
 
     const danseurItems = actor.items.filter(i => i.type === "danseur")
       .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+    const bySort = (a, b) => (a.sort ?? 0) - (b.sort ?? 0);
     context.danseurs = danseurItems.map(d => {
-      const assignedSorts = actor.items
-        .filter(s => s.type === "sort" && s.system.danseurNom === d.name)
+      // Lien par id (system.danseurId) : renommer le danseur ne détache pas ses sorts
+      const assignedSorts = sortsDuDanseur(actor.items, d.id).sort(bySort)
         .map(s => ({ id: s.id, name: s.name, typeMagie: s.system.typeMagie, seuil: s.system.seuil, portee: s.system.portee, duree: s.system.duree, danse: s.system.danse, description: s.system.description ?? "" }));
+      // Sorts libres ou mémorisés par un autre danseur (dont le nom actuel est rappelé dans la liste)
       const autresSorts = actor.items
-        .filter(s => s.type === "sort" && s.system.danseurNom !== d.name)
-        .map(s => ({ id: s.id, name: s.name, seuil: s.system.seuil ?? 0, danseurNom: s.system.danseurNom || "" }));
+        .filter(s => s.type === "sort" && s.system.danseurId !== d.id)
+        .map(s => ({ id: s.id, name: s.name, seuil: s.system.seuil ?? 0, danseurNom: danseurDuSort(s, danseurItems)?.name ?? "" }));
       const sd = d.system;
 
       // Table officielle Agône (colonnes : niv 1–7)
@@ -91,7 +95,7 @@ export const MagieMixin = Base => class extends Base {
     });
 
     // Sorts : types présents (mini-filtre), groupes par seuil et selon le tri choisi
-    Object.assign(context, sortsContext(actor, context.sorts));
+    Object.assign(context, sortsContext(actor, context.sorts, danseurItems.map(d => d.id)));
 
     // Compétences Arts Magiques par domaine (Accord par instrument, Cyse, Décorum, Geste + domaines custom)
     context.artsMagiquesByDomaine = artsMagiquesParDomaine(system, context.competences, system.creativite?.score ?? 0);
@@ -105,8 +109,6 @@ export const MagieMixin = Base => class extends Base {
     // Emprise & danseurs (Emprise brute : AgoneActorSheet#_bindJetsCombat)
     on("click", "[data-action='rollEmprise']", this._onRollEmprise.bind(this));
     on("click", "[data-action='rollImprovisation']", this._onRollImprovisation.bind(this));
-
-    on("click", "[data-action='rollAptitudeMagie']", this._onRollAptitudeMagie.bind(this));
 
     // Drag & drop sorts → danseurs (mémorisation) + réordonnancement
     // Tracking mousedown pour détecter si le drag vient bien de la poignée
@@ -167,11 +169,6 @@ export const MagieMixin = Base => class extends Base {
     await this.actor.rollImprovisationDanseur(itemId);
   }
 
-  async _onRollAptitudeMagie(event) {
-    event.preventDefault();
-    await this.actor.rollAptitudeMagie();
-  }
-
   // Drag & drop sorts → danseurs
   _onDragSortStart(event) {
     // Drag uniquement si initié depuis la poignée (tracké via mousedown)
@@ -221,20 +218,19 @@ export const MagieMixin = Base => class extends Base {
   /** Mémorise un sort chez un danseur, en vérifiant que sa capacité restante le permet. */
   async _memoriserSort(danseur, sort) {
     const capaciteSeuil  = danseur.system.capaciteSeuil ?? (danseur.system.memoireMax * 5);
-    const assignedSorts  = this.actor.items.filter(i =>
-      i.type === "sort" && i.system.danseurNom === danseur.name
-    );
+    const assignedSorts  = sortsDuDanseur(this.actor.items, danseur.id);
     const memoireUtilisee = assignedSorts.reduce((sum, i) => sum + (i.system.seuil ?? 0), 0);
     const sortSeuil       = sort.system.seuil ?? 0;
 
     // Bloquer seulement si c'est un nouveau sort ET qu'il ne rentre plus
-    if (sort.system.danseurNom !== danseur.name && capaciteSeuil > 0 && memoireUtilisee + sortSeuil > capaciteSeuil) {
+    if (sort.system.danseurId !== danseur.id && capaciteSeuil > 0 && memoireUtilisee + sortSeuil > capaciteSeuil) {
       ui.notifications.warn(
         game.i18n.format("AGONE.DanseurMemoirePleine", { nom: danseur.name, max: capaciteSeuil })
       );
       return false;
     }
-    await sort.update({ "system.danseurNom": danseur.name });
+    // danseurNom : rappel du nom au moment de la mémorisation (le lien est danseurId)
+    await sort.update({ "system.danseurId": danseur.id, "system.danseurNom": danseur.name });
     return true;
   }
 
@@ -268,13 +264,13 @@ export const MagieMixin = Base => class extends Base {
     await danseur.update({ "system.enduranceActuelle": danseur.system.enduranceMax });
   }
 
-  // Réordonnancement des sorts
+  /**
+   * Réordonnancement des sorts : carte visée par le dépôt (sous le pointeur, sinon la plus proche
+   * sur les deux axes — la grille a plusieurs colonnes) et position avant / après.
+   * @returns {{cible: HTMLElement, avant: boolean}|null}
+   */
   _getTargetSortCard(event, container) {
-    for (const card of container.querySelectorAll(".sort-card")) {
-      const rect = card.getBoundingClientRect();
-      if (event.clientY >= rect.top && event.clientY <= rect.bottom) return card;
-    }
-    return null;
+    return cibleDepot(event, container, ".sort-card");
   }
 
   _clearSortDropIndicators(container) {
@@ -290,12 +286,10 @@ export const MagieMixin = Base => class extends Base {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
     const container  = event.currentTarget;
-    const targetCard = this._getTargetSortCard(event, container);
+    const depot = this._getTargetSortCard(event, container);
     this._clearSortDropIndicators(container);
-    if (!targetCard) return;
-    const rect   = targetCard.getBoundingClientRect();
-    const before = event.clientY < rect.top + rect.height / 2;
-    targetCard.classList.add(before ? "sort-drop-above" : "sort-drop-below");
+    if (!depot) return;
+    depot.cible.classList.add(depot.avant ? "sort-drop-above" : "sort-drop-below");
   }
 
   _onDragLeaveSortReorder(event) {
@@ -317,14 +311,13 @@ export const MagieMixin = Base => class extends Base {
     const draggedSort = this.actor.items.get(data.itemId);
     if (!draggedSort || draggedSort.type !== "sort") return;
 
-    const targetCard = this._getTargetSortCard(event, container);
-    if (!targetCard || targetCard.dataset.itemId === data.itemId) return;
+    const depot = this._getTargetSortCard(event, container);
+    if (!depot || depot.cible.dataset.itemId === data.itemId) return;
 
-    const targetSort = this.actor.items.get(targetCard.dataset.itemId);
+    const targetSort = this.actor.items.get(depot.cible.dataset.itemId);
     if (!targetSort) return;
 
-    const rect       = targetCard.getBoundingClientRect();
-    const sortBefore = event.clientY < rect.top + rect.height / 2;
+    const sortBefore = depot.avant;
     const siblings   = this.actor.items.filter(i => i.type === "sort" && i.id !== draggedSort.id);
 
     const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
@@ -341,7 +334,7 @@ export const MagieMixin = Base => class extends Base {
     event.stopPropagation();
     const sortId = event.currentTarget.dataset.sortId;
     const sort   = this.actor.items.get(sortId);
-    if (sort) await sort.update({ "system.danseurNom": "" });
+    if (sort) await sort.update({ "system.danseurId": "", "system.danseurNom": "" });
   }
 
   async _onRollSortDanseur(event) {
@@ -414,9 +407,7 @@ export const MagieMixin = Base => class extends Base {
         if (!targetSort) return;
         const r = targetSlot.getBoundingClientRect();
         const sortBefore = evt.clientY < r.top + r.height / 2;
-        const siblings   = this.actor.items.filter(i =>
-          i.type === "sort" && i.id !== draggedSort.id && i.system.danseurNom === danseur.name
-        );
+        const siblings   = sortsDuDanseur(this.actor.items, danseur.id).filter(i => i.id !== draggedSort.id);
         const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
         const updates    = sortHelper.performIntegerSort(draggedSort, { target: targetSort, siblings, sortBefore });
         if (updates.length) {
@@ -474,7 +465,7 @@ export const MagieMixin = Base => class extends Base {
 
     const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
-      content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpDanseur", { nom: danseur.name, stat: label, cout })}</p>`
+      content: `<p>${game.i18n.format("AGONE.ConfirmerLevelUpDanseur", { nom: foundry.utils.escapeHTML(danseur.name), stat: label, cout })}</p>`
     });
     if (!confirmed) return;
 
@@ -507,7 +498,7 @@ export const MagieMixin = Base => class extends Base {
     const sd     = this.actor.system;
     const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.MonterNiveauDanseur"),
-      content: `<p>${game.i18n.format("AGONE.ConfirmerLevelDownDanseur", { nom: danseur.name, stat: label, cout: coutDown })}</p>`
+      content: `<p>${game.i18n.format("AGONE.ConfirmerLevelDownDanseur", { nom: foundry.utils.escapeHTML(danseur.name), stat: label, cout: coutDown })}</p>`
     });
     if (!confirmed) return;
 
@@ -546,7 +537,7 @@ export const MagieMixin = Base => class extends Base {
 
     await roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-      flavor: `<strong>${danseur.name}</strong> — ${label} (3d10) : <strong>${total}</strong> → Niv.\u00a0${niveau} (${prefix}${valeur})`
+      flavor: `<strong>${foundry.utils.escapeHTML(danseur.name)}</strong> — ${foundry.utils.escapeHTML(label ?? "")} (3d10) : <strong>${total}</strong> → Niv.\u00a0${niveau} (${prefix}${valeur})`
     });
     await danseur.update({ [`system.${stat}`]: niveau });
   }
@@ -578,7 +569,7 @@ export const MagieMixin = Base => class extends Base {
     const sd = danseur.system;
     const confirmed = await this._confirmChild({
       title:   game.i18n.localize("AGONE.DanseurValiderCrea"),
-      content: `<p>${game.i18n.format("AGONE.DanseurValiderCreaConfirm", { nom: danseur.name })}</p>`
+      content: `<p>${game.i18n.format("AGONE.DanseurValiderCreaConfirm", { nom: foundry.utils.escapeHTML(danseur.name) })}</p>`
     });
     if (!confirmed) return;
     // Initialise les valeurs courantes = max

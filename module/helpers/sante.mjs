@@ -14,7 +14,8 @@ export function pointsDeVie(actor) {
 }
 
 /**
- * Libellé descriptif de l'état de santé (réglages du monde « santeLabel* »), sans chiffres :
+ * Libellé descriptif de l'état de santé (réglages du monde « santeLabel* », à défaut
+ * les textes traduits « AGONE.SanteLabel*Defaut »), sans chiffres :
  * c'est ce que voient les joueurs pour un acteur qu'ils ne possèdent pas.
  * @returns {string|null}  null si l'acteur n'a pas de maximum de points de vie
  */
@@ -28,12 +29,15 @@ export function libelleSante(actor) {
             : ratio >= 0.25 ? "santeLabel25"
             : ratio > 0     ? "santeLabel10"
             :                 "santeLabel0";
-  return game.settings.get("agone", cle);
+  // Réglage vide (valeur par défaut) : texte traduit du système
+  const personnalise = game.settings.get("agone", cle);
+  if (typeof personnalise === "string" && personnalise.trim()) return personnalise;
+  return game.i18n.localize(`AGONE.${cle.charAt(0).toUpperCase()}${cle.slice(1)}Defaut`);
 }
 
-/** Couleur de la barre de points de vie selon le pourcentage restant. */
+/** Couleur de la barre de points de vie selon le pourcentage restant (jetons de jauge de base.css). */
 export function couleurSante(pourcentage) {
-  if (pourcentage <= 25) return "var(--agone-txt-rouge, #c04040)";
-  if (pourcentage <= 50) return "var(--agone-txt-orange, #c07820)";
-  return "var(--agone-txt-vert, #4a9a4a)";
+  if (pourcentage <= 25) return "var(--agone-txt-rouge-clair)";
+  if (pourcentage <= 50) return "var(--agone-txt-orange-clair)";
+  return "var(--agone-txt-vert-clair)";
 }

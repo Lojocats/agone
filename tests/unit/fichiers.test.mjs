@@ -71,6 +71,35 @@ describe("Traductions", () => {
   });
 });
 
+describe("Traductions sans clé morte", () => {
+  // Clés produites par un constructeur dynamique (aucune citation littérale possible) :
+  const manifeste = JSON.parse(lire("system.json"));
+  const typesItem = Object.keys(manifeste.documentTypes.Item).map(t => t.charAt(0).toUpperCase() + t.slice(1));
+  const CLES_DYNAMIQUES = [
+    /^TYPES\./,                                          // noms de types lus par Foundry
+    /^AGONE\.Des\./,                                     // _L("…") de documents/actor.mjs
+    /^AGONE\.(Attribut|Abr)\./,                          // `AGONE.Attribut.${Cle}`, `AGONE.Abr.${cle}`
+    /^AGONE\.(Peine|Bienfait)\./,                        // paliers de Ténèbres, origines de démon
+    /^AGONE\.Tenebres(Palier|Bienfait)Tooltip\d+$/,      // `AGONE.TenebresPalierTooltip${seuil}`
+    /^AGONE\.SanteLabel\d+(Hint|Defaut)?$/,              // réglages santeLabel* et sante.mjs
+    new RegExp(`^AGONE\\.Nouvel(${typesItem.join("|")})$`), // `AGONE.Nouvel${Type}` à la création d'un objet
+    /^AGONE\.Peuple(Changer|Retirer)Avertissement$/,     // cle.replace(/Confirm$/, "Avertissement")
+  ];
+
+  test("toute clé de lang/fr.json est citée dans le code ou les templates, ou produite dynamiquement", () => {
+    const citees = new Set();
+    for (const f of [...templates, ...modules]) {
+      for (const [cle] of readFileSync(f, "utf8").matchAll(/AGONE\.[A-Za-z0-9_.]*[A-Za-z0-9_]/g)) citees.add(cle);
+    }
+    const mortes = Object.keys(fr).filter(k => !citees.has(k) && !CLES_DYNAMIQUES.some(re => re.test(k)));
+    assert.deepEqual(mortes, [], "clés de traduction que plus rien n'utilise : à retirer de fr.json et en.json");
+  });
+
+  test("chaque motif de clé dynamique correspond encore à des clés existantes", () => {
+    for (const re of CLES_DYNAMIQUES) assert.ok(Object.keys(fr).some(k => re.test(k)), `motif sans clé : ${re}`);
+  });
+});
+
 describe("Templates Handlebars", () => {
   for (const f of templates) {
     test(`${relative(racine, f)} compile`, () => {
@@ -78,16 +107,87 @@ describe("Templates Handlebars", () => {
     });
   }
 
-  test("panneau-progression.hbs est enregistré dans loadTemplates", () => {
+  test("tout partial {{> …}} utilisé dans un template est enregistré dans loadTemplates", () => {
+    // Liste passée à loadTemplates dans agone.mjs (tableau nommé ou littéral) ; à défaut, tout le fichier
     const agone = lire("module/agone.mjs");
-    assert.match(agone, /["']systems\/agone\/templates\/actors\/parts\/panneau-progression\.hbs["']/);
+    const variable = agone.match(/loadTemplates\(\s*(\w+)\s*\)/)?.[1];
+    const liste = (variable && agone.match(new RegExp(`\\b${variable}\\s*=\\s*\\[([\\s\\S]*?)\\]`))?.[1])
+      ?? agone.match(/loadTemplates\(\s*\[([\s\S]*?)\]/)?.[1]
+      ?? agone;
+    const enregistres = new Set([...liste.matchAll(/["'`]([^"'`]+\.hbs)["'`]/g)].map(m => m[1]));
+    assert.ok(enregistres.size > 0, "liste des templates de loadTemplates trouvée dans agone.mjs");
+
+    // Parcours de l'AST Handlebars : partials appelés et partials {{#*inline}} définis sur place
+    const manquants = new Set();
+    for (const f of templates) {
+      const utilises = new Set();
+      const enLigne = new Set();
+      (function visiter(noeud) {
+        if (!noeud || typeof noeud !== "object") return;
+        if (Array.isArray(noeud)) return noeud.forEach(visiter);
+        if (noeud.type === "PartialStatement" || noeud.type === "PartialBlockStatement") {
+          // Un nom dynamique ({{> (lookup …)}}) ne peut pas être vérifié statiquement
+          if (noeud.name.type !== "SubExpression") utilises.add(String(noeud.name.original));
+        }
+        if (noeud.type === "DecoratorBlock" && noeud.path?.original === "inline") {
+          enLigne.add(String(noeud.params[0]?.original));
+        }
+        for (const cle of ["body", "program", "inverse"]) visiter(noeud[cle]);
+      })(Handlebars.parse(readFileSync(f, "utf8")));
+      for (const nom of utilises) {
+        if (nom === "@partial-block" || enLigne.has(nom) || enregistres.has(nom)) continue;
+        manquants.add(`${nom} (${relative(racine, f)})`);
+      }
+    }
+    assert.deepEqual([...manquants], []);
   });
 
-  test("partials des fiches simples (sante-simple, cstats-simples, badges-bonus, armures-card, armes-card, manoeuvres-card) enregistrés dans loadTemplates", () => {
-    const agone = lire("module/agone.mjs");
-    for (const nom of ["sante-simple", "cstats-simples", "badges-bonus", "armures-card", "armes-card", "manoeuvres-card"]) {
-      assert.match(agone, new RegExp(`["']systems/agone/templates/actors/parts/${nom}\\.hbs["']`), nom);
+  describe("helpers", () => {
+    // Fournis par Handlebars ou par le cœur de Foundry (client/applications/handlebars.mjs)
+    const HELPERS_NATIFS = new Set([
+      "if", "unless", "each", "with", "lookup", "log",
+      "localize", "eq", "ne", "lt", "gt", "lte", "gte", "not", "and", "or", "concat", "checked", "disabled",
+      "selectOptions", "numberFormat", "numberInput", "formInput", "formGroup", "formField", "editor",
+      "filePicker", "ifThen", "object", "radioBoxes", "rangePicker", "timeSince",
+    ]);
+    const enregistres = new Set([...lire("module/helpers/handlebars.mjs").matchAll(/registerHelper\("(\w+)"/g)].map(m => m[1]));
+
+    /** Helpers appelés dans un template : blocs, sous-expressions et moustaches avec arguments. */
+    function helpersAppeles(source) {
+      const noms = new Set();
+      (function visiter(noeud) {
+        if (!noeud || typeof noeud !== "object") return;
+        if (Array.isArray(noeud)) return noeud.forEach(visiter);
+        const chemin = noeud.path;
+        if (["MustacheStatement", "BlockStatement", "SubExpression"].includes(noeud.type) && chemin?.type === "PathExpression") {
+          const nomSimple = chemin.parts.length === 1 && !chemin.data && chemin.depth === 0 && chemin.original === chemin.parts[0];
+          const appel = noeud.type !== "MustacheStatement" || noeud.params.length > 0 || Boolean(noeud.hash);
+          if (nomSimple && appel) noms.add(chemin.original);
+        }
+        for (const cle of ["body", "program", "inverse", "params", "hash", "pairs", "value"]) visiter(noeud[cle]);
+      })(Handlebars.parse(source));
+      return noms;
     }
+    const appeles = new Map();
+    for (const f of templates) {
+      for (const nom of helpersAppeles(readFileSync(f, "utf8"))) appeles.set(nom, relative(racine, f));
+    }
+
+    test("le parcours repère blocs, sous-expressions et moustaches avec arguments", () => {
+      assert.deepEqual([...helpersAppeles("{{#ifGT a 1}}{{multiply b 2}}{{/ifGT}}{{#if (or c d)}}{{e}}{{f.g}}{{/if}}")].sort(),
+        ["if", "ifGT", "multiply", "or"]);
+    });
+
+    test("tout helper appelé par un template est enregistré par le système ou fourni par Foundry", () => {
+      const inconnus = [...appeles].filter(([nom]) => !enregistres.has(nom) && !HELPERS_NATIFS.has(nom))
+        .map(([nom, fichier]) => `${nom} (${fichier})`);
+      assert.deepEqual(inconnus, []);
+    });
+
+    test("tout helper enregistré par le système est appelé par un template", () => {
+      assert.ok(enregistres.size > 0, "helpers trouvés dans module/helpers/handlebars.mjs");
+      assert.deepEqual([...enregistres].filter(nom => !appeles.has(nom)), [], "helpers inutilisés : à retirer de handlebars.mjs");
+    });
   });
 
   test("tout template ou partial cité existe", () => {
@@ -207,6 +307,42 @@ describe("CSS", () => {
     assert.deepEqual(partiels.filter(p => !imports.includes(p)), []);
   });
 
+  describe("classes mortes", () => {
+    // Préfixes de classes assemblées à l'exécution (`prefixe-{{valeur}}` ou `prefixe-${valeur}`)
+    const PREFIXES_DYNAMIQUES = ["cmp-type-", "av-sect-", "pnb-cat-", "cal-saison-", "man-badge-", "score-"];
+    // Classes posées par Foundry (fenêtres, éditeur) ou conventions de fiches reprises telles quelles
+    const CLASSES_FOUNDRY = new Set(["window-app", "window-header", "window-title", "header-button", "editor",
+      "item-control", "rollable"]);
+    const sources = [...templates, ...modules].map(f => readFileSync(f, "utf8")).join("\n");
+    const jetons = new Set(sources.match(/[A-Za-z_][\w-]*/g));
+
+    /** Classes d'une feuille de style que rien ne référence (jeton entier dans templates/ ou module/). */
+    function classesMortes(css) {
+      const mortes = new Set();
+      csstree.walk(csstree.parse(css), noeud => {
+        if (noeud.type !== "ClassSelector") return;
+        const nom = noeud.name;
+        if (jetons.has(nom) || CLASSES_FOUNDRY.has(nom) || PREFIXES_DYNAMIQUES.some(p => nom.startsWith(p))) return;
+        mortes.add(nom);
+      });
+      return [...mortes];
+    }
+
+    test("toute classe définie dans css/ est utilisée par un template ou un module", () => {
+      const mortes = fichiers("css", ".css").flatMap(f => classesMortes(readFileSync(f, "utf8")).map(c => `.${c} (${relative(racine, f)})`));
+      assert.deepEqual(mortes, [], "classes CSS que plus rien n'utilise : supprimer leurs règles");
+    });
+
+    test("une classe inconnue est bien signalée, une classe dynamique ou de Foundry ne l'est pas", () => {
+      assert.deepEqual(classesMortes(".agone .classe-jamais-utilisee-zz, .agone .score-7, .window-app .roll-btn { color: red; }"),
+        ["classe-jamais-utilisee-zz"]);
+    });
+
+    test("chaque préfixe dynamique déclaré est réellement assemblé dans un template ou un module", () => {
+      for (const p of PREFIXES_DYNAMIQUES) assert.ok(sources.includes(`${p}{{`) || sources.includes(`${p}$` + "{"),`préfixe ${p} jamais assemblé`);
+    });
+  });
+
   /** Hex codés en dur d'un extrait de CSS, hors d'un appel var(--jeton, #repli) actif. */
   function hexHorsVar(bloc) {
     return [...bloc.matchAll(/#[0-9a-fA-F]{3,6}\b/g)].filter(m => {
@@ -297,8 +433,8 @@ describe("CSS", () => {
 
   test("Flamme et Flamme noire : libellés colorés par jetons du thème", () => {
     const css = lire("css/attributes.css");
-    assert.match(css, /\.txt-flamme\.txt-flamme\s*\{\s*color:\s*var\(--agone-txt-orange,/);
-    assert.match(css, /\.txt-flamme-noire\.txt-flamme-noire\s*\{\s*color:\s*var\(--agone-txt-violet,/);
+    assert.match(css, /\.txt-flamme\.txt-flamme\s*\{\s*color:\s*var\(--agone-txt-orange\)/);
+    assert.match(css, /\.txt-flamme-noire\.txt-flamme-noire\s*\{\s*color:\s*var\(--agone-txt-violet\)/);
     for (const f of ["templates/actors/parts/attributs.hbs", "templates/actors/personnage-sheet.hbs"]) {
       const hbs = lire(f);
       assert.match(hbs, /class="txt-flamme">\{\{localize "AGONE\.Flamme"\}\}/, `${f} : libellé Flamme`);
@@ -316,16 +452,6 @@ describe("CSS", () => {
     // Une opacité sur la ligne s'ajoute à celle des cellules et rend le texte illisible
     const css = lire("css/base.css");
     assert.doesNotMatch(css, /\.palier-row:not\(\.palier-reached\)\s*\{[^}]*opacity/);
-  });
-
-  test("bouton fumble : couleurs sur jetons --agone-fumble-* avec repli, pas de hex en dur", () => {
-    const css = lire("css/apps.css");
-    for (const selecteur of [/\.agone \.fumble-btn\s*\{[^}]*\}/, /\.agone \.fumble-btn:hover\s*\{[^}]*\}/,
-      /\.agone-fumble-btn\s*\{[^}]*\}/, /\.agone-fumble-btn:hover\s*\{[^}]*\}/]) {
-      const bloc = css.match(selecteur)?.[0];
-      assert.ok(bloc, `règle ${selecteur} introuvable dans apps.css`);
-      assert.deepEqual(hexHorsVar(bloc), [], `hex en dur hors var() dans ${bloc}`);
-    }
   });
 
   test("saisons du calendrier : couleurs sur jetons --agone-saison-* avec repli, pas de hex en dur", () => {

@@ -1,18 +1,27 @@
-name: Tag automatique de version
+name: CI main, tag automatique de version
 
-# Quand la version de system.json change sur main : lint et tests, puis tag vX.Y.Z et release.
+# À chaque push sur main : lint et tests. Si la version de system.json n'a pas encore de tag,
+# création du tag vX.Y.Z puis de la release, une fois lint et tests passés.
 # Un tag poussé avec GITHUB_TOKEN ne déclenche pas d'autre workflow : la release est donc
 # appelée directement (release.yml est réutilisable), pas via l'évènement « push tag ».
 
 on:
   push:
     branches: [main]
-    paths: [system.json]
 
 permissions:
   contents: read
 
+# Une seule exécution à la fois sur main, sans annuler celle en cours (deux exécutions
+# simultanées pourraient vouloir créer le même tag).
+concurrency:
+  group: auto-tag-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
+  checks:
+    uses: ./.github/workflows/lint.yml
+
   version:
     runs-on: ubuntu-latest
     outputs:
@@ -37,13 +46,9 @@ jobs:
             echo "nouveau=true" >> "$GITHUB_OUTPUT"
           fi
 
-  checks:
-    needs: version
-    if: needs.version.outputs.nouveau == 'true'
-    uses: ./.github/workflows/lint.yml
-
   tag:
     needs: [version, checks]
+    if: needs.version.outputs.nouveau == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write

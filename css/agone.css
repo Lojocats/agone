@@ -2,6 +2,7 @@
    AGONE – Feuille de style principale
    Ce fichier importe tous les modules CSS.
    Modifier directement les fichiers partiels :
+     polices.css         – Polices embarquées (@font-face, dossier fonts/)
      base.css            – Variables & reset
      header.css          – En-tête, onglets, sections
      attributes.css      – Aspects, caractéristiques, dérivées
@@ -16,6 +17,7 @@
      animations.css      – Micro-animations (cartes, onglets, survols)
    ============================================================ */
 
+@import 'polices.css';
 @import 'base.css';
 @import 'header.css';
 @import 'attributes.css';

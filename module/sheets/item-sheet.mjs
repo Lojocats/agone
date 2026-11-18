@@ -1,6 +1,6 @@
 import { delegate, activerClavier } from "../helpers/dom.mjs";
 import { changeEffet, lireChange } from "../helpers/effets.mjs";
-import { bindTabs, appliquerLectureSeule } from "./sheet-helpers.mjs";
+import { bindTabs, appliquerLectureSeule, confirmerEnfant, editerImage, memoriserFocus, restaurerFocus } from "./sheet-helpers.mjs";
 import { BIENFAITS_PERFIDIE_DATA, descriptionBienfait } from "../helpers/compendium-data.mjs";
 
 /** Champs de texte riche (HTML) des items, rendus par parts/editeur.hbs. */
@@ -23,6 +23,8 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     position: { width: 560, height: 620 },
     window  : { resizable: true },
     actions : {
+      // Icône de l'item : remplace l'action de DocumentSheetV2 (voir editerImage)
+      editImage      : editerImage,
       toChat         : AgoneItemSheet.#onToChat,
       effetCreer     : AgoneItemSheet.#onEffetCreer,
       bienfaitTexteLivre: AgoneItemSheet.#onBienfaitTexteLivre,
@@ -43,6 +45,8 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
 
   /** @override — template selon le type d'item */
   async _renderHTML(context, options) {
+    // Champ focalisé avant le re-rendu (les champs de l'éditeur d'effets n'ont ni id ni name)
+    this._focusMemorise = memoriserFocus(this.element);
     const template = `systems/agone/templates/items/${this.item.type}-sheet.hbs`;
     const html = await foundry.applications.handlebars.renderTemplate(template, context);
     const el = document.createElement("div");
@@ -218,8 +222,18 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     this._effetDepuis(target)?.sheet.render(true);
   }
 
+  /** Confirmation de suppression (dialogue enfant de la fiche) ; `nom` est échappé. */
+  _confirmerSuppression(nom) {
+    return confirmerEnfant(this, {
+      title  : game.i18n.localize("AGONE.Supprimer"),
+      content: `<p>${game.i18n.format("AGONE.ConfirmationSuppression", { nom: foundry.utils.escapeHTML(nom ?? "") })}</p>`,
+    });
+  }
+
   static async #onEffetSupprimer(event, target) {
-    await this._effetDepuis(target)?.delete();
+    const effect = this._effetDepuis(target);
+    if (!effect || !await this._confirmerSuppression(effect.name)) return;
+    await effect.delete();
   }
 
   static async #onModifAjouter(event, target) {
@@ -230,7 +244,13 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
   static async #onModifSupprimer(event, target) {
     const effect = this._effetDepuis(target);
     const index  = Number(target.closest("[data-change-index]")?.dataset.changeIndex);
-    if (effect) await effect.update({ changes: effect.changes.filter((c, i) => i !== index) });
+    const change = effect?.changes[index];
+    if (!change) return;
+    // Libellé du modificateur dans la confirmation : « Agilité +1 » (ou la clé libre telle quelle)
+    const { def, connu } = lireChange(change);
+    const libelle = `${connu ? game.i18n.localize(def.label) : change.key} ${def?.booleen ? "" : change.value}`.trim();
+    if (!await this._confirmerSuppression(libelle)) return;
+    await effect.update({ changes: effect.changes.filter((c, i) => i !== index) });
   }
 
   /** Saisie dans l'éditeur d'effets : nom, activation, statistique ou valeur d'un modificateur. */
@@ -249,6 +269,16 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     const value = champ === "value" ? input.value : current.value;
     changes[index] = changeEffet(stat, value);
     await effect.update({ changes });
+  }
+
+  /**
+   * Le champ `system.*` nommé est-il déclaré `nullable: true` dans le schéma ? (Un NumberField est
+   * nullable par défaut : seule la déclaration explicite indique qu'une valeur vide a un sens.)
+   */
+  _champNullable(name) {
+    if (!name?.startsWith("system.")) return false;
+    const champ = this.item.system.schema?.getField?.(name.slice("system.".length));
+    return champ?.options?.nullable === true;
   }
 
   static #onToChat(event, target) {
@@ -277,13 +307,22 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
     this._renderSignal = new AbortController();
     const signal = this._renderSignal.signal;
 
+    // Focus (et curseur) rendus au champ en cours de saisie
+    const focus = this._focusMemorise;
+    this._focusMemorise = null;
+    if (focus) requestAnimationFrame(() => restaurerFocus(this.element, focus));
+
     // Sauvegarde automatique des champs nommés
     this.element.querySelector("form")?.addEventListener("change", async (ev) => {
       const el = ev.target;
       if (!this.isEditable || !el.name) return;
-      if (el.type === "number" && (el.value === "" || isNaN(Number(el.value)))) el.value = "0";
+      // Nombre vidé : null si le champ l'accepte (bornes raciales d'un peuple, valeurs « variables »), sinon 0
+      const vide = el.type === "number" && (el.value === "" || isNaN(Number(el.value)));
+      const nullable = vide && this._champNullable(el.name);
+      if (vide && !nullable) el.value = "0";
       if (el.name === "system.typeMagie") el.value = el.value.trim().toLowerCase();
       const value = el.type === "checkbox" ? el.checked
+                  : nullable               ? null
                   : el.type === "number"   ? Number(el.value)
                   : el.value;
       await this.item.update(foundry.utils.expandObject({ [el.name]: value }));
@@ -299,7 +338,8 @@ export class AgoneItemSheet extends foundry.applications.api.HandlebarsApplicati
 
     const root = this.element;
     const on   = (type, selector, handler) => delegate(root, type, selector, handler, { signal });
-    bindTabs(this, root, on, "description");
+    // Onglet initial : celui que le template marque actif (ex. « stats » du peuple), sinon le premier
+    bindTabs(this, root, on);
     activerClavier(root, signal);
     appliquerLectureSeule(root, !this.isEditable);
     if (!this.isEditable) return;

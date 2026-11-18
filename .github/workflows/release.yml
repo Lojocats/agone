@@ -1,7 +1,13 @@
 name: Create Release
 
-# Déclenchée par un tag v* poussé à la main, ou appelée par auto-tag.yml après un changement
-# de version de system.json.
+# Appelée par auto-tag.yml (lint et tests déjà passés, tag créé depuis system.json), ou
+# déclenchée par un tag v* poussé à la main : dans ce second cas, lint et tests sont lancés ici.
+# Dans les deux cas, le tag doit valoir « v » + la version de system.json.
+#
+# La release publie deux fichiers :
+#   - agone.zip   : le système, avec un system.json dont `download` pointe sur CE tag ;
+#   - system.json : ce même manifeste, servi par …/releases/latest/download/system.json
+#                   (l'URL `manifest`) : il n'annonce une version qu'une fois sa release créée.
 
 on:
   push:
@@ -14,42 +20,89 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
-  create-release:
+  verifier:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag || github.ref }}
 
-      - name: Get tag name
+      - name: Vérifier que le tag correspond à la version de system.json
         id: tag
-        run: echo "version=${{ inputs.tag || github.ref_name }}" >> $GITHUB_OUTPUT
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          ATTENDU="v$(jq -r .version system.json)"
+          if [ "$TAG" != "$ATTENDU" ]; then
+            echo "::error::Le tag $TAG ne correspond pas à la version de system.json ($ATTENDU)."
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  # Tag poussé à la main uniquement (`inputs.tag` est vide) : auto-tag.yml a déjà lancé lint et tests.
+  checks:
+    if: ${{ !inputs.tag }}
+    uses: ./.github/workflows/lint.yml
+
+  create-release:
+    needs: [verifier, checks]
+    # `checks` est sauté quand la release est appelée par auto-tag.yml
+    if: ${{ !cancelled() && needs.verifier.result == 'success' && (needs.checks.result == 'success' || needs.checks.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: release-${{ needs.verifier.outputs.tag }}
+      cancel-in-progress: false
+    env:
+      TAG: ${{ needs.verifier.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Pointer `download` sur l'archive de ce tag
+        run: |
+          # Dépôt lu dans system.json (`url`) ; `manifest` reste …/releases/latest/download/system.json
+          DEPOT="$(jq -r .url system.json)"
+          jq --arg download "$DEPOT/releases/download/$TAG/agone.zip" '.download = $download' system.json > system.tmp.json
+          mv system.tmp.json system.json
+          jq '{version, manifest, download}' system.json
 
       - name: Create archive
         run: |
-          # Créer un ZIP du système (exclure les fichiers non pertinents)
-          zip -r agone.zip \
-            css/ \
-            lang/ \
-            module/ \
-            packs/ \
-            templates/ \
-            system.json \
-            -x "*.git*" "*.gitignore" "_*.py"
+          # ZIP du système. packs/ n'en fait pas partie : les compendiums sont générés au
+          # premier lancement du MJ. Les dossiers facultatifs ne sont ajoutés que s'ils existent.
+          CONTENU="css lang module templates system.json LICENSE README.md CHANGELOG.md"
+          for dossier in fonts; do
+            if [ -d "$dossier" ]; then CONTENU="$CONTENU $dossier"; fi
+          done
+          zip -r agone.zip $CONTENU -x "*.git*" "_*.py"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.version }}
-          files: agone.zip
+          tag_name: ${{ env.TAG }}
+          files: |
+            agone.zip
+            system.json
+          fail_on_unmatched_files: true
           body: |
-            Système Agone ${{ steps.tag.outputs.version }}
+            Système Agone ${{ env.TAG }}
 
-            Pour installer : téléchargez `agone.zip` et extrayez-le dans votre dossier FoundryVTT/Data/systems/agone
+            Pour installer ou mettre à jour depuis Foundry VTT, utilisez l'URL de manifeste :
+            `${{ github.server_url }}/${{ github.repository }}/releases/latest/download/system.json`
+            (pour cette version précise : le fichier `system.json` joint à cette release).
+
+            Installation manuelle : téléchargez `agone.zip` et extrayez-le dans votre dossier FoundryVTT/Data/systems/agone
           draft: false
           prerelease: false
         env:

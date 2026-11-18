@@ -107,6 +107,9 @@ export class SortData extends foundry.abstract.TypeDataModel {
       instrument:  new fields.StringField({ initial: "" }),
       special:     new fields.StringField({ initial: "" }),
       description: new fields.HTMLField({ initial: "" }),
+      // Danseur qui mémorise le sort : id de l'item danseur du même acteur ("" = sort libre).
+      // danseurNom : ancien lien par nom (avant 1.11.0), conservé pour les anciennes données et l'affichage.
+      danseurId:   new fields.StringField({ initial: "" }),
       danseurNom:  new fields.StringField({ initial: "" }),
       // Compétence alternative pour min(artsMagiques, compAlt + attrAlt)
       compAlt:     new fields.StringField({ initial: "" }),

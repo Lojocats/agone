@@ -1,4 +1,6 @@
 import { listen } from "../helpers/dom.mjs";
+import { avancerDate } from "../helpers/calendrier-date.mjs";
+import { creerFile } from "../helpers/mj.mjs";
 
 const DATE_DEFAUT = { jour: 1, mois: 1, an: 1, heure: 8, minute: 0 };
 
@@ -12,6 +14,9 @@ const PERIODES = [
   { debut: 5,  icone: "fa-mountain-sun",   label: "AGONE.Calendrier.Periode.Aube"      },
   { debut: 0,  icone: "fa-moon",           label: "AGONE.Calendrier.Periode.Nuit"      },
 ];
+
+/** Écritures de la date, l'une après l'autre : chacune relit la date laissée par la précédente. */
+const ecrireDate = creerFile();
 
 /** Date courante du monde, heure et minute toujours renseignées. */
 export function dateCalendrier() {
@@ -37,7 +42,7 @@ export function etatCalendrier() {
   const phase     = CalendrierAgone.moonPhase(jourDeLAn);
 
   const meteoId  = game.settings.get("agone", "calendrierMeteo") ?? "";
-  const meteoObj = (CONFIG.AGONE.meteoTypes ?? []).find(m => m.id === meteoId) ?? { id: "", icon: "—", label: "—" };
+  const meteoObj = (CONFIG.AGONE.meteoTypes ?? []).find(m => m.id === meteoId) ?? { id: "", icon: "fas fa-minus", label: "—" };
 
   const periode = CalendrierAgone.periode(date.heure);
   return {
@@ -98,7 +103,7 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
   /** Phase de lune d'un jour de l'an. */
   static moonPhase(jourDeLAn) {
     const phases = CONFIG.AGONE?.phasesLune ?? [];
-    if (!phases.length) return { icon: "🌑", label: "" };
+    if (!phases.length) return { icon: "far fa-circle", label: "" };
     return phases[Math.min(CalendrierAgone.moonPhaseIndex(jourDeLAn), phases.length - 1)];
   }
 
@@ -197,7 +202,7 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
     // Clic sur un jour de la grille ou de la liste des notes
     listen(root, "[data-jour]", "click", async (e) => {
       const jour = Number(e.currentTarget.dataset.jour);
-      if (jour) await game.settings.set("agone", "calendrierDate", { ...dateCalendrier(), jour });
+      if (jour) await ecrireDate(() => game.settings.set("agone", "calendrierDate", { ...dateCalendrier(), jour }));
     });
 
     // Changement météo : un bouton par type (MJ)
@@ -219,58 +224,28 @@ export class CalendrierAgone extends foundry.applications.api.HandlebarsApplicat
 
   // ── Navigation ──────────────────────────────────────────────────────────
 
-  async _navigate(delta, unit) {
-    const date   = dateCalendrier();
-    const nbMois = CONFIG.AGONE.calendrier.mois.length; // 10
-    const jpp    = CONFIG.AGONE.calendrier.joursParMois; // 30
-
-    if (unit === "minute") {
-      date.minute += delta * 15;
-      // overflow minutes → heures
-      while (date.minute >= 60) { date.minute -= 60; date.heure++; }
-      while (date.minute < 0)   { date.minute += 60; date.heure--; }
-    }
-
-    if (unit === "heure") {
-      date.heure += delta;
-    }
-
-    if (unit === "heure" || unit === "minute") {
-      // overflow heures → jours
-      while (date.heure >= 24) { date.heure -= 24; date.jour++; }
-      while (date.heure < 0)   { date.heure += 24; date.jour--; }
-    }
-
-    if (unit === "jour" || unit === "heure" || unit === "minute") {
-      if (unit === "jour") date.jour += delta;
-      // overflow jours → mois
-      while (date.jour > jpp) { date.jour -= jpp; date.mois++; }
-      while (date.jour < 1)   { date.mois--;      date.jour += jpp; }
-    } else if (unit === "mois") {
-      date.mois += delta;
-    } else if (unit === "an") {
-      date.an += delta;
-    }
-
-    // Overflow mois → années
-    while (date.mois > nbMois) { date.mois -= nbMois; date.an++; }
-    while (date.mois < 1)      { date.mois += nbMois; date.an--; }
-    if (date.an < 1) date.an = 1;
-    date.jour = Math.max(1, Math.min(jpp, date.jour));
-
-    // Recalcul saison du monde
-    const moisData  = CONFIG.AGONE.calendrier.mois[date.mois - 1];
-    const newSaison = moisData?.saison ?? "";
-    await game.settings.set("agone", "calendrierDate", date);
-    if (newSaison !== game.settings.get("agone", "saisonMonde")) {
-      await game.settings.set("agone", "saisonMonde", newSaison);
-    }
+  /**
+   * Avance la date. Les navigations sont sérialisées : chacune part de la date laissée par la
+   * précédente, si bien que deux clics rapides avancent bien deux fois.
+   */
+  _navigate(delta, unit) {
+    return ecrireDate(async () => {
+      const cal  = CONFIG.AGONE.calendrier;
+      const date = avancerDate(dateCalendrier(), delta, unit, { nbMois: cal.mois.length, joursParMois: cal.joursParMois });
+      await game.settings.set("agone", "calendrierDate", date);
+      // Saison du monde : écrite seulement quand le mois change de saison
+      const saison = cal.mois[date.mois - 1]?.saison ?? "";
+      if (saison !== game.settings.get("agone", "saisonMonde")) {
+        await game.settings.set("agone", "saisonMonde", saison);
+      }
+    });
   }
 
-  async _setYear(year) {
+  _setYear(year) {
     if (!Number.isInteger(year) || year < 1) return;
-    const date = dateCalendrier();
-    if (date.an === year) return;
-    await game.settings.set("agone", "calendrierDate", { ...date, an: year });
+    return ecrireDate(async () => {
+      const date = dateCalendrier();
+      if (date.an !== year) await game.settings.set("agone", "calendrierDate", { ...date, an: year });
+    });
   }
 }

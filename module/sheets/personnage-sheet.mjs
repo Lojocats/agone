@@ -1,5 +1,7 @@
 ﻿import { AgoneActorSheet } from "./agone-actor-sheet.mjs";
 import { AVANTAGES_DATA } from "../helpers/compendium-data.mjs";
+import { achatForce, coutCreationTotal } from "../helpers/creation.mjs";
+import { descriptionsEnrichies, optionsAttributLie, TYPES_AVEC_DESCRIPTION } from "./actor-context.mjs";
 import { CompetencesMixin } from "./personnage/competences.mjs";
 import { CombatMixin }      from "./personnage/combat.mjs";
 import { MagieMixin }       from "./personnage/magie.mjs";
@@ -24,9 +26,8 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
   };
 
   static AUTOSAVE_SKIP = {
-    classes: ["inline-edit", "arme-equipe", "armure-portee", "danseur-inline-num", "demon-inline-num"],
-    // Champs d'armure dont le gestionnaire recalcule des valeurs dérivées
-    names  : ["system.armure.portee", "system.armure.malusAgi", "system.armure.type"],
+    classes: ["inline-edit", "arme-equipe", "armure-portee", "danseur-inline-num"],
+    names  : [],
   };
 
   static RECHERCHE_NON_ACQUISES = true;
@@ -91,15 +92,14 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     context.equipements  = actor.items.filter(i => i.type === "equipement").sort(bySort);
     context.pouvoirs     = actor.items.filter(i => i.type === "pouvoir");
     context.manoeuvres   = actor.items.filter(i => i.type === "manoeuvre").sort(bySort);
-    context.demons       = actor.items.filter(i => i.type === "demon").sort((a, b) => a.name.localeCompare(b.name, "fr"));
 
-    // Enrichissement de la description HTML
-    context.descriptionHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      system.description ?? "", { async: true, secrets: actor.isOwner }
-    );
-    context.historiqueHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      system.historique ?? "", { async: true, secrets: actor.isOwner }
-    );
+    // Enrichissement (en parallèle) de la description, de l'historique et des descriptions d'items dépliables
+    const enrichir = foundry.applications.ux.TextEditor.implementation;
+    [context.descriptionHTML, context.historiqueHTML, context.descriptionsHTML] = await Promise.all([
+      enrichir.enrichHTML(system.description ?? "", { async: true, secrets: actor.isOwner }),
+      enrichir.enrichHTML(system.historique ?? "", { async: true, secrets: actor.isOwner }),
+      descriptionsEnrichies(actor.items.filter(i => TYPES_AVEC_DESCRIPTION.includes(i.type))),
+    ]);
 
     // Config pour les selects
     context.peuples   = Object.entries(CONFIG.AGONE.peuples).map(([k, v]) => ({
@@ -109,6 +109,7 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     context.attributsConfig = CONFIG.AGONE.attributs;
     context.typsArme  = CONFIG.AGONE.typesArme;
     context.competencesListe = CONFIG.AGONE.competences;
+    context.attributsLies    = optionsAttributLie();
 
     // ── Visibilité des onglets ──────────────────────────────────────────────
     const defaultTabsVisible = {
@@ -142,13 +143,9 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
 
   /**
    * @override
-   * Sauvegarde le nom du champ focalisé ET la position de scroll AVANT le re-render.
+   * Sauvegarde la position de scroll AVANT le re-render (le focus : AgoneActorSheet#_renderHTML).
    */
   async _renderHTML(context, options) {
-    const focused = document.activeElement;
-    const isOurInput = this.element?.contains(focused) &&
-      ["INPUT", "SELECT", "TEXTAREA"].includes(focused?.tagName ?? "");
-    this._pendingFocusName = isOurInput ? (focused.name || null) : null;
     const scrollEl = this.element?.querySelector(".sheet-body");
     this._pendingScrollTop = scrollEl ? scrollEl.scrollTop : 0;
     return super._renderHTML(context, options);
@@ -158,15 +155,7 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
   _onRender(context, options) {
     super._onRender(context, options);
 
-    // Restaurer le focus et le scroll après re-render
-    if (this._pendingFocusName) {
-      const name = this._pendingFocusName;
-      this._pendingFocusName = null;
-      requestAnimationFrame(() => {
-        const el = this.element.querySelector(`[name="${CSS.escape(name)}"]`);
-        if (el) el.focus();
-      });
-    }
+    // Restaurer le scroll après re-render
     if (this._pendingScrollTop > 0) {
       const st = this._pendingScrollTop;
       this._pendingScrollTop = 0;
@@ -175,13 +164,6 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
         if (scrollEl) scrollEl.scrollTop = st;
       });
     }
-  }
-
-  /** @override */
-  _bindViewListeners(on, root) {
-    super._bindViewListeners(on, root);
-    // Sections dépliables
-    on("click", ".section-toggle", this._onToggleSection.bind(this));
   }
 
   /** @override */
@@ -195,12 +177,6 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     // Retirer le peuple actuel
     on("click", ".peuple-clear", this._onClearPeuple.bind(this));
 
-    // Drag & drop inline items
-    root.querySelectorAll(".item-drag").forEach(li => {
-      li.setAttribute("draggable", true);
-      li.addEventListener("dragstart", this._onDragStart.bind(this));
-    });
-
     // ── Visibilité des onglets (paramètres) ───────────────────────────────
     on("change", "[data-action='toggleTabVisibility']", this._onToggleTabVisibility.bind(this));
 
@@ -211,20 +187,6 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     this._bindMagieListeners(on, root);
     this._bindTenebresListeners(on, root);
     this._bindCompagnonsListeners(on, root);
-  }
-
-  // Sections dépliables
-  _onToggleSection(event) {
-    event.preventDefault();
-    const btn = event.currentTarget;
-    const section = btn.closest(".agone-section");
-    if (!section) return;
-    const content = section.querySelector(".section-content");
-    if (!content) return;
-    const isOpen = !section.classList.contains("collapsed");
-    section.classList.toggle("collapsed", isOpen);
-    btn.querySelector("i")?.classList.toggle("fa-chevron-down", isOpen);
-    btn.querySelector("i")?.classList.toggle("fa-chevron-right", !isOpen);
   }
 
   // Gestion des Items
@@ -250,10 +212,29 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     return await Item.create(itemData, { parent: this.actor });
   }
 
+  /**
+   * Changer ou retirer le peuple réinitialise les caractéristiques : confirmation demandée dès que le
+   * personnage a déjà un peuple ou n'est plus en création.
+   * @param {string} cle   Clé du message de confirmation ; son avertissement est la clé de même préfixe en « Avertissement »
+   * @param {string} nom   Nom du peuple concerné
+   * @returns {Promise<boolean>}
+   */
+  async _confirmerPeuple(cle, nom) {
+    const sd = this.actor.system;
+    if (!sd.peuple && sd.modeCreation) return true;
+    return this._confirmChild({
+      title  : game.i18n.localize("AGONE.PeupleChangerTitre"),
+      content: `<p>${game.i18n.format(cle, { nom: foundry.utils.escapeHTML(nom ?? "") })}</p>`
+             + `<p class="agone-recap-avertissement">${game.i18n.localize(cle.replace(/Confirm$/, "Avertissement"))}</p>`,
+    });
+  }
+
   async _onClearPeuple(event) {
     event.preventDefault();
     const sd  = this.actor.system;
     const old = sd.peupleBonusApplique ?? {};
+    if (!sd.peuple && !sd.peupleId) return;
+    if (!await this._confirmerPeuple("AGONE.PeupleRetirerConfirm", sd.peuple)) return;
 
     // Supprimer les compétences raciales de l'ancien peuple
     const oldCompIds = (sd.peupleCompetenceIds ?? []).filter(id => this.actor.items.has(id));
@@ -333,10 +314,16 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     return super._onDrop(event);
   }
 
+  /**
+   * Applique un item Peuple au personnage (dépôt sur la fiche ou navigateur de peuples) : remet les
+   * caractéristiques au minimum racial et les compétences à zéro, après confirmation si nécessaire.
+   * @returns {Promise<boolean>}  false si l'utilisateur a renoncé
+   */
   async _applyPeuple(peupleItem) {
     const sd  = this.actor.system;
     const old = sd.peupleBonusApplique ?? {};
     const nw  = peupleItem.system;
+    if (!await this._confirmerPeuple("AGONE.PeupleChangerConfirm", peupleItem.name)) return false;
 
     // Supprimer les compétences raciales de l'ancien peuple
     const oldCompIds = (sd.peupleCompetenceIds ?? []).filter(id => this.actor.items.has(id));
@@ -374,21 +361,11 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
     const totB = k => nw[`${k}Bonus`] ?? 0;
 
     // Coût de création forcé : raceMin et compensation des malus négatifs (score plancher 0)
-    const _creaTbl  = CONFIG.AGONE.tableAchatCreation ?? [0, 1, 2, 3, 4, 5, 7, 10, 14, 19, 25];
-    const _creaLast = _creaTbl.length >= 2 ? _creaTbl[_creaTbl.length-1] - _creaTbl[_creaTbl.length-2] : 1;
-    const _creaCost = (n) => n <= 0 ? 0 : (n < _creaTbl.length ? _creaTbl[n] : _creaTbl[_creaTbl.length-1] + (n - _creaTbl.length + 1) * _creaLast);
-    // forcedRaw = achat minimum imposé en points de création (hors bonus racial)
-    const _forcedRaw = (k) => {
-      const bon = totB(k);
-      const pos = Math.max(0, bon);
-      return Math.max(
-        bon < 0 ? -bon : 0,
-        Math.max(0, (nw[`${k}Min`] ?? 0) - pos)
-      );
-    };
+    // forcedRaw = achat minimum imposé en points de création (hors bonus racial) ; coût : helpers/creation.mjs
+    const _forcedRaw = (k) => achatForce(totB(k), nw[`${k}Min`]);
     let _forcedCost = 0;
     for (const _k of ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite'])
-      _forcedCost += _creaCost(_forcedRaw(_k));
+      _forcedCost += coutCreationTotal(_forcedRaw(_k));
 
     const update = {
       "system.peuple":                 peupleItem.name,
@@ -464,16 +441,15 @@ export class PersonnageSheet extends ProgressionMixin(CompetencesMixin(CombatMix
       })));
     }
     ui.notifications?.info(game.i18n.format("AGONE.PeupleApplique", { name: peupleItem.name }));
+    return true;
   }
 
   // Paramètres — visibilité onglets
   async _onToggleTabVisibility(event) {
     const tab     = event.currentTarget.dataset.tab;
     const checked = event.currentTarget.checked;
-    // Si l'onglet actif est masqué, repasser sur Attributs
-    if (!checked && this._tabs?.[0]?.active === tab) {
-      this._tabs[0].activate("attributs");
-    }
+    // Si l'onglet actif est masqué, repasser sur Attributs au prochain rendu (voir bindTabs)
+    if (!checked && this._currentTab === tab) this._currentTab = "attributs";
     const current = this.actor.getFlag("agone", "tabsVisible") ?? {};
     await this.actor.setFlag("agone", "tabsVisible", { ...current, [tab]: checked });
   }

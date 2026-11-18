@@ -1,4 +1,8 @@
 import { pointsDeVie, libelleSante, couleurSante } from "../helpers/sante.mjs";
+import { concerneCombat } from "../helpers/suivi-combat.mjs";
+
+/** Saisies directes du tracker (initiative, points de vie). */
+const SAISIES = ".ct-init-input, .ct-pdv-input";
 
 /** Statuts proposés en accès rapide (ids de CONFIG.statusEffects) et leur icône. */
 const STATUTS_RAPIDES = [
@@ -134,18 +138,54 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
 
   _onFirstRender(context, options) {
     super._onFirstRender(context, options);
-    this._hookIds = HOOKS_RAFRAICHIR.map(nom => [nom, Hooks.on(nom, () => this.render())]);
+    // Rendus regroupés (une rafale de mises à jour = un rendu), limités aux documents du combat actif
+    this._rafraichir = foundry.utils.debounce(() => { if (this.rendered) this.render(); }, 100);
+    this._hookIds = HOOKS_RAFRAICHIR.map(nom => [nom, Hooks.on(nom, (doc, changed) => {
+      if (concerneCombat(nom, doc, changed, game.combat)) this._rafraichir();
+    })]);
+  }
+
+  /** @override — retient les saisies en cours (non validées) avant le remplacement du contenu */
+  _preSyncPartState(partId, newElement, priorElement, state) {
+    super._preSyncPartState(partId, newElement, priorElement, state);
+    state.saisies = [];
+    for (const input of priorElement.querySelectorAll(SAISIES)) {
+      const focus = input === document.activeElement;
+      if (!focus && input.value === input.defaultValue) continue;
+      state.saisies.push({
+        id: input.closest("[data-combatant-id]")?.dataset.combatantId,
+        classe: input.classList.contains("ct-init-input") ? "ct-init-input" : "ct-pdv-input",
+        valeur: input.value, modifiee: input.value !== input.defaultValue, focus,
+      });
+    }
+  }
+
+  /** @override — restitue les saisies en cours dans le nouveau contenu */
+  _syncPartState(partId, newElement, priorElement, state) {
+    super._syncPartState(partId, newElement, priorElement, state);
+    for (const { id, classe, valeur, modifiee, focus } of state.saisies ?? []) {
+      if (!id) continue;
+      const input = newElement.querySelector(`[data-combatant-id="${CSS.escape(id)}"] .${classe}`);
+      if (!input) continue;
+      if (modifiee) input.value = valeur;
+      if (focus) input.focus();
+    }
   }
 
   _onRender(context, options) {
     super._onRender(context, options);
-    // Garder le combattant actif visible
-    this.element.querySelector(".ct-active")?.scrollIntoView({ block: "nearest" });
+    // Amener le combattant actif à l'écran quand le tour change (sans contrarier le défilement du MJ)
+    const actif = this.element.querySelector(".ct-active");
+    const actifId = actif?.dataset.combatantId ?? null;
+    if (actif && actifId !== this._actifAffiche) actif.scrollIntoView({ block: "nearest" });
+    this._actifAffiche = actifId;
 
     // Saisies directes : initiative et points de vie
     for (const input of this.element.querySelectorAll(".ct-init-input")) {
       input.addEventListener("change", ev => {
         const valeur = Number(ev.currentTarget.value);
+        // Saisie validée : elle n'est plus « en cours » pour le prochain rendu
+        ev.currentTarget.defaultValue = ev.currentTarget.value;
         if (!isNaN(valeur)) game.combat?.setInitiative(AgoreCombatTracker.#combattant(ev.currentTarget)?.id, valeur);
       });
     }
@@ -155,6 +195,7 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
         if (!actor) return;
         const { max, champ } = pointsDeVie(actor);
         const valeur = Math.max(0, Math.min(max, Number(ev.currentTarget.value) || 0));
+        ev.currentTarget.value = ev.currentTarget.defaultValue = String(valeur);
         actor.update({ [`system.${champ}.valeur`]: valeur });
       });
     }
@@ -186,12 +227,15 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     if (combat) ui.notifications.info(game.i18n.localize("AGONE.Combat.CombatCree"));
   }
 
+  /** Fin du combat : une seule confirmation (Combat#endCombat en demanderait une seconde). */
   static async #onEndCombat() {
+    const combat = game.combat;
+    if (!combat) return;
     const confirme = await foundry.applications.api.DialogV2.confirm({
       window : { title: game.i18n.localize("AGONE.Combat.TerminerCombat") },
       content: `<p>${game.i18n.localize("AGONE.Combat.TerminerCombatConfirm")}</p>`,
     });
-    if (confirme) await game.combat?.endCombat();
+    if (confirme) await combat.delete();
   }
 
   static async #onAddTokens() {
@@ -212,7 +256,8 @@ export class AgoreCombatTracker extends foundry.applications.api.HandlebarsAppli
     const c = AgoreCombatTracker.#combattant(target);
     const actor = AgoreCombatTracker.#acteur(target);
     if (!c) return;
-    if (typeof actor?.rollInitiative === "function" && actor.system) await actor.rollInitiative(null);
+    // Le combattant cliqué est précisé : un acteur peut avoir plusieurs tokens au combat
+    if (typeof actor?.rollInitiative === "function" && actor.system) await actor.rollInitiative(null, { combatantId: c.id });
     else await game.combat.rollInitiative([c.id]);
   }
 

@@ -50,7 +50,7 @@
         <tbody>
           {{#each peines as |peine|}}
           <tr class="peine-row item-row" data-item-id="{{peine.id}}">
-            <td class="item-drag-handle"><i class="fas fa-grip-vertical"></i></td>
+            <td class="item-drag-handle" data-tooltip='{{localize "AGONE.Deplacer"}}' aria-label='{{localize "AGONE.Deplacer"}}'><i class="fas fa-grip-vertical"></i></td>
             <td class="peine-col-desc"><button type="button" class="desc-bascule" data-desc="{{peine.id}}" aria-expanded="false" aria-label="{{localize 'AGONE.VoirDescription'}}"><i class="fas fa-chevron-right"></i></button></td>
             <td class="peine-name"><a class="item-edit" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Peine.Modifier"}}' role="button" tabindex="0">{{peine.name}}</a></td>
             <td class="peine-noir">
@@ -84,11 +84,11 @@
               {{/if}}
             </td>
             <td class="peine-actions">
-              <a class="item-edit" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Peine.Modifier"}}' aria-label='{{localize "AGONE.Peine.Modifier"}}' role="button" tabindex="-1">
+              <a class="item-edit" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Peine.Modifier"}}' aria-label='{{localize "AGONE.Peine.Modifier"}}' role="button" tabindex="0">
                 <i class="fas fa-edit fa-xs"></i>
               </a>
               {{#if isOwner}}
-              <a class="item-delete" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' aria-label='{{localize "AGONE.Supprimer"}}' role="button" tabindex="-1">
+              <a class="item-delete" data-item-id="{{peine.id}}" data-tooltip='{{localize "AGONE.Supprimer"}}' aria-label='{{localize "AGONE.Supprimer"}}' role="button" tabindex="0">
                 <i class="fas fa-trash fa-xs"></i>
               </a>
               {{/if}}

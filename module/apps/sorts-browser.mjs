@@ -1,5 +1,5 @@
 import { SORTS_DATA } from "../helpers/compendium-data.mjs";
-import { familleSort, instrumentsSorts, cleInstrument } from "../helpers/filtres-navigateurs.mjs";
+import { familleSort, instrumentsSorts, cleInstrument, TYPES_EMPRISE } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
 
 /**
@@ -36,13 +36,13 @@ export class SortsBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-sorts-browser",
+    id      : "agone-sorts-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "sorts-browser"],
     actions : { addSort: SortsBrowser.#onAddSort, rollSortImpro: SortsBrowser.#onRollSortImpro },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/sorts-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/sorts-browser.hbs", scrollable: [".sb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -135,8 +135,7 @@ export class SortsBrowser extends AgoneBrowser {
     if (!d) return;
 
     // Sorts d'emprise (danseurs) : demander quel danseur utiliser
-    const EMPRISE_TYPES = new Set(["jorniste", "obscurantiste", "eclipsiste"]);
-    if (EMPRISE_TYPES.has(d.typeMagie)) {
+    if (TYPES_EMPRISE.includes(d.typeMagie)) {
       const danseurs = this.actor.items.filter(i => i.type === "danseur" && !i.system.modeCreation);
       if (!danseurs.length) {
         ui.notifications.warn(game.i18n.format("AGONE.Notif.AucunDanseurDisponible", { acteur: this.actor.name }));
@@ -146,7 +145,7 @@ export class SortsBrowser extends AgoneBrowser {
       if (danseurs.length === 1) {
         danseurId = danseurs[0].id;
       } else {
-        const options = danseurs.map(dan => `<option value="${dan.id}">${dan.name}</option>`).join("");
+        const options = danseurs.map(dan => `<option value="${dan.id}">${foundry.utils.escapeHTML(dan.name)}</option>`).join("");
         danseurId = await foundry.applications.api.DialogV2.prompt({
           window:  { title: game.i18n.format("AGONE.Browser.TitreDialogSortImpro", { nom: d.name }) },
           content: `<div class="form-group" style="margin:8px 0">
@@ -177,16 +176,9 @@ export class SortsBrowser extends AgoneBrowser {
     await this._addItem({
       name  : d.name,
       type  : "sort",
-      system: {
-        typeMagie  : d.typeMagie   ?? "",
-        seuil      : d.seuil       ?? 0,
-        portee     : d.portee      ?? "",
-        duree      : d.duree       ?? "",
-        danse      : d.danse       ?? "",
-        instrument : d.instrument  ?? "",
-        special    : d.special     ?? "",
-        description: d.description ?? "",
-      },
+      system: AgoneBrowser._systemDepuis(d, {
+        typeMagie: "", seuil: 0, portee: "", duree: "", danse: "", instrument: "", special: "", description: "",
+      }),
     }, "AGONE.Notif.SortAjoute");
   }
 

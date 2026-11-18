@@ -3,6 +3,7 @@
  */
 import { sourcesEffets } from "../helpers/effets.mjs";
 import { resoudreDomaineArts } from "../helpers/domaines-arts.mjs";
+import { sortEstLibre } from "../helpers/danseurs.mjs";
 
 /**
  * Compétences regroupées par score décroissant (un groupe par niveau).
@@ -127,13 +128,16 @@ const TYPES_MAGIE_LABELS = {
 /**
  * Sorts de l'onglet Magie : types présents (mini-filtre), groupes par seuil et groupes
  * selon le tri choisi (flag `triSorts` : "type" | "seuil"). Les sorts mémorisés par un
- * danseur sont affichés dans son emplacement, pas dans la grille.
+ * danseur existant (`system.danseurId`) sont affichés dans son emplacement, pas dans la grille ;
+ * un sort dont le danseur a disparu redevient libre.
  * @param {Actor} actor
  * @param {Item[]} sorts
+ * @param {string[]} [idsDanseurs]  Ids des danseurs de l'acteur (aucun : fiche sans danseurs)
  */
-export function sortsContext(actor, sorts) {
+export function sortsContext(actor, sorts, idsDanseurs = []) {
   const typeLabel = t => TYPES_MAGIE_LABELS[t] ? game.i18n.localize(TYPES_MAGIE_LABELS[t]) : t;
-  const libres    = sorts.filter(s => !s.system.danseurNom);
+  const danseurs  = idsDanseurs.map(id => ({ id }));
+  const libres    = sorts.filter(s => sortEstLibre(s, danseurs));
 
   const sortTypes = [...new Set(sorts.map(s => s.system.typeMagie).filter(Boolean))]
     .sort()
@@ -166,7 +170,7 @@ export function sortsContext(actor, sorts) {
  * Fonction pure — ne lit ni le DataModel ni `game.i18n`, uniquement les valeurs passées en argument.
  * @param {object} danseur                  `{ capaciteSeuil, enduranceActuelle, enduranceMax }`
  * @param {Array<{seuil?: number}>} sortsAssignes  Sorts déjà mémorisés par ce danseur
- * @param {Array<{id: string, name: string, seuil?: number, danseurNom?: string}>} autresSorts
+ * @param {Array<{id: string, name: string, seuil?: number}>} autresSorts
  *        Sorts de l'acteur non mémorisés par ce danseur (libres ou mémorisés par un autre danseur)
  * @returns {{memoireUtilisee: number, isFull: boolean, memoirePct: number, endurancePct: number,
  *            enduranceVide: boolean, sortsMemorisables: Array}}
@@ -180,6 +184,50 @@ export function danseurMemoire({ capaciteSeuil = 0, enduranceActuelle = 0, endur
   const restant = capaciteSeuil - memoireUtilisee;
   const sortsMemorisables = autresSorts.filter(s => (s.seuil ?? 0) <= restant);
   return { memoireUtilisee, isFull, memoirePct, endurancePct, enduranceVide, sortsMemorisables };
+}
+
+// Origines des démons : couleurs chromatiques (noms propres) + démons intérieurs des paliers de Ténèbres
+const ORIGINES_CHROMATIQUES = ["Opalin", "Azurin", "Saphirin", "Ambré", "Safran", "Carmin", "Vermillon", "Obsidien"];
+const ORIGINES_PALIERS = ["diablotin", "demonFacetieux", "jumeauDemoniaque", "siamoisTenebres"];
+
+/**
+ * Origines possibles d'un démon (fiche Démon, cartes de démons liés) : `{ value, label }`.
+ * La valeur d'une origine chromatique est son nom sans accent ni majuscule.
+ */
+export function originesDemon() {
+  return [
+    ...ORIGINES_CHROMATIQUES.map(label => ({ value: label.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(), label })),
+    ...ORIGINES_PALIERS.map(value => ({ value, label: game.i18n.localize(`AGONE.Peine.${value}`) })),
+  ];
+}
+
+/** Libellé d'une origine de démon ; une origine inconnue (saisie libre) est affichée telle quelle. */
+export function libelleOrigineDemon(origine) {
+  if (!origine) return "";
+  return originesDemon().find(o => o.value === origine)?.label ?? origine;
+}
+
+/** Options du sélecteur « attribut lié » d'une compétence : libellés abrégés traduits (AGONE.Abr.*). */
+export function optionsAttributLie() {
+  return ["agilite", "force", "perception", "resistance", "intelligence", "volonte", "charisma", "creativite", "melee", "tir"]
+    .map(value => ({ value, label: game.i18n.localize(`AGONE.Abr.${value}`) }));
+}
+
+/** Types d'item dont la description est affichée (dépliable) sur les fiches d'acteur. */
+export const TYPES_AVEC_DESCRIPTION = ["don", "sort", "pouvoir", "manoeuvre"];
+
+/**
+ * Descriptions enrichies (liens, jets inline, secrets selon le propriétaire) des items, par id.
+ * Les enrichissements sont lancés en parallèle ; les descriptions vides sont ignorées.
+ * @param {Iterable<Item>} items
+ * @returns {Promise<Record<string, string>>}
+ */
+export async function descriptionsEnrichies(items) {
+  const avecDescription = [...items].filter(i => typeof i.system?.description === "string" && i.system.description.trim());
+  const enrichir = foundry.applications.ux.TextEditor.implementation;
+  const html = await Promise.all(avecDescription.map(i =>
+    enrichir.enrichHTML(i.system.description, { secrets: !!i.isOwner, relativeTo: i })));
+  return Object.fromEntries(avecDescription.map((i, index) => [i.id, html[index]]));
 }
 
 const ASPECTS = [
@@ -292,18 +340,8 @@ export function trierItems(actor, type) {
     .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0) || a.name.localeCompare(b.name, "fr"));
 }
 
-/**
- * Malus de surcharge (affichage) : -3 au-delà de la charge max, -1 au-delà de la demi-charge.
- * @param {number} charge      Charge portée
- * @param {number} demiCharge
- * @param {number} chargeMax
- * @returns {number}
- */
-export function malusSurcharge(charge, demiCharge, chargeMax) {
-  if (chargeMax > 0 && charge > chargeMax)   return -3;
-  if (demiCharge > 0 && charge > demiCharge) return -1;
-  return 0;
-}
+// Malus de surcharge : implémentation unique, partagée avec AgoneActor (helpers/derivations.mjs)
+export { malusSurcharge } from "../helpers/derivations.mjs";
 
 /**
  * Stats de combat affichées par le partial cstats-simples.hbs pour un acteur simple.
@@ -406,6 +444,11 @@ export async function contexteActeurSimple(actor, sheet) {
   const system      = actor.system;
   const competences = trierItems(actor, "competence");
   const badges      = badgesActeurSimple(actor);
+  const enrichir    = foundry.applications.ux.TextEditor.implementation;
+  const [descriptionsHTML, descriptionHTML] = await Promise.all([
+    descriptionsEnrichies(actor.items.filter(i => TYPES_AVEC_DESCRIPTION.includes(i.type))),
+    enrichir.enrichHTML(system.description ?? "", { async: true, secrets: actor.isOwner }),
+  ]);
   return {
     system, actor,
     source  : actor._source.system,   // valeurs stockées (saisie), sans les effets actifs
@@ -425,8 +468,9 @@ export async function contexteActeurSimple(actor, sheet) {
     showLevelUp           : false,
     showLevelUpComp       : false,
     showLevelUpAspect     : false,
-    descriptionHTML: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      system.description ?? "", { async: true, secrets: actor.isOwner }
-    ),
+    attributsLies         : optionsAttributLie(),
+    // Descriptions enrichies des items (dépliables), par id d'item
+    descriptionsHTML,
+    descriptionHTML,
   };
 }

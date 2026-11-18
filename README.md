@@ -1,6 +1,6 @@
 # Agone — Système Foundry VTT
 
-Système non-officiel pour le jeu de rôle [**Agone**](https://fr.wikipedia.org/wiki/Agone_(jeu_de_r%C3%B4le)) (Multisim) sur [Foundry VTT](https://foundryvtt.com/) v13 / v14.
+Système non-officiel pour le jeu de rôle [**Agone**](https://fr.wikipedia.org/wiki/Agone_(jeu_de_r%C3%B4le)) (Multisim) sur [Foundry VTT](https://foundryvtt.com/) v14.
 
 > ⚠️ Ce système est un projet communautaire non affilié à Multisim ou aux ayants droit d'Agone.
 
@@ -13,8 +13,10 @@ Système non-officiel pour le jeu de rôle [**Agone**](https://fr.wikipedia.org/
 Dans Foundry VTT → **Configuration** → **Systèmes de jeu** → **Installer un système** :
 
 ```
-https://raw.githubusercontent.com/Lojocats/agone/main/system.json
+https://github.com/Lojocats/agone/releases/latest/download/system.json
 ```
+
+Ce manifeste est celui de la dernière release publiée. Pour installer une version précise, utilisez le `system.json` joint à sa [release](https://github.com/Lojocats/agone/releases).
 
 ### Manuellement
 
@@ -176,7 +178,6 @@ La luminosité de la scène varie automatiquement selon l'heure du jour (nuit �
 
 | Foundry VTT | Statut |
 |---|---|
-| v13 | ✅ Vérifié |
 | v14 | ✅ Vérifié |
 
 ---
@@ -186,15 +187,17 @@ La luminosité de la scène varie automatiquement selon l'heure du jour (nuit �
 Le système est servi tel quel par Foundry (modules ES natifs, sans étape de build) : le dépôt se place directement dans `FoundryVTT/Data/systems/agone`, et un rechargement du monde (F5) suffit pour tester une modification.
 
 ```bash
-npm install      # outillage de développement uniquement
-npm run lint     # vérification ESLint du code (module/, tests/)
-npm test         # tests unitaires hors Foundry (tests/unit)
+npm install               # outillage de développement uniquement (Node 22 ou plus récent, voir .nvmrc)
+npm run lint              # vérification ESLint du code (module/, tests/) ; lint:fix pour corriger
+npm test                  # tests unitaires hors Foundry (tests/unit) ; test:court pour une sortie compacte
+npm run test:couverture   # tests unitaires avec le rapport de couverture de Node
+node --test tests/unit/recherche.test.mjs   # un seul fichier de tests
 ```
 
 - **Tests unitaires** (`tests/unit`, Node) : logique des effets, données de contexte des fiches, intégrité des données de compendium, traductions fr/en, compilation des templates, validité du CSS, cohérence du manifeste et du CHANGELOG.
-- ESLint et les tests unitaires sont exécutés par GitHub Actions à chaque push et pull request.
+- ESLint et les tests unitaires sont exécutés par GitHub Actions à chaque push sur `main` et à chaque pull request.
 - **Tests d'intégration** (`module/tests`, Quench) : activez le module Quench dans un monde de test, puis lancez les batchs « Agone » depuis son onglet — intégration du système, valeurs dérivées, formules de chaque jet, chaque statistique d'effet sur chaque type d'acteur, fiches et éditeur d'effets, navigateurs de compendium.
-- **Publication** : augmentez `version` dans `system.json`, complétez le [CHANGELOG](CHANGELOG.md), puis poussez un tag `vX.Y.Z` : la release et `agone.zip` sont créés automatiquement.
+- **Publication** : augmentez `version` dans `system.json`, complétez le [CHANGELOG](CHANGELOG.md), puis poussez sur `main` : une fois lint et tests passés, le tag `vX.Y.Z` et la release sont créés automatiquement, avec `agone.zip` et le `system.json` de cette version.
 - Les contenus des compendiums du système sont générés depuis `module/helpers/compendium-data.mjs` ; les modifications de données persistantes passent par une migration (`module/migration.mjs`).
 
 ---

@@ -1,6 +1,6 @@
 <form class="agone sheet item danseur-sheet" autocomplete="off">
   <header class="sheet-header">
-    <img class="profile-img" src="{{item.img}}" data-edit="img" data-tooltip="{{item.name}}" width="36" height="36">
+    <img class="profile-img" src="{{item.img}}" data-action="editImage" data-edit="img" data-tooltip="{{item.name}}" width="36" height="36">
     <div class="header-fields">
       <h1 class="charname">
         <input name="name" type="text" value="{{item.name}}" placeholder='{{localize "AGONE.NomDanseur"}}'>
@@ -74,7 +74,7 @@
 
     <!-- Capacité mémoire en Seuil -->
     <div class="danseur-memoire-bloc">
-      <span>{{localize "AGONE.DanseurCapaciteSeuil"}} : <strong>{{system.capaciteSeuil}}</strong> pts</span>
+      <span>{{localize "AGONE.DanseurCapaciteSeuil"}} : <strong>{{system.capaciteSeuil}}</strong> {{localize "AGONE.UnitePoints"}}</span>
       <small>({{localize "AGONE.Ui.CasesMemoire" n=system.memoireMax}} · {{localize "AGONE.DanseurMemoireExplain"}})</small>
     </div>
 

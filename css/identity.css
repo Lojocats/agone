@@ -8,9 +8,9 @@
   gap: 8px;
   flex-wrap: wrap;
   padding: 6px 10px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.08);
-  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.3);
-  border-radius: var(--radius, 4px);
+  background: rgba(var(--agone-or-rgb), 0.08);
+  border: 1px solid rgba(var(--agone-or-rgb), 0.3);
+  border-radius: var(--radius);
   margin-bottom: 8px;
 }
 .agone .flamme-stat-box {
@@ -19,23 +19,9 @@
   align-items: center;
   min-width: 48px;
   padding: 4px 8px;
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
-  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.35);
+  background: rgba(var(--agone-or-rgb), 0.12);
+  border: 1px solid rgba(var(--agone-or-rgb), 0.35);
   border-radius: 3px;
-}
-.agone .flamme-stat-box .fsb-val {
-  font-size: 18px;
-  font-weight: bold;
-  color: var(--agone-brown, #5c3a1e);
-  line-height: 1.1;
-}
-.agone .flamme-stat-box .fsb-lbl {
-  font-size: 9px;
-  text-transform: uppercase;
-  color: var(--agone-dark-text, #2a1a08);
-  opacity: 0.7;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
 }
 
 /* ── Onglet Identité ─────────────────────────────────────── */
@@ -50,24 +36,24 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-@media (max-width: 550px) {
+@container agone-fiche (max-width: 550px) {
   .agone .identite-main-grid { grid-template-columns: 1fr; }
 }
 .agone .identite-card {
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
-  border-radius: var(--radius, 4px);
+  background: rgba(var(--agone-surface-rgb), 0.35);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.2);
+  border-radius: var(--radius);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .agone .identite-card-header {
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.08);
+  background: rgba(var(--agone-brun-rgb), 0.08);
   padding: 5px 10px;
   font-family: 'MedievalSharp', Georgia, serif;
   font-size: 12px;
-  color: var(--agone-brown, #5c3a1e);
-  border-bottom: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
+  color: var(--agone-brown);
+  border-bottom: 1px solid rgba(var(--agone-brun-rgb), 0.15);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -93,25 +79,25 @@
 .agone .identite-row label {
   min-width: 90px;
   font-size: 12px;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   font-weight: 600;
 }
 .agone .identite-row input,
 .agone .identite-row select {
   flex: 1;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.25);
   border-radius: 3px;
   padding: 2px 5px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.5);
+  background: rgba(var(--agone-surface-rgb), 0.5);
   font-family: 'Crimson Text', Georgia, serif;
   font-size: 13px;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
 }
 .agone .identite-row input:focus,
 .agone .identite-row select:focus {
   outline: none;
-  border-color: var(--agone-gold, #c9a227);
-  box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb, 201,162,39), 0.15);
+  border-color: var(--agone-gold);
+  box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb), 0.15);
 }
 .agone .identite-peuple-row {
   display: flex;
@@ -120,7 +106,7 @@
 }
 .agone .peuple-drop-zone {
   flex: 1;
-  border: 1px dashed rgba(var(--agone-brun-rgb, 92,58,30), 0.35);
+  border: 1px dashed rgba(var(--agone-brun-rgb), 0.35);
   border-radius: 3px;
   padding: 4px 8px;
   min-height: 28px;
@@ -128,13 +114,13 @@
   align-items: center;
   font-size: 12px;
   font-style: italic;
-  color: var(--agone-brown, #5c3a1e);
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
+  color: var(--agone-brown);
+  background: rgba(var(--agone-surface-rgb), 0.35);
   transition: background 0.15s, border-color 0.15s;
 }
 .agone .peuple-drop-zone.drag-over {
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.12);
-  border-color: var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-or-rgb), 0.12);
+  border-color: var(--agone-gold);
   border-style: solid;
 }
 .agone .identite-notes-zone {
@@ -143,19 +129,13 @@
   flex-direction: column;
   gap: 5px;
 }
-.agone .identite-editor {
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
-  border-radius: var(--radius, 4px);
-  min-height: 80px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
-}
 
 /* ── Fiche Item (sheet) ──────────────────────────────────── */
 .agone.item {
   font-family: 'Crimson Text', Georgia, serif;
   font-size: 14px;
-  color: var(--agone-dark-text, #2a1a08);
-  background: var(--agone-parchment, #f4e8c1);
+  color: var(--agone-dark-text);
+  background: var(--agone-parchment);
 }
 .agone.item *,
 .agone.item *::before,
@@ -167,7 +147,7 @@
   gap: 8px 16px;
   padding: 8px;
 }
-@media (max-width: 480px) {
+@container agone-fiche (max-width: 480px) {
   .agone.item .item-form-grid { grid-template-columns: 1fr; }
 }
 .agone.item .form-group {
@@ -177,41 +157,40 @@
 }
 .agone.item .comp-score-preview {
   font-size: 11px;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.8;
   font-style: italic;
   padding: 1px 0;
 }
 .agone.item .comp-score-preview.comp-manquante {
-  color: var(--agone-txt-rouge, #b94040);
+  color: var(--agone-txt-rouge-clair);
   opacity: 1;
 }
 
-.agone.item .form-group.full-width { grid-column: 1 / -1; }
 .agone.item .form-group > label {
   font-size: 11px;
   text-transform: uppercase;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   font-weight: 600;
   letter-spacing: 0.04em;
 }
 .agone.item .form-group input,
 .agone.item .form-group select,
 .agone.item .form-group textarea {
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.25);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.25);
   border-radius: 3px;
   padding: 4px 8px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.55);
+  background: rgba(var(--agone-surface-rgb), 0.55);
   font-family: 'Crimson Text', Georgia, serif;
   font-size: 13px;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
 }
 .agone.item .form-group input:focus,
 .agone.item .form-group select:focus,
 .agone.item .form-group textarea:focus {
   outline: none;
-  border-color: var(--agone-gold, #c9a227);
-  box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb, 201,162,39), 0.15);
+  border-color: var(--agone-gold);
+  box-shadow: 0 0 0 2px rgba(var(--agone-or-rgb), 0.15);
 }
 
 .agone.item .form-check {
@@ -225,7 +204,7 @@
   width: 14px;
   height: 14px;
   cursor: pointer;
-  accent-color: var(--agone-brown, #5c3a1e);
+  accent-color: var(--agone-brown);
 }
 
 .agone.item .description-group {
@@ -241,9 +220,9 @@
   gap: 12px;
   flex-wrap: wrap;
   padding: 6px 8px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.15);
-  border-radius: var(--radius, 4px);
+  background: rgba(var(--agone-brun-rgb), 0.06);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.15);
+  border-radius: var(--radius);
 }
 .agone.item .totaux-row {
   display: flex;
@@ -251,7 +230,7 @@
   gap: 6px;
   font-size: 13px;
 }
-.agone.item .totaux-row label { font-weight: 600; color: var(--agone-brown, #5c3a1e); }
+.agone.item .totaux-row label { font-weight: 600; color: var(--agone-brown); }
 .agone.item .arme-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -277,27 +256,27 @@
   gap: 8px;
   font-size: 13px;
   padding: 2px 0;
-  border-bottom: 1px dotted rgba(var(--agone-brun-rgb, 92,58,30), 0.2);
+  border-bottom: 1px dotted rgba(var(--agone-brun-rgb), 0.2);
 }
 .agone.peuple .peuple-row-label {
   flex: 1;
   font-size: 12px;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
 }
 .agone.peuple .bonus-input {
   width: 48px;
   text-align: center;
-  border: 1px solid rgba(var(--agone-brun-rgb, 92,58,30), 0.3);
+  border: 1px solid rgba(var(--agone-brun-rgb), 0.3);
   border-radius: 3px;
   padding: 2px 4px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.5);
+  background: rgba(var(--agone-surface-rgb), 0.5);
   font-size: 12px;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
 }
 .agone.peuple .col-header {
   font-size: 10px;
   text-transform: uppercase;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   font-weight: 600;
   text-align: center;
   opacity: 0.7;
@@ -311,8 +290,8 @@
   gap: 6px;
 }
 .agone .effet-bloc {
-  border: 1px solid var(--agone-border, rgba(92,58,30,0.35));
-  border-radius: var(--radius, 4px);
+  border: 1px solid var(--agone-border);
+  border-radius: var(--radius);
   padding: 6px 8px;
   display: flex;
   flex-direction: column;
@@ -325,15 +304,15 @@
   margin: 0;
   font-size: 11px;
   font-style: italic;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.8;
 }
 /* Effets du bienfait d'une peine (suspendus tant qu'il n'est pas acquis) */
 .agone .agone-effets-bienfait {
   padding: 6px 8px;
-  border-left: 3px solid var(--agone-gold, #c9a227);
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
-  border-radius: var(--radius, 4px);
+  border-left: 3px solid var(--agone-gold);
+  background: rgba(var(--agone-or-rgb), 0.06);
+  border-radius: var(--radius);
 }
 .agone .agone-effets-bienfait.effets-suspendus .effet-bloc {
   opacity: 0.6;
@@ -344,19 +323,19 @@
 .agone .peine-bienfait-bloc {
   margin-top: 10px;
   padding: 6px 10px 10px;
-  border: 1px solid rgba(var(--agone-or-rgb, 201,162,39), 0.5);
-  border-radius: var(--radius, 4px);
+  border: 1px solid rgba(var(--agone-or-rgb), 0.5);
+  border-radius: var(--radius);
 }
 .agone .peine-bienfait-bloc.bienfait-acquis {
-  border-color: var(--agone-gold, #c9a227);
-  background: rgba(var(--agone-or-rgb, 201,162,39), 0.06);
+  border-color: var(--agone-gold);
+  background: rgba(var(--agone-or-rgb), 0.06);
 }
 .agone .peine-bienfait-bloc legend {
   padding: 0 4px;
   font-weight: 700;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
 }
-.agone .peine-bienfait-bloc legend i { color: var(--agone-gold, #c9a227); }
+.agone .peine-bienfait-bloc legend i { color: var(--agone-gold); }
 .agone .bienfait-texte-livre {
   display: flex;
   flex-direction: column;
@@ -364,7 +343,7 @@
   margin-bottom: 6px;
   padding: 6px 8px;
   border-radius: 3px;
-  background: rgba(var(--agone-brun-rgb, 92,58,30), 0.06);
+  background: rgba(var(--agone-brun-rgb), 0.06);
   font-size: 12px;
 }
 .agone .bienfait-texte-livre p { margin: 0; }
@@ -420,7 +399,7 @@
 /* ── Vue limitée (permission « Limité ») ────────────────── */
 .agone-limitee .window-content {
   padding: 0;
-  background: var(--agone-parchment, #f4e8c1);
+  background: var(--agone-parchment);
 }
 .agone .agone-limitee-wrap {
   display: flex;
@@ -428,34 +407,34 @@
   gap: 10px;
   padding: 12px;
   font-family: 'Crimson Text', Georgia, serif;
-  color: var(--agone-dark-text, #2a1a08);
+  color: var(--agone-dark-text);
 }
 .agone .limitee-entete {
   display: flex;
   align-items: center;
   gap: 12px;
   padding-bottom: 8px;
-  border-bottom: 2px solid var(--agone-gold, #c9a227);
+  border-bottom: 2px solid var(--agone-gold);
 }
 .agone .limitee-portrait {
   width: 96px;
   height: 96px;
   flex-shrink: 0;
   object-fit: cover;
-  border: 2px solid var(--agone-border, #7d5a2a);
-  border-radius: var(--radius, 4px);
+  border: 2px solid var(--agone-border);
+  border-radius: var(--radius);
 }
 .agone .limitee-nom {
   margin: 0;
   font-family: 'MedievalSharp', Georgia, serif;
   font-size: 24px;
   border: none;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
 }
 .agone .limitee-type {
   font-size: 13px;
   font-style: italic;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.8;
 }
 .agone .limitee-description {
@@ -471,7 +450,7 @@
 .agone .limitee-pied {
   font-size: 11px;
   font-style: italic;
-  color: var(--agone-brown, #5c3a1e);
+  color: var(--agone-brown);
   opacity: 0.6;
 }
 

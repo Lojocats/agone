@@ -37,13 +37,13 @@ export class ArmesBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-armes-browser",
+    id      : "agone-armes-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "armes-browser"],
     actions : { addArme: ArmesBrowser.#onAddArme },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/armes-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/armes-browser.hbs", scrollable: [".ab-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -51,9 +51,7 @@ export class ArmesBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
-    const actorArmeNames = new Set(
-      this.actor.items.filter(i => i.type === "arme").map(i => i.name)
-    );
+    const actorArmeNames = this._nomsPossedes();
 
     const STYLE_LABELS = {
       melee   : game.i18n.localize("AGONE.Melee"),
@@ -136,21 +134,10 @@ export class ArmesBrowser extends AgoneBrowser {
     await this._addItem({
       name  : d.name,
       type  : "arme",
-      system: {
-        style       : d.style        ?? "melee",
-        type        : d.type         ?? "P",
-        tai         : d.tai          ?? 0,
-        initBonus   : d.initBonus    ?? 0,
-        attackBonus : d.attackBonus  ?? 0,
-        defenseBonus: d.defenseBonus ?? 0,
-        dommages    : d.dommages     ?? 0,
-        portee      : d.portee       ?? "",
-        reqFor      : d.reqFor       ?? 0,
-        reqAgi      : d.reqAgi       ?? 0,
-        protection  : d.protection   ?? 0,
-        malusAgi    : d.malusAgi     ?? 0,
-        description : d.description  ?? "",
-      },
+      system: AgoneBrowser._systemDepuis(d, {
+        style: "melee", type: "P", tai: 0, initBonus: 0, attackBonus: 0, defenseBonus: 0, dommages: 0,
+        portee: "", reqFor: 0, reqAgi: 0, protection: 0, malusAgi: 0, description: "",
+      }),
     }, "AGONE.Notif.ArmeAjoutee");
   }
 

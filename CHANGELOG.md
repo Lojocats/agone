@@ -3,6 +3,54 @@
 Toutes les évolutions notables du système Agone pour Foundry VTT.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; les versions suivent la numérotation de `system.json`.
 
+## [1.11.0] — 2026-11-18
+
+Revue complète du système : corrections de jeu, protections contre les pertes de données, sécurité, accessibilité, outillage. Deux migrations s'appliquent à la première connexion du MJ.
+
+### Corrigé
+- **Jetons** : la barre de points de vie s'affiche enfin (attribut `pdv`, `densite` pour un démon) et se modifie depuis le HUD du jeton ; elle est proposée dans la configuration du jeton. Une migration répare les tokens prototypes et les tokens déjà placés dans les scènes.
+- **Armes** : les totaux d'initiative, d'attaque, de parade et de dommages (fiche, fiche d'arme, chat) sont calculés après les effets actifs et utilisent la même caractéristique que le jet d'attaque ; ils n'étaient justes qu'après une modification de l'arme elle-même.
+- **Danseurs** : les sorts mémorisés sont liés au danseur par son identifiant. Renommer un danseur ne fait plus disparaître ses sorts, le supprimer les libère (migration automatique ; si deux danseurs portent le même nom, les sorts vont au premier).
+- **Armures et boucliers** : la protection et les malus sont lus sur l'armure portée et le bouclier équipé ; supprimer ou modifier l'objet ne laisse plus de protection fantôme (migration : les anciennes copies sont effacées).
+- **Portraits et icônes** : un clic sur l'image d'une fiche d'acteur ou d'objet ouvre de nouveau le sélecteur de fichiers.
+- **Fiche d'arme** : le style « Bouclier » est proposé, avec ses champs Protection et Malus AGI.
+- **Surcharge** : le malus tient compte de la charge maximale modifiée par les avantages et les effets.
+- **Initiative** : le jet est toujours fermé (ni fumble ni critique) ; le total de la carte est celui reporté dans le tracker, et le bon combattant est mis à jour quand plusieurs partagent le même acteur.
+- **Ténèbres** : le démon apparu au franchissement d'un palier est créé par le MJ connecté (les joueurs n'ont pas le droit de créer des acteurs) et hérite des droits du personnage ; un palier manuel n'est plus coché si la création échoue.
+- **Magie** : les bonus personnalisés d'Art, d'Emprise et d'Initiative comptent dans les potentiels d'Arts Magiques et d'Emprise et dans l'initiative magique ; un sort d'Accord improvisé depuis le navigateur respecte la contrainte d'instrument ; l'endurance du danseur est relue au moment du jet.
+- **Effets actifs** : PH max et PdV max suivent la Flamme et la Résistance modifiées ; une caractéristique ne peut plus devenir négative. Compagnons et démons : plus de ligne « Bonus d'aspect » fantôme.
+- **Peuple** : les minimums et maximums raciaux d'un Peuple personnalisé sont respectés ; vider un minimum ou un maximum l'efface au lieu d'écrire 0 ; la fiche d'un Peuple s'ouvre sur ses statistiques. Coût de création au-delà de la table d'achat : même calcul partout.
+- **Fiches** : le focus et le curseur sont conservés après la modification d'un champ ; vider un champ texte modifié en ligne n'écrit plus « 0 » ; glisser-déposer correct dans les grilles à plusieurs colonnes ; origine chromatique des démons liés affichée ; descriptions dépliables avec liens actifs et secrets masqués aux non-propriétaires.
+- **Jetons à la création** : seuls les personnages et les compagnons sont liés à leur acteur ; les réglages de token d'un acteur importé ou dupliqué sont conservés.
+- **Météo** : l'application automatique ne supprime plus les effets FXMaster posés à la main, ne relance les effets que si la météo change, ne modifie la scène que si nécessaire et ne tourne que chez le MJ actif.
+- **Calendrier** : deux clics rapides avancent bien deux fois ; le premier changement de date ou de météo d'un monde rafraîchit le widget.
+- **Navigateurs** : la recherche ne mange plus les espaces ni les caractères tapés pendant le rafraîchissement, la liste garde son défilement, un double-clic n'ajoute plus deux objets, deux fiches peuvent ouvrir le même navigateur ; refuser la confirmation d'un peuple n'affiche plus « peuple appliqué ».
+- **Tracker de combat** : une seule confirmation en fin de combat ; les saisies d'initiative et de PdV en cours ne sont plus effacées par un rafraîchissement.
+- **Barre de raccourcis** : le glisser-déposer d'un objet fonctionne de nouveau.
+- **Migrations et compendiums** : exécutés par le seul MJ actif ; un échec de génération ne laisse plus un compendium déverrouillé.
+- Foundry v14 : plus d'avertissement `CONST.ACTIVE_EFFECT_MODES` venant du système.
+- Les grilles des fiches se replient selon la largeur de la fenêtre de la fiche et non plus celle de l'écran.
+
+### Sécurité
+- Noms de token, d'objet, de compétence, de spécialité et de danseur échappés dans l'infobulle de santé, les dialogues de jet et les cartes de chat.
+
+### Modifié
+- **Foundry v13 n'est plus pris en charge** : le système demande Foundry v14 (`compatibility.minimum`). Les branches de compatibilité v13 (modes de jet, menu contextuel du chat) sont retirées.
+- Appliquer ou retirer un peuple demande confirmation dès que le personnage a déjà un peuple ou n'est plus en création ; supprimer un effet ou un modificateur aussi.
+- Création manuelle d'un démon réservée aux utilisateurs autorisés à créer des acteurs ; sinon un message invite à demander au MJ.
+- Polices Crimson Text et MedievalSharp embarquées (dossier `fonts/`, licence SIL OFL 1.1) : plus de requête vers Google Fonts, les parties hors ligne gardent les polices.
+- Palette claire définie une seule fois dans `:root` : nuances de rouge, vert, brun, bleu et orange harmonisées ; jauges et tracker sur des jetons de thème.
+- Accessibilité : indicateur de focus sur le nom du personnage et les champs de recherche ; noms d'arme, d'équipement et d'Art magique activables au clavier ; `prefers-reduced-motion` coupe toutes les animations ; icônes de météo et de lune en Font Awesome.
+- Textes de santé par défaut et abréviations (PdV, SBG, SBC, BG, attributs liés) traduits.
+- Compétences Démonologie, Danseurs, Résonance, Esquive et Arts Magiques reconnues sans tenir compte des accents ni de la casse.
+- Tests Quench chargés seulement quand Quench est actif.
+- Nettoyage : CSS, clés de traduction et helpers Handlebars inutilisés supprimés.
+
+### Outillage
+- Manifeste : l'URL de manifeste devient `…/releases/latest/download/system.json` ; une version n'est annoncée qu'une fois sa release publiée et chaque release fournit son propre `system.json`. Licence, suivi des bugs, FXMaster recommandé, grille de 1 m et barre de PdV par défaut déclarés.
+- Release : `LICENSE`, `README.md`, `CHANGELOG.md` et les polices dans l'archive, `packs/` retiré ; échec si le tag ne correspond pas à la version ; Node 22 minimum, Dependabot mensuel, `npm run test:couverture`.
+- Tests : dérivations et modificateurs de jet extraits en fonctions pures testées, mécanique des migrations, modes de jet, barres de jeton, armures, danseurs, coût de création, météo, calendrier, tracker, santé ; vérifications statiques des partials, des classes CSS, des clés de traduction et des helpers utilisés.
+
 ## [1.10.0] — 2026-11-17
 
 ### Corrigé

@@ -1,5 +1,5 @@
 /**
- * Agone – système pour FoundryVTT v13
+ * Agone – système pour FoundryVTT v14
  * Point d'entrée principal du module.
  */
 
@@ -8,8 +8,11 @@ import { AGONE }                from "./helpers/config.mjs";
 import { ARMES_DATA, ARMURES_DATA, BOUCLIERS_DATA, SORTS_DATA, PEUPLES_DATA } from "./helpers/compendium-data.mjs";
 import { registerHandlebarsHelpers as registerHandlebars } from "./helpers/handlebars.mjs";
 import { registerMigrationSettings, migrateWorld } from "./migration.mjs";
-import { registerQuenchTests } from "./tests/quench.mjs";
 import { libelleSante } from "./helpers/sante.mjs";
+import { AgoneTokenDocument } from "./documents/token.mjs";
+import { defautsTokenPrototype } from "./helpers/jeton.mjs";
+import { estMJActif, creerFile } from "./helpers/mj.mjs";
+import { METEO_FX, luminositeMeteo, effetMeteoNatif, effetsFXMeteo, changementsScene } from "./helpers/meteo.mjs";
 
 // ── DataModels ────────────────────────────────────────────────────────────────
 import {
@@ -40,8 +43,15 @@ import { DemonSheet }     from "./sheets/demon-sheet.mjs";
 import { PnjSheet }       from "./sheets/pnj-sheet.mjs";
 import { AgoneItemSheet }    from "./sheets/item-sheet.mjs";
 
-// Tests d'intégration (actifs seulement si le module Quench est installé et activé)
-Hooks.on("quenchReady", registerQuenchTests);
+// Tests d'intégration : chargés seulement si le module Quench est installé et activé
+Hooks.on("quenchReady", async quench => {
+  try {
+    const { registerQuenchTests } = await import("./tests/quench.mjs");
+    registerQuenchTests(quench);
+  } catch (err) {
+    console.error("Agone | Chargement des tests Quench impossible", err);
+  }
+});
 
 /* ============================================================================
  * INIT HOOK
@@ -68,22 +78,15 @@ Hooks.once("init", () => {
   });
 
   // ── Labels de santé (textes affichés au hover d'un token non-possédé) ──
-  const _santeLabels = [
-    { key: "santeLabel100", def: "se porte à merveille",      hint: "AGONE.SanteLabel100Hint" },
-    { key: "santeLabel75",  def: "se porte bien",             hint: "AGONE.SanteLabel75Hint"  },
-    { key: "santeLabel50",  def: "a vu de meilleurs jours",   hint: "AGONE.SanteLabel50Hint"  },
-    { key: "santeLabel25",  def: "est blessé",                hint: "AGONE.SanteLabel25Hint"  },
-    { key: "santeLabel10",  def: "est aux portes de la mort", hint: "AGONE.SanteLabel10Hint"  },
-    { key: "santeLabel0",   def: "semble mourant",            hint: "AGONE.SanteLabel0Hint"   },
-  ];
-  for (const { key, def, hint } of _santeLabels) {
-    game.settings.register("agone", key, {
-      name: `AGONE.${key.charAt(0).toUpperCase() + key.slice(1)}`,
-      hint,
+  // Vide par défaut : le texte traduit « AGONE.SanteLabel*Defaut » s'applique (helpers/sante.mjs)
+  for (const palier of ["100", "75", "50", "25", "10", "0"]) {
+    game.settings.register("agone", `santeLabel${palier}`, {
+      name: `AGONE.SanteLabel${palier}`,
+      hint: `AGONE.SanteLabel${palier}Hint`,
       scope: "world",
       config: true,
       type: String,
-      default: def,
+      default: "",
     });
   }
 
@@ -161,6 +164,14 @@ Hooks.once("init", () => {
   CONFIG.Actor.documentClass = AgoneActor;
   CONFIG.Item.documentClass  = AgoneItem;
   CONFIG.ActiveEffect.documentClass = AgoneActiveEffect;
+  CONFIG.Token.documentClass = AgoneTokenDocument;
+  // Barres proposées dans la configuration d'un jeton (le schéma stocke « valeur », pas « value »)
+  CONFIG.Actor.trackableAttributes = {
+    personnage : { bar: ["pdv"], value: [] },
+    compagnon  : { bar: ["pdv"], value: [] },
+    pnj        : { bar: ["pdv"], value: [] },
+    demon      : { bar: ["densite"], value: [] },
+  };
 
   // ── DataModels ──────────────────────────────────────────────────────────
   CONFIG.Actor.dataModels = {
@@ -329,11 +340,13 @@ Hooks.once("ready", async () => {
   console.log("Agone | Système prêt");
 
   // Synchroniser saisonMonde avec le mois courant du calendrier
-  if (game.user.isGM) {
+  if (estMJActif()) {
     try {
       const date = game.settings.get("agone", "calendrierDate") ?? { jour: 1, mois: 1, an: 1 };
       const moisData = CONFIG.AGONE.calendrier.mois[(date.mois - 1)];
-      if (moisData) await game.settings.set("agone", "saisonMonde", moisData.saison);
+      if (moisData && moisData.saison !== game.settings.get("agone", "saisonMonde")) {
+        await game.settings.set("agone", "saisonMonde", moisData.saison);
+      }
     } catch {}
   }
 
@@ -356,161 +369,87 @@ Hooks.once("ready", async () => {
    * sinon fallback sur le weather natif Foundry V14.
    */
 
-  // IDs des effets FXMaster actuellement actifs (pour les arrêter avant d'en appliquer de nouveaux)
-  let _agoneWeatherFxIds = null;
-
-  async function _clearFXMasterEffects() {
-    if (_agoneWeatherFxIds !== null) {
-      try { await FXMASTER.api.effects.stop(_agoneWeatherFxIds); } catch {}
-      _agoneWeatherFxIds = null;
-    }
-    // Nettoyage de secours : vider les flags FXMaster de la scène active
+  /**
+   * Arrête les effets FXMaster lancés par le système sur la scène (identifiants mémorisés
+   * dans le drapeau `flags.agone.meteoFx`), sans toucher à ceux que le MJ a posés à la main.
+   */
+  async function _arreterEffetsMeteo(scene) {
+    const suivi = scene.getFlag("agone", "meteoFx");
     try {
-      const sc = canvas.scene;
-      if (sc) {
-        const flags = sc.flags?.fxmaster ?? {};
-        if (Object.keys(flags).length > 0)
-          await sc.update({ "flags.fxmaster": null });
+      if (suivi === undefined) {
+        // Scène jamais suivie (effets lancés par une version antérieure) : arrêt par
+        // correspondance exacte avec les effets que le système sait lancer
+        await FXMASTER.api.effects.stop({ effects: Object.values(METEO_FX).flat(), scene });
+      } else if (suivi?.particles?.length || suivi?.filters?.length) {
+        await FXMASTER.api.effects.stop({ particles: suivi.particles ?? [], filters: suivi.filters ?? [], scene });
       }
-    } catch {}
+    } catch (e) {
+      console.warn("Agone | Arrêt des effets météo FXMaster impossible :", e);
+    }
+  }
+
+  /** Effets FXMaster de la météo : relancés seulement si la météo ou les préférences ont changé. */
+  async function _appliquerEffetsFX(scene, meteoId) {
+    const couleur    = game.settings.get("agone", "meteoApplyColor");
+    const particules = game.settings.get("agone", "meteoApplyParticles");
+    const cle = `${meteoId}|${couleur}|${particules}`;
+    if (scene.getFlag("agone", "meteoFx")?.cle === cle) return;
+
+    await _arreterEffetsMeteo(scene);
+    const effets = effetsFXMeteo(meteoId, { couleur, particules });
+    let ids = null;
+    if (effets.length) {
+      try {
+        ids = await FXMASTER.api.effects.play({ effects: effets, scene });
+      } catch (e) {
+        console.warn("Agone | Lancement des effets météo FXMaster impossible :", e);
+      }
+    }
+    // Les tableaux d'identifiants sont remplacés en entier (pas de fusion avec les anciens)
+    // Lancement échoué : la clé n'est pas retenue, pour réessayer au prochain changement
+    await scene.setFlag("agone", "meteoFx", { cle: (ids || !effets.length) ? cle : null, particles: [...ids?.particles ?? []], filters: [...ids?.filters ?? []] });
   }
 
   async function _applyWeatherToScene() {
-    if (!game.user.isGM) return;
+    // Un seul client écrit dans la scène : celui du MJ actif
+    if (!estMJActif()) return;
     if (!game.settings.get("agone", "meteoAutoApply")) return;
     const scene = canvas.scene;
     if (!scene) return;
 
     const meteoId = game.settings.get("agone", "calendrierMeteo") ?? "";
     const date    = game.settings.get("agone", "calendrierDate") ?? { heure: 8, minute: 0 };
-    const heure   = date.heure ?? 8;
+    const cible   = { weather: effetMeteoNatif(meteoId), luminosite: luminositeMeteo(date.heure, meteoId) };
 
-    // ── Luminosité selon heure + météo ──────────────────────────────────
-    let brightness;
-    if      (heure >= 22 || heure < 5)  brightness = 0.0;
-    else if (heure >= 20)               brightness = 0.15;
-    else if (heure >= 18)               brightness = 0.35;
-    else if (heure >= 6 && heure < 8)   brightness = 0.45;
-    else                                brightness = 0.75;
-
-    const METEO_BRIGHTNESS = {
-      "ensoleille":   +0.15, "nuageux":     -0.10, "pluie":       -0.15,
-      "orage":        -0.25, "brouillard":  -0.20, "neige":       -0.05,
-      "grele":        -0.20, "blizzard":    -0.30, "chaleur":     +0.20,
-      "nuit":         -0.05, "automne":     -0.05, "cendres":     -0.30,
-      "brumechaleur": +0.05, "": 0,
-    };
-    brightness = Math.max(0, Math.min(1, brightness + (METEO_BRIGHTNESS[meteoId] ?? 0)));
-
-    // ── FXMaster (si le module est actif) ────────────────────────────────
+    // FXMaster (si le module est actif) gère les particules : le weather natif est vidé
     const hasFXMaster = game.modules.get("fxmaster")?.active && typeof FXMASTER !== "undefined";
-
     if (hasFXMaster) {
-      // Arrêter TOUS les effets précédents avant d'en appliquer de nouveaux
-      await _clearFXMasterEffects();
-
-      const applyColor     = game.settings.get("agone", "meteoApplyColor");
-      const applyParticles = game.settings.get("agone", "meteoApplyParticles");
-
-      // Définition des effets FXMaster par météo
-      // Particules disponibles : autumnleaves, bats, birds, bubbles, clouds, crows,
-      //   eagles, embers, fog, hail, rain, rats, snow, snowstorm, spiders, stars
-      // Filtres disponibles    : bloom, color, fog, lightning, oldfilm, predator, underwater
-      const METEO_FX = {
-        "ensoleille": [
-          { kind: "filter", type: "color", options: { color: { value: "#fff0cc", apply: true }, saturation: 1.05, contrast: 1.02 } },
-        ],
-        "nuageux": [
-          { kind: "particle", type: "clouds", options: { scale: 1.0, density: 0.08, speed: 0.5, alpha: 0.45 } },
-          { kind: "filter",   type: "color",  options: { color: { value: "#c8d4de", apply: true }, saturation: 0.85 } },
-        ],
-        "pluie": [
-          { kind: "particle", type: "rain",  options: { direction: 90, density: 0.15, speed: 1.2 } },
-          { kind: "filter",   type: "color", options: { color: { value: "#90aec0", apply: true }, saturation: 0.75 } },
-        ],
-        "orage": [
-          { kind: "particle", type: "rain",      options: { direction: 95, density: 0.35, speed: 1.8 } },
-          { kind: "filter",   type: "lightning", options: {} },
-          { kind: "filter",   type: "color",     options: { color: { value: "#6680a0", apply: true }, saturation: 0.6 } },
-        ],
-        "brouillard": [
-          { kind: "particle", type: "fog",   options: { scale: 1.2, density: 0.12, speed: 0.4, alpha: 0.55 } },
-          { kind: "filter",   type: "color", options: { color: { value: "#a8b8c0", apply: true }, saturation: 0.65 } },
-        ],
-        "neige": [
-          { kind: "particle", type: "snow",  options: { direction: 90, density: 0.12, speed: 0.9 } },
-          { kind: "filter",   type: "color", options: { color: { value: "#d8eaff", apply: true }, saturation: 0.8 } },
-        ],
-        "grele": [
-          { kind: "particle", type: "hail",   options: { direction: 92, density: 0.20, speed: 1.6 } },
-          { kind: "particle", type: "clouds", options: { scale: 0.9, density: 0.06, speed: 0.6, alpha: 0.5 } },
-          { kind: "filter",   type: "color",  options: { color: { value: "#9eb8cc", apply: true }, saturation: 0.7 } },
-        ],
-        "blizzard": [
-          { kind: "particle", type: "snowstorm", options: { direction: 95, density: 0.30, speed: 2.0 } },
-          { kind: "filter",   type: "color",     options: { color: { value: "#c0d8f0", apply: true }, saturation: 0.5 } },
-        ],
-        "chaleur": [
-          { kind: "filter", type: "color", options: { color: { value: "#ffcc88", apply: true }, saturation: 1.1, contrast: 1.05 } },
-          { kind: "filter", type: "bloom", options: { blur: 3, bloomScale: 1.3, threshold: 0.35 } },
-        ],
-        "nuit": [
-          { kind: "particle", type: "stars", options: { scale: 0.8, density: 0.12, alpha: 0.85 } },
-          { kind: "filter",   type: "color", options: { color: { value: "#1a2040", apply: true }, saturation: 0.6 } },
-        ],
-        "automne": [
-          { kind: "particle", type: "autumnleaves", options: { direction: 88, density: 0.10, speed: 0.7 } },
-          { kind: "filter",   type: "color",        options: { color: { value: "#d4a870", apply: true }, saturation: 1.1 } },
-        ],
-        "cendres": [
-          { kind: "particle", type: "embers", options: { density: 0.15, speed: 0.6, alpha: 0.7, tint: { value: "#808080", apply: true } } },
-          { kind: "filter",   type: "color",  options: { color: { value: "#887060", apply: true }, saturation: 0.4 } },
-        ],
-        "brumechaleur": [
-          { kind: "filter", type: "predator", options: {} },
-          { kind: "filter", type: "color",    options: { color: { value: "#e8c890", apply: true }, saturation: 0.9 } },
-        ],
-      };
-
-      let fxEffects = METEO_FX[meteoId] ?? [];
-      // Filtrer selon les préférences du MJ
-      if (!applyColor)     fxEffects = fxEffects.filter(e => !(e.kind === "filter" && e.type === "color"));
-      if (!applyParticles) fxEffects = fxEffects.filter(e => e.kind !== "particle");
-
-      if (fxEffects.length) {
-        try {
-          _agoneWeatherFxIds = await FXMASTER.api.effects.play({ effects: fxEffects });
-        } catch (e) {
-          console.warn("Agone | FXMaster weather play failed:", e);
-        }
-      }
-
-      // FXMaster gère les particules → on vide le weather natif, on pose la luminosité
-      await scene.update({
-        weather: "",
-        "environment.globalLight.luminosity": brightness,
-      });
-      return;
+      await _appliquerEffetsFX(scene, meteoId);
+      cible.weather = "";
     }
 
-    // ── Fallback : weather natif Foundry V14 ─────────────────────────────
-    const WEATHER_EFFECTS = {
-      "": "", "ensoleille": "", "nuageux": "",
-      "pluie": "rain", "orage": "rainstorm",
-      "brouillard": "fog", "neige": "snow",
-      "grele": "rain", "blizzard": "snow",
-      "chaleur": "", "nuit": "",
-      "automne": "", "cendres": "",
-      "brumechaleur": "",
-    };
-    await scene.update({
-      weather: WEATHER_EFFECTS[meteoId] ?? "",
-      "environment.globalLight.luminosity": brightness,
-    });
+    // La scène n'est modifiée que si la météo ou la luminosité diffèrent de l'état enregistré
+    const source = scene._source ?? scene;
+    const maj = changementsScene(
+      { weather: source.weather, luminosite: source.environment?.globalLight?.luminosity },
+      cible,
+    );
+    if (Object.keys(maj).length) await scene.update(maj);
   }
 
-  // Re-rendu du widget et du calendrier à chaque changement de setting calendrier, météo ou thème
-  Hooks.on("updateSetting", (setting) => {
+  // Applications sérialisées (une seule à la fois) et regroupées : date et météo changent souvent ensemble
+  const _fileMeteo = creerFile();
+  const _appliquerMeteo = foundry.utils.debounce(() => {
+    _fileMeteo(_applyWeatherToScene).catch(err => console.warn("Agone | Application de la météo impossible :", err));
+  }, 100);
+
+  // Re-rendu du widget et du calendrier à chaque changement de setting calendrier, météo ou thème.
+  // La première écriture d'un réglage du monde déclenche createSetting, les suivantes updateSetting.
+  const REGLAGES_METEO = [
+    "agone.calendrierDate", "agone.calendrierMeteo",
+    "agone.meteoAutoApply", "agone.meteoApplyColor", "agone.meteoApplyParticles",
+  ];
+  const _onReglageChange = (setting) => {
     const key = setting.key ?? "";
     if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo" || key === "agone.saisonMonde") {
       game.agone.calendrierWidget?.render(true);
@@ -518,13 +457,14 @@ Hooks.once("ready", async () => {
     if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo" || key === "agone.calendrierNotes") {
       CalendrierAgone.rafraichir();
     }
-    if (key === "agone.calendrierDate" || key === "agone.calendrierMeteo") {
-      _applyWeatherToScene();
-    }
+    if (REGLAGES_METEO.includes(key)) _appliquerMeteo();
     if (key === "agone.agoneTheme" || key === "core.uiConfig") _applyAgoneTheme();
-  });
+  };
+  Hooks.on("createSetting", _onReglageChange);
+  Hooks.on("updateSetting", _onReglageChange);
 
-  if (!game.user.isGM) return;
+  // Migrations et compendiums : une seule fois, sur le client du MJ actif
+  if (!estMJActif()) return;
 
   await migrateWorld();
 
@@ -536,25 +476,37 @@ Hooks.once("ready", async () => {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
   }
 
-  // Reseede un compendium si vide ou si les données ont changé
+  // Reseede un compendium si vide ou si les données ont changé.
+  // Un échec ne laisse pas le compendium déverrouillé et n'empêche pas de traiter les suivants :
+  // le hachage n'étant enregistré qu'en cas de succès, le compendium sera regénéré au prochain chargement.
   async function _syncPack(packId, newHash, seedFn) {
     const pack = game.packs.get(packId);
     if (!pack) return;
-    const hashes = game.settings.get("agone", "compendiumHashes") ?? {};
-    const index  = await pack.getIndex();
-    const isEmpty     = index.size === 0;
-    const hashChanged = hashes[packId] !== newHash;
-    if (!isEmpty && !hashChanged) return;
-    console.log(`Agone | Reseed ${packId} (isEmpty=${isEmpty}, hashChanged=${hashChanged})`);
-    await pack.configure({ locked: false });
-    if (!isEmpty) {
-      await Item.deleteDocuments(index.map(e => e._id), { pack: packId });
-      if (pack.folders.size > 0)
-        await Folder.deleteDocuments([...pack.folders].map(f => f.id), { pack: packId });
+    let deverrouille = false;
+    try {
+      const hashes = game.settings.get("agone", "compendiumHashes") ?? {};
+      const index  = await pack.getIndex();
+      const isEmpty     = index.size === 0;
+      const hashChanged = hashes[packId] !== newHash;
+      if (!isEmpty && !hashChanged) return;
+      console.log(`Agone | Reseed ${packId} (isEmpty=${isEmpty}, hashChanged=${hashChanged})`);
+      await pack.configure({ locked: false });
+      deverrouille = true;
+      if (!isEmpty) {
+        await Item.deleteDocuments(index.map(e => e._id), { pack: packId });
+        if (pack.folders.size > 0)
+          await Folder.deleteDocuments([...pack.folders].map(f => f.id), { pack: packId });
+      }
+      await seedFn(pack);
+      await game.settings.set("agone", "compendiumHashes", { ...game.settings.get("agone", "compendiumHashes"), [packId]: newHash });
+    } catch (err) {
+      console.error(`Agone | Échec de la génération du compendium ${packId}`, err);
+    } finally {
+      if (deverrouille) {
+        try { await pack.configure({ locked: true }); }
+        catch (err) { console.error(`Agone | Verrouillage du compendium ${packId} impossible`, err); }
+      }
     }
-    await seedFn(pack);
-    await pack.configure({ locked: true });
-    await game.settings.set("agone", "compendiumHashes", { ...game.settings.get("agone", "compendiumHashes"), [packId]: newHash });
   }
 
   // ── Compendium compétences ─────────────────────────────────────────────
@@ -705,10 +657,7 @@ Hooks.on("getChatMessageContextOptions", (_application, options) => {
   };
   const icon = '<i class="fas fa-rotate-left"></i>';
   const label = "AGONE.Relance.Menu";
-  // v14 : label / visible / onClick ; v13 : name / condition / callback
-  options.push(game.release.generation >= 14
-    ? { label, icon, visible, onClick: (_event, li) => relancer(li) }
-    : { name: label, icon, condition: visible, callback: relancer });
+  options.push({ label, icon, visible, onClick: (_event, li) => relancer(li) });
 });
 
 // Boutons Agone dans la barre d'outils
@@ -772,19 +721,12 @@ Hooks.on("getSceneControlButtons", (controls) => {
   };
 });
 
-// Hotbar drag-drop
-Hooks.on("hotbarDrop", (_bar, data, _slot) => {
-  if (data.type === "Item" && data.uuid) {
-    return false; // laisser FVTT gérer
-  }
-});
 // ── Tokens : défauts pour les nouveaux acteurs ──────────────────────────────
-Hooks.on("preCreateActor", (actor, _data, _options) => {
-  actor.updateSource({
-    "prototypeToken.bar1.attribute": "system.pdv",
-    "prototypeToken.displayBars": CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40,
-    "prototypeToken.actorLink": true,
-  });
+// Barre de santé (PdV, Densité pour un démon) ; seuls personnages et compagnons sont liés.
+// Les réglages déjà présents dans les données de création (import, duplication) sont conservés.
+Hooks.on("preCreateActor", (actor, data, _options) => {
+  const maj = defautsTokenPrototype(actor.type, data, CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40);
+  if (Object.keys(maj).length) actor.updateSource(maj);
 });
 
 // ── Scènes : grille en mètres (1 m / case) par défaut ───────────────────────
@@ -804,6 +746,15 @@ Hooks.on("preCreateScene", (scene, data) => {
 
   function _buildTipLabel(token) {
     return libelleSante(token.actor);
+  }
+
+  /** Contenu de l'infobulle, construit en nœuds DOM : le nom du token n'est jamais interprété comme du HTML. */
+  function _remplirTip(tip, nom, label) {
+    const strong = document.createElement("strong");
+    strong.textContent = nom ?? "";
+    const em = document.createElement("em");
+    em.textContent = label ?? "";
+    tip.replaceChildren(strong, " ", em);
   }
 
   function _removeTip() {
@@ -827,7 +778,7 @@ Hooks.on("preCreateScene", (scene, data) => {
     const tip = document.createElement("div");
     tip.id = "agone-sante-tip";
     tip.className = "agone-sante-tip";
-    tip.innerHTML = `<strong>${token.name}</strong> <em>${label}</em>`;
+    _remplirTip(tip, token.name, label);
     document.body.appendChild(tip);
 
     const move = (e) => {
@@ -855,7 +806,7 @@ Hooks.on("preCreateScene", (scene, data) => {
     if (!tip) return;
     if (_agoneSanteToken.actor?.id !== actor.id) return;
     const label = _buildTipLabel(_agoneSanteToken);
-    if (label) tip.innerHTML = `<strong>${_agoneSanteToken.name}</strong> <em>${label}</em>`;
+    if (label) _remplirTip(tip, _agoneSanteToken.name, label);
   });
 }
 

@@ -1,6 +1,6 @@
 # Copilot instructions — Agone (Foundry VTT system)
 
-Unofficial Foundry VTT v13–v14 game system for the French TTRPG **Agone**. Code, comments,
+Unofficial Foundry VTT v14 game system for the French TTRPG **Agone**. Code, comments,
 identifiers and game data are in **French** (`personnage`, `peine`, `bienfait`, `ténèbres`…);
 keep them in French. No build step: files under `module/`, `templates/`, `css/`, `lang/` are
 served as-is. `npm run lint` and `npm test` are the checks CI runs.

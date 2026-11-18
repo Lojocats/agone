@@ -38,7 +38,7 @@
   /* fixe : pastille verte à texte blanc */
   background: #5a8a30;
   color: #fff;
-  border: 1px solid var(--agone-txt-vert, #3a6010);
+  border: 1px solid var(--agone-txt-vert);
   border-radius: 3px;
   cursor: pointer;
   font-size: 11px;
@@ -62,8 +62,8 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 4px 12px;
-  background: rgba(var(--agone-surface-rgb, 255,255,255), 0.35);
-  border-bottom: 1px solid var(--agone-gold, #c9a227);
+  background: rgba(var(--agone-surface-rgb), 0.35);
+  border-bottom: 1px solid var(--agone-gold);
   font-size: 12px;
 }
 .agone .panneau-progression.en-creation {
@@ -81,20 +81,20 @@
 }
 .agone .panneau-jauge-label {
   font-weight: 600;
-  color: var(--agone-brown, #5a3e1b);
+  color: var(--agone-brown);
 }
 .agone .panneau-jauge-val {
   font-weight: 700;
-  color: var(--agone-txt-vert, #2e7d32);
+  color: var(--agone-txt-vert);
 }
 .agone .panneau-jauge.jauge-zero .panneau-jauge-val {
-  color: var(--agone-txt-orange, #a06010);
+  color: var(--agone-txt-orange);
 }
 .agone .panneau-jauge.jauge-negative .panneau-jauge-val {
-  color: var(--agone-txt-rouge, #800000);
+  color: var(--agone-txt-rouge);
 }
 .agone .panneau-sous-min {
-  color: var(--agone-txt-rouge, #800000);
+  color: var(--agone-txt-rouge);
   font-weight: 600;
   font-size: 11px;
 }
@@ -103,7 +103,7 @@
   padding: 2px 10px;
   background: #5a8a30; /* fixe : pastille verte à texte blanc, cohérente avec .btn-valider-creation */
   color: #fff;
-  border: 1px solid var(--agone-txt-vert, #3a6010);
+  border: 1px solid var(--agone-txt-vert);
   border-radius: 3px;
   cursor: pointer;
   font-size: 11px;
@@ -117,11 +117,11 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--agone-brown, #5a3e1b);
+  color: var(--agone-brown);
   font-weight: 600;
 }
 .agone .panneau-xp-item.panneau-reserve {
-  color: var(--agone-txt-bleu, #4a6ea0);
+  color: var(--agone-txt-bleu-clair);
 }
 .agone .panneau-toggle-levelup {
   margin-left: auto;
@@ -157,6 +157,12 @@
   color: var(--agone-entete-texte, var(--agone-parchment));
   outline: none;
   padding: 2px 4px;
+}
+/* Focus clavier : même anneau doré que les boutons (controls.css).
+   [type="text"] : passe devant le outline: none de « .agone input[type="text"]:focus ». */
+.agone .charname input[type="text"]:focus-visible {
+  outline: 2px solid var(--agone-gold);
+  outline-offset: 1px;
 }
 
 .agone .header-row {
@@ -209,7 +215,7 @@
   color: var(--agone-gold-light);
 }
 .agone .derived.sombre {
-  color: var(--agone-noir, #2a2a2a);
+  color: var(--agone-noir);
 }
 
 /* ── Onglets ─────────────────────────────────────────────── */
@@ -240,7 +246,7 @@
 }
 .agone .sheet-tabs .item[data-tab="magie"],
 .agone .sheet-body .tab[data-tab="magie"] {
-  --agone-accent: var(--agone-txt-bleu, #2a50a0);
+  --agone-accent: var(--agone-txt-bleu);
 }
 .agone .sheet-tabs .item[data-tab="combat"],
 .agone .sheet-body .tab[data-tab="combat"] {
@@ -276,6 +282,11 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* Conteneur de requêtes : les grilles des onglets se replient selon la largeur de
+     la fenêtre de la fiche (redimensionnable), pas selon celle de l'écran.
+     inline-size seulement : la hauteur reste celle du flex, le défilement est intact. */
+  container-type: inline-size;
+  container-name: agone-fiche;
 }
 
 /* ── Titres de sections ──────────────────────────────────── */
@@ -310,14 +321,4 @@
 .agone .sheet-tabs .item.tab-hidden,
 .agone .sheet-body .tab.tab-hidden {
   display: none !important;
-}
-
-/* ── Indicateur mode création (header) ──────────────────── */
-.agone .creation-mode-indicator {
-  display: flex;
-  align-items: center;
-  padding: 2px 8px;
-  /* fixe : bandeau orangé sur l'en-tête sombre, identique dans les deux thèmes */
-  background: rgba(120, 60, 0, 0.35);
-  border-top: 1px solid #e8a030;
 }

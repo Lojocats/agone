@@ -1,9 +1,13 @@
 /* ============================================================
-   AGONE – Base : variables, polices, reset global
+   AGONE – Base : variables, reset global, mode sombre
+   (polices : voir polices.css, servies depuis fonts/)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
-
+/* ── Palette claire ──────────────────────────────────────────
+   Chaque jeton reçoit ICI sa valeur claire, une seule fois ; les règles écrivent
+   var(--agone-…) sans repli. Le mode sombre redéfinit les mêmes jetons sur
+   body.agone-dark (section « Mode Sombre » plus bas) : body descend de :root,
+   sa valeur l'emporte donc pour toute la page. */
 :root {
   --agone-brown:      #5c3a1e;
   --agone-brown-dark: #3b210e;
@@ -19,6 +23,57 @@
   --agone-noir:       #1a1a2e;
   --agone-noir-text:  #c0c0d0;
   --radius:           4px;
+
+  /* Triplets RVB, pour rgba(var(--agone-brun-rgb), 0.3) */
+  --agone-brun-rgb:    92,58,30;
+  --agone-encre-rgb:   60,35,15;     /* texte */
+  --agone-or-rgb:      201,162,39;
+  --agone-noir-rgb:    26,26,46;
+  --agone-surface-rgb: 255,255,255;  /* fonds de cartes et de champs */
+  --agone-surface-parchemin-rgb: 244,232,193; /* fond opaque couleur parchemin */
+  --agone-rouge-rgb:   160,0,0;
+  --agone-bordeaux-rgb: 90,21,48;    /* démons, peines de l'âme */
+  --agone-orange-rgb:  180,100,0;
+  --agone-vert-rgb:    74,154,74;
+  --agone-bleu-rgb:    80,110,200;
+  --agone-violet-rgb:  60,30,120;
+
+  /* Textes colorés. -clair : filets, icônes et jauges (teinte plus vive) ;
+     -fonce : texte de badge sur fond teinté */
+  --agone-txt-rouge:        #800000;
+  --agone-txt-rouge-clair:  #c04040;
+  --agone-txt-bordeaux:     #5a1530;
+  --agone-txt-orange:       #a06010;
+  --agone-txt-orange-clair: #c07820;
+  --agone-txt-orange-fonce: #7a3a00;
+  --agone-txt-jaune:        #7a5a00;
+  --agone-txt-vert:         #1a6b30;
+  --agone-txt-vert-clair:   #4a9a4a;
+  --agone-txt-bleu:         #2a50a0;
+  --agone-txt-bleu-clair:   #4a6ea0;
+  --agone-txt-violet:       #3d1f8a;
+  --agone-txt-brun:         #4a3b1e;
+  --agone-txt-brun-clair:   #7a5c3a;
+  --agone-txt-brun-roux:    #7a3a00;
+  --agone-txt-doux:         rgba(26,26,46,0.65); /* texte secondaire */
+  --agone-txt-pale:         #a08878;             /* texte atténué */
+
+  /* Fonds pleins clairs */
+  --agone-fond-brun:       #f5ede0;
+  --agone-fond-brun-fonce: #e8d8b8;
+  --agone-fond-vert:       #b8d98a;
+
+  /* Couleurs propres à un écran */
+  --agone-fumble-debut:       #6a1010;
+  --agone-saison-printemps:   #6aa84f;
+  --agone-saison-ete:         #e0a030;
+  --agone-saison-automne:     #b0582a;
+  --agone-saison-hiver:       #6a8fb8;
+  --agone-ct-start-hover:     #a0c46a;
+  --agone-ct-start-bordure:   #8bc34a;
+  --agone-ct-init:            #e0a040; /* dé d'initiative du tracker */
+  --agone-ct-grave:           #c04040; /* case de blessure grave active (texte blanc) */
+  --agone-ct-critique:        #6a0000; /* case de blessure critique active (texte blanc) */
 }
 
 /* ── Base feuille ────────────────────────────────────────── */
@@ -49,10 +104,10 @@
   --color-form-hint:          var(--agone-brown);
   --input-background-color:   var(--agone-input-bg);
   --input-text-color:         var(--agone-dark-text);
-  --input-border-color:       rgba(var(--agone-brun-rgb, 92, 58, 30), 0.35);
+  --input-border-color:       rgba(var(--agone-brun-rgb), 0.35);
   --input-box-shadow:         none;
   --input-focus-outline-color: var(--agone-gold);
-  --input-placeholder-color:  rgba(var(--agone-encre-rgb, 44, 26, 8), 0.45);
+  --input-placeholder-color:  rgba(var(--agone-encre-rgb), 0.45);
   color-scheme:               light;
   color:                      var(--agone-dark-text);
 }
@@ -64,7 +119,7 @@
 
 /* ── Scrollbar ───────────────────────────────────────────── */
 .agone ::-webkit-scrollbar { width: 6px; }
-.agone ::-webkit-scrollbar-track { background: rgba(var(--agone-brun-rgb, 92,58,30), 0.1); }
+.agone ::-webkit-scrollbar-track { background: rgba(var(--agone-brun-rgb), 0.1); }
 .agone ::-webkit-scrollbar-thumb { background: var(--agone-brown); border-radius: 3px; }
 .agone ::-webkit-scrollbar-thumb:hover { background: var(--agone-gold); }
 
@@ -76,11 +131,15 @@
 /* ── 1. Variables Agone en mode sombre ───────────────────────
    Définies sur le body : elles s'appliquent aussi hors des fenêtres Agone
    (cartes de jet du chat, widget calendrier, tracker de combat).
-   Les jetons ci-dessous hors :root n'existent qu'ici : en mode clair, chaque règle
-   retombe sur sa couleur d'origine, écrite en repli : var(--agone-txt-rouge, #800000).
+   Les valeurs claires de ces jetons sont dans :root, en tête de fichier. Seuls les
+   jetons --agone-entete-*, --agone-bouton-* et --agone-bordure-douce n'existent qu'ici :
+   en mode clair, leurs règles retombent sur un autre jeton écrit en repli,
+   var(--agone-entete-fond, var(--agone-brown)).
+   Les variantes (-clair, -fonce, -roux, bordeaux, parchemin) suivent leur jeton de base :
+   le mode sombre n'a qu'une teinte lisible par couleur.
    Familles :
    - --agone-<couleur>-rgb (brun, encre, or, noir, surface, rouge, orange, vert, bleu,
-     violet) : triplets pour rgba(var(--agone-brun-rgb, 92,58,30), 0.3) ; surface = fonds
+     violet) : triplets pour rgba(var(--agone-brun-rgb), 0.3) ; surface = fonds
      de cartes et champs, encre = texte ;
    - --agone-txt-<couleur> : textes colorés (valeurs, badges) lisibles sur fond sombre ;
      --agone-txt-doux : texte secondaire (descriptions dépliées, notes) ;
@@ -125,15 +184,25 @@ body.agone-dark {
   --agone-txt-vert: #6ecf7a;
   --agone-txt-violet: #c9a0f0;
   --agone-fumble-debut: #8a2018;
-  --agone-fumble-fin: #4a1006;
-  --agone-fumble-hover-debut: #a83828;
-  --agone-fumble-hover-fin: #6a1810;
-  --agone-fumble-texte: #ffdede;
   --agone-saison-printemps: #7ec25f;
   --agone-saison-ete: #f0b850;
   --agone-saison-automne: #d07a48;
   --agone-saison-hiver: #8aa8d8;
   --agone-ct-start-hover: #3a6a20;
+  --agone-ct-start-bordure: rgba(110,207,122,0.5);
+  --agone-ct-init: var(--agone-txt-orange);
+  --agone-ct-critique: #8a2018;
+  --agone-surface-parchemin-rgb: var(--agone-surface-rgb);
+  --agone-bordeaux-rgb: var(--agone-rouge-rgb);
+  --agone-txt-rouge-clair: var(--agone-txt-rouge);
+  --agone-txt-bordeaux: var(--agone-txt-rouge);
+  --agone-txt-orange-clair: var(--agone-txt-orange);
+  --agone-txt-orange-fonce: var(--agone-txt-orange);
+  --agone-txt-vert-clair: var(--agone-txt-vert);
+  --agone-txt-bleu-clair: var(--agone-txt-bleu);
+  --agone-txt-brun-clair: var(--agone-txt-brun);
+  --agone-txt-brun-roux: var(--agone-txt-brun);
+  --agone-fond-brun-fonce: var(--agone-fond-brun);
   --agone-txt-doux: #c0a060;
   --agone-txt-pale: rgba(180,140,80,0.65);
   --agone-bordure-douce: rgba(180,130,60,0.35);
@@ -164,7 +233,7 @@ body.agone-dark .window-app.agone {
    Surcharges sombres restantes : uniquement ce qui ne passe pas par un jeton
    (éléments de Foundry sans règle claire côté Agone, réglages d'opacité).
    Tout le reste s'adapte via les jetons de la section 1 : une nouvelle règle
-   doit utiliser var(--agone-…, <valeur claire>) plutôt qu'ajouter une surcharge ici.
+   doit utiliser un jeton var(--agone-…) défini dans :root plutôt qu'ajouter une surcharge ici.
    ============================================================ */
 
 /* ── 1b. Barre de titre des fenêtres (style Foundry, pas de règle claire Agone) ── */
@@ -196,8 +265,8 @@ body.agone-dark .agone .arts-domaines-table .arts-absent td { opacity: 0.55; }
    s'ajouterait à celle des cellules et rendrait le texte illisible sur fond sombre) */
 body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-check,
 body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-palier { opacity: 0.6; }
-body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-peine { color: rgba(var(--agone-noir-rgb, 144,144,200), 0.75); }
-body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .peine-dot { border-color: rgba(var(--agone-noir-rgb, 144,144,200), 0.4); }
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-peine { color: rgba(var(--agone-noir-rgb), 0.75); }
+body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .peine-dot { border-color: rgba(var(--agone-noir-rgb), 0.4); }
 body.agone-dark .agone .paliers-table .palier-row:not(.palier-reached) .col-bienfait { opacity: 0.7; }
 
 /* ── Lisibilité du texte sur fond sombre ─────────────────────

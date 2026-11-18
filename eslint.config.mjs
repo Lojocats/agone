@@ -4,7 +4,7 @@ import globals from "globals";
 // Globales fournies par Foundry VTT à l'exécution
 const foundryGlobals = Object.fromEntries([
   "foundry", "game", "CONFIG", "CONST", "ui", "Hooks", "canvas", "Handlebars", "PIXI",
-  "Actor", "Item", "ActiveEffect", "ChatMessage", "Combat", "Folder", "Roll", "Token",
+  "Actor", "Item", "ActiveEffect", "ChatMessage", "Combat", "Folder", "Roll", "Token", "TokenDocument",
   "fromUuid", "fromUuidSync", "FXMASTER", "quench",
 ].map(name => [name, "readonly"]));
 

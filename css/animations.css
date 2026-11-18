@@ -46,4 +46,18 @@
   .agone :where(button, .item-control, .rollable, a) {
     transition-duration: 0ms;
   }
+  /* Filet général : toute animation ou transition posée ailleurs (descriptions
+     dépliées, jauges, survols à plus forte spécificité) sous une racine du système.
+     !important : seule façon de passer devant ces règles sans les recopier ici. */
+  :is(.agone, .agone-roll-card, .agone-item-card, .agone-entree,
+      .agone-calendrier-wrap, #agone-cal-widget-container, #agone-sante-tip),
+  :is(.agone, .agone-roll-card, .agone-item-card, .agone-entree,
+      .agone-calendrier-wrap, #agone-cal-widget-container, #agone-sante-tip) *,
+  :is(.agone, .agone-roll-card, .agone-item-card, .agone-entree,
+      .agone-calendrier-wrap, #agone-cal-widget-container, #agone-sante-tip) *::before,
+  :is(.agone, .agone-roll-card, .agone-item-card, .agone-entree,
+      .agone-calendrier-wrap, #agone-cal-widget-container, #agone-sante-tip) *::after {
+    animation: none !important;
+    transition-duration: 0s !important;
+  }
 }

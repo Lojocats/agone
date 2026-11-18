@@ -2,9 +2,9 @@
   "id": "agone",
   "title": "Agone",
   "description": "Système Agone — Jeu de rôle fantasy médiéval pour Foundry VTT",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "compatibility": {
-    "minimum": "13",
+    "minimum": "14",
     "verified": "14",
     "maximum": "14"
   },
@@ -86,9 +86,26 @@
       "type": "Item"
     }
   ],
+  "relationships": {
+    "recommends": [
+      {
+        "id": "fxmaster",
+        "type": "module",
+        "reason": "Effets météo avancés du calendrier (particules et filtres)"
+      }
+    ]
+  },
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
+  "primaryTokenAttribute": "pdv",
   "socket": false,
   "url": "https://github.com/Lojocats/agone",
-  "manifest": "https://raw.githubusercontent.com/Lojocats/agone/main/system.json",
+  "manifest": "https://github.com/Lojocats/agone/releases/latest/download/system.json",
   "download": "https://github.com/Lojocats/agone/releases/latest/download/agone.zip",
+  "license": "https://github.com/Lojocats/agone/blob/main/LICENSE",
+  "readme": "https://github.com/Lojocats/agone/blob/main/README.md",
+  "bugs": "https://github.com/Lojocats/agone/issues",
   "changelog": "https://github.com/Lojocats/agone/blob/main/CHANGELOG.md"
 }

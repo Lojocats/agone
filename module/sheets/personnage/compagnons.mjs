@@ -1,3 +1,5 @@
+import { ouvrirEnfant } from "../sheet-helpers.mjs";
+
 /**
  * Onglet Compagnons : acteurs liés par glisser-déposer.
  */
@@ -18,7 +20,8 @@ export const CompagnonsMixin = Base => class extends Base {
       const pdvVal = cs.pdv?.valeur ?? 0;
       const pdvMax = cs.pdv?.max   ?? 0;
       const pdvPct = pdvMax > 0 ? Math.round(Math.min(100, (pdvVal / pdvMax) * 100)) : 0;
-      const pdvColor = pdvPct >= 75 ? '#4a9a4a' : pdvPct >= 50 ? '#8a8a00' : pdvPct >= 25 ? '#c06000' : '#9a1a1a';
+      const pdvColor = pdvPct >= 75 ? "var(--agone-txt-vert-clair)" : pdvPct >= 50 ? "var(--agone-txt-jaune)"
+        : pdvPct >= 25 ? "var(--agone-txt-orange-clair)" : "var(--agone-txt-rouge-clair)";
 
       // Blessures graves
       const bg1 = !!cs.blessureGrave1;
@@ -123,7 +126,7 @@ export const CompagnonsMixin = Base => class extends Base {
     event.preventDefault();
     const uuid  = event.currentTarget.dataset.uuid;
     const actor = await fromUuid(uuid).catch(() => null);
-    if (actor) this.renderChild(actor.sheet);
+    if (actor) ouvrirEnfant(this, actor.sheet);
   }
 
   async _onRemoveCompanion(event) {

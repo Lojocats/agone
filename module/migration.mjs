@@ -7,6 +7,10 @@
  * avec la version du système qui introduit le changement de données.
  */
 import { EFFET_PREFIX, effetsDepuisTable } from "./helpers/effets.mjs";
+import { attributBarreSante, correctionsBarres } from "./helpers/jeton.mjs";
+import { estMJActif } from "./helpers/mj.mjs";
+import { lienDanseurDepuisNom } from "./helpers/danseurs.mjs";
+import { armureStockeeAReinitialiser } from "./helpers/armure.mjs";
 
 /** Texte brut (sans balise) → paragraphes HTML ; `null` si le texte est déjà du HTML ou vide. */
 export function texteEnHTML(texte) {
@@ -28,18 +32,30 @@ function* tousLesItems() {
   }
 }
 
+/** Tous les acteurs du monde : acteurs du monde et acteurs des tokens non liés. */
+function* tousLesActeurs() {
+  yield* game.actors ?? [];
+  for (const scene of game.scenes ?? []) {
+    for (const token of scene.tokens) {
+      if (!token.actorLink && token.actor) yield token.actor;
+    }
+  }
+}
+
 const MIGRATIONS = [
   {
     version: "1.8.5",
     label: "Barre PdV des tokens prototypes",
     async run() {
       const updates = [];
+      // L'attribut d'une barre est relatif à actor.system : « pdv » (« densite » pour un démon).
+      // Cette migration écrivait « system.pdv », que Foundry ne sait pas résoudre : la valeur
+      // correcte est posée ici, et la migration 1.11.0 répare les mondes déjà migrés.
       for (const actor of game.actors ?? []) {
-        const bar = actor.prototypeToken?.bar1?.attribute;
-        if (bar && bar !== "pdv") continue;
+        if (actor.prototypeToken?.bar1?.attribute) continue;
         updates.push({
           _id: actor.id,
-          "prototypeToken.bar1.attribute": "system.pdv",
+          "prototypeToken.bar1.attribute": attributBarreSante(actor.type),
           "prototypeToken.displayBars":    CONST.TOKEN_DISPLAY_MODES?.OWNER ?? 40,
           "prototypeToken.actorLink":      true,
         });
@@ -77,6 +93,57 @@ const MIGRATIONS = [
       }
     },
   },
+  {
+    version: "1.11.0",
+    label: "Barre de santé des tokens (attribut « pdv » ou « densite »)",
+    async run() {
+      // « system.pdv » n'est pas résolu par Foundry (chemin relatif à actor.system) : la barre
+      // ne s'affichait pas. Tokens prototypes des acteurs, puis tokens placés dans les scènes.
+      const majActeurs = correctionsBarres(
+        [...game.actors ?? []].map(a => ({ id: a.id, attribut: a.prototypeToken?.bar1?.attribute, type: a.type })),
+        "prototypeToken.bar1.attribute");
+      if (majActeurs.length) await Actor.updateDocuments(majActeurs);
+
+      for (const scene of game.scenes ?? []) {
+        const majTokens = correctionsBarres(
+          [...scene.tokens ?? []].map(t => ({
+            id: t.id,
+            attribut: t._source?.bar1?.attribute ?? t.bar1?.attribute,
+            type: t.actor?.type ?? game.actors?.get(t.actorId)?.type,
+          })),
+          "bar1.attribute");
+        if (majTokens.length) await scene.updateEmbeddedDocuments("Token", majTokens);
+      }
+    },
+  },
+  {
+    version: "1.11.0",
+    label: "Sorts des danseurs liés par identifiant, armures lues sur les items",
+    async run() {
+      const echecs = [];
+      for (const actor of tousLesActeurs()) {
+        try {
+          // Sorts mémorisés : lien par id du danseur (danseurId) au lieu de son nom (danseurNom)
+          const danseurs = actor.items.filter(i => i.type === "danseur");
+          const majSorts = actor.items.filter(i => i.type === "sort")
+            .map(sort => ({ sort, maj: lienDanseurDepuisNom(sort._source?.system ?? sort.system, danseurs) }))
+            .filter(({ maj }) => maj)
+            .map(({ sort, maj }) => ({ _id: sort.id, ...maj }));
+          if (majSorts.length) await actor.updateEmbeddedDocuments("Item", majSorts);
+
+          // Armure et bouclier : les copies stockées sur l'acteur (fantômes si l'item a été supprimé)
+          // sont effacées, les valeurs sont désormais lues sur les items portés
+          const majArmure = armureStockeeAReinitialiser(actor.type, actor._source?.system, actor.items);
+          if (majArmure) await actor.update(majArmure);
+        } catch (err) {
+          console.warn(`Agone | Migration 1.11.0 : échec pour l'acteur ${actor.name}`, err);
+          echecs.push(actor.name);
+        }
+      }
+      // Les autres acteurs sont migrés ; l'échec fait rejouer la migration (idempotente) à la prochaine connexion
+      if (echecs.length) throw new Error(`Acteurs non migrés : ${echecs.join(", ")}`);
+    },
+  },
 ];
 
 /**
@@ -91,14 +158,15 @@ export function registerMigrationSettings() {
 }
 
 /**
- * Exécute les migrations en attente. À appeler dans le hook `ready`, MJ uniquement.
+ * Exécute les migrations en attente. À appeler dans le hook `ready`.
+ * Seul le client du MJ actif migre : deux MJ connectés ne migrent pas le monde en parallèle.
  */
 export async function migrateWorld() {
-  if (!game.user.isGM) return;
+  if (!estMJActif()) return;
   const current = game.settings.get("agone", "systemMigrationVersion");
   const pending = MIGRATIONS.filter(m => !current || foundry.utils.isNewerVersion(m.version, current));
 
-  for (const migration of pending) {
+  for (const [i, migration] of pending.entries()) {
     console.log(`Agone | Migration ${migration.version} : ${migration.label}`);
     try {
       await migration.run();
@@ -107,7 +175,11 @@ export async function migrateWorld() {
       ui.notifications.error(game.i18n.format("AGONE.Migration.Echec", { version: migration.version }), { permanent: true });
       return;
     }
-    await game.settings.set("agone", "systemMigrationVersion", migration.version);
+    // Plusieurs migrations peuvent porter la même version : la version n'est enregistrée
+    // qu'après la dernière, pour qu'un échec de l'une les fasse toutes rejouer (elles sont idempotentes)
+    if (pending[i + 1]?.version !== migration.version) {
+      await game.settings.set("agone", "systemMigrationVersion", migration.version);
+    }
   }
 
   if (pending.length) ui.notifications.info(game.i18n.format("AGONE.Migration.Terminee", { version: game.system.version }));

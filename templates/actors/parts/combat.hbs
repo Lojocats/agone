@@ -14,7 +14,7 @@
           <span class="pdv-current {{#if system.blessuresCritique}}pdv-critique{{/if}}">{{system.pdv.valeur}}</span>
           <span class="pdv-sep">/</span>
           <span class="pdv-max" data-tooltip='{{localize "AGONE.Combat.PdvMaxTooltip" bpdv=bpdv}}'>{{system.pdv.max}}</span>
-          <span class="pdv-label">PdV</span>
+          <span class="pdv-label" data-tooltip='{{localize "AGONE.PdV"}}'>{{localize "AGONE.Abr.PdV"}}</span>
         </div>
         <div class="pdv-track" data-tooltip="{{system.pdv.valeur}} / {{system.pdv.max}}">
           <div class="pdv-fill" style="width:{{pdvPercent}}%;"></div>

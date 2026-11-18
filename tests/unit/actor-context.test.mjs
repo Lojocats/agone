@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 const ctx = await import(fichier("module/sheets/actor-context.mjs"));
 
 const comp = (name, score, domaine = "", extra = {}) => item(name, "competence", { score, domaine, ...extra });
-const sort = (name, typeMagie, seuil, danseurNom = "") => item(name, "sort", { typeMagie, seuil, danseurNom });
+const sort = (name, typeMagie, seuil, danseurId = "") => item(name, "sort", { typeMagie, seuil, danseurId });
 
 describe("competencesParScore", () => {
   test("groupes par score décroissant, compétences dans l'ordre reçu", () => {
@@ -67,26 +67,26 @@ describe("artsMagiquesParDomaine", () => {
 });
 
 describe("sortsContext", () => {
-  const sorts = [sort("S1", "accord", 10), sort("S2", "jorniste", 5), sort("S3", "accord", 5), sort("S4", "geste", 15, "Danseur A")];
+  const sorts = [sort("S1", "accord", 10), sort("S2", "jorniste", 5), sort("S3", "accord", 5), sort("S4", "geste", 15, "dA")];
 
   test("types présents triés, y compris ceux des sorts mémorisés", () => {
-    const { sortTypes } = ctx.sortsContext(acteur(), sorts);
+    const { sortTypes } = ctx.sortsContext(acteur(), sorts, ["dA"]);
     assert.deepEqual(sortTypes.map(t => t.value), ["accord", "geste", "jorniste"]);
   });
 
   test("les sorts mémorisés par un danseur sont hors de la grille", () => {
-    const { sortsBySeuil } = ctx.sortsContext(acteur(), sorts);
+    const { sortsBySeuil } = ctx.sortsContext(acteur(), sorts, ["dA"]);
     assert.ok(!sortsBySeuil.flatMap(g => g.sorts).some(s => s.name === "S4"));
   });
 
   test("tri par type (défaut) : ordre des obédiences puis des domaines", () => {
-    const { triSortsEstType, sortsGroups } = ctx.sortsContext(acteur(), sorts);
+    const { triSortsEstType, sortsGroups } = ctx.sortsContext(acteur(), sorts, ["dA"]);
     assert.ok(triSortsEstType);
     assert.deepEqual(sortsGroups.map(g => g.label), ["AGONE.Jorniste", "AGONE.Accord"]);
   });
 
   test("tri par seuil (flag) : groupes par seuil croissant", () => {
-    const { triSortsEstType, sortsGroups } = ctx.sortsContext(acteur({ triSorts: "seuil" }), sorts);
+    const { triSortsEstType, sortsGroups } = ctx.sortsContext(acteur({ triSorts: "seuil" }), sorts, ["dA"]);
     assert.ok(!triSortsEstType);
     assert.deepEqual(sortsGroups.map(g => g.sorts.map(s => s.name)), [["S2", "S3"], ["S1"]]);
   });
@@ -358,5 +358,71 @@ describe("peupleDepuisRace", () => {
     const { peupleDepuisRace } = await import(fichier("module/helpers/config.mjs"));
     assert.equal(peupleDepuisRace(""), null);
     assert.equal(peupleDepuisRace("Gobelin"), null);
+  });
+});
+
+describe("sortsContext : lien sort → danseur par identifiant", () => {
+  const lie = (name, danseurId, danseurNom = "") => item(name, "sort", { typeMagie: "accord", seuil: 5, danseurId, danseurNom });
+
+  test("un sort lié à un danseur existant est hors de la grille", () => {
+    const { sortsBySeuil } = ctx.sortsContext(acteur(), [lie("A", "d1"), lie("B", "")], ["d1"]);
+    assert.deepEqual(sortsBySeuil.flatMap(g => g.sorts).map(s => s.name), ["B"]);
+  });
+
+  test("danseur supprimé : ses sorts reviennent dans la grille", () => {
+    const { sortsBySeuil } = ctx.sortsContext(acteur(), [lie("A", "disparu", "Ancien danseur")], ["d1"]);
+    assert.deepEqual(sortsBySeuil.flatMap(g => g.sorts).map(s => s.name), ["A"]);
+  });
+
+  test("fiche sans danseurs (PNJ) : tous les sorts sont dans la grille", () => {
+    const { sortsBySeuil } = ctx.sortsContext(acteur(), [lie("A", "d1", "Danseur")]);
+    assert.deepEqual(sortsBySeuil.flatMap(g => g.sorts).map(s => s.name), ["A"]);
+  });
+});
+
+describe("originesDemon", () => {
+  test("origines chromatiques : valeur sans accent ni majuscule, libellé = nom propre", () => {
+    const options = ctx.originesDemon();
+    assert.deepEqual(options.find(o => o.value === "ambre"), { value: "ambre", label: "Ambré" });
+    assert.ok(options.some(o => o.value === "opalin" && o.label === "Opalin"));
+  });
+
+  test("démons intérieurs des paliers : libellé traduit AGONE.Peine.*", () => {
+    assert.equal(ctx.originesDemon().find(o => o.value === "diablotin").label, "AGONE.Peine.diablotin");
+  });
+
+  test("libelleOrigineDemon : jamais de clé de traduction brute pour une origine chromatique", () => {
+    assert.equal(ctx.libelleOrigineDemon("opalin"), "Opalin");
+    assert.equal(ctx.libelleOrigineDemon("jumeauDemoniaque"), "AGONE.Peine.jumeauDemoniaque");
+    assert.equal(ctx.libelleOrigineDemon(""), "");
+    assert.equal(ctx.libelleOrigineDemon("origine maison"), "origine maison");
+  });
+});
+
+describe("optionsAttributLie", () => {
+  test("une option par attribut lié possible, libellé abrégé traduit", () => {
+    const options = ctx.optionsAttributLie();
+    assert.deepEqual(options.map(o => o.value),
+      ["agilite", "force", "perception", "resistance", "intelligence", "volonte", "charisma", "creativite", "melee", "tir"]);
+    assert.equal(options[0].label, "AGONE.Abr.agilite");
+  });
+});
+
+describe("descriptionsEnrichies", () => {
+  const enrichis = [];
+  foundry.applications = { ux: { TextEditor: { implementation: {
+    enrichHTML: async (html, options) => { enrichis.push({ html, options }); return `[${html}]`; },
+  } } } };
+
+  test("chaque description non vide est enrichie, indexée par id d'item, secrets selon le propriétaire", async () => {
+    const items = [
+      item("A", "don", { description: "<p>@UUID[x]</p>" }, { id: "a", isOwner: true }),
+      item("B", "sort", { description: "" }, { id: "b", isOwner: true }),
+      item("C", "pouvoir", { description: "<p>c</p>" }, { id: "c", isOwner: false }),
+    ];
+    const html = await ctx.descriptionsEnrichies(items);
+    assert.deepEqual(html, { a: "[<p>@UUID[x]</p>]", c: "[<p>c</p>]" });
+    assert.deepEqual(enrichis.map(e => e.options.secrets), [true, false]);
+    assert.equal(enrichis[0].options.relativeTo, items[0]);
   });
 });

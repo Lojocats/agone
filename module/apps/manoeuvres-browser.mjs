@@ -25,14 +25,14 @@ export class ManoeuvresBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-manoeuvres-browser",
+    id      : "agone-manoeuvres-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "manoeuvres-browser"],
     position: { width: 980, height: 600 },
     actions : { addManoeuvre: ManoeuvresBrowser.#onAddManoeuvre },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/manoeuvres-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/manoeuvres-browser.hbs", scrollable: [".mb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -40,9 +40,7 @@ export class ManoeuvresBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
-    const actorManNames = new Set(
-      this.actor.items.filter(i => i.type === "manoeuvre").map(i => i.name)
-    );
+    const actorManNames = this._nomsPossedes();
 
     let items = MANOEUVRES_DATA.map((d, idx) => ({
       idx       : String(idx),
@@ -90,15 +88,9 @@ export class ManoeuvresBrowser extends AgoneBrowser {
     await this._addItem({
       name  : d.name,
       type  : "manoeuvre",
-      system: {
-        categorie  : d.categorie   ?? "manoeuvre",
-        ini        : d.ini         ?? 0,
-        att        : d.att         ?? 0,
-        def        : d.def         ?? 0,
-        dom        : d.dom         ?? "0",
-        condition  : d.condition   ?? "",
-        description: d.description ?? "",
-      },
+      system: AgoneBrowser._systemDepuis(d, {
+        categorie: "manoeuvre", ini: 0, att: 0, def: 0, dom: "0", condition: "", description: "",
+      }),
     }, "AGONE.Notif.ManoeuvreAjoutee");
   }
 

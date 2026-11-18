@@ -1,5 +1,7 @@
 import { descriptionBienfaitPeine } from "../../helpers/compendium-data.mjs";
 import { lireChange } from "../../helpers/effets.mjs";
+import { libelleOrigineDemon } from "../actor-context.mjs";
+import { ouvrirEnfant } from "../sheet-helpers.mjs";
 
 /** Seuils du tableau des paliers de Ténèbres, dans l'ordre d'affichage. */
 const SEUILS_TENEBRES = [10, 20, 30, 40, 50, 55, 60, 65, 70, 75, 78, 81, 84, 87, 90, 92, 94, 96, 98, 99, 100];
@@ -36,7 +38,7 @@ function effetsLisiblesPeine(peine) {
 }
 
 /**
- * Onglets Ténèbres & Perfidie : paliers (auto / manuel), bienfaits, conjuration, démons (items et acteurs liés).
+ * Onglets Ténèbres & Perfidie : paliers (auto / manuel), bienfaits, conjuration, démons (acteurs liés).
  */
 export const TenebresMixin = Base => class extends Base {
 
@@ -71,15 +73,20 @@ export const TenebresMixin = Base => class extends Base {
         bienfaitsMap.get(key).sources.push(peine.name);
       }
     }
-    context.bienfaitsActifsPerfidie = [...bienfaitsMap.values()].map(b => {
-      return {
-        ...b,
-        sourceNames : b.sources.join(", "),
-      };
-    });
+    // Descriptions enrichies (liens, jets inline ; secrets selon le propriétaire), en parallèle
+    const enrichir = foundry.applications.ux.TextEditor.implementation;
+    context.bienfaitsActifsPerfidie = await Promise.all([...bienfaitsMap.values()].map(async b => ({
+      ...b,
+      description : b.description
+        ? await enrichir.enrichHTML(b.description, { secrets: actor.isOwner, relativeTo: actor })
+        : b.description,
+      sourceNames : b.sources.join(", "),
+    })));
 
     // ── Démons intérieurs (acteurs liés par UUID) ──────────────────────────
     const demonUUIDs = this.actor.getFlag("agone", "demons") ?? [];
+    // Créer un acteur démon demande la permission Foundry « Créer de nouveaux acteurs »
+    context.peutCreerDemon = game.user.can("ACTOR_CREATE");
     context.demonActors = [];
     for (const dUuid of demonUUIDs) {
       const dActor = await fromUuid(dUuid).catch(() => null);
@@ -88,12 +95,14 @@ export const TenebresMixin = Base => class extends Base {
       const densiteVal = ds.densite?.valeur ?? 0;
       const densiteMax = ds.densite?.max   ?? 0;
       const densitePct = densiteMax > 0 ? Math.round(Math.min(100, (densiteVal / densiteMax) * 100)) : 0;
-      const densiteColor = densitePct >= 75 ? '#4a9a4a' : densitePct >= 50 ? '#8a8a00' : densitePct >= 25 ? '#c06000' : '#9a1a1a';
+      const densiteColor = densitePct >= 75 ? "var(--agone-txt-vert-clair)" : densitePct >= 50 ? "var(--agone-txt-jaune)"
+        : densitePct >= 25 ? "var(--agone-txt-orange-clair)" : "var(--agone-txt-rouge-clair)";
       context.demonActors.push({
         uuid:      dActor.uuid,
         name:      dActor.name,
         img:       dActor.img ?? 'icons/svg/mystery-man.svg',
-        origine:   ds.origine ?? '',
+        // Libellé de l'origine : mêmes options que la fiche Démon (chromatiques et paliers de Ténèbres)
+        origine:   libelleOrigineDemon(ds.origine ?? ''),
         dif:       ds.dif      ?? 0,
         opacite:   ds.opacite  ?? 0,
         melee:     ds.melee    ?? 0,
@@ -129,18 +138,10 @@ export const TenebresMixin = Base => class extends Base {
 
   /** Écouteurs délégués de l'onglet (voir PersonnageSheet#_onRender). */
   _bindTenebresListeners(on, root) {
-    on("click", "[data-action='rollAptitudeConjuration']", this._onRollAptitudeConjuration.bind(this));
     on("click", "[data-action='rollConjurationDemonologie']", this._onRollConjurationDemonologie.bind(this));
     on("click", "[data-action='toggleTenebresModeManuel']", this._onToggleTenebresModeManuel.bind(this));
     on("click", "[data-action='togglePalierManuel']",   this._onTogglePalierManuel.bind(this));
     on("click", "[data-action='toggleBienfaitManuel']", this._onToggleBienfaitManuel.bind(this));
-
-    // Valider / réactiver mode création démon
-    on("click", "[data-action='validerCreationDemon']", this._onValiderCreationDemon.bind(this));
-    on("click", "[data-action='reactiverCreationDemon']", this._onReactiverCreationDemon.bind(this));
-
-    // Édition inline des stats démon
-    on("change", ".demon-inline-num", this._onDemonStatEdit.bind(this));
 
     // Acquérir un bienfait de Perfidie (+1 Perfidie, bienfaitAcquis = true)
     on("click", "[data-action='acquerirBienfait']", this._onAcquerirBienfait.bind(this));
@@ -160,11 +161,6 @@ export const TenebresMixin = Base => class extends Base {
       });
       el.addEventListener("drop", () => el.classList.remove("drag-over"));
     });
-  }
-
-  async _onRollAptitudeConjuration(event) {
-    event.preventDefault();
-    await this.actor.rollAptitudeConjuration();
   }
 
   async _onRollConjurationDemonologie(event) {
@@ -205,9 +201,9 @@ export const TenebresMixin = Base => class extends Base {
     const paliers   = foundry.utils.deepClone(this.actor.getFlag("agone", "paliersManuels") ?? {});
     const wasActive = !!paliers[seuil];
     paliers[seuil]  = !wasActive;
-    await this.actor.setFlag("agone", "paliersManuels", paliers);
 
-    // Si on active un palier démon, créer le démon correspondant s'il n'existe pas encore
+    // Si on active un palier démon, créer le démon correspondant s'il n'existe pas encore.
+    // Le palier n'est enregistré qu'ensuite : si la création échoue, il reste décoché.
     const PALIERS_DEMON = { "10": "diablotin", "30": "demonFacetieux", "70": "jumeauDemoniaque", "92": "siamoisTenebres" };
     const NOM_DEMON = {
       diablotin:        "AGONE.Peine.diablotin",
@@ -227,63 +223,56 @@ export const TenebresMixin = Base => class extends Base {
       });
       if (!alreadyExistsItem && !alreadyExistsActor) {
         const name = game.i18n.localize(NOM_DEMON[origine]) || origine;
-        const newActor = await Actor.create({ name, type: "demon", system: { origine } });
-        if (newActor) {
+        if (!game.user.can("ACTOR_CREATE")) {
+          // Sans le droit de créer un acteur, le palier est coché mais le démon reste à créer par le MJ
+          ui.notifications.warn(game.i18n.format("AGONE.Notif.DemonACreerParMJ", { name }));
+        } else {
+          const newActor = await this._creerDemon({ name, type: "demon", system: { origine } });
+          if (!newActor) return;
           await this.actor.setFlag("agone", "demons", [...linkedUuids, newActor.uuid]);
           ui.notifications.info(game.i18n.format("AGONE.DemonAutoApparu", { name }));
         }
       }
     }
+    await this.actor.setFlag("agone", "paliersManuels", paliers);
   }
 
-  // Démon — valider la création
-  async _onValiderCreationDemon(event) {
-    event.preventDefault();
-    const id    = event.currentTarget.dataset.itemId;
-    const demon = this.actor.items.get(id);
-    if (!demon) return;
-    await demon.update({ "system.modeCreation": false });
-  }
-
-  // Démon — réactiver le mode création
-  async _onReactiverCreationDemon(event) {
-    event.preventDefault();
-    const id    = event.currentTarget.dataset.itemId;
-    const demon = this.actor.items.get(id);
-    if (!demon) return;
-    await demon.update({ "system.modeCreation": true });
-  }
-
-  // Démon — édition inline d'un champ
-  async _onDemonStatEdit(event) {
-    event.preventDefault();
-    const input  = event.currentTarget;
-    const itemId = input.dataset.itemId;
-    const field  = input.dataset.field;
-    const value  = Number(input.value);
-    const demon  = this.actor.items.get(itemId);
-    if (!demon || !field) return;
-    await demon.update({ [`system.${field}`]: value });
+  /**
+   * Crée un acteur démon. Échec (permission refusée par le serveur, erreur de validation…) : erreur
+   * notifiée et `null` renvoyé, sans exception.
+   * @returns {Promise<Actor|null>}
+   */
+  async _creerDemon(data) {
+    try {
+      return (await Actor.create(data)) ?? null;
+    } catch (err) {
+      console.error("Agone | Création du démon impossible", err);
+      ui.notifications.error(game.i18n.localize("AGONE.Notif.DemonCreationEchec"));
+      return null;
+    }
   }
 
   // Démons acteurs — créer / ouvrir / retirer
   async _onCreateDemonActor(event) {
     event.preventDefault();
-    const newActor = await Actor.create({
+    if (!game.user.can("ACTOR_CREATE")) {
+      return ui.notifications.warn(game.i18n.localize("AGONE.Notif.CreationActeurInterdite"));
+    }
+    const newActor = await this._creerDemon({
       name: game.i18n.localize("AGONE.NouveauDemon"),
       type: "demon",
     });
     if (!newActor) return;
     const current = this.actor.getFlag("agone", "demons") ?? [];
     await this.actor.setFlag("agone", "demons", [...current, newActor.uuid]);
-    this.renderChild(newActor.sheet);
+    ouvrirEnfant(this, newActor.sheet);
   }
 
   async _onOpenDemonActor(event) {
     event.preventDefault();
     const uuid  = event.currentTarget.dataset.uuid;
     const actor = await fromUuid(uuid).catch(() => null);
-    if (actor) this.renderChild(actor.sheet);
+    if (actor) ouvrirEnfant(this, actor.sheet);
   }
 
   async _onRemoveDemonActor(event) {
@@ -302,7 +291,7 @@ export const TenebresMixin = Base => class extends Base {
     const { html: description } = descriptionBienfaitPeine(peine);
     const confirmed = await this._confirmChild({
       title  : game.i18n.localize("AGONE.AcquerirBienfait"),
-      content: `<p>${game.i18n.format("AGONE.AcquerirBienfaitConfirm", { bienfait: `<strong>${peine.system.bienfait}</strong>` })}</p>`
+      content: `<p>${game.i18n.format("AGONE.AcquerirBienfaitConfirm", { bienfait: `<strong>${foundry.utils.escapeHTML(peine.system.bienfait)}</strong>` })}</p>`
              + (description ? `<div class="bienfait-perfidie-desc"><em>${description}</em></div>` : ""),
     });
     if (!confirmed) return;

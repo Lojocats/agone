@@ -393,7 +393,7 @@ export function jetsBatch({ describe, it, assert, before, after }) {
     it("mode de jet conservé : un jet secret (gmroll) reste chuchoté de la même façon après relance", async () => {
       const actor7 = await tests.acteur("personnage", { ...PERSO, ph: { valeur: 2, max: 2 } });
       // v14 : core.rollMode est déprécié et ne relaie core.messageMode que de façon asynchrone ;
-      // on règle directement le réglage réel (messageMode en v14, rollMode en v13).
+      // on règle directement le réglage réel (messageMode).
       const v14 = game.settings.settings.has("core.messageMode");
       const cle = v14 ? "messageMode" : "rollMode";
       const modeOriginal = game.settings.get("core", cle);

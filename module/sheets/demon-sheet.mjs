@@ -1,15 +1,11 @@
 import { AgoneActorSheet } from "./agone-actor-sheet.mjs";
-import { caracsParAspect, contexteActeurSimple, jaugePct } from "./actor-context.mjs";
+import { caracsParAspect, contexteActeurSimple, jaugePct, originesDemon } from "./actor-context.mjs";
 
 // Caractéristiques achetables du démon (échelle 0–5) ; la RÉSistance est dérivée de la Densité
 const CARACS_DEMON = ["agilite", "force", "perception", "intelligence", "volonte", "charisma", "creativite"];
 const CARAC_MAX = 5;
 const COUT_CARAC = 2;  // XP par point de caractéristique
 const COUT_COMP  = 1;  // XP par point de compétence
-
-// Origines : couleurs chromatiques (noms propres) + démons intérieurs des paliers de Ténèbres
-const ORIGINES_CHROMATIQUES = ["Opalin", "Azurin", "Saphirin", "Ambré", "Safran", "Carmin", "Vermillon", "Obsidien"];
-const ORIGINES_PALIERS = ["diablotin", "demonFacetieux", "jumeauDemoniaque", "siamoisTenebres"];
 
 /**
  * Feuille de Démon (dont les démons intérieurs créés par les paliers de Ténèbres).
@@ -44,11 +40,8 @@ export class DemonSheet extends AgoneActorSheet {
       c.coutAffiche = c.coutAfficheDown = `${COUT_COMP} XP`;
     }
 
-    const origines = [
-      { value: "", label: "—" },
-      ...ORIGINES_CHROMATIQUES.map(label => ({ value: label.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(), label })),
-      ...ORIGINES_PALIERS.map(value => ({ value, label: game.i18n.localize(`AGONE.Peine.${value}`) })),
-    ];
+    // Origines : couleurs chromatiques + démons intérieurs des paliers de Ténèbres (actor-context.mjs)
+    const origines = [{ value: "", label: "—" }, ...originesDemon()];
 
     return {
       ...context,
@@ -119,9 +112,12 @@ export class DemonSheet extends AgoneActorSheet {
   }
 
   _confirmLevel(key, data) {
+    // Les noms (démon, compétence, stat) sont saisis par l'utilisateur : échappés avant insertion dans le HTML
+    const valeurs = Object.fromEntries(Object.entries({ nom: this.actor.name, ...data })
+      .map(([cle, valeur]) => [cle, typeof valeur === "string" ? foundry.utils.escapeHTML(valeur) : valeur]));
     return this._confirmChild({
       title  : game.i18n.localize("AGONE.LevelUpDemon"),
-      content: `<p>${game.i18n.format(key, { nom: this.actor.name, ...data })}</p>`,
+      content: `<p>${game.i18n.format(key, valeurs)}</p>`,
     });
   }
 

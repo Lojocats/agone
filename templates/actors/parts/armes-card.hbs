@@ -33,7 +33,7 @@
           </label>
         </td>
         <td class="col-arme-name">
-          <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{arme.id}}">{{arme.name}}</span>
+          <span class="roll-btn item-name" data-action="rollItemChat" data-item-id="{{arme.id}}" role="button" tabindex="0" data-tooltip='{{localize "AGONE.EnvoyerChat"}}'>{{arme.name}}</span>
           {{#if (eq arme.system.style "bouclier")}}
           <span class="armure-badge pro-badge">{{localize "AGONE.Combat.Pro"}} {{arme.system.protection}}</span>
           {{#if arme.system.malusAgi}}<span class="armure-badge malus-badge">{{localize "AGONE.Combat.MalusAgi"}} {{arme.system.malusAgi}}</span>{{/if}}

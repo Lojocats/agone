@@ -44,7 +44,7 @@
         <!-- Barre PdV -->
         <div class="cmp-pdv-block">
           <div class="cmp-pdv-line">
-            <span class="cmp-pdv-label">PdV</span>
+            <span class="cmp-pdv-label" data-tooltip='{{localize "AGONE.PdV"}}'>{{localize "AGONE.Abr.PdV"}}</span>
             <span class="cmp-pdv-nums">{{pdvVal}} / {{pdvMax}}</span>
             {{#if bgMalus}}<span class="cmp-bg-malus">{{bgMalus}}</span>{{/if}}
             {{#if bcActive}}<span class="cmp-bc-badge"><i class="fas fa-skull"></i></span>{{/if}}
@@ -57,9 +57,9 @@
         <!-- Blessures graves -->
         {{#if (or bg1 bg2 bg3)}}
         <div class="cmp-bg-row">
-          <span class="cmp-bg-dot {{#if bg1}}bg-active{{/if}}" data-tooltip="BG 1 (-2)">1</span>
-          <span class="cmp-bg-dot {{#if bg2}}bg-active{{/if}}" data-tooltip="BG 2 (-6)">2</span>
-          <span class="cmp-bg-dot {{#if bg3}}bg-active{{/if}}" data-tooltip="BG 3 (-12)">3</span>
+          <span class="cmp-bg-dot {{#if bg1}}bg-active{{/if}}" data-tooltip='{{localize "AGONE.Abr.BlessureGrave" n=1 malus="-2"}}'>1</span>
+          <span class="cmp-bg-dot {{#if bg2}}bg-active{{/if}}" data-tooltip='{{localize "AGONE.Abr.BlessureGrave" n=2 malus="-6"}}'>2</span>
+          <span class="cmp-bg-dot {{#if bg3}}bg-active{{/if}}" data-tooltip='{{localize "AGONE.Abr.BlessureGrave" n=3 malus="-12"}}'>3</span>
         </div>
         {{/if}}
 

@@ -93,11 +93,12 @@
       <div class="demons-block">
         <div class="section-header">
           <h3 class="section-title">{{localize "AGONE.Demons"}}</h3>
-          {{#if isOwner}}
+          {{!-- Créer un acteur démon demande la permission Foundry de création d'acteurs --}}
+          {{#if isOwner}}{{#if peutCreerDemon}}
           <button type="button" data-action="createDemonActor" data-tooltip='{{localize "AGONE.NouveauDemon"}}' aria-label='{{localize "AGONE.NouveauDemon"}}'>
             <i class="fas fa-plus"></i>
           </button>
-          {{/if}}
+          {{/if}}{{/if}}
         </div>
 
         {{#if isOwner}}
@@ -125,10 +126,7 @@
                 <div class="cmp-name-block">
                   <span class="cmp-name">{{name}}</span>
                   {{#if origine}}
-                  <span class="cmp-subtitle">{{localize (concat "AGONE.Peine." origine)}}</span>
-                  {{/if}}
-                  {{#if modeCreation}}
-                  <span class="demon-creation-badge">{{localize "AGONE.EnModeCreation"}}</span>
+                  <span class="cmp-subtitle">{{origine}}</span>
                   {{/if}}
                 </div>
                 {{#if ../isOwner}}

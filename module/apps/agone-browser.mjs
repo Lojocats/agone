@@ -1,6 +1,7 @@
 import { rechercher, comparerPertinence, plagesSurlignage } from "../helpers/recherche.mjs";
 import { lierDescriptions } from "../helpers/descriptions.mjs";
 import { activerClavier } from "../helpers/dom.mjs";
+import { systemDepuis } from "../helpers/filtres-navigateurs.mjs";
 
 /**
  * Base commune des navigateurs Agone (armes, sorts, compétences, peuples…).
@@ -45,7 +46,7 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
 
   /**
    * Contrôles de filtre : { [sélecteur CSS]: spec }.
-   *   kind "text"   — saisie texte (debounce), valeur trimée
+   *   kind "text"   — saisie texte (debounce), valeur brute (espaces retirés seulement pour chercher)
    *   kind "select" — valeur brute du contrôle
    *   kind "number" — entier ou null ; `debounce` pour un champ saisi au clavier
    *   kind "set"    — cases à cocher alimentant un Set
@@ -73,11 +74,16 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
    * indique si les résultats sont approchants (faute de frappe tolérée).
    */
   _applySearch(items, fields = ["name"], { principale = true } = {}) {
-    const r = rechercher(items, this._search, fields);
+    const r = rechercher(items, this._requete, fields);
     this._pertinence ??= new Map();
     for (const [e, s] of r.scores) this._pertinence.set(e, s);
     if (principale) this._rechercheApprox = r.approximatif;
     return r.resultats;
+  }
+
+  /** Recherche courante sans espaces de début ni de fin (la saisie est conservée telle quelle). */
+  get _requete() {
+    return (this._search ?? "").trim();
   }
 
   /** Trie `items` : par pertinence si une recherche est active, puis selon `ordre`. */
@@ -90,6 +96,57 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     super._configureRenderOptions(options);
     this._pertinence = new Map();
     this._rechercheApprox = false;
+    // Valeur des champs de saisie au début du rendu : ce qui est tapé pendant le rendu sera conservé
+    this._saisiesAuRendu = {};
+    if (this.rendered) {
+      for (const selecteur of this._selecteursSaisie()) {
+        const el = this.element?.querySelector(selecteur);
+        if (el) this._saisiesAuRendu[selecteur] = el.value;
+      }
+    }
+  }
+
+  /** Sélecteurs des filtres saisis au clavier (texte, nombre avec debounce). */
+  _selecteursSaisie() {
+    return Object.entries(this.constructor.FILTERS)
+      .filter(([, spec]) => spec.kind === "text" || (spec.kind === "number" && spec.debounce))
+      .map(([selecteur]) => selecteur);
+  }
+
+  /** @override — retient saisies, focus et défilement avant le remplacement du contenu */
+  _preSyncPartState(partId, newElement, priorElement, state) {
+    super._preSyncPartState(partId, newElement, priorElement, state);
+    state.saisies = [];
+    for (const selecteur of this._selecteursSaisie()) {
+      const el = priorElement.querySelector(selecteur);
+      if (!el) continue;
+      const saisie = { selecteur, valeur: el.value, focus: el === document.activeElement };
+      // Tapé pendant le rendu : la valeur du champ n'est plus celle du début du rendu
+      saisie.modifiee = selecteur in (this._saisiesAuRendu ?? {}) && el.value !== this._saisiesAuRendu[selecteur];
+      try { saisie.debut = el.selectionStart; saisie.fin = el.selectionEnd; } catch { /* input number */ }
+      state.saisies.push(saisie);
+    }
+    // La fenêtre défile parfois elle-même (hors de la partie rendue)
+    state.defilementFenetre = this.element?.querySelector(".window-content")?.scrollTop ?? 0;
+  }
+
+  /** @override — restitue la frappe en cours, le focus avec sa position et le défilement */
+  _syncPartState(partId, newElement, priorElement, state) {
+    super._syncPartState(partId, newElement, priorElement, state);
+    for (const { selecteur, valeur, modifiee, focus, debut, fin } of state.saisies ?? []) {
+      const el = newElement.querySelector(selecteur);
+      if (!el) continue;
+      if (modifiee) el.value = valeur;
+      // Un focus demandé explicitement (Échap, effacement des filtres) est géré par _restoreFocus
+      if (!focus || this._refocusSelector) continue;
+      el.focus({ preventScroll: true });
+      if (debut !== null && debut !== undefined) {
+        const max = el.value.length;
+        try { el.setSelectionRange(Math.min(debut, max), Math.min(fin ?? debut, max)); } catch { /* input number */ }
+      }
+    }
+    const fenetre = this.element?.querySelector(".window-content");
+    if (fenetre && state.defilementFenetre) fenetre.scrollTop = state.defilementFenetre;
   }
 
   /** Filtre `items` selon `_filterPossede` ("all" | "oui" | "non") et le prédicat `owned`. */
@@ -106,11 +163,37 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     return isNaN(idx) ? null : (data[idx] ?? null);
   }
 
+  /** Noms des items de l'acteur d'un type donné (par défaut celui du navigateur). */
+  _nomsPossedes(type = this.constructor.ITEM_TYPE) {
+    return new Set(this.actor.items.filter(i => i.type === type).map(i => i.name));
+  }
+
+  /** Données `system` d'un item à partir d'une entrée des tables : voir `systemDepuis`. */
+  static _systemDepuis(entree, defauts) {
+    return systemDepuis(entree, defauts);
+  }
+
+  /**
+   * Exécute un ajout en ignorant les demandes reçues tant qu'il n'est pas terminé :
+   * un double-clic sur un bouton d'ajout ne crée pas deux items.
+   */
+  async _ajoutUnique(ajout) {
+    if (this._ajoutEnCours) return;
+    this._ajoutEnCours = true;
+    try {
+      return await ajout();
+    } finally {
+      this._ajoutEnCours = false;
+    }
+  }
+
   /** Crée un item sur l'acteur, notifie et rafraîchit le navigateur. */
   async _addItem(itemData, notifKey) {
-    await Item.create(itemData, { parent: this.actor });
-    if (notifKey) ui.notifications?.info(game.i18n.format(notifKey, { nom: itemData.name, acteur: this.actor.name }));
-    this.render();
+    return this._ajoutUnique(async () => {
+      await Item.create(itemData, { parent: this.actor });
+      if (notifKey) ui.notifications?.info(game.i18n.format(notifKey, { nom: itemData.name, acteur: this.actor.name }));
+      await this.render();
+    });
   }
 
   // ── Objets personnalisés (monde et compendiums hors système) ──────────────
@@ -129,7 +212,7 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
    */
   async _objetsPersonnalises() {
     const type = this.constructor.ITEM_TYPE;
-    const possedes = new Set(this.actor.items.filter(i => i.type === type).map(i => i.name));
+    const possedes = this._nomsPossedes(type);
     const entrees = game.items
       .filter(i => i.type === type)
       .map(i => ({
@@ -153,7 +236,14 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     let liste = entrees.map(e => ({ ...e, possede: possedes.has(e.name), hasInActor: possedes.has(e.name) }));
     liste = this._applySearch(liste, ["name", "description"], { principale: false });
     liste = this._applyPossede(liste);
-    return this._trier(liste, (a, b) => a.name.localeCompare(b.name, "fr"));
+    this._trier(liste, (a, b) => a.name.localeCompare(b.name, "fr"));
+
+    // Descriptions affichées : enrichies sans les blocs secrets (la recherche porte sur le texte brut)
+    const TextEditor = foundry.applications.ux.TextEditor.implementation;
+    for (const e of liste) {
+      e.descriptionHTML = e.description ? await TextEditor.enrichHTML(e.description, { secrets: false }) : "";
+    }
+    return liste;
   }
 
   /** Ajoute l'objet personnalisé à l'acteur, avec ses effets actifs. */
@@ -162,9 +252,11 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     if (!doc) return;
     // Un peuple s'applique à la fiche (bonus raciaux) au lieu d'être ajouté comme item
     if (doc.type === "peuple" && this.actor.sheet?._applyPeuple) {
-      await this.actor.sheet._applyPeuple(doc);
-      ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: doc.name, acteur: this.actor.name }));
-      return this.render();
+      return this._ajoutUnique(async () => {
+        if (await this.actor.sheet._applyPeuple(doc) === false) return;
+        ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: doc.name, acteur: this.actor.name }));
+        await this.render();
+      });
     }
     const data = doc.toObject();
     delete data._id;
@@ -201,15 +293,16 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
    * bandeau quand les résultats sont approchants (faute de frappe tolérée).
    */
   _afficherRecherche() {
-    if (!this._search) return;
+    const requete = this._requete;
+    if (!requete) return;
     for (const cellule of this.element.querySelectorAll("td[class$='-name'], .browser-perso-nom")) {
-      surligner(cellule, this._search);
+      surligner(cellule, requete);
     }
     const table = this.element.querySelector("table:not(.browser-perso-table)");
     if (this._rechercheApprox && table) {
       const bandeau = document.createElement("div");
       bandeau.className = "browser-recherche-approx";
-      bandeau.innerHTML = `<i class="fas fa-spell-check"></i> ${game.i18n.format("AGONE.Browser.RechercheApprochante", { requete: foundry.utils.escapeHTML(this._search) })}`;
+      bandeau.innerHTML = `<i class="fas fa-spell-check"></i> ${game.i18n.format("AGONE.Browser.RechercheApprochante", { requete: foundry.utils.escapeHTML(requete) })}`;
       table.before(bandeau);
     }
   }
@@ -284,30 +377,30 @@ export class AgoneBrowser extends foundry.applications.api.HandlebarsApplication
     requestAnimationFrame(() => {
       const el = this.element?.querySelector(sel);
       if (!el) return;
-      el.focus();
+      el.focus({ preventScroll: true });
       try { el.setSelectionRange?.(el.value.length, el.value.length); } catch { /* input number */ }
     });
   }
 
   _bindFilter(el, selector, spec) {
-    const update = (value, refocus = false) => {
+    // Le focus et la position du curseur d'un champ saisi sont conservés par _syncPartState
+    const update = value => {
       if (spec.prop) this[spec.prop] = value;
       spec.onChange?.call(this, value);
-      if (refocus) this._refocusSelector = selector;
       this.render();
     };
 
     switch (spec.kind) {
       case "text":
         el.addEventListener("input", foundry.utils.debounce(
-          e => update(e.target.value.trim(), true), spec.debounce ?? 250));
+          e => update(e.target.value), spec.debounce ?? 250));
         break;
       case "select":
         el.addEventListener("change", e => update(e.target.value));
         break;
       case "number": {
         const parse = e => { const v = parseInt(e.target.value); return isNaN(v) ? null : v; };
-        if (spec.debounce) el.addEventListener("input", foundry.utils.debounce(e => update(parse(e), true), spec.debounce));
+        if (spec.debounce) el.addEventListener("input", foundry.utils.debounce(e => update(parse(e)), spec.debounce));
         else               el.addEventListener("change", e => update(parse(e)));
         break;
       }

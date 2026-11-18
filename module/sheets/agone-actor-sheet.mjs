@@ -9,7 +9,9 @@ import { PouvoirsBrowser }   from "../apps/pouvoirs-browser.mjs";
 import { PeinesBrowser }     from "../apps/peines-browser.mjs";
 import { delegate, activerClavier } from "../helpers/dom.mjs";
 import { lierDescriptions } from "../helpers/descriptions.mjs";
-import { bindTabs, bindCompetenceSearch, appliquerLectureSeule } from "./sheet-helpers.mjs";
+import { cibleDepot } from "../helpers/glisser.mjs";
+import { bindTabs, bindCompetenceSearch, appliquerLectureSeule, ouvrirEnfant, confirmerEnfant, editerImage,
+         memoriserFocus, restaurerFocus } from "./sheet-helpers.mjs";
 
 /** Template de la vue limitée, commun à tous les types d'acteur. */
 const TEMPLATE_LIMITEE = "systems/agone/templates/actors/limitee-sheet.hbs";
@@ -47,6 +49,8 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     classes: ["agone", "sheet", "actor"],
     window : { resizable: true },
     form   : { submitOnChange: true },
+    // Portrait : remplace l'action de DocumentSheetV2 (voir editerImage)
+    actions: { editImage: editerImage },
   };
 
   /**
@@ -122,11 +126,26 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     };
   }
 
+  /**
+   * @override
+   * Mémorise le champ focalisé avant le re-rendu : Foundry ne restaure le focus que par `id` ou
+   * `name`, or les champs à gestionnaire dédié (édition en ligne, valeurs de base…) n'en ont pas.
+   */
+  async _renderHTML(context, options) {
+    this._focusMemorise = memoriserFocus(this.element);
+    return super._renderHTML(context, options);
+  }
+
   /** @override */
   _onRender(context, options) {
     super._onRender(context, options);
     this.element.classList.toggle("agone-limitee", this.vueLimitee);
     if (this.vueLimitee) return;
+
+    // Focus (et curseur) rendus au champ en cours de saisie
+    const focus = this._focusMemorise;
+    this._focusMemorise = null;
+    if (focus) requestAnimationFrame(() => restaurerFocus(this.element, focus));
 
     // AbortController : retire les écouteurs du rendu précédent (l'élément racine persiste)
     this._renderSignal?.abort();
@@ -181,7 +200,6 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
    */
   _bindViewListeners(on, root) {
     on("click", ".item-edit", this._onItemEdit.bind(this));
-    on("click", ".item-send-chat", this._onItemSendChat.bind(this));
     on("click", "[data-action='rollItemChat']", this._onItemSendChat.bind(this));
     bindCompetenceSearch(root, on, { nonAcquises: this.constructor.RECHERCHE_NON_ACQUISES });
     on("input", ".smf-search", this._onFiltreSorts.bind(this));
@@ -258,9 +276,9 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
 
   _onItemEdit(event) {
     event.preventDefault();
-    // renderChild : la fiche d'item s'ouvre dans la même fenêtre (pop-out ou non)
+    // La fiche d'item s'ouvre dans la même fenêtre que la fiche (pop-out ou non)
     const item = this._itemFromEvent(event);
-    if (item) this.renderChild(item.sheet);
+    if (item) ouvrirEnfant(this, item.sheet);
   }
 
   async _onItemDelete(event) {
@@ -269,7 +287,7 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     if (!item) return;
     const confirmed = await this._confirmChild({
       title  : game.i18n.localize("AGONE.Supprimer"),
-      content: `<p>${game.i18n.format("AGONE.ConfirmationSuppression", { nom: item.name })}</p>`,
+      content: `<p>${game.i18n.format("AGONE.ConfirmationSuppression", { nom: foundry.utils.escapeHTML(item.name) })}</p>`,
     });
     if (confirmed) await item.delete();
   }
@@ -284,7 +302,10 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     const el    = event.currentTarget;
     const field = el.dataset.field;
     const item  = this.actor.items.get(el.dataset.itemId);
-    const value = el.type === "checkbox" ? el.checked : (isNaN(el.value) ? el.value : Number(el.value));
+    // Seuls les champs numériques sont convertis : un texte vidé reste "" (et non 0)
+    const value = el.type === "checkbox" ? el.checked
+                : el.type === "number"   ? (Number(el.value) || 0)
+                : el.value;
     if (item && field) await item.update({ [field]: value });
   }
 
@@ -339,12 +360,13 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     });
   }
 
-  /** Ligne `.item-row[data-item-id]` du conteneur située sous le pointeur. */
-  _ligneSousPointeur(container, clientY) {
-    return [...container.querySelectorAll(".item-row[data-item-id]")].find(row => {
-      const rect = row.getBoundingClientRect();
-      return clientY >= rect.top && clientY <= rect.bottom;
-    });
+  /**
+   * Ligne `.item-row[data-item-id]` visée par le dépôt : celle sous le pointeur, sinon la plus proche
+   * sur les deux axes (grilles de cartes à plusieurs colonnes), et position avant / après.
+   * @returns {{cible: HTMLElement, avant: boolean}|null}
+   */
+  _cibleReordonnancement(event, container) {
+    return cibleDepot(event, container, ".item-row[data-item-id]");
   }
 
   _effacerMarquesDepot(container) {
@@ -359,11 +381,10 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
     const container = event.currentTarget;
-    const targetRow = this._ligneSousPointeur(container, event.clientY);
+    const depot = this._cibleReordonnancement(event, container);
     this._effacerMarquesDepot(container);
-    if (!targetRow) return;
-    const rect = targetRow.getBoundingClientRect();
-    targetRow.classList.add(event.clientY < rect.top + rect.height / 2 ? "item-drop-above" : "item-drop-below");
+    if (!depot) return;
+    depot.cible.classList.add(depot.avant ? "item-drop-above" : "item-drop-below");
   }
 
   _onDragLeaveItemReorder(event) {
@@ -379,12 +400,11 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
     if (data?.type !== "item-reorder") return;
     const draggedItem = this.actor.items.get(data.itemId);
     if (!draggedItem) return;
-    const targetRow = this._ligneSousPointeur(container, event.clientY);
-    if (!targetRow || targetRow.dataset.itemId === data.itemId) return;
-    const targetItem = this.actor.items.get(targetRow.dataset.itemId);
+    const depot = this._cibleReordonnancement(event, container);
+    if (!depot || depot.cible.dataset.itemId === data.itemId) return;
+    const targetItem = this.actor.items.get(depot.cible.dataset.itemId);
     if (!targetItem || targetItem.type !== draggedItem.type) return;
-    const rect = targetRow.getBoundingClientRect();
-    const sortBefore = event.clientY < rect.top + rect.height / 2;
+    const sortBefore = depot.avant;
     const siblings   = this.actor.items.filter(i => i.type === draggedItem.type && i.id !== draggedItem.id);
     const sortHelper = foundry.utils.SortingHelpers ?? globalThis.SortingHelpers;
     const updates    = sortHelper.performIntegerSort(draggedItem, { target: targetItem, siblings, sortBefore });
@@ -417,28 +437,12 @@ export class AgoneActorSheet extends foundry.applications.api.HandlebarsApplicat
 
   /** Ouvre une application comme enfant de la fiche (suit le pop-out). */
   async _renderChildApp(app) {
-    await this.renderChild(app);
+    await ouvrirEnfant(this, app);
   }
 
-  /** Dialogue de confirmation oui / non ouvert comme enfant de la fiche. */
+  /** Dialogue de confirmation oui / non ouvert comme enfant de la fiche (`content` : HTML déjà échappé). */
   _confirmChild({ title, content }) {
-    return new Promise(resolve => {
-      let settled = false;
-      const settle = (v) => { if (!settled) { settled = true; resolve(v); } };
-      const dialog = new foundry.applications.api.DialogV2({
-        window: { title },
-        content,
-        buttons: [
-          { action: "yes", icon: "fas fa-check", label: game.i18n.localize("Yes"), default: true,
-            callback: () => settle(true) },
-          { action: "no",  icon: "fas fa-times", label: game.i18n.localize("No"),
-            callback: () => settle(false) },
-        ],
-        rejectClose: false,
-      });
-      dialog.addEventListener("close", () => settle(false), { once: true });
-      this.renderChild(dialog);
-    });
+    return confirmerEnfant(this, { title, content });
   }
 
   // ── Jets ───────────────────────────────────────────────────────────────

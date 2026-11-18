@@ -13,15 +13,15 @@
     <i class="fas {{periode.icone}}"></i> {{timeStr}}
   </span>
 
-  <span class="acw-moon" data-tooltip="{{moonPhase.label}}">{{moonPhase.icon}}</span>
+  <span class="acw-moon" data-tooltip="{{moonPhase.label}}"><i class="{{moonPhase.icon}}"></i></span>
 
   {{#if isGM}}
   <button type="button" class="acw-meteo acw-clickable" data-action="cycleMeteo"
           data-tooltip='{{localize "AGONE.Ui.ChangerMeteo"}}'>
-    {{meteoIcon}} <span class="acw-meteo-label">{{meteoLabel}}</span>
+    <i class="{{meteoIcon}}"></i> <span class="acw-meteo-label">{{meteoLabel}}</span>
   </button>
   {{else}}
-  <span class="acw-meteo" data-tooltip="{{meteoLabel}}">{{meteoIcon}}</span>
+  <span class="acw-meteo" data-tooltip="{{meteoLabel}}"><i class="{{meteoIcon}}"></i></span>
   {{/if}}
 
 </div>

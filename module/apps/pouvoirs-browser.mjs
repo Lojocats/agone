@@ -22,13 +22,13 @@ export class PouvoirsBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-pouvoirs-browser",
+    id      : "agone-pouvoirs-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "pouvoirs-browser"],
     actions : { addPouvoir: PouvoirsBrowser.#onAddPouvoir },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/pouvoirs-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/pouvoirs-browser.hbs", scrollable: [".pvb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -36,9 +36,7 @@ export class PouvoirsBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
-    const actorPouvoirNames = new Set(
-      this.actor.items.filter(i => i.type === "pouvoir").map(i => i.name)
-    );
+    const actorPouvoirNames = this._nomsPossedes();
 
     let items = POUVOIRS_DATA.map((d, idx) => ({
       idx         : String(idx),
@@ -73,10 +71,7 @@ export class PouvoirsBrowser extends AgoneBrowser {
     await this._addItem({
       name  : d.name,
       type  : "pouvoir",
-      system: {
-        categorie  : d.categorie   ?? "flamme",
-        description: d.description ?? "",
-      },
+      system: AgoneBrowser._systemDepuis(d, { categorie: "flamme", description: "" }),
     }, "AGONE.Notif.PouvoirAjoute");
   }
 

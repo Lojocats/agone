@@ -28,13 +28,13 @@ export class ArmuresBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-armures-browser",
+    id      : "agone-armures-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "armures-browser"],
     actions : { addArmure: ArmuresBrowser.#onAddArmure },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/armures-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/armures-browser.hbs", scrollable: [".arb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -42,9 +42,7 @@ export class ArmuresBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
-    const actorArmureNames = new Set(
-      this.actor.items.filter(i => i.type === "armure").map(i => i.name)
-    );
+    const actorArmureNames = this._nomsPossedes();
 
     const TYPE_LABELS = {
       "0": game.i18n.localize("AGONE.Armure.VesteSeule"),
@@ -96,13 +94,7 @@ export class ArmuresBrowser extends AgoneBrowser {
     await this._addItem({
       name  : d.name,
       type  : "armure",
-      system: {
-        type       : d.type        ?? "0",
-        protection : d.protection  ?? 0,
-        malusAgi   : d.malusAgi    ?? 0,
-        malusPer   : d.malusPer    ?? 0,
-        description: d.description ?? "",
-      },
+      system: AgoneBrowser._systemDepuis(d, { type: "0", protection: 0, malusAgi: 0, malusPer: 0, description: "" }),
     }, "AGONE.Notif.ArmureAjoutee");
   }
 

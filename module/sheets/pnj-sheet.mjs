@@ -51,16 +51,6 @@ export class PnjSheet extends AgoneActorSheet {
     this._bindSortsListeners(on);
   }
 
-  /**
-   * @override
-   * Une seule armure portée ; ses valeurs alimentent l'armure de la fiche.
-   */
-  async _onArmureItemPorteeChange(event) {
-    await super._onArmureItemPorteeChange(event);
-    const item = event.currentTarget.checked ? this.actor.items.get(event.currentTarget.dataset.itemId) : null;
-    await this.actor.update({
-      "system.armure.protection": item?.system.protection ?? 0,
-      "system.armure.malusAgi":   item?.system.malusAgi   ?? 0,
-    });
-  }
+  // Armure : une seule portée (AgoneActorSheet#_onArmureItemPorteeChange) ; sa protection et son malus
+  // d'AGI sont lus sur l'item à la préparation des données (PnjData, helpers/armure.mjs).
 }

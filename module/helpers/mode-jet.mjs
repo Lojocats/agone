@@ -1,8 +1,8 @@
 /**
- * Mode de jet (public, MJ, aveugle, privé) compatible Foundry v13 et v14.
- * v14 remplace le réglage `core.rollMode` par `core.messageMode` (valeurs public/gm/blind/self)
- * et `ChatMessage.applyRollMode` par `ChatMessage.applyMode`. Le système manipule toujours les
- * noms historiques (publicroll, gmroll, blindroll, selfroll), stockés tels quels dans les drapeaux.
+ * Mode de jet (public, MJ, aveugle, privé).
+ * Foundry v14 lit le réglage `core.messageMode` (valeurs public/gm/blind/self) et applique un mode
+ * avec `ChatMessage.applyMode`. Le système manipule toujours les noms historiques (publicroll,
+ * gmroll, blindroll, selfroll), stockés tels quels dans les drapeaux des messages.
  */
 
 const VERS_MESSAGE = { publicroll: "public", gmroll: "gm", blindroll: "blind", selfroll: "self" };
@@ -20,19 +20,12 @@ export function modeMessage(mode) {
   return VERS_MESSAGE[mode] ?? mode;
 }
 
-/** Vrai si Foundry expose les modes de message v14. */
-function estV14() {
-  return typeof ChatMessage.applyMode === "function" && game.settings.settings.has("core.messageMode");
-}
-
 /** Mode de jet actuellement choisi dans le chat, sous son nom historique. */
 export function modeJetCourant() {
-  const mode = estV14() ? game.settings.get("core", "messageMode") : game.settings.get("core", "rollMode");
-  return modeHistorique(mode) ?? "publicroll";
+  return modeHistorique(game.settings.get("core", "messageMode")) ?? "publicroll";
 }
 
 /** Applique un mode (nom historique ou v14 ; mode courant par défaut) aux données d'un message. */
 export function appliquerModeJet(chatData, mode = modeJetCourant()) {
-  if (estV14()) return ChatMessage.applyMode(chatData, modeMessage(mode));
-  return ChatMessage.applyRollMode(chatData, modeHistorique(mode));
+  return ChatMessage.applyMode(chatData, modeMessage(mode));
 }

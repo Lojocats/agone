@@ -26,13 +26,13 @@ export class PeuplesBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-peuples-browser",
+    id      : "agone-peuples-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "peuples-browser"],
     actions : { applyPeuple: PeuplesBrowser.#onApplyPeuple },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/peuples-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/peuples-browser.hbs", scrollable: [".pb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -75,16 +75,24 @@ export class PeuplesBrowser extends AgoneBrowser {
   static async #onApplyPeuple(event, target) {
     const d = AgoneBrowser._entryFromTarget(target, PEUPLES_DATA, "peupleIdx");
     if (!d) return;
+    return this._ajoutUnique(() => this._appliquerPeuple(d));
+  }
+
+  /** Applique le peuple `d` (entrée de PEUPLES_DATA) à l'acteur. */
+  async _appliquerPeuple(d) {
 
     const pack  = game.packs.get("agone.peuples");
     const entry = pack ? (await pack.getIndex()).find(e => e.name === d.name) : null;
     const item  = entry ? await pack.getDocument(entry._id) : null;
     const sheet = this.actor.sheet;
-    if (item && sheet?._applyPeuple) await sheet._applyPeuple(item);
+    if (item && sheet?._applyPeuple) {
+      // Confirmation refusée : rien n'a changé, pas de notification
+      if (await sheet._applyPeuple(item) === false) return;
+    }
     else                             await this.actor.update({ "system.peuple": d.name });
 
     ui.notifications?.info(game.i18n.format("AGONE.Notif.PeupleApplique", { nom: d.name, acteur: this.actor.name }));
-    this.render();
+    await this.render();
   }
 
 }

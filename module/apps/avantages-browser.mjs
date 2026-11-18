@@ -1,4 +1,5 @@
 import { AVANTAGES_DATA, AVANTAGES_EFFETS } from "../helpers/compendium-data.mjs";
+import { coutCreationTotal } from "../helpers/creation.mjs";
 import { effetsDepuisTable } from "../helpers/effets.mjs";
 import { avecSans } from "../helpers/filtres-navigateurs.mjs";
 import { AgoneBrowser } from "./agone-browser.mjs";
@@ -52,13 +53,13 @@ export class AvantagesBrowser extends AgoneBrowser {
   };
 
   static DEFAULT_OPTIONS = {
-    id      : "agone-avantages-browser",
+    id      : "agone-avantages-browser-{id}",   // {id} : identifiant unique de la fenêtre (une par fiche)
     classes : ["agone", "avantages-browser"],
     actions : { addAvantage: AvantagesBrowser.#onAddAvantage },
   };
 
   static PARTS = {
-    form: { template: "systems/agone/templates/apps/avantages-browser.hbs" },
+    form: { template: "systems/agone/templates/apps/avantages-browser.hbs", scrollable: [".avb-list-wrapper", ".browser-perso"] },
   };
 
   get title() {
@@ -66,15 +67,14 @@ export class AvantagesBrowser extends AgoneBrowser {
   }
 
   async _prepareContext(options) {
-    const actorDonNames = new Set(
-      this.actor.items.filter(i => i.type === "don").map(i => i.name)
-    );
+    const actorDonNames = this._nomsPossedes();
+    const catLabels = _buildCatLabels();
 
     let items = AVANTAGES_DATA.map((d, idx) => ({
       idx        : String(idx),
       name       : d.name,
       section    : d.categorie,
-      sectionLabel: _buildCatLabels()[d.categorie] ?? d.categorie,
+      sectionLabel: catLabels[d.categorie] ?? d.categorie,
       type       : d.type,
       charge     : d.charge,
       chargeAbs  : Math.abs(d.charge),
@@ -119,21 +119,23 @@ export class AvantagesBrowser extends AgoneBrowser {
       filterPrerequis   : this._filterPrerequis,
       filterEffet       : this._filterEffet,
       allCharges,
-      sections          : Object.entries(_buildCatLabels()).map(([k, v]) => ({ key: k, label: v })),
+      sections          : Object.entries(catLabels).map(([k, v]) => ({ key: k, label: v })),
     };
   }
 
   static async #onAddAvantage(event, target) {
     const d = AgoneBrowser._entryFromTarget(target, AVANTAGES_DATA, "avIdx");
     if (!d) return;
+    return this._ajoutUnique(() => this._ajouterAvantage(d));
+  }
+
+  /** Ajoute l'avantage ou le défaut `d` (entrée de AVANTAGES_DATA), compensation de création comprise. */
+  async _ajouterAvantage(d) {
 
     // ----- Validation : effets négatifs sur stats primaires -----
     const PRIMAIRES   = ['agilite','force','perception','resistance','intelligence','volonte','charisma','creativite','corps','esprit','ame'];
     const effets      = AVANTAGES_EFFETS[d.name] ?? [];
     const sd          = this.actor.system;
-    const tbl         = CONFIG.AGONE?.tableAchatCreation ?? [0,1,2,3,4,5,7,10,14,19,25];
-    const lastDelta   = tbl[tbl.length-1] - tbl[tbl.length-2];
-    const creaTotal   = (n) => n <= 0 ? 0 : n < tbl.length ? tbl[n] : tbl[tbl.length-1] + (n - (tbl.length - 1)) * lastDelta;
     const update      = {};
 
     for (const effet of effets) {
@@ -147,7 +149,7 @@ export class AvantagesBrowser extends AgoneBrowser {
         const racialBonus = sd.peupleBonusApplique?.[`${k}Bonus`] ?? 0;
         const dbStored    = (sd[k]?.score ?? 0) - (sd[k]?.avantageBonus ?? 0);
         const rawBase     = Math.max(0, dbStored - racialBonus);
-        const cost        = creaTotal(rawBase + deficit) - creaTotal(rawBase);
+        const cost        = coutCreationTotal(rawBase + deficit) - coutCreationTotal(rawBase);
         const depense     = update["system.ptsCreationCarac.depense"] ?? sd.ptsCreationCarac.depense;
         const available   = sd.ptsCreationCarac.max - depense;
         if (cost <= available) {
@@ -188,7 +190,7 @@ export class AvantagesBrowser extends AgoneBrowser {
     }, { parent: this.actor });
 
     ui.notifications?.info(game.i18n.format("AGONE.Notif.AvantageAjoute", { nom: d.name, acteur: this.actor.name }));
-    this.render();
+    await this.render();
   }
 
 }

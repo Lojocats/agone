@@ -4,6 +4,8 @@
  */
 
 import { peupleDepuisRace } from "../helpers/config.mjs";
+import { malusBlessuresGraves } from "../helpers/derivations.mjs";
+import { armureEffective, bouclierEffectif } from "../helpers/armure.mjs";
 
 const fields = foundry.data.fields;
 
@@ -20,6 +22,12 @@ function appliquerEffetsCaracs(model, keys) {
   const fx = model.parent?.flags?.agone?.effets ?? {};
   for (const k of keys) model[k] = Math.max(0, (model[k] ?? 0) + (fx[k] ?? 0));
   return fx;
+}
+
+/** Nombre de blessures graves cochées et malus associé (table CONFIG.AGONE.malusBlessuresGraves). */
+function deriverBlessuresGraves(model) {
+  model.blessuresGraves = (model.blessureGrave1 ? 1 : 0) + (model.blessureGrave2 ? 1 : 0) + (model.blessureGrave3 ? 1 : 0);
+  model.malusBlessureGrave = malusBlessuresGraves(model.blessuresGraves);
 }
 
 export class PersonnageData extends foundry.abstract.TypeDataModel {
@@ -356,11 +364,8 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     this.initMagique    = this.initiative + 10;
     this.defenseNaturelle = this.agilite.score + this.bonusCorps;
 
-    // Aptitudes magiques
-    // Arts Magiques (Jorniste / Obscurantiste / Éclipsiste) : CRÉ x 2
-    this.aptitudeArtsMagiques = this.creativite.score * 2;
-    // Harmoniste (Accord / Cyse / Décorum / Geste) : ART x 2 = (CHA + CRÉ)
-    this.aptitudeConjuration  = this.art * 2;
+    // Aptitudes magiques (aptitudeArtsMagiques, aptitudeConjuration, aptitudeEmprise) : dépendent des
+    // compétences de l'acteur, calculées par AgoneActor#_deriverStatsCompetences après les effets.
 
     // Seuils PdV
     this.seuilBlessureGrave    = Math.max(1, Math.floor(this.pdv.max / 3));
@@ -387,11 +392,14 @@ export class PersonnageData extends foundry.abstract.TypeDataModel {
     };
 
     // Malus Blessures Graves
-    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
-    const malusTable = [0, -2, -6, -12];
-    this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    deriverBlessuresGraves(this);
 
-    // malusPer stocké directement sur l'item (0 / 1 / 3 selon couverture), pas dérivé ici
+    // Armure et bouclier : valeurs lues sur les items portés (transitoire) ; les valeurs stockées ne
+    // servent que sans aucun item d'armure / de bouclier. Les items sont déjà préparés à ce stade.
+    const itemsPortes = this.parent?.items ?? [];
+    Object.assign(this.armure, armureEffective(this.armure, itemsPortes));
+    Object.assign(this.bouclier, bouclierEffectif(this.bouclier, itemsPortes));
+    // malusPer : fixé par la couverture de l'armure (0 / 1 / 3), voir ArmureData
     this.armure._malusAgiActif = this.armure.portee ? -this.armure.malusAgi : 0;
     this.armure._malusPerActif  = this.armure.portee ? -this.armure.malusPer : 0;
 
@@ -436,9 +444,7 @@ export class CompagnonData extends foundry.abstract.TypeDataModel {
     this.demiCharge = Math.floor(this.chargeMax / 2);
     this.chargeJour = Math.floor(this.chargeMax / 4);
     this.defenseNaturelle = this.agilite + (fx.defense_bonus ?? 0);
-    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
-    const malusTable = [0, -2, -6, -12];
-    this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    deriverBlessuresGraves(this);
     // Alias de compatibilité modules (Health Estimate, etc.) qui cherchent attributes.hp
     this.pdv.value = this.pdv.valeur;
     this.pdv.min   = 0;
@@ -527,9 +533,7 @@ export class DemonData extends foundry.abstract.TypeDataModel {
     this.demiCharge  = Math.floor(this.chargeMax / 2);
     this.chargeJour  = Math.floor(this.chargeMax / 4);
     // Blessures graves
-    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
-    const malusTable = [0, -2, -6, -12];
-    this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    deriverBlessuresGraves(this);
     // Alias token bar
     this.densite.value = this.densite.valeur;
     this.densite.min   = 0;
@@ -614,9 +618,11 @@ export class PnjData extends foundry.abstract.TypeDataModel {
     this.bonusAme    = this.ame;
     if (this.corps + this.esprit + this.ame > 0)
       this.flamme = Math.min(this.corps, this.esprit, this.ame);
-    this.blessuresGraves = (this.blessureGrave1 ? 1 : 0) + (this.blessureGrave2 ? 1 : 0) + (this.blessureGrave3 ? 1 : 0);
-    const malusTable = [0, -2, -6, -12];
-    this.malusBlessureGrave = malusTable[this.blessuresGraves];
+    deriverBlessuresGraves(this);
+    // Armure : valeurs lues sur les armures portées (transitoire) ; la saisie stockée ne sert que sans item d'armure
+    const armure = armureEffective(this.armure, this.parent?.items ?? []);
+    this.armure.protection = armure.protection ?? 0;
+    this.armure.malusAgi   = armure.malusAgi   ?? 0;
     // Alias de compatibilité modules (Health Estimate, etc.) qui cherchent attributes.hp
     this.pdv.value = this.pdv.valeur;
     this.pdv.min   = 0;
