@@ -29,7 +29,7 @@ jobs:
       nouveau: ${{ steps.lire.outputs.nouveau }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0  # tags existants
 
@@ -54,7 +54,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Créer et pousser le tag
         env:
